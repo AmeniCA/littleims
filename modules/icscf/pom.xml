@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.cipango.littleims</groupId>
+    <artifactId>littleims-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <artifactId>littleims-icscf</artifactId>
+  <packaging>war</packaging>
+  <name>littleIMS :: I-CSCF</name>
+  <url>http://www.nexcom.fr</url>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.cipango</groupId>
+        <artifactId>maven-cipango-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <systemProperty>
+              <name>icscf.port</name>
+              <value>5070</value>
+            </systemProperty>
+            <systemProperty>
+              <name>jetty.port</name>
+              <value>8090</value>
+            </systemProperty>
+          </systemProperties>
+          <stopKey>foo</stopKey>
+          <stopPort>9998</stopPort>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+       <groupId>org.cipango.littleims</groupId>
+       <artifactId>littleims-common</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+       <groupId>org.cipango.littleims</groupId>
+       <artifactId>littleims-hss</artifactId>
+       <version>${project.version}</version>
+       <scope>runtime</scope>
+    </dependency>
+     <dependency>
+       <groupId>org.springframework</groupId>
+       <artifactId>spring</artifactId>
+     </dependency>
+  </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>copy-jetty</id>
+      <activation>
+        <property>
+          <name>jetty</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete includeemptydirs="true">
+                      <fileset dir="${jetty.home}/sipapps" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
+                      <fileset dir="${jetty.home}/etc" includes="i-cscf.xml"/>
+                    </delete>
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <phase>install</phase>
+                <configuration>
+                  <tasks>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/sipapps"/>
+                    <copy todir="${jetty.home}/etc">
+                      <fileset dir="etc"/>
+                    </copy>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles> 
+
+</project>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<users>
+	<public id="sip:bob@cipango.org">
+		<private id="bob_private" password="bob" operatorId="0000000000000000000000000000000"/>
+	</public>
+	<public id="sip:alice@cipango.org">
+		<private id="alice_private" password="alice" operatorId="0000000000000000000000000000000"/>
+	</public>
+	<public id="sip:carol@cipango.org">
+		<private id="carol_private" password="carol" operatorId="0000000000000000000000000000000"/>
+	</public>
+</users>

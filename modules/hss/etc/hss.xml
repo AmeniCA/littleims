@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+			http://www.springframework.org/schema/util 
+			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+<!--  
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${jetty.home}/etc/littleims.properties</value>
+			</list>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
+
+	<bean id="hssDao"
+		class="org.cipango.littleims.hss.FileHssDao"
+		init-method="init">
+		<property name="hssDirectory" value="file://${jetty.home}/hss" />
+	</bean>
+
+	<bean id="cx" class="org.cipango.littleims.hss.FileHSS">
+		<property name="dao" ref="hssDao" />
+		<property name="realm" value="cipango.org" />
+		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.port}" />
+	</bean>
+-->
+
+	<bean id="dataSource" class="org.hsqldb.jdbc.jdbcDataSource">
+		<property name="database"
+			value="jdbc:hsqldb:file:db/hss;shutdown=true"/>
+		<property name="user" value="sa" />
+		<property name="password" value="" />
+	</bean>
+	
+	<bean id="namingStrategy" class="org.cipango.ims.hss.util.CustomNamingStrategy"/>
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt"/>
+	
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.HSQLDialect
+				</prop>
+	
+				<!--  <prop key="hibernate.current_session_context_class">thread</prop>  -->
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.NoCacheProvider
+				</prop>
+			</props>
+		</property>
+		<property name="namingStrategy"><ref bean="namingStrategy"/></property>
+	</bean>	
+	
+	<bean id="subscriptionDao" class="org.cipango.ims.hss.db.hibernate.SubscriptionDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="privateIdentityDao" class="org.cipango.ims.hss.db.hibernate.PrivateIdentityDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="publicIdentityDao" class="org.cipango.ims.hss.db.hibernate.PublicIdentityDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="scscfDao" class="org.cipango.ims.hss.db.hibernate.ScscfDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="hss" class="org.cipango.ims.hss.Hss">
+		<property name="privateIdentityDao" ref="privateIdentityDao"></property>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--  
+	<bean id="hss" 
+		class="org.cipango.ims.hss.HSS">
+		<property name="transactionTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate">
+				<property name="transactionManager" ref="transactionManager"/>
+			</bean>
+		</property>
+		
+		<property name="dao" ref="subscriptionDAO"/>
+	</bean>
+	-->
+</beans>

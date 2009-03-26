@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sip-app	xmlns="http://www.jcp.org/xml/ns/sipservlet"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+					version="1.1">
+	<app-name>org.cipango.littleims.pcscf</app-name>
+
+	<main-servlet>pcscf</main-servlet>
+	<display-name>LittleIMS: P-CSCF</display-name>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			file:${jetty.home}/etc/p-cscf.xml
+		</param-value>
+	</context-param>
+		
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+
+	<servlet>
+		<servlet-name>pcscf</servlet-name>
+		<servlet-class>org.cipango.littleims.pcscf.PcscfServlet</servlet-class>
+		<load-on-startup/>
+	</servlet>
+
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+
+</sip-app>

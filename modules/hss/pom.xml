@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.cipango.littleims</groupId>
+    <artifactId>littleims-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <artifactId>littleims-hss</artifactId>
+  <packaging>war</packaging>
+  <name>littleIMS :: HSS</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango</groupId>
+      <artifactId>cipango-diameter</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate</artifactId>
+      <version>3.2.6.ga</version>
+    </dependency> 
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.3.1.GA </version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>3.3.1.ga</version>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>copy-jetty</id>
+      <activation>
+        <property>
+          <name>jetty</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete includeemptydirs="true">
+                      <fileset dir="${jetty.home}/webapps-diameter" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
+                      <fileset dir="${jetty.home}/etc" includes="hss.xml"/>
+                    </delete>
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <phase>install</phase>
+                <configuration>
+                  <tasks>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/webapps-diameter"/>
+                    <copy todir="${jetty.home}/etc">
+                      <fileset dir="etc"/>
+                    </copy>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>log4j</groupId>
+                      <artifactId>log4j</artifactId>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${jetty.home}/lib/ext</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles> 
+
+</project>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.springframework.org/schema/util 
+			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${jetty.home}/etc/littleims.properties</value>
+			</list>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
+	
+	<bean id="sipFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
+	</bean>
+	
+	<bean id="diameterFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="org.cipango.diameter.DiameterFactory" />
+	</bean>
+	
+	<bean id="customEditorConfigurator" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="javax.servlet.sip.SipURI">
+					<bean id="SipUriEditor" class="org.cipango.littleims.util.SipUriEditor">
+						<property name="sipFactory" ref="sipFactory" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="cdf" 
+			class="org.cipango.littleims.scscf.charging.CDF">
+		<property name="chargingDirectory" value="${jetty.home}/charging" />
+		<property name="enabled" value="false" />
+	</bean>
+	
+	<bean id="cxManager"
+		class="org.cipango.littleims.scscf.cx.CxManager">
+		<property name="diameterFactory" ref="diameterFactory" />
+		<property name="hssRealm" value="${hss.realm}" />
+		<property name="hssHost" value="${hss.host}" />
+		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.port}" />
+	</bean>
+
+	<bean id="userProfileCache" class="org.cipango.littleims.scscf.data.UserProfileCache">
+		<!--
+		Shared IFCs URL
+		-->
+		<property name="sharedIfcsUrl" value="file://${jetty.home}/hss/ifcs.xml" />
+	</bean>
+	
+	<bean id="registrar" 
+			class="org.cipango.littleims.scscf.registrar.Registrar"
+			init-method="init">
+		<!-- 
+		S-CSCF policy for minimun registration time in seconds
+		-->
+		<property name="minExpires" value="60" />
+		<!-- 
+		S-CSCF policy for maximum registration time in seconds
+		-->
+		<property name="maxExpires" value="3600" />
+		<!--
+		List of realms managed by this server.
+		If a REGISTER is received with a domain not present in this list, it is refused
+		with code "403 Forbidden".
+		-->
+		<property name="realms">
+			<list>
+				<value>cipango.org</value>
+			</list>
+		</property>
+		<!--
+		This URI is used for building service-route header of REGISTER 200 OK. 
+		Must match with IP address and port on which S-SCF is listening.
+		
+		Default: sip:scscf@${scscf.host}:${scscf.port}
+		-->
+		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.port}" />
+		
+		<!--
+		Maximum number of users that can be registered at the same time.
+		When this number is reached, new registration are refused with code "503 Service unavailable".
+		This number is unlimited if set to -1
+		-->
+		<property name="maxUsers" value="-1" />
+		<property name="cxManager" ref="cxManager" />
+		<property name="userProfileCache" ref="userProfileCache" />
+		<property name="cdf" ref="cdf" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+	
+	<bean id="regEventManager" 
+			class="org.cipango.littleims.scscf.registrar.regevent.RegEventManager"
+			init-method="start">
+		<property name="registrar" ref="registrar" />
+	</bean>
+		
+	<bean id="enumClient" 
+			class="org.cipango.littleims.scscf.session.EnumClient">
+		<property name="domain" value="e164.org" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+	
+	<!--
+	Policy to accept of refused media function of request and user profile
+	Values possible:
+		org.cipango.littleims.scscf.media.NullPolicy: accept all requests
+	-->
+	<bean id="mediaPolicy" 
+			class="org.cipango.littleims.scscf.media.NullPolicy">
+	</bean>
+	
+	<bean id="authenticator" 
+			class="org.cipango.littleims.scscf.registrar.ImsAuthenticator">
+		<property name="cxManager" ref="cxManager" />
+		<property name="sipFactory" ref="sipFactory" />
+		<property name="realm" value="scscf.cipango.org" />
+	</bean>
+	
+	<bean id="sessionManager" 
+			class="org.cipango.littleims.scscf.session.SessionManagerImpl"
+			init-method="init">
+		<!--
+		This URI is used to push own route after AS processing
+		Must match with IP address and port on which S-SCF is listening.
+		
+		Default: sip:scscf@${scscf.host}:${scscf.port}
+		-->
+		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.port}" />
+		<!--
+		This URI is used by S-CSCF function for routing outgoing request to terminating 
+		"network" (i.e. I-CSCF node)
+		If this parameter is not present, the Request-URI is used thanks DNS or etc/host
+		file for resolving domain name. 
+		
+		Default: sip:icscf@${icscf.host}:${icscf.port}
+		-->
+		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.port}" />
+		
+		<!--
+		Requests are routed to the SIP element defined by this SIP URI:
+			- In originating mode, when request-URI is a tel URI and enum resolution 
+			has failed 
+			- In terminating mode, when no profile is found and request-URI user part 
+		starts with a digit or a '+'.
+		-->
+		<property name="bgcfUri" value="sip:bgcf@${bgcf.host}:${bgcf.port}" />
+		<!-- 
+		If terminatingDefault set to false and "term" is present in the route, the request is treated as terminating.
+		If terminatingDefault set to false and "term" is not present in the route, the request is treated as originating.
+		
+		If terminatingDefault set to true and "orig" is present in the route, the request is treated as originating.
+		If terminatingDefault set to true and "orig" is not present in the route, the request is treated as terminating.
+		-->
+		<property name="terminatingDefault" value="true" />
+		<property name="registrar" ref="registrar" />
+		<property name="mediaPolicy" ref="mediaPolicy" />
+		<property name="cdf" ref="cdf" />
+		<property name="sipFactory" ref="sipFactory" />
+		<property name="userProfileCache" ref="userProfileCache" />
+		<property name="cxManager" ref="cxManager" />
+	</bean>
+	
+	
+</beans>
+
