@@ -16,12 +16,16 @@ package org.cipango.ims.hss.db.hibernate;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractHibernateDao<T>
 {
@@ -67,4 +71,31 @@ public abstract class AbstractHibernateDao<T>
     {
         return _entityClass;
     }
+    
+    public int count() {
+		Criteria criteria = currentSession().createCriteria(_entityClass);
+		criteria.setProjection(Projections.rowCount());
+		return (Integer) criteria.uniqueResult();
+	}
+    
+    @SuppressWarnings("unchecked")
+	public Iterator<T> iterator(int first, int count, String sort, boolean sortAsc) 
+    {
+    	StringBuilder sql = new StringBuilder();
+    	sql.append("FROM ").append(_entityClass.getName());
+		if (sort != null && !sort.trim().equals("")) {
+			sql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		}
+		Query query = currentSession().createQuery(sql.toString());
+		if (count > 0)
+			query.setMaxResults(count);
+		query.setFirstResult(first);
+    	return query.list().iterator();
+	}
+    
+    @Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void delete(T o) {
+		currentSession().delete(o);
+	}
+
 }

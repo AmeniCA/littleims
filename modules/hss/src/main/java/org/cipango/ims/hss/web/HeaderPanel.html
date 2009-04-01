@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title wicket:id="page.title">Kaleo</title>
+    <wicket:link>
+    	<link rel="stylesheet" href="style.css" />
+    </wicket:link>
+</head>   
+<body>
+<wicket:panel>
+    <div id="header">
+    	<wicket:link>
+    	<div id="nav-container">
+	    	<ul id="nav">
+	    		<li>
+	    			<a><wicket:message key="headerPanel.users">Users</wicket:message></a>
+	    			<ul>
+		    			<li>
+							<a href="/org/cipango/ims/hss/web/subscription/SubscriptionBrowserPage.html">
+								<wicket:message key="headerPanel.subscriptions">Subscriptions</wicket:message>
+							</a>
+						</li>
+	    				<li>
+	    					<a href="/org/cipango/ims/hss/web/privateid/PrivateIdBrowserPage.html">
+	    						<wicket:message key="headerPanel.privateIds">Private identities</wicket:message>
+	    					</a>
+	    				</li>
+	    				<li>
+	    					<a href="/org/cipango/ims/hss/web/publicid/PublicIdBrowserPage.html">
+	    						<wicket:message key="headerPanel.publicIds">Public identities</wicket:message>
+	    					</a>
+	    				</li>
+	    			</ul>
+	    		</li>
+	    	</ul>
+	    </div>
+    	</wicket:link>
+    </div>
+</wicket:panel>     
+</body>
+</html>

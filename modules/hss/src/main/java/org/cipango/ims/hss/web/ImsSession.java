@@ -11,19 +11,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web;
 
-package org.cipango.ims.hss.db;
+import java.util.Hashtable;
 
-import java.util.List;
+import org.apache.wicket.Page;
+import org.apache.wicket.Request;
+import org.apache.wicket.protocol.http.WebSession;
 
-import org.cipango.ims.hss.model.PrivateIdentity;
 
-public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
-{
-	void save(PrivateIdentity impi);
+
+public class ImsSession extends WebSession {
+
+	private Hashtable<Class<?>, Page> backPages = new Hashtable<Class<?>, Page>();
+
+
+	public ImsSession(Request request) {
+		super(request);
+	}
+
+
+	@Override
+	protected void detach() {
+		super.detach();
+	}
+
+	public void setBackPage(Class<?> clazz, Page page) {
+		backPages.put(clazz, page);
+	}
 	
-	PrivateIdentity findById(String id);
-	List<PrivateIdentity> findAll();
+	public Page getBackPage(Class<?> clazz) {
+		return backPages.get(clazz);
+	}
 	
-	public void delete(PrivateIdentity privateIdentity);
 }

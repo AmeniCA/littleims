@@ -17,6 +17,7 @@ package org.cipango.ims.hss.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -44,10 +45,10 @@ public class PrivateIdentity
 	private byte[] _sqn;
 	
 	@ManyToOne
-	@JoinColumn (nullable = false)
+	@JoinColumn (nullable = true)
 	private Subscription _subscription;
 	
-	@OneToMany (mappedBy = "_privateIdentity")
+	@OneToMany (mappedBy = "_privateIdentity", cascade = { CascadeType.ALL })
 	private Set<PublicPrivate> _publicIdentities = new HashSet<PublicPrivate>();
 	
 	@ManyToMany
@@ -111,6 +112,7 @@ public class PrivateIdentity
 	public void setSubscription(Subscription subscription)
 	{
 		_subscription = subscription;
+		subscription.getPrivateIdentities().add(this);
 	}
 
 	public Set<PublicPrivate> getPublicIdentities()
@@ -123,9 +125,9 @@ public class PrivateIdentity
 		_publicIdentities = publicIdentities;
 	}
 	
-	public void addPublicId(PublicIdentity publicId)
+	public PublicPrivate addPublicId(PublicIdentity publicId)
 	{
-		new PublicPrivate(publicId, this);
+		return new PublicPrivate(publicId, this);
 	}
 	
 	public String toXml()

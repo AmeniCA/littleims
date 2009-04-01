@@ -1,0 +1,204 @@
+body {
+	font-family:verdana,Arial,verdana,Helvetica,sans-serif;
+    font-size:12px;
+    font-size-adjust:none;
+    font-style:normal;
+    font-variant:normal;
+    font-weight:normal;
+    line-height:normal;
+    padding: 0px;
+    margin: 0px;
+}
+
+#contentContainer {
+}
+
+#content {
+     margin: 8px;
+     margin-left:10em;
+}
+
+#footer {
+	padding: 20px 22px 20px 22px;
+	clear: both;
+	font-size: 80%;
+}
+
+th { background:#0068B2 none repeat scroll 0% 50%; color:#FFFFFF; font-weight:bold; line-height: 120%; text-align:left; }
+tr.odd { background-color: #ECF2F6; }
+tr.even { background-color: #FFFFFF; }
+
+
+/* ------------------------------------------------------------------------- */
+/*                                Wicket                                     */
+/* ------------------------------------------------------------------------- */
+
+.dataDetails th { text-align:left; vertical-align:top; color: black; background:white; font-weight:normal; white-space:nowrap; padding:3px; }
+.dataDetails .description { color:#555555; padding:4px 0px;}
+.dataDetails .defaultValue { font-style:italic; margin:0px 30px; }
+.dataDetails ul {padding:0pt; margin: 0px;}
+.dataDetails li {list-style: none; padding: 2px;}
+
+.feedbackPanelERROR { color:#FF0000; }
+.feedbackPanelWARNING { color:#FF0000; }
+.feedbackPanelINFO { }
+.feedback li {list-style: none;}
+
+
+table.filteredTable tr th { padding: 3px 24px 3px 8px; text-align: left; white-space: nowrap; vertical-align: middle;}
+table.filteredTable tr th a { padding-right: 15px; background-position: right; background-repeat:no-repeat; color:white; text-decoration: none; }
+table.filteredTable tr th.wicket_orderDown a { background-image: url(arrow_down.png); }
+table.filteredTable tr th.wicket_orderUp a { background-image: url(arrow_up.png); }
+table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.png); }
+
+.filter { background-color:#fffff0; border:1px solid #BBBBBB; padding:5px 30px;}
+.filter li {list-style: none; display: inline; padding: 30px;}
+
+.editUserGroup div { display:inline; padding:10px 40px; float:left;}
+.editUserGroup div li {list-style: none; padding:5px; text-align:center;}
+
+#quicklinks {clear:right; float:right; margin:5px 0pt; padding:5px; width:15em;}
+#quicklinks li {list-style: none;}
+
+.longInput {width:20em; }
+
+#bysy_indicator {
+  display: none;
+  background: rgb(255,241,168);
+  margin-top: 5px;
+  z-index: 1000;
+  width: 200;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/*                                Menu                                       */
+/* ------------------------------------------------------------------------- */
+
+#header { }
+
+#statusBar { height:20px; line-height:20px; padding: 0; text-align:right; margin: 0px 10px 0px 0px; font-size:8pt; vertical-align:bottom;}
+#statusBar .link-delimiter {padding:0px 4px; color: #A0A0A0;}
+
+#contextMenu {width:200px; float:left; min-width:10em;}
+#contextMenu ul {padding:0pt 0pt 0pt 15pt; }
+#contextMenu li { list-style-image:none; list-style-position:outside; list-style-type:square; padding:5px 0pt;}
+#contextMenu ul li ul {padding:0pt 0pt 0pt 5pt; }
+#contextMenu a {text-decoration: none; color:#000000; }
+#contextMenu a:hover {text-decoration: underline; }
+
+#nav-container {
+    font-size:10px;
+ color: #FFFFFF;
+ background-image:url(bg_menu.gif);
+ background-position:center center;
+ background-repeat:repeat-x;
+ height:32px;
+ line-height:32px;
+ text-align:center;
+ vertical-align:middle;
+}
+
+#nav, #nav ul {
+    float: left;
+    list-style: none;
+    line-height: 1;
+    font-weight: bold;
+    padding: 0;
+    border-width: 1px 0;
+    margin: 0 0 0em 0;
+    text-align:left;
+}
+
+
+
+#nav a, #nav em {
+    display: block;
+    width: 13em;
+    w\idth: 8.8em;
+    color: #FFF;
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 0.25em 2em;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 0.9em 1em;
+    white-space:nowrap;
+    border-right: 1px solid #C7E0F0;
+}
+
+#nav a:hover, #nav em:hover {color:#E9EAEC;}
+
+#nav li {
+    float: left;
+    padding: 0;
+    width: 12em;
+}
+
+#nav li ul {
+    position: absolute;
+    left: -999em;
+    height: auto;
+    width: 14.4em;
+    w\idth: 13.9em;
+    font-weight: normal;
+    border-width: 0.25em;
+    margin: 0;
+}
+
+#nav li li {
+    padding-right: 1em;
+    width: 13em
+}
+
+#nav li ul a, #nav li ul em {
+    width: 15em;
+    w\idth: 10em;
+    color: #1F84DB;
+    margin: 0 0 2px 0;
+    border-right: 0px solid #FFF;
+    border-bottom: 1px solid #ccc;
+    text-transform: none;
+}
+
+#nav li ul{
+background:#ECF2F6;
+
+}
+
+
+#nav li ul ul {
+    margin: -1.75em 0 0 14em;
+}
+
+#nav li:hover ul ul, #nav li:hover ul ul ul, #nav li:hover ul ul ul ul,
+#nav li.sfhover ul ul, #nav li.sfhover ul ul ul, #nav li.sfhover ul ul ul ul
+{
+    left: -999em;
+}
+
+
+#nav li:hover ul, 
+#nav li li:hover ul, 
+#nav li li li:hover ul,
+#nav li li li li:hover ul
+{
+    left: auto;
+}
+
+#nav li.sfhover ul{
+    left:auto;
+}
+#nav li li.sfhover ul,
+#nav li li li.sfhover ul,
+#nav li li li li.sfhover ul
+{
+    left: auto;
+}
+
+#nav li:hover, #nav li.sfhover {
+    background: #0084D3;
+}

@@ -14,4 +14,8 @@
 
 package org.cipango.ims.hss.db;
 
-public interface Dao { }
+
+public interface Dao 
+{ 
+	
+}

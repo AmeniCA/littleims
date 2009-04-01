@@ -11,19 +11,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web;
 
-package org.cipango.ims.hss.db;
+import org.apache.wicket.PageParameters;
 
-import java.util.List;
+public class Index extends BasePage {
 
-import org.cipango.ims.hss.model.PrivateIdentity;
 
-public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
-{
-	void save(PrivateIdentity impi);
+	public Index(PageParameters pageParameters) {
+
+	}
 	
-	PrivateIdentity findById(String id);
-	List<PrivateIdentity> findAll();
-	
-	public void delete(PrivateIdentity privateIdentity);
+	@Override
+	public String getTitle() {
+		return getString("log.registrations.title");			
+	}
+
 }

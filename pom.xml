@@ -82,12 +82,12 @@
         <groupId>org.cipango</groupId>
         <artifactId>cipango-kaleo</artifactId>
         <version>${cipango-version}</version>
-     </dependency>
-     <dependency>
+      </dependency>
+      <dependency>
         <groupId>org.cipango</groupId>
         <artifactId>cipango-diameter</artifactId>
         <version>${cipango-version}</version>
-     </dependency>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   
@@ -119,6 +119,8 @@
     <junit-version>3.8.1</junit-version>
     <sip-api-version>1.1</sip-api-version>
     <cipango-version>1.0-SNAPSHOT</cipango-version>
+    <wicket.version>1.4-rc2</wicket.version>
+    <slf4j.version>1.4.0</slf4j.version>
   </properties>
 
 </project>

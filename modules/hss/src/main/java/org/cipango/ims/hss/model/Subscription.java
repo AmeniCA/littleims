@@ -59,7 +59,7 @@ public class Subscription
 	{
 		_privateIdentities = privateIdentities;
 	}
-
+	
 	public Scscf getScscf()
 	{
 		return _scscf;

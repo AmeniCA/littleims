@@ -11,17 +11,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.subscription;
 
-package org.cipango.ims.hss.db;
-
-import java.util.List;
-
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.Subscription;
+import org.cipango.ims.hss.web.BasePage;
 
-public interface SubscriptionDao extends Dao, ImsDao<Subscription>
+public abstract class SubscriptionPage extends BasePage
 {
-	void save(Subscription subscription);
+
+	@SpringBean
+	protected SubscriptionDao _dao;
 	
-	Subscription findById(long id);
-	List<Subscription> findAll();
+	protected String getPrefix()
+	{
+		return "subscription";
+	}
+
+	public class DaoDetachableModel extends LoadableDetachableModel<Subscription>
+	{
+		private Long key;
+
+		public DaoDetachableModel(Long key)
+		{
+			this.key = key;
+		}
+
+		public DaoDetachableModel(Subscription o)
+		{
+			super(o);
+			if (o != null)
+				this.key = o.getId();
+		}
+
+		@Override
+		protected Subscription load()
+		{
+			if (key == null)
+				return new Subscription();
+			else
+				return _dao.findById(key);
+		}
+	}
+
 }

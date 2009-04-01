@@ -15,6 +15,7 @@ package org.cipango.ims.hss.model;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
@@ -66,11 +67,11 @@ public class PublicPrivate implements Convertible
 	@EmbeddedId
 	private Id _id = new Id();
 
-	@ManyToOne
+	@ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn (nullable = false, insertable=false, updatable=false)
 	private PrivateIdentity _privateIdentity;
 	
-	@ManyToOne
+	@ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn (nullable = false, insertable=false, updatable=false)
 	private PublicIdentity _publicIdentity;
 	
@@ -88,6 +89,16 @@ public class PublicPrivate implements Convertible
 		_id._publicId = publicIdentity.getIdentity();
 		publicIdentity.getPrivateIdentities().add(this);
 		privateIdentity.getPublicIdentities().add(this);
+	}
+	
+	public String getPublicId()
+	{
+		return _id._publicId;
+	}
+	
+	public String getPrivateId()
+	{
+		return _id._privateId;
 	}
 	
 	public PrivateIdentity getPrivateIdentity()

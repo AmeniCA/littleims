@@ -11,19 +11,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web;
 
-package org.cipango.ims.hss.db;
+import org.apache.wicket.markup.html.panel.Panel;
 
-import java.util.List;
+public class HeaderPanel extends Panel {
 
-import org.cipango.ims.hss.model.PrivateIdentity;
+	public HeaderPanel() {
+		super("header");
+		/*ImsSession session = ((ImsSession) getSession());
+		if (session.isAuthenticated()) {
+			add(new Label("user.current", 
+					new StringResourceModel("headerPanel.user.current", new LoadableDetachableModel() {
+						@Override
+						protected Object load() {
+							return ((ImsSession) getSession()).getUser();
+						}
+						
+					})));
+		} else {
+			add(new Label("user.current", "User: FIXME").setVisible(true)); // FIXME visible
+		}
+		*/
+		
+	}
 
-public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
-{
-	void save(PrivateIdentity impi);
-	
-	PrivateIdentity findById(String id);
-	List<PrivateIdentity> findAll();
-	
-	public void delete(PrivateIdentity privateIdentity);
 }

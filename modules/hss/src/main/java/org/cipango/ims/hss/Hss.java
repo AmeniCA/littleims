@@ -31,6 +31,7 @@ import org.cipango.ims.hss.diameter.DiameterException;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.littleims.cx.ServerAssignmentType;
 import org.cipango.littleims.util.HexString;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,8 +126,8 @@ public class Hss
 		
 		switch (serverAssignmentType)
 		{
-		case Cx.ServerAssignmentType.REGISTRATION:
-		case Cx.ServerAssignmentType.RE_REGISTRATION:
+		case ServerAssignmentType.REGISTRATION:
+		case ServerAssignmentType.RE_REGISTRATION:
 			
 			String user = avps.getString(Base.USER_NAME);
 			if (user == null)

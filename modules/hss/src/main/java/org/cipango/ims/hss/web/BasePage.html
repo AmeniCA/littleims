@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/">
+    <head>
+        <title wicket:id="page.title">LittleIMS :: HSS</title>
+        <wicket:link>
+        	<link rel="stylesheet" href="style.css" />
+        </wicket:link>
+        <script type="text/javascript">
+        function hideBusysign() {
+          document.getElementById('bysy_indicator').style.display ='none';
+        }
+
+        function showBusysign() {
+            showBusysign('Loading ...');
+        }
+        
+        function showBusysign(message) {
+            var node = document.createTextNode(message);
+            var busy = document.getElementById('bysy_indicator');
+            busy.replaceChild(node, busy.firstChild);
+            busy.style.display ='inline';
+        }
+        
+        function clearNode(id) {
+            var feedback = document.getElementById(id);
+            while(feedback.hasChildNodes()==true){ 
+                feedback.removeChild(feedback.firstChild);
+            }
+        }
+
+        </script>
+    </head>    
+    <body>        
+        <div wicket:id="header"></div>
+        <div id="contentContainer">
+	        <div id="contextMenu" wicket:id="contextMenu"></div>
+	        <div id="content">
+	        	<div id="bysy_indicator">Loading ...</div>
+		    	<div wicket:id="feedback" class="feedback"></div>
+		        <wicket:child/>
+		    </div>
+	        <div id="footer">
+	        	powered by <a href="http://cipango.org" target="_blank">Cipango</a>
+	        </div>
+	    </div>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<html>
+<head>
+    <wicket:link>
+    	<link rel="stylesheet" href="style.css" />
+    </wicket:link>
+</head>   
+<body>
+<wicket:panel>
+	<ul>
+		<li><a href="#" wicket:id="subscriptionLink"><wicket:message key="contextPanel.subscription">Subscription</wicket:message></a></li>
+		<li><a href="#" wicket:id="editLink"><wicket:message key="contextPanel.privateIdentity">Profile</wicket:message></a></li>
+		<li>
+			<wicket:message key="contextPanel.publicIdentities"/>
+			<ul>
+				<li wicket:id="publicIds">
+					<a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
+				</li>
+				<li><a href="#" wicket:id="newPublicIdLink"><wicket:message key="contextPanel.newPublicId">Groups</wicket:message></a></li>
+			</ul>
+		</li>
+	</ul>
+</wicket:panel>     
+</body>
+</html>

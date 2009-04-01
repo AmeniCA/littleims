@@ -1,0 +1,44 @@
+<html>
+<body>        
+<wicket:extend>
+	<h2 wicket:id="title">User Account configuration</h2>
+	<form wicket:id="form">
+		<table class="dataDetails">
+			<tr>
+				<th><wicket:message key="privateId.name">Private URI</wicket:message></th>
+				<td><input wicket:id="identity" type="text" /></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="privateId.password">Password</wicket:message></th>
+				<td>
+					<input wicket:id="password" type="text"/>
+				</td>
+			</tr>
+			<tr>
+                <th><wicket:message key="privateId.operatorId">Operator ID</wicket:message></th>
+                <td>
+                    <input wicket:id="operatorId" type="text" size="42" maxlength="32"/>
+                    <div class="description"><wicket:message key="privateId.operatorId.descr"/></div>
+                </td>
+            </tr>
+			<wicket:enclosure>
+				<tr>
+					<th><wicket:message key="user.new.another">New user</wicket:message></th>
+					<td>
+						<input wicket:id="anotherUser" type="checkbox" />
+					</td>
+				</tr>
+			</wicket:enclosure>
+			<tr>
+				<th>&nbsp;</th>
+				<td>
+					<input type="submit" wicket:id="ok" wicket:message="value:button.ok" />
+					<input type="submit" wicket:id="submit" wicket:message="value:button.apply" />
+					<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</wicket:extend>
+</body>
+</html>

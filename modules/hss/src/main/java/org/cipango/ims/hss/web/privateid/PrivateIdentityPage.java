@@ -11,37 +11,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.privateid;
 
-package org.cipango.ims.hss.db.hibernate;
-
-import java.util.List;
-
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.hibernate.SessionFactory;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.cipango.ims.hss.web.BasePage;
 
-public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity> implements PrivateIdentityDao
+public abstract class PrivateIdentityPage extends BasePage
 {
-	public PrivateIdentityDaoImpl(SessionFactory sessionFactory)
-	{
-		super(sessionFactory);
-	}
+
+	@SpringBean
+	protected PrivateIdentityDao _dao;
 	
-	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void save(PrivateIdentity privateIdentity)
+	protected String getPrefix()
 	{
-		currentSession().saveOrUpdate(privateIdentity);
+		return "privateId";
 	}
-	
-	public PrivateIdentity findById(String id)
+
+	public class DaoDetachableModel extends LoadableDetachableModel<PrivateIdentity>
 	{
-		return get(id);
+		private String key;
+
+		public DaoDetachableModel(String key)
+		{
+			this.key = key;
+		}
+
+		public DaoDetachableModel(PrivateIdentity privateIdentity)
+		{
+			super(privateIdentity);
+			if (privateIdentity != null)
+				this.key = privateIdentity.getIdentity();
+		}
+
+		@Override
+		protected PrivateIdentity load()
+		{
+			if (key == null)
+				return new PrivateIdentity();
+			else
+				return _dao.findById(key);
+		}
 	}
-	
-	public List<PrivateIdentity> findAll()
-	{
-		return all();
-	}
+
 }

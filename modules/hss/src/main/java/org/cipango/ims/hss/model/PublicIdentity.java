@@ -20,11 +20,9 @@ package org.cipango.ims.hss.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -37,7 +35,7 @@ public class PublicIdentity implements Convertible
 	@Id
 	private String _identity;
 	
-	@OneToMany (mappedBy="_publicIdentity")
+	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.ALL })
 	private Set<PublicPrivate> _privateIdentities = new HashSet<PublicPrivate>();
 
 	private boolean _barred;
@@ -49,7 +47,6 @@ public class PublicIdentity implements Convertible
 	private Short _state;
 	
 	@ManyToOne
-	@JoinColumn (nullable = false, insertable=false, updatable=false)
 	private ServiceProfile _serviceProfile;
 	
 	public String getIdentity()
@@ -91,6 +88,11 @@ public class PublicIdentity implements Convertible
 	{
 		return _identityType;
 	}
+	
+	public String getIdentityTypeAsString()
+	{
+		return IdentityType.toString(_identityType);
+	}
 
 	public void setIdentityType(Short identityType)
 	{
@@ -100,6 +102,11 @@ public class PublicIdentity implements Convertible
 	public Short getState()
 	{
 		return _state;
+	}
+	
+	public String getStateAsString()
+	{
+		return State.toString(_state);
 	}
 
 	public void setState(Short state)
@@ -170,6 +177,26 @@ public class PublicIdentity implements Convertible
 		public static final short DISTINCT_PSI = 1;
 		public static final short WILDCARDED_PSI = 2;
 		public static final short WILDCARDED_IMPU = 3;	
+		
+		public static String toString(Short id)
+		{
+			if (id == null)
+				return "";
+			
+			switch (id)
+			{
+			case PUBLIC_USER_IDENTITY:
+				return "PUBLIC_USER_IDENTITY";
+			case DISTINCT_PSI:
+				return "DISTINCT_PSI";
+			case WILDCARDED_PSI:
+				return "WILDCARDED_PSI";
+			case WILDCARDED_IMPU:
+				return "WILDCARDED_IMPU";
+			default:
+				return "Unknown id " + id;
+			}
+		}
 	}
 	
 	public static class State
@@ -178,5 +205,25 @@ public class PublicIdentity implements Convertible
 		public static final short NOT_REGISTERED = 1;
 		public static final short AUTH_PENDING = 2;
 		public static final short REGISTERED = 3;	
+		
+		public static String toString(Short id)
+		{
+			if (id == null)
+				return "";
+			
+			switch (id)
+			{
+			case UNREGISTERED:
+				return "UNREGISTERED";
+			case NOT_REGISTERED:
+				return "NOT_REGISTERED";
+			case AUTH_PENDING:
+				return "AUTH_PENDING";
+			case REGISTERED:
+				return "REGISTERED";
+			default:
+				return "Unknown id " + id;
+			}
+		}
 	}
 }

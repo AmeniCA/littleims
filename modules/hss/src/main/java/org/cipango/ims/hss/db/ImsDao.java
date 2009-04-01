@@ -11,19 +11,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-
 package org.cipango.ims.hss.db;
 
-import java.util.List;
+import java.util.Iterator;
 
-import org.cipango.ims.hss.model.PrivateIdentity;
-
-public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
+public interface ImsDao<T> extends Dao
 {
-	void save(PrivateIdentity impi);
+	public int count();
 	
-	PrivateIdentity findById(String id);
-	List<PrivateIdentity> findAll();
+	public Iterator<T> iterator(int first, int count, String sort, boolean sortAsc);
 	
-	public void delete(PrivateIdentity privateIdentity);
+	public void save(T o);
+		
+	public void delete(T o);
 }

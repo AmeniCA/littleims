@@ -10,6 +10,58 @@
   <packaging>war</packaging>
   <name>littleIMS :: HSS</name>
 
+  <build>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <additionalProjectnatures>
+            <projectnature>wicketbench.wicketnature</projectnature>
+          </additionalProjectnatures>
+          <additionalBuildcommands>
+            <buildcommand>wicketbench.associatedMarkupAuditor</buildcommand>
+          </additionalBuildcommands>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.cipango</groupId>
+        <artifactId>maven-cipango-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <systemProperty>
+              <name>jetty.home</name>
+              <value>.</value>
+            </systemProperty>
+            <systemProperty>
+              <name>log4j.configuration</name>
+              <value>file:resources/log4j.xml</value>
+            </systemProperty>
+          </systemProperties>
+          <stopKey>foo</stopKey>
+          <stopPort>9998</stopPort>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
+  
   <dependencies>
     <dependency>
       <groupId>org.cipango.littleims</groupId>
@@ -46,6 +98,34 @@
       <version>1.8.0.7</version>
       <scope>runtime</scope>
     </dependency>
+    
+     <dependency>
+       <groupId>org.apache.wicket</groupId>
+       <artifactId>wicket</artifactId>
+       <version>${wicket.version}</version>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.wicket</groupId>
+       <artifactId>wicket-extensions</artifactId>
+       <version>${wicket.version}</version>
+     </dependency>
+     <dependency>
+       <groupId>org.apache.wicket</groupId>
+       <artifactId>wicket-spring</artifactId>
+       <version>${wicket.version}</version>
+     </dependency>
+     
+     <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+     
   </dependencies>
   
   <profiles>

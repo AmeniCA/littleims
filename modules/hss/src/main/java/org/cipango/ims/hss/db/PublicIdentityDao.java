@@ -16,11 +16,18 @@ package org.cipango.ims.hss.db;
 
 import java.util.List;
 
+import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 
-public interface PublicIdentityDao extends Dao
+public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 {
 	void save(PublicIdentity impu);
-	PublicIdentity findBy(String id);
+	PublicIdentity findById(String id);
 	List<PublicIdentity> findAll();
+	
+	 /**
+     * Returns the public identities that NOT belong the private identity with identity id
+     * but have the same subscription.
+     */
+	List<PublicIdentity> getAvalaiblePublicIds(PrivateIdentity privateIdentity);
 }
