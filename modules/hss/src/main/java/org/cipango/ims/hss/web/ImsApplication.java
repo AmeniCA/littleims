@@ -65,6 +65,11 @@ public class ImsApplication extends WebApplication {
 	@Override
 	protected void init() {
 		super.init();		
+		
+		// Need to change class resolver due a weird ClassNotFound (on Java 6 only) thrown on
+		// Classes.resolveClass("[B]")		
+		getApplicationSettings().setClassResolver(new ClassResolver());
+		
 		getMarkupSettings().setStripWicketTags(true);
 		AutolinkBookmarkablePageLink.autoEnable=false;
 		
