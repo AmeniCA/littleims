@@ -17,6 +17,7 @@ package org.cipango.ims.hss.db;
 import java.util.List;
 
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.PublicPrivate;
 
 public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
 {
@@ -26,4 +27,19 @@ public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
 	List<PrivateIdentity> findAll();
 	
 	public void delete(PrivateIdentity privateIdentity);
+	
+	public void delete(PublicPrivate publicPrivate);
+	
+	 /**
+     * Returns the public identities that NOT belong the private identity with identity id
+     * but have the same subscription.
+     */
+	List<String> getAvalaiblePublicIds(PrivateIdentity privateIdentity);
+	
+	 /**
+     * Returns the public identities that are linked to any private identity.
+     */
+	List<String> getAvalaiblePublicIdsNoPrivate();
+	
+	public PublicPrivate getPublicPrivate(String publicId, String privateId);
 }

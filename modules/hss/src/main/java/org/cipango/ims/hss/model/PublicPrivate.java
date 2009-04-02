@@ -62,7 +62,28 @@ public class PublicPrivate implements Convertible
 		{
 			return new String(_privateId + _publicId).hashCode();
 		}
+
+		public String getPrivateId()
+		{
+			return _privateId;
+		}
+
+		public void setPrivateId(String privateId)
+		{
+			_privateId = privateId;
+		}
+
+		public String getPublicId()
+		{
+			return _publicId;
+		}
+
+		public void setPublicId(String publicId)
+		{
+			_publicId = publicId;
+		}
 	}
+
 
 	@EmbeddedId
 	private Id _id = new Id();
@@ -90,6 +111,17 @@ public class PublicPrivate implements Convertible
 		publicIdentity.getPrivateIdentities().add(this);
 		privateIdentity.getPublicIdentities().add(this);
 	}
+	
+	public Id getId()
+	{
+		return _id;
+	}
+
+	public void setId(Id id)
+	{
+		_id = id;
+	}
+
 	
 	public String getPublicId()
 	{

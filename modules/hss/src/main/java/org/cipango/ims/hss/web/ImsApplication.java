@@ -30,6 +30,7 @@ import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.util.HexString;
 import org.cipango.ims.hss.web.privateid.DeletePrivateIdPage;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
+import org.cipango.ims.hss.web.privateid.EditPublicIdsPage;
 import org.cipango.ims.hss.web.privateid.PrivateIdBrowserPage;
 import org.cipango.ims.hss.web.publicid.DeletePublicIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
@@ -80,6 +81,7 @@ public class ImsApplication extends WebApplication {
 		
 		mount(new MixedParamUrlCodingStrategy("/private-identity/edit", EditPrivateIdPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/private-identity/delete", DeletePrivateIdPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/private-identity/public-ids", EditPublicIdsPage.class, id));
 		mountBookmarkablePage("/private-identities/browser", PrivateIdBrowserPage.class); 
 		
 		mount(new MixedParamUrlCodingStrategy("/public-identity/edit", EditPublicIdPage.class, id));

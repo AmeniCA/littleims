@@ -47,17 +47,6 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		currentSession().saveOrUpdate(impu);
 	}
 	
-	private static final String GET_AVAILABLE_PUBLIC_IDS =
-		"SELECT p FROM PublicIdentity AS p WHERE p.privateIdentities.privateIdentity != :privateId AND p.privateIdentities.privateIdentity.subscription.id = :subscription ORDER BY p.identity";
 
-	
-	@SuppressWarnings("unchecked")
-	public List<PublicIdentity> getAvalaiblePublicIds(PrivateIdentity privateIdentity)
-	{
-		Query query = currentSession().createQuery(GET_AVAILABLE_PUBLIC_IDS);
-    	query.setParameter("privateId", privateIdentity);
-    	query.setLong("subscription", privateIdentity.getSubscription().getId());
-    	return query.list();
-	}
 
 }
