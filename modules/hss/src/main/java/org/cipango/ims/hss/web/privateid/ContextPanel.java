@@ -17,6 +17,7 @@ package org.cipango.ims.hss.web.privateid;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
@@ -39,18 +40,19 @@ public class ContextPanel extends Panel {
 	
 	public ContextPanel(PrivateIdentity privateIdentity) {
 		super("contextMenu");
+		setOutputMarkupId(true);
 		if (privateIdentity.getSubscription() != null)
 			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getId())));
 		else
 			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class).setVisible(false));
 		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
 		
-		final List<String> publicIds = new ArrayList<String>();
+		final TreeSet<String> publicIds = new TreeSet<String>();
 		Iterator<PublicPrivate> it = privateIdentity.getPublicIdentities().iterator();
 		while (it.hasNext())
 			publicIds.add(it.next().getPublicId());
 		
-		add(new RefreshingView("publicIds"){
+		add(new RefreshingView("publicIds", new Model(publicIds)){
 
 			@Override
 			protected Iterator getItemModels()

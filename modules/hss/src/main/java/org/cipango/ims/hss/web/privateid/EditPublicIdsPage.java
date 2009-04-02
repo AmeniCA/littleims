@@ -13,15 +13,21 @@
 // ========================================================================
 package org.cipango.ims.hss.web.privateid;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.AbstractChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
+import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -57,20 +63,13 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		add(new Label("title", getTitle()));
 		
 		Form form = new Form("form");
+		form.setOutputMarkupId(true);
 		add(form);
-		form.add(new Button("join.noSub") {
+		form.add(new AjaxFallbackButton("join.noSub", form) {
 			@Override
-			public void onSubmit() {
-				Iterator it = ((List)getForm().get("publics.available.noSub").getDefaultModelObject()).iterator();
-				PrivateIdentity id = _dao.findById(_key);
-				List choosen = ((ListMultipleChoice) getForm().get("publics.available.noSub")).getChoices();
-				while (it.hasNext()) {
-					String publicId = (String) it.next();
-					id.addPublicId(_publicIdentityDao.findById(publicId));
-					choosen.remove(publicId);
-					it.remove();
-				}
-				_dao.save(id);
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, form1.get("publics.available.noSub"), false);
 			}
 		});
 		form.add(new ListMultipleChoice(
@@ -83,19 +82,11 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 					}
 				}));
 		
-		form.add(new Button("join") {
+		form.add(new AjaxFallbackButton("join", form) {
 			@Override
-			public void onSubmit() {
-				Iterator it = ((List)getForm().get("publics.available.sub").getDefaultModelObject()).iterator();
-				PrivateIdentity id = _dao.findById(_key);
-				List choosen = ((ListMultipleChoice) getForm().get("publics.available.sub")).getChoices();
-				while (it.hasNext()) {
-					String publicId = (String) it.next();
-					id.addPublicId(_publicIdentityDao.findById(publicId));
-					choosen.remove(publicId);
-					it.remove();
-				}
-				_dao.save(id);
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, form1.get("publics.available.sub"), false);
 			}
 		});
 		form.add(new ListMultipleChoice(
@@ -109,36 +100,61 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 				}));
 		
 		
-		form.add(new Button("leave") {
+		form.add(new AjaxFallbackButton("leave", form) {
 			@Override
-			public void onSubmit() {
-				Iterator it = ((List)getForm().get("publics").getDefaultModelObject()).iterator();
-				List choosen = ((ListMultipleChoice) getForm().get("publics")).getChoices();
-				while (it.hasNext()) {
-					String publicId = (String) it.next();
-					_dao.delete(_dao.getPublicPrivate(publicId, _key));
-					choosen.remove(publicId);
-					it.remove();
-				}
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, form1.get("publics"), true);			
 			}
 		});
+		
+		List publics = new ArrayList();
+		Iterator<PublicPrivate> it = _dao.findById(_key).getPublicIdentities().iterator();
+		while (it.hasNext()) {
+			publics.add(it.next().getPublicId());
+		}		
 		form.add(new ListMultipleChoice(
 				"publics", 
 				new Model(new ArrayList()),
-				new LoadableDetachableModel() {
-					@Override
-					protected Object load() {
-						List list = new ArrayList();
-						Iterator<PublicPrivate> it = _dao.findById(_key).getPublicIdentities().iterator();
-						while (it.hasNext()) {
-							list.add(it.next().getPublicId());
-						}
-						return list;
-					}
-				}));
+				new Model((Serializable) publics)));
 		
 	}
 	
+	
+	@SuppressWarnings("unchecked")
+	private void apply(AjaxRequestTarget target, Form<?> form1, Component component, boolean remove)
+	{
+		Iterator it = ((List) component.getDefaultModelObject()).iterator();
+		List choosen = ((AbstractChoice) component).getChoices();
+		PrivateIdentity id = _dao.findById(_key);
+
+		RefreshingView publics = (RefreshingView) getPage().get("contextMenu:publicIds");
+		Collection<String> publicsModel = (Collection<String>) publics.getDefaultModelObject();
+		while (it.hasNext()) {
+			String publicId = (String) it.next();
+			if (remove)
+			{
+				_dao.delete(_dao.getPublicPrivate(publicId, _key));
+				publicsModel.remove(publicId);
+			}
+			else
+			{
+				id.addPublicId(_publicIdentityDao.findById(publicId));
+				publicsModel.add(publicId);
+				((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
+			}
+			choosen.remove(publicId);
+			it.remove();
+		}
+		if (!remove)
+			_dao.save(id);
+				
+		if (target != null)
+		{
+			target.addComponent(form1);
+			target.addComponent(getPage().get("contextMenu"));
+		}
+	}
 	
 	@Override
 	public String getTitle() {

@@ -83,12 +83,12 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
 #statusBar { height:20px; line-height:20px; padding: 0; text-align:right; margin: 0px 10px 0px 0px; font-size:8pt; vertical-align:bottom;}
 #statusBar .link-delimiter {padding:0px 4px; color: #A0A0A0;}
 
-#contextMenu {width:200px; float:left; min-width:10em;}
-#contextMenu ul {padding:0pt 0pt 0pt 15pt; }
-#contextMenu li { list-style-image:none; list-style-position:outside; list-style-type:square; padding:5px 0pt;}
-#contextMenu ul li ul {padding:0pt 0pt 0pt 5pt; }
-#contextMenu a {text-decoration: none; color:#000000; }
-#contextMenu a:hover {text-decoration: underline; }
+.contextMenu {width:200px; float:left; min-width:10em;}
+.contextMenu ul {padding:0pt 0pt 0pt 15pt; }
+.contextMenu li { list-style-image:none; list-style-position:outside; list-style-type:square; padding:5px 0pt;}
+.contextMenu ul li ul {padding:0pt 0pt 0pt 5pt; }
+.contextMenu a {text-decoration: none; color:#000000; }
+.contextMenu a:hover {text-decoration: underline; }
 
 #nav-container {
     font-size:10px;
