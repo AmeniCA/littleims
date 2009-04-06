@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Handles for diameter messages.
+ * Handler for diameter messages.
  */
 public class HssServlet extends SipServlet implements DiameterListener
 {

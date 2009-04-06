@@ -18,10 +18,7 @@ import java.util.Iterator;
 public interface ImsDao<T> extends Dao
 {
 	public int count();
-	
 	public Iterator<T> iterator(int first, int count, String sort, boolean sortAsc);
-	
 	public void save(T o);
-		
 	public void delete(T o);
 }
