@@ -18,7 +18,10 @@
 package org.cipango.ims.hss.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -30,7 +33,7 @@ import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
 
 @Entity
-public class PublicIdentity implements Convertible
+public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 {
 	@Id
 	private String _identity;
@@ -62,6 +65,15 @@ public class PublicIdentity implements Convertible
 	public Set<PublicPrivate> getPrivateIdentities()
 	{
 		return _privateIdentities;
+	}
+	
+	public SortedSet<String> getPrivateIds()
+	{
+		TreeSet<String> publicIds = new TreeSet<String>();
+		Iterator<PublicPrivate> it = getPrivateIdentities().iterator();
+		while (it.hasNext())
+			publicIds.add(it.next().getPrivateId());
+		return publicIds;
 	}
 
 	public boolean isBarred()
@@ -171,6 +183,11 @@ public class PublicIdentity implements Convertible
 		}
 	}
 	
+	public int compareTo(PublicIdentity o)
+	{
+		return getIdentity().compareTo(o.getIdentity());
+	}
+	
 	public static class IdentityType
 	{
 		public static final short PUBLIC_USER_IDENTITY = 0;
@@ -226,4 +243,5 @@ public class PublicIdentity implements Convertible
 			}
 		}
 	}
+
 }

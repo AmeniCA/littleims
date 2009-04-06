@@ -14,8 +14,9 @@ body {
 }
 
 #content {
-     margin: 8px;
-     margin-left:10em;
+     left:50px;
+    margin:8px 8px 8px 10em;
+    position:absolute;
 }
 
 #footer {
@@ -73,7 +74,19 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
   font-size: 1em;
 }
 
+.elementPanel { 
+    width:400px;
+    border-color:#BBBBBB;
+    border-style:dashed;
+    border-width:0pt 1px 1px;
+    margin:10px 0px 0pt 0pt;
+}
 
+.elementPanel .title { background-color: #CCCCCC; padding:4px;}
+
+.elementPanel .title a { float:right;  }
+
+.elementPanel .body {padding:4px;}
 /* ------------------------------------------------------------------------- */
 /*                                Menu                                       */
 /* ------------------------------------------------------------------------- */

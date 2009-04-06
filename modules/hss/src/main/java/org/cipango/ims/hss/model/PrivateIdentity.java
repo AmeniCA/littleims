@@ -15,7 +15,10 @@
 package org.cipango.ims.hss.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -118,6 +121,15 @@ public class PrivateIdentity
 	public Set<PublicPrivate> getPublicIdentities()
 	{
 		return _publicIdentities;
+	}
+	
+	public SortedSet<String> getPublicIds()
+	{
+		TreeSet<String> publicIds = new TreeSet<String>();
+		Iterator<PublicPrivate> it = getPublicIdentities().iterator();
+		while (it.hasNext())
+			publicIds.add(it.next().getPublicId());
+		return publicIds;
 	}
 
 	public void setPublicIdentities(Set<PublicPrivate> publicIdentities)

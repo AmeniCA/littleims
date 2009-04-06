@@ -4,31 +4,8 @@
         <title wicket:id="page.title">LittleIMS :: HSS</title>
         <wicket:link>
         	<link rel="stylesheet" href="style.css" />
+        	<script type="text/javascript" src="hss-util.js" />
         </wicket:link>
-        <script type="text/javascript">
-        function hideBusysign() {
-          document.getElementById('bysy_indicator').style.display ='none';
-        }
-
-        function showBusysign() {
-            showBusysign('Loading ...');
-        }
-        
-        function showBusysign(message) {
-            var node = document.createTextNode(message);
-            var busy = document.getElementById('bysy_indicator');
-            busy.replaceChild(node, busy.firstChild);
-            busy.style.display ='inline';
-        }
-        
-        function clearNode(id) {
-            var feedback = document.getElementById(id);
-            while(feedback.hasChildNodes()==true){ 
-                feedback.removeChild(feedback.firstChild);
-            }
-        }
-
-        </script>
     </head>    
     <body>        
         <div wicket:id="header"></div>
@@ -40,7 +17,7 @@
 		        <wicket:child/>
 		    </div>
 	        <div id="footer">
-	        	powered by <a href="http://cipango.org" target="_blank">Cipango</a>
+	        	powered by <a href="http://www.cipango.org" target="_blank">Cipango</a>
 	        </div>
 	    </div>
     </body>

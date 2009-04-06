@@ -14,10 +14,9 @@
 package org.cipango.ims.hss.web.privateid;
 
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
@@ -30,7 +29,6 @@ import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 
@@ -46,18 +44,14 @@ public class ContextPanel extends Panel {
 		else
 			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class).setVisible(false));
 		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-		
-		final TreeSet<String> publicIds = new TreeSet<String>();
-		Iterator<PublicPrivate> it = privateIdentity.getPublicIdentities().iterator();
-		while (it.hasNext())
-			publicIds.add(it.next().getPublicId());
-		
-		add(new RefreshingView("publicIds", new Model(publicIds)){
+		add(new BookmarkablePageLink("deleteLink", DeletePrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
+				
+		add(new RefreshingView("publicIds", new Model((Serializable) privateIdentity.getPublicIds())){
 
 			@Override
 			protected Iterator getItemModels()
 			{
-				return new ModelIteratorAdapter<String>(publicIds.iterator()) {
+				return new ModelIteratorAdapter<String>(((Collection)getDefaultModelObject()).iterator()) {
 
 					@Override
 					protected IModel<String> model(String id)

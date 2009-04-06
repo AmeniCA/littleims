@@ -103,6 +103,8 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 			{
 				key = subscription.getId();
 			}
+			add(new BookmarkablePageLink("viewLink", ViewSubscriptionPage.class, new PageParameters(
+					"id=" + key)));
 			add(new BookmarkablePageLink("editLink", EditSubscriptionPage.class, new PageParameters(
 					"id=" + key)));
 			add(new BookmarkablePageLink("addPrivateLink", EditPrivateIdPage.class, new PageParameters(

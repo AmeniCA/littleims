@@ -15,7 +15,10 @@
 package org.cipango.ims.hss.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,6 +56,28 @@ public class Subscription
 	public Set<PrivateIdentity> getPrivateIdentities()
 	{
 		return _privateIdentities;
+	}
+	
+	public SortedSet<String> getPrivateIds()
+	{
+		TreeSet<String> publicIds = new TreeSet<String>();
+		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
+		while (it.hasNext())
+			publicIds.add(it.next().getIdentity());
+		return publicIds;
+	}
+	
+	public SortedSet<PublicIdentity> getPublicIdentities()
+	{
+		TreeSet<PublicIdentity> publicIds = new TreeSet<PublicIdentity>();
+		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
+		while (it.hasNext()) 
+		{
+			Iterator<PublicPrivate> it2 = it.next().getPublicIdentities().iterator();
+			while (it2.hasNext())
+				publicIds.add(it2.next().getPublicIdentity());
+		}
+		return publicIds;
 	}
 
 	public void setPrivateIdentities(Set<PrivateIdentity> privateIdentities)
