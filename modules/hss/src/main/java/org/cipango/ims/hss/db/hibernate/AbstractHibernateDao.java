@@ -72,30 +72,30 @@ public abstract class AbstractHibernateDao<T>
         return _entityClass;
     }
     
-    public int count() {
-		Criteria criteria = currentSession().createCriteria(_entityClass);
-		criteria.setProjection(Projections.rowCount());
-		return (Integer) criteria.uniqueResult();
+    public int count() 
+    {
+    	return (Integer) criteria().setProjection(Projections.rowCount()).uniqueResult();
 	}
     
     @SuppressWarnings("unchecked")
 	public Iterator<T> iterator(int first, int count, String sort, boolean sortAsc) 
     {
-    	StringBuilder sql = new StringBuilder();
-    	sql.append("FROM ").append(_entityClass.getName());
-		if (sort != null && !sort.trim().equals("")) {
-			sql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
-		}
-		Query query = currentSession().createQuery(sql.toString());
+    	StringBuilder hql = new StringBuilder();
+    	hql.append("FROM ").append(_entityClass.getName());
+		if (sort != null && !sort.trim().equals("")) 
+			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		
+		Query query = query(hql.toString());
 		if (count > 0)
 			query.setMaxResults(count);
 		query.setFirstResult(first);
+		
     	return query.list().iterator();
 	}
     
     @Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void delete(T o) {
+	public void delete(T o) 
+    {
 		currentSession().delete(o);
 	}
-
 }

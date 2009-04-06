@@ -34,8 +34,6 @@ public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity
 	private static final String GET_AVAILABLE_PUBLIC_IDS_NO_SUB =
 		"SELECT p.id FROM PublicIdentity AS p WHERE p._privateIdentities IS EMPTY";
 
-	
-	
 	public PrivateIdentityDaoImpl(SessionFactory sessionFactory)
 	{
 		super(sessionFactory);
@@ -73,9 +71,9 @@ public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity
     	return query.list();
 	}
 	
-	
 	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void delete(PublicPrivate publicPrivate) {
+	public void delete(PublicPrivate publicPrivate) 
+	{
 	  	publicPrivate.getPrivateIdentity().getPublicIdentities().remove(publicPrivate);
 	  	publicPrivate.getPublicIdentity().getPrivateIdentities().remove(publicPrivate);
 		currentSession().delete(publicPrivate);

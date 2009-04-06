@@ -17,9 +17,7 @@ package org.cipango.ims.hss.db.hibernate;
 import java.util.List;
 
 import org.cipango.ims.hss.db.PublicIdentityDao;
-import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
-import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +44,4 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 	{
 		currentSession().saveOrUpdate(impu);
 	}
-	
-
-
 }
