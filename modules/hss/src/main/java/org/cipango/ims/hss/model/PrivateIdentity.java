@@ -37,13 +37,16 @@ import org.cipango.ims.hss.util.XML.Output;
 @Entity
 public class PrivateIdentity 
 {
+	public static final byte[] DEFAULT_OPERATOR_ID = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	
+	
 	@Id
 	private String _identity;
 
 	private byte[] _password;
 
 	//@Column(nullable=false, length=16)
-	private byte[] _operatorId;
+	private byte[] _operatorId = DEFAULT_OPERATOR_ID;
 	
 	private byte[] _sqn;
 	
@@ -51,7 +54,7 @@ public class PrivateIdentity
 	@JoinColumn (nullable = true)
 	private Subscription _subscription;
 	
-	@OneToMany (mappedBy = "_privateIdentity", cascade = { CascadeType.ALL })
+	@OneToMany (mappedBy = "_privateIdentity", cascade = {CascadeType.REMOVE })
 	private Set<PublicPrivate> _publicIdentities = new HashSet<PublicPrivate>();
 	
 	@ManyToMany

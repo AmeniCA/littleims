@@ -41,7 +41,7 @@ public abstract class PrivateIdentityPage extends BasePage
 
 		public DaoDetachableModel(PrivateIdentity privateIdentity)
 		{
-			super(privateIdentity);
+			super(privateIdentity == null ? new PrivateIdentity() : privateIdentity);
 			if (privateIdentity != null)
 				this.key = privateIdentity.getIdentity();
 		}

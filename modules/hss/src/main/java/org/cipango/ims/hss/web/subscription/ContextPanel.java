@@ -25,7 +25,11 @@ public class ContextPanel extends Panel {
 	
 	public ContextPanel(Subscription subscription) {
 		super("contextMenu");
-		add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class, 
+		add(new BookmarkablePageLink("viewLink", ViewSubscriptionPage.class, 
+				new PageParameters("id=" + subscription.getId())));
+		add(new BookmarkablePageLink("editLink", EditSubscriptionPage.class, 
+				new PageParameters("id=" + subscription.getId())));
+		add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getId())));
 		
 		final List<String> privateIds = new ArrayList<String>();

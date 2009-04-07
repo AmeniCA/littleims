@@ -13,8 +13,11 @@
 // ========================================================================
 package org.cipango.ims.hss.web.subscription;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.BasePage;
@@ -24,6 +27,35 @@ public abstract class SubscriptionPage extends BasePage
 
 	@SpringBean
 	protected SubscriptionDao _dao;
+	
+	@SuppressWarnings("unchecked")
+	protected Subscription getSubscription(PageParameters pageParameters)
+	{
+		String sKey = pageParameters.getString("id");
+		Subscription subscription = null;
+		if (sKey != null)
+		{
+			try 
+			{
+				Long key = Long.parseLong(sKey);
+				subscription = _dao.findById(key);
+				if (subscription == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
+							new MicroMap("id", key)));
+					key = null;
+				}
+			}
+			catch (NumberFormatException e) 
+			{
+				error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
+						new MicroMap("id", sKey)));
+			}
+
+		}
+		return subscription;
+	}
+	
 	
 	protected String getPrefix()
 	{

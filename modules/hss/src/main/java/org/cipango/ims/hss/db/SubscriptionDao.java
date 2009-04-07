@@ -21,7 +21,7 @@ import org.cipango.ims.hss.model.Subscription;
 public interface SubscriptionDao extends Dao, ImsDao<Subscription>
 {
 	void save(Subscription subscription);
-	
+	void saveWithCascade(Subscription subscription);
 	Subscription findById(long id);
 	List<Subscription> findAll();
 }

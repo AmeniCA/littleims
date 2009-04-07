@@ -35,7 +35,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
-import org.cipango.ims.hss.web.publicid.DeletePublicIdPage;
 
 public class SubscriptionBrowserPage extends SubscriptionPage
 {
@@ -56,6 +55,8 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 				}
 			}	
 		});
+		
+		add(new BookmarkablePageLink("createLink2", AddSubscriptionPage.class));
 		
 		IColumn[] columns = new IColumn[3];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".id", this, null),
@@ -109,7 +110,7 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 					"id=" + key)));
 			add(new BookmarkablePageLink("addPrivateLink", EditPrivateIdPage.class, new PageParameters(
 					"subscription=" + key)));
-			add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class,
+			add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class,
 					new PageParameters("id=" + key)));
 		}
 

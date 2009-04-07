@@ -1,0 +1,70 @@
+<html>
+<body>        
+<wicket:extend>
+	<h2 wicket:id="title">User Account configuration</h2>
+	<form wicket:id="form">
+		<table class="dataDetails">
+			<tr>
+				<th colspan="2"><wicket:message key="contextPanel.privateIdentity"/></th>
+			</tr>
+			<tr>
+				<th><wicket:message key="privateId.name">Private URI</wicket:message></th>
+				<td><input wicket:id="privateId.identity" type="text" /></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="privateId.password">Password</wicket:message></th>
+				<td>
+					<input wicket:id="password" type="text"/>
+				</td>
+			</tr>
+			<tr>
+                <th><wicket:message key="privateId.operatorId">Operator ID</wicket:message></th>
+                <td>
+                    <input wicket:id="operatorId" type="text" size="42" maxlength="32"/>
+                    <div class="description"><wicket:message key="privateId.operatorId.descr"/></div>
+                </td>
+            </tr>
+            <tr>
+				<th colspan="2"><wicket:message key="contextPanel.publicIdentity"/></th>
+			</tr>
+			<tr>
+				<th><wicket:message key="publicId.name">Private URI</wicket:message></th>
+				<td><input wicket:id="publicId.identity" type="text" /></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="publicId.barred">Barred</wicket:message></th>
+				<td>
+					<input wicket:id="barred" type="checkbox"/>
+				</td>
+			</tr>
+			<tr>
+	            <th><wicket:message key="publicId.identityType">identityType</wicket:message></th>
+	            <td>
+	            	<select wicket:id="identityType">
+	            	</select>
+	            </td>
+	        </tr>
+			<tr>
+				<th><wicket:message key="publicId.displayName"></wicket:message></th>
+				<td><input wicket:id="displayName" type="text" /></td>
+			</tr>
+			<wicket:enclosure>
+				<tr>
+					<th><wicket:message key="user.new.another">New user</wicket:message></th>
+					<td>
+						<input wicket:id="anotherUser" type="checkbox" />
+					</td>
+				</tr>
+			</wicket:enclosure>
+			<tr>
+				<th>&nbsp;</th>
+				<td>
+					<input type="submit" wicket:id="ok" wicket:message="value:button.ok" />
+					<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</wicket:extend>
+</body>
+</html>

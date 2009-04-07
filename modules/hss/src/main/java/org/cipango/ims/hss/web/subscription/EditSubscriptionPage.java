@@ -18,35 +18,31 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.util.collections.MicroMap;
-import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.Subscription;
 
 public class EditSubscriptionPage extends SubscriptionPage
 {
 
 	private Long _key;
-	private DaoDetachableModel _model;
+	private String _title;
 	
 	@SuppressWarnings("unchecked")
 	public EditSubscriptionPage(PageParameters pageParameters)
 	{
-		_key = pageParameters.getLong("id");
-		Subscription subscription = null;
-		if (_key != null)
-		{
-			subscription = _dao.findById(_key);
-			if (subscription == null)
-			{
-				error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
-						new MicroMap("id", _key)));
-				_key = null;
-			}
+		Subscription subscription = getSubscription(pageParameters);
+		_key = subscription == null ? null : subscription.getId();
+		
+		IModel model = new DaoDetachableModel(subscription);
+		
+		if (isAdding()) {
+			_title = getString(getPrefix() + ".add.title");
+		} else {
+			_title = getString(getPrefix() + ".edit.title", model);
 		}
-		_model = new DaoDetachableModel(subscription);
-
+		
 		add(new Label("title", getTitle()));
-		Form form = new Form("form", new CompoundPropertyModel(_model));
+		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 		form.add(new Label("id"));
 		form.add(new Label("scscf"));
@@ -106,11 +102,7 @@ public class EditSubscriptionPage extends SubscriptionPage
 	@Override
 	public String getTitle()
 	{
-		if (isAdding()) {
-			return getString(getPrefix() + ".add.title");
-		} else {
-			return getString(getPrefix() + ".edit.title", _model);
-		}
+		return _title;
 	}
 }
 

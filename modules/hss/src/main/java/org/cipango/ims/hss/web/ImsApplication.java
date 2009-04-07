@@ -35,6 +35,7 @@ import org.cipango.ims.hss.web.privateid.PrivateIdBrowserPage;
 import org.cipango.ims.hss.web.publicid.DeletePublicIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
@@ -78,6 +79,7 @@ public class ImsApplication extends WebApplication {
 		String[] id = new String[] {"id"};
 		
 		mountBookmarkablePage("/subscriptions/browser", SubscriptionBrowserPage.class); 
+		mount(new MixedParamUrlCodingStrategy("/subscription/add", AddSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription/edit", EditSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription", ViewSubscriptionPage.class, id));
 		
