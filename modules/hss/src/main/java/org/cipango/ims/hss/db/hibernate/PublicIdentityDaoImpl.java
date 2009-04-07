@@ -18,12 +18,15 @@ import java.util.List;
 
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> implements PublicIdentityDao
 {
+	private static final String FIND_LIKE = "SELECT p._identity FROM PublicIdentity AS p WHERE LOWER(p._identity) LIKE :id order by p._identity asc";
+	
 	public PublicIdentityDaoImpl(SessionFactory sessionFactory)
 	{
 		super(sessionFactory);
@@ -43,5 +46,16 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 	public void save(PublicIdentity impu) 
 	{
 		currentSession().saveOrUpdate(impu);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> findLike(String id, int maxResults)
+	{
+		Query query = query(FIND_LIKE);
+		if (maxResults > 0)
+			query.setMaxResults(maxResults);
+		query.setParameter("id", id.toLowerCase());
+		
+    	return query.list();
 	}
 }

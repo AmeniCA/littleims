@@ -90,6 +90,14 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
 .elementPanel .title { background-color: #CCCCCC; padding:4px;}
 .elementPanel .title a { float:right;  }
 .elementPanel .body {padding:4px;}
+
+/* Autocomplete field */
+div.wicket-aa { font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; font-size: 12px;
+                 background-color: white; border-width: 1px; border-color: #cccccc; border-style: solid;
+                 padding: 2px; margin: 1px 0 0 0; text-align:left; }
+div.wicket-aa ul { list-style:none; padding: 2px; margin:0; }
+div.wicket-aa ul li.selected { background-color: #FFFF00; padding: 2px; margin:0; }
+
 /* ------------------------------------------------------------------------- */
 /*                                Menu                                       */
 /* ------------------------------------------------------------------------- */

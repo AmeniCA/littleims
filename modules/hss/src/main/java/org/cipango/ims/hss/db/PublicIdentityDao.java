@@ -22,6 +22,7 @@ public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 {
 	void save(PublicIdentity impu);
 	PublicIdentity findById(String id);
+	List<String> findLike(String id, int maxResults);
 	List<PublicIdentity> findAll();
 	
 }

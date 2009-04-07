@@ -3,6 +3,10 @@
 <wicket:extend>
   <div class="section">
   	<h2><wicket:message key="publicId.browser.title">Private identities</wicket:message></h2>
+  	<form wicket:id="form">
+  		<input type="text" wicket:id="searchInput" size="50"/>
+  		<input type="submit" wicket:id="search" wicket:message="value:button.search" />
+    </form>
   	<a href="#" wicket:id="createLink"><wicket:message key="publicId.new.link">Add a new public identity</wicket:message></a><br/><br/>
   	<table wicket:id="browser" class="filteredTable"></table>
   </div>

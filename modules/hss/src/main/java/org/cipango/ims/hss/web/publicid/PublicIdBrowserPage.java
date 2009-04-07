@@ -13,10 +13,15 @@
 // ========================================================================
 package org.cipango.ims.hss.web.publicid;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -24,6 +29,9 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -31,6 +39,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.model.PublicIdentity;
 
 public class PublicIdBrowserPage extends PublicIdentityPage
@@ -39,6 +48,8 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	@SuppressWarnings("unchecked")
 	public PublicIdBrowserPage()
 	{
+		
+		addSearchField();
 		add(new BookmarkablePageLink("createLink", EditPublicIdPage.class));
 
 		IColumn[] columns = new IColumn[5];
@@ -70,6 +81,41 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
 				"identity"), 15);
 		add(table);
+	}
+	
+	private void addSearchField()
+	{
+		Form form = new Form("form");
+        add(form);
+
+        final AutoCompleteTextField<String> field = new AutoCompleteTextField<String>("searchInput",
+            new Model<String>(""))
+        {
+            @Override
+            protected Iterator<String> getChoices(String input)
+            {
+                if (input == null || input.length() < 2 && input.trim().length() < 2 )
+                {
+                    List<String> emptyList = Collections.emptyList();
+                    return emptyList.iterator();
+                }
+
+                List<String> choices = _dao.findLike("%" + input + "%", 10);
+                return choices.iterator();
+            }
+        };
+        form.add(field);
+
+        form.add(new Button("search")
+		{
+			@Override
+			public void onSubmit()
+			{
+				String id = (String) getForm().get("searchInput").getDefaultModelObject();
+				if (!Strings.isEmpty(id))
+					setResponsePage(EditPublicIdPage.class, new PageParameters("id=" + id));
+			}
+		});
 	}
 
 	@Override
