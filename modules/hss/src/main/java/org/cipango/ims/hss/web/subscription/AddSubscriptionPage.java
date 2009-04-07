@@ -16,6 +16,7 @@ package org.cipango.ims.hss.web.subscription;
 import java.util.Arrays;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -24,6 +25,8 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -41,9 +44,20 @@ public class AddSubscriptionPage extends SubscriptionPage
 		add(new Label("title", getTitle()));
 		Form form = new Form("form");
 		add(form);
-		form.add(new RequiredTextField<String>("privateId.identity", new Model()));
-		form.add(new TextField("password", new Model(), byte[].class));
-		form.add(new TextField("operatorId", new Model(PrivateIdentity.DEFAULT_OPERATOR_ID.clone()), byte[].class).add(new AbstractValidator<byte[]>()
+		
+		WebMarkupContainer privateId = new WebMarkupContainer("privateIdentity", new CompoundPropertyModel( new LoadableDetachableModel(new PrivateIdentity()) {
+			@Override
+			protected Object load()
+			{
+				return new PrivateIdentity();
+			}
+			
+		}));
+		form.add(privateId);
+		
+		privateId.add(new RequiredTextField<String>("identity"));
+		privateId.add(new TextField("password", byte[].class));
+		privateId.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
 		{
 			@Override
 			protected void onValidate(IValidatable<byte[]> validatable)
@@ -52,11 +66,20 @@ public class AddSubscriptionPage extends SubscriptionPage
 					error(validatable, "validator.byteArray.length");
 			}
 		}));
-		form.add(new RequiredTextField<String>("publicId.identity", new Model()));
-		form.add(new CheckBox("barred", new Model()));
+		
+		WebMarkupContainer publicId = new WebMarkupContainer("publicIdentity", new CompoundPropertyModel( new LoadableDetachableModel() {
+			@Override
+			protected Object load()
+			{
+				return new PublicIdentity();
+			}
+			
+		}));
+		form.add(publicId);
+		publicId.add(new RequiredTextField<String>("identity"));
+		publicId.add(new CheckBox("barred"));
 
-		form.add(new DropDownChoice("identityType",
-				new Model(),
+		publicId.add(new DropDownChoice("identityType",
 				Arrays.asList(new Short[]{0,1,2,3}),
 				new ChoiceRenderer<Short>()
 		{
@@ -67,7 +90,8 @@ public class AddSubscriptionPage extends SubscriptionPage
 			}
 			
 		}));
-		form.add(new TextField("displayName", new Model(), String.class));
+		publicId.add(new TextField("displayName", String.class));
+		
 		form.add(new Button("ok")
 		{
 			@Override
@@ -77,16 +101,10 @@ public class AddSubscriptionPage extends SubscriptionPage
 				try
 				{
 					Subscription subscription = new Subscription();
-					PrivateIdentity privateIdentity = new PrivateIdentity();
-					privateIdentity.setIdentity((String) form.get("privateId.identity").getDefaultModelObject()); 
-					privateIdentity.setPassword((byte[]) form.get("password").getDefaultModelObject()); 
-					privateIdentity.setPassword((byte[]) form.get("operatorId").getDefaultModelObject()); 
+					PrivateIdentity privateIdentity = (PrivateIdentity) form.get("privateIdentity").getDefaultModelObject();  
 					privateIdentity.setSubscription(subscription);
 					
-					PublicIdentity publicIdentity = new PublicIdentity();
-					publicIdentity.setIdentity((String) form.get("publicId.identity").getDefaultModelObject()); 
-					publicIdentity.setBarred((Boolean) form.get("barred").getDefaultModelObject());
-					publicIdentity.setIdentityType((Short) form.get("identityType").getDefaultModelObject()); 
+					PublicIdentity publicIdentity = (PublicIdentity) form.get("publicIdentity").getDefaultModelObject(); 
 					privateIdentity.addPublicId(publicIdentity);
 					
 					_dao.saveWithCascade(subscription);

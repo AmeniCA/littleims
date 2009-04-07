@@ -3,13 +3,13 @@
 <wicket:extend>
 	<h2 wicket:id="title">User Account configuration</h2>
 	<form wicket:id="form">
-		<table class="dataDetails">
-			<tr>
+		<table wicket:id="privateIdentity" class="dataDetails">
+			<tr class="title">
 				<th colspan="2"><wicket:message key="contextPanel.privateIdentity"/></th>
 			</tr>
 			<tr>
 				<th><wicket:message key="privateId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="privateId.identity" type="text" /></td>
+				<td><input wicket:id="identity" type="text" /></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="privateId.password">Password</wicket:message></th>
@@ -24,12 +24,15 @@
                     <div class="description"><wicket:message key="privateId.operatorId.descr"/></div>
                 </td>
             </tr>
-            <tr>
+		</table>
+		
+		<table wicket:id="publicIdentity" class="dataDetails" >
+            <tr class="title">
 				<th colspan="2"><wicket:message key="contextPanel.publicIdentity"/></th>
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="publicId.identity" type="text" /></td>
+				<td><input wicket:id="identity" type="text" /></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.barred">Barred</wicket:message></th>
@@ -48,6 +51,9 @@
 				<th><wicket:message key="publicId.displayName"></wicket:message></th>
 				<td><input wicket:id="displayName" type="text" /></td>
 			</tr>
+		</table>
+		
+		<table class="actions" >
 			<wicket:enclosure>
 				<tr>
 					<th><wicket:message key="user.new.another">New user</wicket:message></th>

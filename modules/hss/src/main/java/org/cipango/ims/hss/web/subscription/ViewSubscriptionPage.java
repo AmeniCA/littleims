@@ -33,8 +33,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.util.collections.MicroMap;
-import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.Subscription;
@@ -50,18 +48,8 @@ public class ViewSubscriptionPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public ViewSubscriptionPage(PageParameters pageParameters)
 	{
-		_key = pageParameters.getLong("id");
-		Subscription subscription = null;
-		if (_key != null)
-		{
-			subscription = _dao.findById(_key);
-			if (subscription == null)
-			{
-				error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
-						new MicroMap("id", _key)));
-				_key = null;
-			}
-		}
+		Subscription subscription = getSubscription(pageParameters);
+		_key = subscription == null ? null : subscription.getId();
 		
 		_title = getString("view.subscription.title", new DaoDetachableModel(subscription));
 		add(new Label("title", _title));
