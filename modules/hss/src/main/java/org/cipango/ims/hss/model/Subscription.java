@@ -79,6 +79,19 @@ public class Subscription
 		}
 		return publicIds;
 	}
+	
+	public SortedSet<String> getPublicIds()
+	{
+		TreeSet<String> publicIds = new TreeSet<String>();
+		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
+		while (it.hasNext()) 
+		{
+			Iterator<PublicPrivate> it2 = it.next().getPublicIdentities().iterator();
+			while (it2.hasNext())
+				publicIds.add(it2.next().getPublicId());
+		}
+		return publicIds;
+	}
 
 	public void setPrivateIdentities(Set<PrivateIdentity> privateIdentities)
 	{

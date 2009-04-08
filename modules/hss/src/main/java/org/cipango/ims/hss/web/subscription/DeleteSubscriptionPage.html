@@ -1,6 +1,30 @@
 <wicket:extend>
 	<span wicket:id="delete.confirm">Please confirm you want to delete the user {}</span>
+
 	<form wicket:id="confirmForm">
+		<wicket:message key="subscription.delete.deletePrivateIds"/>
+		<ul wicket:id="privateIdsGroup">
+			<li wicket:id="list">
+				<!-- input wicket:id="delete" type="checkbox"/ -->
+				<span wicket:id="identity"></span>
+			</li>
+			<!-- li>
+				<input wicket:id="groupSelector" type="checkbox"/>
+				<wicket:message key="subscription.delete.all"></wicket:message>
+			</li -->
+		</ul>
+		<wicket:message key="subscription.delete.deletePublicIds"/>
+		<ul wicket:id="publicIdsGroup">
+			<li wicket:id="list">
+				<!-- input wicket:id="delete" type="checkbox"/ -->
+				<span wicket:id="identity"></span>
+			</li>
+			<!-- li>
+				<input wicket:id="groupSelector" type="checkbox"/>
+				<wicket:message key="subscription.delete.all"></wicket:message>
+			</li -->		
+		</ul>
+		<br/>
 		<input type="submit" wicket:id="delete" wicket:message="value:button.delete" />
 		<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
 	</form>

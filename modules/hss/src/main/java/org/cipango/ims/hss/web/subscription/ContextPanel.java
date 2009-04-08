@@ -4,6 +4,7 @@ package org.cipango.ims.hss.web.subscription;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
@@ -32,10 +33,7 @@ public class ContextPanel extends Panel {
 		add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getId())));
 		
-		final List<String> privateIds = new ArrayList<String>();
-		Iterator<PrivateIdentity> it = subscription.getPrivateIdentities().iterator();
-		while (it.hasNext())
-			privateIds.add(it.next().getIdentity());
+		final Set<String> privateIds = subscription.getPrivateIds();
 		
 		add(new RefreshingView("privateIds"){
 

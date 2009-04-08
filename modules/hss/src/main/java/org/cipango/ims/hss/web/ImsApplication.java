@@ -36,6 +36,7 @@ import org.cipango.ims.hss.web.publicid.DeletePublicIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
+import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
@@ -81,6 +82,7 @@ public class ImsApplication extends WebApplication {
 		mountBookmarkablePage("/subscriptions/browser", SubscriptionBrowserPage.class); 
 		mount(new MixedParamUrlCodingStrategy("/subscription/add", AddSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription/edit", EditSubscriptionPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/subscription/delete", DeleteSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription", ViewSubscriptionPage.class, id));
 		
 		mount(new MixedParamUrlCodingStrategy("/private-identity/edit", EditPrivateIdPage.class, id));
@@ -91,14 +93,7 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/public-identity/edit", EditPublicIdPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/public-identity/delete", DeletePublicIdPage.class, id));
 		mountBookmarkablePage("/public-identities/browser", PublicIdBrowserPage.class); 
-		
-		/* 
-		mountBookmarkablePage("/config/database/view", ViewDatabaseConfig.class);
-		mountBookmarkablePage("/config/database/edit", EditDatabaseConfig.class);
-		mountBookmarkablePage("/config/database/wizard", WizardDatabaseConfig.class);
-		
-		mount(new MixedParamUrlCodingStrategy("/status/registrations", Index.class, id));*/
-		
+				
 		wicketStarted = true;
 		springStart();
 	}
