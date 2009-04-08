@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -27,12 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity> implements PrivateIdentityDao
 {
 	private static final String GET_AVAILABLE_PUBLIC_IDS =
-		"SELECT p._publicIdentity.id FROM PublicPrivate AS p WHERE p._publicIdentity NOT IN (" +
+		"SELECT p._publicIdentity._identity FROM PublicPrivate AS p WHERE p._publicIdentity.id NOT IN (" +
 			"SELECT p._publicIdentity.id FROM PublicPrivate AS p WHERE p._privateIdentity = :privateId)" +
-			" AND p._privateIdentity._subscription.id = :subscription ORDER BY p._publicIdentity.id";
+			" AND p._privateIdentity._subscription.id = :subscription ORDER BY p._publicIdentity._identity";
 	
 	private static final String GET_AVAILABLE_PUBLIC_IDS_NO_SUB =
-		"SELECT p.id FROM PublicIdentity AS p WHERE p._privateIdentities IS EMPTY";
+		"SELECT p._identity FROM PublicIdentity AS p WHERE p._privateIdentities IS EMPTY";
+	
+	private static final String GET_BY_IDENTITY =
+		"FROM PrivateIdentity WHERE _identity = :key";
 
 	public PrivateIdentityDaoImpl(SessionFactory sessionFactory)
 	{
@@ -47,7 +51,9 @@ public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity
 	
 	public PrivateIdentity findById(String id)
 	{
-		return get(id);
+		Query query = currentSession().createQuery(GET_BY_IDENTITY);
+		query.setParameter("key", id);
+		return (PrivateIdentity) query.uniqueResult();
 	}
 	
 	public List<PrivateIdentity> findAll()
@@ -79,8 +85,8 @@ public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity
 		currentSession().delete(publicPrivate);
 	}
 
-	public PublicPrivate getPublicPrivate(String publicId, String privateId)
+	public PublicPrivate getPublicPrivate(PublicIdentity publicId, PrivateIdentity privateId)
 	{
-		return (PublicPrivate) currentSession().get(PublicPrivate.class, new PublicPrivate.Id(publicId, privateId));
+		return (PublicPrivate) currentSession().get(PublicPrivate.class, new PublicPrivate.Id(publicId.getId(), privateId.getId()));
 	}
 }

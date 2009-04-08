@@ -92,6 +92,17 @@ public class AddSubscriptionPage extends SubscriptionPage
 		}));
 		publicId.add(new TextField("displayName", String.class));
 		
+		WebMarkupContainer subscriptionMarkup = new WebMarkupContainer("subscription", new CompoundPropertyModel( new LoadableDetachableModel() {
+			@Override
+			protected Object load()
+			{
+				return new Subscription();
+			}
+			
+		}));
+		form.add(subscriptionMarkup);
+		subscriptionMarkup.add(new RequiredTextField<String>("name"));
+		
 		form.add(new Button("ok")
 		{
 			@Override
@@ -100,7 +111,8 @@ public class AddSubscriptionPage extends SubscriptionPage
 				Form form = getForm();
 				try
 				{
-					Subscription subscription = new Subscription();
+					Subscription subscription = (Subscription) form.get("subscription").getDefaultModelObject();
+					
 					PrivateIdentity privateIdentity = (PrivateIdentity) form.get("privateIdentity").getDefaultModelObject();  
 					privateIdentity.setSubscription(subscription);
 					
@@ -111,7 +123,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 
 					getSession().info(getString("modification.success"));
 
-					setResponsePage(ViewSubscriptionPage.class, new PageParameters("id=" + subscription.getId()));
+					setResponsePage(ViewSubscriptionPage.class, new PageParameters("id=" + subscription.getName()));
 				}
 				catch (Exception e)
 				{

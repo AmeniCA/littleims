@@ -121,15 +121,16 @@ public class EditPublicIdPage extends PublicIdentityPage
 		try
 		{
 			PublicIdentity publicIdentity = (PublicIdentity) form.getModelObject();
+
+			_dao.save(publicIdentity);
 			if (_privateIdKey != null)
 			{
 				PrivateIdentity privateIdentity = _privateIdentityDao.findById(_privateIdKey);
 				if (privateIdentity != null)
 				{
-					privateIdentity.addPublicId(publicIdentity);
+					_dao.save(privateIdentity.addPublicId(publicIdentity));
 				}
 			}
-			_dao.save(publicIdentity);
 
 			getSession().info(getString("modification.success"));
 		}

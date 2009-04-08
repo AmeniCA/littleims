@@ -35,6 +35,7 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 
 
@@ -132,9 +133,10 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		Collection<String> publicsModel = (Collection<String>) publics.getDefaultModelObject();
 		while (it.hasNext()) {
 			String publicId = (String) it.next();
+			PublicIdentity publicIdentity = _publicIdentityDao.findById(publicId);
 			if (remove)
 			{
-				_dao.delete(_dao.getPublicPrivate(publicId, _key));
+				_dao.delete(_dao.getPublicPrivate(publicIdentity, id));
 				publicsModel.remove(publicId);
 			}
 			else

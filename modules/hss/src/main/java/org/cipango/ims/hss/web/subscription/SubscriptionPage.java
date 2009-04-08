@@ -31,27 +31,17 @@ public abstract class SubscriptionPage extends BasePage
 	@SuppressWarnings("unchecked")
 	protected Subscription getSubscription(PageParameters pageParameters)
 	{
-		String sKey = pageParameters.getString("id");
+		String key = pageParameters.getString("id");
 		Subscription subscription = null;
-		if (sKey != null)
+		if (key != null)
 		{
-			try 
-			{
-				Long key = Long.parseLong(sKey);
-				subscription = _dao.findById(key);
-				if (subscription == null)
-				{
-					error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
-							new MicroMap("id", key)));
-					key = null;
-				}
-			}
-			catch (NumberFormatException e) 
+			subscription = _dao.findById(key);
+			if (subscription == null)
 			{
 				error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
-						new MicroMap("id", sKey)));
+						new MicroMap("id", key)));
+				key = null;
 			}
-
 		}
 		return subscription;
 	}
@@ -64,9 +54,9 @@ public abstract class SubscriptionPage extends BasePage
 
 	public class DaoDetachableModel extends LoadableDetachableModel<Subscription>
 	{
-		private Long key;
+		private String key;
 
-		public DaoDetachableModel(Long key)
+		public DaoDetachableModel(String key)
 		{
 			this.key = key;
 		}
@@ -75,7 +65,7 @@ public abstract class SubscriptionPage extends BasePage
 		{
 			super(o);
 			if (o != null)
-				this.key = o.getId();
+				this.key = o.getName();
 		}
 
 		@Override

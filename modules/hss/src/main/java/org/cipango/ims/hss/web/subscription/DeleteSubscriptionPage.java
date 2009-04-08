@@ -14,7 +14,6 @@
 package org.cipango.ims.hss.web.subscription;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,18 +21,14 @@ import java.util.List;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.Check;
 import org.apache.wicket.markup.html.form.CheckGroup;
-import org.apache.wicket.markup.html.form.CheckGroupSelector;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.Subscription;
 
@@ -49,7 +44,7 @@ public class DeleteSubscriptionPage extends SubscriptionPage {
 	@SuppressWarnings("unchecked")
 	public DeleteSubscriptionPage(PageParameters pageParameters) {
 		Subscription subscription = getSubscription(pageParameters);
-		final Long key = subscription == null ? null : subscription.getId();
+		final String key = subscription == null ? null : subscription.getName();
 
 		add(new Label("delete.confirm", 
 				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(subscription))));

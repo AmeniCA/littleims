@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,7 +35,10 @@ import javax.persistence.OneToMany;
 public class Subscription 
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
+	
+	@Column (unique = true)
+	private String _name;
 	
 	@OneToMany(mappedBy = "_subscription")
 	private Set<PrivateIdentity> _privateIdentities = new HashSet<PrivateIdentity>();
@@ -43,14 +47,24 @@ public class Subscription
 	@JoinColumn (nullable = true)
 	private Scscf _scscf;
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
+	}
+	
+	public String getName()
+	{
+		return _name;
+	}
+
+	public void setName(String name)
+	{
+		_name = name;
 	}
 
 	public Set<PrivateIdentity> getPrivateIdentities()

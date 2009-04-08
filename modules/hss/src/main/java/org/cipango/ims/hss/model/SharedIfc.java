@@ -32,13 +32,13 @@ public class SharedIfc
 		private int _id;
 
 		@Column(name = "SERVICE_PROFILE")
-		private long _serviceProfileId;
+		private Long _serviceProfileId;
 
 		public Key()
 		{
 		}
 
-		public Key(int sharedIfcId, long serviceProfileId)
+		public Key(int sharedIfcId, Long serviceProfileId)
 		{
 			_id = sharedIfcId;
 			_serviceProfileId = serviceProfileId;

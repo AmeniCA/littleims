@@ -22,7 +22,7 @@ import javax.persistence.Id;
 public class Scscf
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
 	
 	@Column(unique=true)
 	private String _name;
@@ -30,12 +30,12 @@ public class Scscf
 	@Column (unique=true)
 	private String _uri;
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
 	}

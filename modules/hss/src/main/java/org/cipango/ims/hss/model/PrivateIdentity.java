@@ -21,7 +21,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
@@ -40,7 +42,10 @@ public class PrivateIdentity
 	public static final byte[] DEFAULT_OPERATOR_ID = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	
 	
-	@Id
+	@Id @GeneratedValue
+	private Long _id;
+	
+	@Column (unique = true)
 	private String _identity;
 
 	private byte[] _password;
@@ -59,6 +64,17 @@ public class PrivateIdentity
 	
 	@ManyToMany
 	private Set<ServiceProfile> _serviceProfiles;
+	
+	
+	public Long getId()
+	{
+		return _id;
+	}
+
+	public void setId(Long id)
+	{
+		_id = id;
+	}
 	
 	public Set<ServiceProfile> getServiceProfiles()
 	{

@@ -29,7 +29,7 @@ import org.cipango.ims.hss.util.XML.Output;
 public class ApplicationServer implements Convertible
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
 	
 	@Column (unique = true)
 	private String _serverName;
@@ -51,12 +51,12 @@ public class ApplicationServer implements Convertible
 		_icfc = icfc;
 	}
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
 	}

@@ -17,6 +17,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.Subscription;
@@ -24,14 +25,14 @@ import org.cipango.ims.hss.model.Subscription;
 public class EditSubscriptionPage extends SubscriptionPage
 {
 
-	private Long _key;
+	private String _key;
 	private String _title;
 	
 	@SuppressWarnings("unchecked")
 	public EditSubscriptionPage(PageParameters pageParameters)
 	{
 		Subscription subscription = getSubscription(pageParameters);
-		_key = subscription == null ? null : subscription.getId();
+		_key = subscription == null ? null : subscription.getName();
 		
 		IModel model = new DaoDetachableModel(subscription);
 		
@@ -44,7 +45,7 @@ public class EditSubscriptionPage extends SubscriptionPage
 		add(new Label("title", getTitle()));
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("id"));
+		form.add(new RequiredTextField<String>("name"));
 		form.add(new Label("scscf"));
 		
 		form.add(new Button("submit")

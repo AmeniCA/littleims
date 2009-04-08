@@ -35,7 +35,7 @@ import org.cipango.ims.hss.util.XML.Output;
 public abstract class SPT implements XML.Convertible
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
 	private boolean _conditionNegated;
 	private int _groupId;
 	
@@ -44,7 +44,7 @@ public abstract class SPT implements XML.Convertible
 	private InitialFilterCriteria _initialFilterCriteria;
 	
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
@@ -59,7 +59,7 @@ public abstract class SPT implements XML.Convertible
 		_initialFilterCriteria = initialFilterCriteria;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
 	}

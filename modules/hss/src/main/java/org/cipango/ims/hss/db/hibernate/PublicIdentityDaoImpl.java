@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicPrivate;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> implements PublicIdentityDao
 {
 	private static final String FIND_LIKE = "SELECT p._identity FROM PublicIdentity AS p WHERE LOWER(p._identity) LIKE :id order by p._identity asc";
+	
+	private static final String GET_BY_IDENTITY =
+		"FROM PublicIdentity WHERE _identity = :key";
 	
 	public PublicIdentityDaoImpl(SessionFactory sessionFactory)
 	{
@@ -37,9 +41,11 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		return all();
 	}
 
-	public PublicIdentity findById(String id) 
+	public PublicIdentity findById(String id)
 	{
-		return get(id);
+		Query query = currentSession().createQuery(GET_BY_IDENTITY);
+		query.setParameter("key", id);
+		return (PublicIdentity) query.uniqueResult();
 	}
 
 	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
@@ -48,6 +54,13 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		currentSession().saveOrUpdate(impu);
 	}
 
+	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void save(PublicPrivate publicPrivate) 
+	{
+		currentSession().saveOrUpdate(publicPrivate);
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	public List<String> findLike(String id, int maxResults)
 	{
@@ -58,4 +71,5 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		
     	return query.list();
 	}
+	
 }

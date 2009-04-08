@@ -22,6 +22,6 @@ public interface SubscriptionDao extends Dao, ImsDao<Subscription>
 {
 	void save(Subscription subscription);
 	void saveWithCascade(Subscription subscription);
-	Subscription findById(long id);
+	Subscription findById(String id);
 	List<Subscription> findAll();
 }

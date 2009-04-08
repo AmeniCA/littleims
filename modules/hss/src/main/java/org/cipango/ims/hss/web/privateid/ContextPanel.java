@@ -40,7 +40,7 @@ public class ContextPanel extends Panel {
 		super("contextMenu");
 		setOutputMarkupId(true);
 		if (privateIdentity.getSubscription() != null)
-			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getId())));
+			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getName())));
 		else
 			add(new BookmarkablePageLink("subscriptionLink", EditSubscriptionPage.class).setVisible(false));
 		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));

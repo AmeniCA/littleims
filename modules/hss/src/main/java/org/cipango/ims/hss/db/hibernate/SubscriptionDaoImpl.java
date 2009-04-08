@@ -21,12 +21,16 @@ import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.Subscription;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class SubscriptionDaoImpl extends AbstractHibernateDao<Subscription> implements SubscriptionDao
 {
+	private static final String GET_BY_NAME =
+		"FROM Subscription WHERE _name = :key";
+	
 	public SubscriptionDaoImpl(SessionFactory sessionFactory)
 	{
 		super(sessionFactory);
@@ -48,14 +52,21 @@ public class SubscriptionDaoImpl extends AbstractHibernateDao<Subscription> impl
 			currentSession().saveOrUpdate(privateIdentity);
 			Iterator<PublicPrivate> it2 = privateIdentity.getPublicIdentities().iterator();
 			while (it2.hasNext())
-				currentSession().saveOrUpdate(it2.next().getPublicIdentity());
+			{
+				PublicPrivate publicPrivate = it2.next();
+				currentSession().saveOrUpdate(publicPrivate.getPublicIdentity());
+				publicPrivate.refresh();
+				currentSession().saveOrUpdate(publicPrivate);
+			}
 		}
 		
 	}
 	
-	public Subscription findById(long id)
+	public Subscription findById(String id)
 	{
-		return get(id);
+		Query query = currentSession().createQuery(GET_BY_NAME);
+		query.setParameter("key", id);
+		return (Subscription) query.uniqueResult();
 	}
 	
 	public List<Subscription> findAll()

@@ -33,15 +33,15 @@ public class PublicPrivate implements Convertible
 	@Embeddable
 	public static class Id implements Serializable {
 		@Column (name = "private_identity")
-		private String _privateId;
+		private Long _privateId;
 		@Column (name = "public_identity")
-		private String _publicId;
+		private Long _publicId;
 		
 		public Id()
 		{
 		}
 
-		public Id(String publicId, String privateId)
+		public Id(Long publicId, Long privateId)
 		{
 			_privateId = privateId;
 			_publicId = publicId;
@@ -60,27 +60,7 @@ public class PublicPrivate implements Convertible
 		@Override
 		public int hashCode()
 		{
-			return new String(_privateId + _publicId).hashCode();
-		}
-
-		public String getPrivateId()
-		{
-			return _privateId;
-		}
-
-		public void setPrivateId(String privateId)
-		{
-			_privateId = privateId;
-		}
-
-		public String getPublicId()
-		{
-			return _publicId;
-		}
-
-		public void setPublicId(String publicId)
-		{
-			_publicId = publicId;
+			return (int) (_privateId * 31 + _publicId);
 		}
 	}
 
@@ -106,10 +86,20 @@ public class PublicPrivate implements Convertible
 	{
 		_privateIdentity = privateIdentity;
 		_publicIdentity = publicIdentity;
-		_id._privateId = privateIdentity.getIdentity();
-		_id._publicId = publicIdentity.getIdentity();
+		_id._privateId = privateIdentity.getId();
+		_id._publicId = publicIdentity.getId();
 		publicIdentity.getPrivateIdentities().add(this);
 		privateIdentity.getPublicIdentities().add(this);
+	}
+	
+	public void refresh()
+	{
+		System.out.println(">>>_id._publicId: " +_id._publicId + "/" + _id._privateId);
+		if (_id._privateId == null)
+			_id._privateId = _privateIdentity.getId();
+		if (_id._publicId == null)
+			_id._publicId = _publicIdentity.getId();
+		System.out.println(">>>_id._publicId: " +_id._publicId + "/" + _id._privateId);
 	}
 	
 	public Id getId()
@@ -125,12 +115,12 @@ public class PublicPrivate implements Convertible
 	
 	public String getPublicId()
 	{
-		return _id._publicId;
+		return _publicIdentity.getIdentity();
 	}
 	
 	public String getPrivateId()
 	{
-		return _id._privateId;
+		return _privateIdentity.getIdentity();
 	}
 	
 	public PrivateIdentity getPrivateIdentity()

@@ -42,14 +42,14 @@ import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
 public class ViewSubscriptionPage extends SubscriptionPage
 {
 	
-	private Long _key;
+	private String _key;
 	private String _title;
 	
 	@SuppressWarnings("unchecked")
 	public ViewSubscriptionPage(PageParameters pageParameters)
 	{
 		Subscription subscription = getSubscription(pageParameters);
-		_key = subscription == null ? null : subscription.getId();
+		_key = subscription == null ? null : subscription.getName();
 		
 		_title = getString("view.subscription.title", new DaoDetachableModel(subscription));
 		add(new Label("title", _title));

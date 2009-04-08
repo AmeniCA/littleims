@@ -32,7 +32,7 @@ import org.cipango.ims.hss.util.XML.Output;
 public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>, Convertible
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
 	
 	private int _priority;
 	private Short _profilePartIndicator;
@@ -91,12 +91,12 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 		return _priority;
 	}
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
 	}

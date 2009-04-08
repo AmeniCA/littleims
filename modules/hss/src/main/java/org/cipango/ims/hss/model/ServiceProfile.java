@@ -33,7 +33,7 @@ import org.hibernate.annotations.SortType;
 public class ServiceProfile
 {
 	@Id @GeneratedValue
-	private long _id;
+	private Long _id;
 	
 	@ManyToMany
 	@JoinTable (
@@ -61,12 +61,12 @@ public class ServiceProfile
 		_sharedIfcs = sharedIfcs;
 	}
 
-	public long getId()
+	public Long getId()
 	{
 		return _id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		_id = id;
 	}

@@ -17,6 +17,7 @@ package org.cipango.ims.hss.db;
 import java.util.List;
 
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 
 public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
@@ -41,5 +42,5 @@ public interface PrivateIdentityDao extends ImsDao<PrivateIdentity>
      */
 	List<String> getAvalaiblePublicIdsNoPrivate();
 	
-	public PublicPrivate getPublicPrivate(String publicId, String privateId);
+	public PublicPrivate getPublicPrivate(PublicIdentity publicId, PrivateIdentity privateId);
 }

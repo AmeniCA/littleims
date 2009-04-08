@@ -24,7 +24,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -35,10 +37,13 @@ import org.cipango.ims.hss.util.XML.Output;
 @Entity
 public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 {
-	@Id
-	private String _identity;
+	@Id @GeneratedValue
+	private Long _id;
 	
-	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.ALL })
+	@Column (unique = true)
+	private String _identity;
+
+	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.REMOVE })
 	private Set<PublicPrivate> _privateIdentities = new HashSet<PublicPrivate>();
 
 	private boolean _barred;
@@ -51,6 +56,17 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
+	
+	
+	public Long getId()
+	{
+		return _id;
+	}
+
+	public void setId(Long id)
+	{
+		_id = id;
+	}
 	
 	public String getIdentity()
 	{

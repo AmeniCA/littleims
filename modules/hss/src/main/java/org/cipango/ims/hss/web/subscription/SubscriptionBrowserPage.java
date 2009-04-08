@@ -59,8 +59,8 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 		add(new BookmarkablePageLink("createLink2", AddSubscriptionPage.class));
 		
 		IColumn[] columns = new IColumn[3];
-		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".id", this, null),
-				"id", "id");
+		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
+				"name", "name");
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".scscf", this, null),
 				"scscf", "scscf");
 		columns[2] = new FilteredAbstractColumn(new Model("Actions"))
@@ -81,7 +81,7 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 		};
 
 		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"id"), 15);
+				"name"), 15);
 		table.setOutputMarkupId(true);
 		add(table);
 	}
@@ -99,10 +99,10 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 		public ActionsPanel(String id, Subscription subscription)
 		{
 			super(id);
-			Long key = null;
+			String key = null;
 			if (subscription != null)
 			{
-				key = subscription.getId();
+				key = subscription.getName();
 			}
 			add(new BookmarkablePageLink("viewLink", ViewSubscriptionPage.class, new PageParameters(
 					"id=" + key)));
