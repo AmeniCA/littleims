@@ -75,7 +75,6 @@ public class ImsApplication extends WebApplication {
 		getApplicationSettings().setClassResolver(new ClassResolver());
 		
 		getMarkupSettings().setStripWicketTags(true);
-		AutolinkBookmarkablePageLink.autoEnable=false;
 		
 		String[] id = new String[] {"id"};
 		

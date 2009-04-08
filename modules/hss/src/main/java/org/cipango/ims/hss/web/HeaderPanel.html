@@ -8,30 +8,33 @@
 <body>
 <wicket:panel>
     <div id="header">
+    	<div id="logo">LittleIMS</div>
+		<div id="statusBar">
+			<span>User: none</span>
+			<span class="link-delimiter">|</span>
+			LOGOUT
+			<span class="link-delimiter">|</span>
+			HISTORY
+		</div>
     	<wicket:link>
     	<div id="nav-container">
-	    	<ul id="nav">
-	    		<li>
-	    			<a><wicket:message key="headerPanel.users">Users</wicket:message></a>
-	    			<ul>
-		    			<li>
-							<a href="/org/cipango/ims/hss/web/subscription/SubscriptionBrowserPage.html">
-								<wicket:message key="headerPanel.subscriptions">Subscriptions</wicket:message>
-							</a>
-						</li>
-	    				<li>
-	    					<a href="/org/cipango/ims/hss/web/privateid/PrivateIdBrowserPage.html">
-	    						<wicket:message key="headerPanel.privateIds">Private identities</wicket:message>
-	    					</a>
-	    				</li>
-	    				<li>
-	    					<a href="/org/cipango/ims/hss/web/publicid/PublicIdBrowserPage.html">
-	    						<wicket:message key="headerPanel.publicIds">Public identities</wicket:message>
-	    					</a>
-	    				</li>
-	    			</ul>
-	    		</li>
-	    	</ul>
+	    	<ul>
+    			<li>
+					<a href="/org/cipango/ims/hss/web/subscription/SubscriptionBrowserPage.html">
+						<wicket:message key="headerPanel.subscriptions">Subscriptions</wicket:message>
+					</a>
+				</li>
+				<li>
+					<a href="/org/cipango/ims/hss/web/privateid/PrivateIdBrowserPage.html">
+						<wicket:message key="headerPanel.privateIds">Private identities</wicket:message>
+					</a>
+				</li>
+				<li>
+					<a href="/org/cipango/ims/hss/web/publicid/PublicIdBrowserPage.html">
+						<wicket:message key="headerPanel.publicIds">Public identities</wicket:message>
+					</a>
+				</li>
+			</ul>
 	    </div>
     	</wicket:link>
     </div>
