@@ -14,11 +14,11 @@
 
 package org.cipango.ims.hss.db;
 
-import org.cipango.ims.hss.model.Scscf;
+import org.cipango.ims.hss.model.ApplicationServer;
 
-public interface ScscfDao extends Dao, ImsDao<Scscf>
+public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
 {
-	void save(Scscf scscf);
-	Scscf findById(String id);
-	long getNbSubscriptions(Scscf scscf);
+	void save(ApplicationServer as);
+	ApplicationServer findById(String id);
+	long getNbIfcs(ApplicationServer applicationServer);
 }

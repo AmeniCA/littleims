@@ -14,39 +14,41 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
-import org.cipango.ims.hss.db.ScscfDao;
-import org.cipango.ims.hss.model.Scscf;
+import org.cipango.ims.hss.db.ApplicationServerDao;
+import org.cipango.ims.hss.model.ApplicationServer;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
-public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDao
+public class ApplicationServerDaoImpl extends AbstractHibernateDao<ApplicationServer> implements ApplicationServerDao
 {
 	private static final String GET_BY_NAME =
-		"FROM Scscf WHERE _name = :key";
-	private static final String NB_SUBSCRIPTIONS =
-		"SELECT count(*) FROM Subscription AS s WHERE s._scscf.id = :scscf";
+		"FROM ApplicationServer WHERE _name = :key";
 	
-	public ScscfDaoImpl(SessionFactory sessionFactory) 
+	private static final String NB_IFCS =
+		"SELECT count(*) FROM InitialFilterCriteria AS ifc WHERE ifc._applicationServer.id = :as";
+	
+	public ApplicationServerDaoImpl(SessionFactory sessionFactory) 
 	{
 		super(sessionFactory);
 	}
 	
-	public void save(Scscf scscf)
+	public void save(ApplicationServer applicationServer)
 	{
-		currentSession().saveOrUpdate(scscf);
+		currentSession().saveOrUpdate(applicationServer);
 	}
 
-	public Scscf findById(String id)
+	public ApplicationServer findById(String id)
 	{
 		Query query = currentSession().createQuery(GET_BY_NAME);
 		query.setParameter("key", id);
-		return (Scscf) query.uniqueResult();
+		return (ApplicationServer) query.uniqueResult();
 	}
-
-	public long getNbSubscriptions(Scscf scscf)
+	
+	public long getNbIfcs(ApplicationServer applicationServer)
 	{
-		Query query = currentSession().createQuery(NB_SUBSCRIPTIONS);
-		query.setParameter("scscf", scscf.getId());
+		Query query = currentSession().createQuery(NB_IFCS);
+		query.setParameter("as", applicationServer.getId());
 		return (Long) query.uniqueResult();
 	}
+
 }

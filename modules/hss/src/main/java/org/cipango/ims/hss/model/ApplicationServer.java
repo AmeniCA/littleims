@@ -32,6 +32,9 @@ public class ApplicationServer implements Convertible
 	private Long _id;
 	
 	@Column (unique = true)
+	private String _name;
+	
+	@Column (unique = true)
 	private String _serverName;
 	private Short _defaultHandling;
 	private String _serviceInformation;
@@ -109,6 +112,16 @@ public class ApplicationServer implements Convertible
 	public void setIncludeRegisterResponse(Boolean includeRegisterResponse)
 	{
 		_includeRegisterResponse = includeRegisterResponse;
+	}	
+	
+	public String getName()
+	{
+		return _name;
+	}
+
+	public void setName(String name)
+	{
+		_name = name;
 	}
 	
 	public void print(Output out)
@@ -124,5 +137,23 @@ public class ApplicationServer implements Convertible
 	{
 		public static final short SESSION_CONTINUED = 0;
 		public static final short SESSION_TERMINATED = 1;
+		
+		public static String toString(Short id)
+		{
+			if (id == null)
+				return "";
+			
+			switch (id)
+			{
+			case SESSION_CONTINUED:
+				return "SESSION_CONTINUED";
+			case SESSION_TERMINATED:
+				return "SESSION_TERMINATED";
+			default:
+				return "Unknown id " + id;
+			}
+		}
 	}
+
+
 }

@@ -81,6 +81,10 @@
 		<constructor-arg ref="sessionFactory"/>
 	</bean>
 	
+	<bean id="applicationServerDao" class="org.cipango.ims.hss.db.hibernate.ApplicationServerDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
 	<bean id="hss" class="org.cipango.ims.hss.Hss">
 		<property name="privateIdentityDao" ref="privateIdentityDao"></property>
 	</bean>

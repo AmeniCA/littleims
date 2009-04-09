@@ -11,42 +11,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.scscf;
 
-package org.cipango.ims.hss.db.hibernate;
-
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.diameter.ims.SCSCF;
 import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.model.Scscf;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
+import org.cipango.ims.hss.model.Subscription;
+import org.cipango.ims.hss.web.BasePage;
 
-public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDao
+public abstract class ScscfPage extends BasePage
 {
-	private static final String GET_BY_NAME =
-		"FROM Scscf WHERE _name = :key";
-	private static final String NB_SUBSCRIPTIONS =
-		"SELECT count(*) FROM Subscription AS s WHERE s._scscf.id = :scscf";
-	
-	public ScscfDaoImpl(SessionFactory sessionFactory) 
+
+	@SpringBean
+	protected ScscfDao _dao;
+		
+	protected String getPrefix()
 	{
-		super(sessionFactory);
-	}
-	
-	public void save(Scscf scscf)
-	{
-		currentSession().saveOrUpdate(scscf);
+		return "scscf";
 	}
 
-	public Scscf findById(String id)
+	public class DaoDetachableModel extends LoadableDetachableModel<Scscf>
 	{
-		Query query = currentSession().createQuery(GET_BY_NAME);
-		query.setParameter("key", id);
-		return (Scscf) query.uniqueResult();
+		private String key;
+
+		public DaoDetachableModel(String key)
+		{
+			this.key = key;
+		}
+
+		public DaoDetachableModel(Scscf o)
+		{
+			super(o);
+			if (o != null)
+				this.key = o.getName();
+		}
+
+		@Override
+		protected Scscf load()
+		{
+			if (key == null)
+				return new Scscf();
+			else
+				return _dao.findById(key);
+		}
 	}
 
-	public long getNbSubscriptions(Scscf scscf)
-	{
-		Query query = currentSession().createQuery(NB_SUBSCRIPTIONS);
-		query.setParameter("scscf", scscf.getId());
-		return (Long) query.uniqueResult();
-	}
 }

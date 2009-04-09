@@ -41,6 +41,7 @@ tr.even { background-color: #FFFFFF; }
 .dataDetails .defaultValue { font-style:italic; margin:0px 30px; }
 .dataDetails ul {padding:0pt; margin: 0px;}
 .dataDetails li {list-style: none; padding: 2px;}
+.dataDetails .longText { width: 200px; }
 .actions { color: black; background:white; width:400px; margin:10px 0px 0pt 0pt; }
 .actions th { text-align:left; vertical-align:top; color: black; background:white; font-weight:normal; white-space:nowrap; padding:3px; }
 
@@ -122,6 +123,7 @@ div.wicket-aa ul li.selected { background-color: #FFFF00; padding: 2px; margin:0
 #nav-container ul li {float:left; list-style-type:none; margin:0pt; padding:0pt; width:auto;}
 #nav-container ul li a {display:block; font-weight:700; margin:0pt; padding:6px 7px; text-decoration:none; text-transform:uppercase; color:#FFFFFF;}
 #nav-container ul li a:hover { color:#0068B2; background-color:#FFFFFF;}
+#nav-container ul li span em { color:#0068B2; background-color:#FFFFFF; display:block; font-weight:700; margin:0pt; padding:6px 7px; text-transform:uppercase;}
 
 .contextMenu {width:200px; float:left; min-width:10em;}
 .contextMenu ul {padding:0pt 0pt 0pt 15pt; }

@@ -16,6 +16,7 @@ package org.cipango.ims.hss.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -33,6 +34,9 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 {
 	@Id @GeneratedValue
 	private Long _id;
+	
+	@Column (unique = true)
+	private String _name;
 	
 	private int _priority;
 	private Short _profilePartIndicator;
@@ -116,12 +120,6 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 		_priority = priority;
 	}
 
-	public static class ProfilePartIndicator
-	{
-		public static final short REGISTERED = 0;
-		public static final short UNREGISTERED = 1;
-	}
-
 	public int compareTo(InitialFilterCriteria o)
 	{
 		if (getPriority() == o.getPriority())
@@ -139,4 +137,19 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 		out.add("ApplicationServer", _applicationServer);
 		out.add("ProfilePartIndicator", _profilePartIndicator);
 	}
+	public String getName()
+	{
+		return _name;
+	}
+	public void setName(String name)
+	{
+		_name = name;
+	}
+	
+	public static class ProfilePartIndicator
+	{
+		public static final short REGISTERED = 0;
+		public static final short UNREGISTERED = 1;
+	}
+
 }
