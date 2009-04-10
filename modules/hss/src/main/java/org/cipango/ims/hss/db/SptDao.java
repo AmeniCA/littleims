@@ -16,12 +16,12 @@ package org.cipango.ims.hss.db;
 
 import java.util.List;
 
-import org.cipango.ims.hss.model.ApplicationServer;
+import org.cipango.ims.hss.model.spt.SPT;
 
-public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
+public interface SptDao extends Dao, ImsDao<SPT>
 {
-	void save(ApplicationServer as);
-	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
-	List<ApplicationServer> getAll();
+	void save(SPT spt);
+	SPT findById(Long id);
+	List<SPT> getSptsByIfc(Long ifcId, Integer groupId);
+	List<Integer> getGroups(Long ifcId);
 }

@@ -14,14 +14,11 @@
 
 package org.cipango.ims.hss.db;
 
-import java.util.List;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 
-import org.cipango.ims.hss.model.ApplicationServer;
-
-public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
+public interface IfcDao extends Dao, ImsDao<InitialFilterCriteria>
 {
-	void save(ApplicationServer as);
-	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
-	List<ApplicationServer> getAll();
+	void save(InitialFilterCriteria ifc);
+	InitialFilterCriteria findById(String id);
+	InitialFilterCriteria findByRealKey(Long id);
 }

@@ -30,6 +30,9 @@ import org.cipango.ims.hss.util.HexString;
 import org.cipango.ims.hss.web.as.AsBrowserPage;
 import org.cipango.ims.hss.web.as.DeleteAsPage;
 import org.cipango.ims.hss.web.as.EditAsPage;
+import org.cipango.ims.hss.web.ifc.DeleteIfcPage;
+import org.cipango.ims.hss.web.ifc.EditIfcPage;
+import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
 import org.cipango.ims.hss.web.privateid.DeletePrivateIdPage;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.privateid.EditPublicIdsPage;
@@ -40,6 +43,7 @@ import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 import org.cipango.ims.hss.web.scscf.DeleteScscfPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.scscf.ScscfBrowserPage;
+import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
@@ -105,6 +109,12 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/application-server/edit", EditAsPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/application-server/delete", DeleteAsPage.class, id));
 		mountBookmarkablePage("/application-server/browser", AsBrowserPage.class);
+		
+		mount(new MixedParamUrlCodingStrategy("/ifc/edit", EditIfcPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/ifc/delete", DeleteIfcPage.class, id));
+		mountBookmarkablePage("/ics/browser", IfcBrowserPage.class);
+		
+		mount(new MixedParamUrlCodingStrategy("/spt/edit", EditSptsPage.class, id));
 				
 		wicketStarted = true;
 		springStart();

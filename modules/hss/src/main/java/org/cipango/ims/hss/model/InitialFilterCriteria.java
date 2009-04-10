@@ -16,6 +16,7 @@ package org.cipango.ims.hss.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,12 +43,12 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	private Short _profilePartIndicator;
 	
 	@ManyToOne
-	@JoinColumn (nullable = false, insertable=false, updatable=false)
+	@JoinColumn (nullable = false)
 	private ApplicationServer _applicationServer;
 	
 	private boolean _conditionTypeCnf;
 	
-	@OneToMany(mappedBy = "_initialFilterCriteria")
+	@OneToMany(mappedBy = "_initialFilterCriteria", cascade = { CascadeType.ALL })
 	private Set<SPT> _spts = new HashSet<SPT>();
 	
 	@ManyToMany (mappedBy = "_ifcs")
@@ -68,7 +69,17 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	public void setApplicationServer(ApplicationServer applicationServer)
 	{
 		_applicationServer = applicationServer;
+		if (applicationServer != null)
+			applicationServer.getIcfc().add(this);
 	}
+	public String getApplicationServerName()
+	{
+		if (_applicationServer == null)
+			return "";
+		else
+			return _applicationServer.getName();
+	}
+	
 	public boolean isConditionTypeCnf()
 	{
 		return _conditionTypeCnf;
@@ -150,6 +161,22 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	{
 		public static final short REGISTERED = 0;
 		public static final short UNREGISTERED = 1;
+		
+		public static String toString(Short id)
+		{
+			if (id == null)
+				return "";
+			
+			switch (id)
+			{
+			case REGISTERED:
+				return "REGISTERED";
+			case UNREGISTERED:
+				return "UNREGISTERED";
+			default:
+				return "Unknown id " + id;
+			}
+		}
 	}
 
 }

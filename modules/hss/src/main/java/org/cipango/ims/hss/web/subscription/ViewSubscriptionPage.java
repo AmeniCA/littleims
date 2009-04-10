@@ -20,10 +20,6 @@ import java.util.Iterator;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
@@ -38,6 +34,7 @@ import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
+import org.cipango.ims.hss.web.util.HideableLink;
 
 public class ViewSubscriptionPage extends SubscriptionPage
 {
@@ -201,33 +198,4 @@ public class ViewSubscriptionPage extends SubscriptionPage
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	class HideableLink extends AjaxLink
-	{	
-		private String _markupId;
-		
-		public HideableLink(String id, String markupId)
-		{
-			super(id);
-			_markupId = markupId;
-			setOutputMarkupId(true);
-		}
-		
-		public IAjaxCallDecorator getAjaxCallDecorator() 
-		{
-			return new AjaxCallDecorator() 
-			{
-				public CharSequence decorateScript(CharSequence script)
-				{
-					return "var wcall=0;hide('" + _markupId + "','" + getMarkupId(true)
-							+ "','" + getString("elementPanel.show") + "','" + getString("elementPanel.hide") + "');";
-				}
-			};
-		}
-		@Override
-		public void onClick(AjaxRequestTarget arg0)
-		{
-		}	
-	}
-
 }

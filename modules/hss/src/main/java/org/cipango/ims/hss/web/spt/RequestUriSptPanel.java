@@ -11,17 +11,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.spt;
 
-package org.cipango.ims.hss.db;
+import org.apache.wicket.markup.html.form.RequiredTextField;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.cipango.ims.hss.model.spt.SPT;
 
-import java.util.List;
-
-import org.cipango.ims.hss.model.ApplicationServer;
-
-public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
+public class RequestUriSptPanel extends Panel
 {
-	void save(ApplicationServer as);
-	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
-	List<ApplicationServer> getAll();
+	@SuppressWarnings("unchecked")
+	public RequestUriSptPanel(String id, IModel<SPT> sptModel)
+	{
+		super(id, sptModel);
+		add(new RequiredTextField("requestUri", String.class));
+	}
 }

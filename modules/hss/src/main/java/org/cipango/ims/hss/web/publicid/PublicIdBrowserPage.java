@@ -19,8 +19,6 @@ import java.util.List;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -29,7 +27,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -58,7 +55,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".barred", this, null),
 				"barred", "barred");
 		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".identityType", this, null),
-				"identityType", "identityTypeAsString");
+				"identity_type", "identityTypeAsString");
 		columns[3] = new PropertyColumn(new StringResourceModel(getPrefix() + ".state", this, null),
 				"state","stateAsString");
 		columns[4] = new FilteredAbstractColumn(new Model("Actions"))
@@ -88,7 +85,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		Form form = new Form("form");
         add(form);
 
-        final AutoCompleteTextField<String> field = new AutoCompleteTextField<String>("searchInput",
+        AutoCompleteTextField<String> field = new AutoCompleteTextField<String>("searchInput",
             new Model<String>(""))
         {
             @Override

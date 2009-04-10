@@ -11,45 +11,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-
 package org.cipango.ims.hss.db.hibernate;
 
-import org.cipango.ims.hss.db.ScscfDao;
-import org.cipango.ims.hss.model.Scscf;
+import java.util.List;
+
+import org.cipango.ims.hss.db.SptDao;
+import org.cipango.ims.hss.model.spt.SPT;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDao
+public class SptDaoImpl extends AbstractHibernateDao<SPT> implements SptDao
 {
-	private static final String GET_BY_NAME =
-		"FROM Scscf WHERE _name = :key";
-	private static final String NB_SUBSCRIPTIONS =
-		"SELECT count(*) FROM Subscription AS s WHERE s._scscf.id = :scscf";
+
+	private static final String GET_SPTS_BY_IFC =
+		"FROM SPT WHERE _initialFilterCriteria.id = :ifcId AND _groupId = :groupId ORDER BY _id";
 	
-	public ScscfDaoImpl(SessionFactory sessionFactory) 
+	private static final String GET_GROUPS_BY_IFC =
+		"SELECT distinct _groupId FROM SPT WHERE _initialFilterCriteria.id = :ifcId ORDER BY _groupId";
+	
+	public SptDaoImpl(SessionFactory sessionFactory) 
 	{
 		super(sessionFactory);
 	}
 	
+	public SPT findById(Long id)
+	{
+		return (SPT) get(id);
+	}
+
 	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void save(Scscf scscf)
+	public void save(SPT spt)
 	{
-		currentSession().saveOrUpdate(scscf);
+		currentSession().saveOrUpdate(spt);
 	}
 
-	public Scscf findById(String id)
+	@SuppressWarnings("unchecked")
+	public List<SPT> getSptsByIfc(Long ifcId, Integer groupId)
 	{
-		Query query = currentSession().createQuery(GET_BY_NAME);
-		query.setParameter("key", id);
-		return (Scscf) query.uniqueResult();
+		Query query = currentSession().createQuery(GET_SPTS_BY_IFC);
+		query.setParameter("ifcId", ifcId);
+		query.setParameter("groupId", groupId);
+		return query.list();
 	}
 
-	public long getNbSubscriptions(Scscf scscf)
+	@SuppressWarnings("unchecked")
+	public List<Integer> getGroups(Long ifcId)
 	{
-		Query query = currentSession().createQuery(NB_SUBSCRIPTIONS);
-		query.setParameter("scscf", scscf.getId());
-		return (Long) query.uniqueResult();
+		return currentSession().createQuery(GET_GROUPS_BY_IFC).setParameter("ifcId", ifcId).list();
 	}
+
 }

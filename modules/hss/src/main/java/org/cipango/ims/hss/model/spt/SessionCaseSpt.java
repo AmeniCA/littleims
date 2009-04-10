@@ -46,5 +46,25 @@ public class SessionCaseSpt extends SPT
 		public static final short TERMINATING_REGISTERED = 1;
 		public static final short TERMINATING_UNREGISTERED = 2;
 		public static final short ORIGINATING_UNREGISTERED = 3;
+		
+		public static String toString(Short id)
+		{
+			if (id == null)
+				return "";
+			
+			switch (id)
+			{
+			case ORIGINATING_SESSION:
+				return "ORIGINATING_SESSION";
+			case TERMINATING_REGISTERED:
+				return "TERMINATING_REGISTERED";
+			case TERMINATING_UNREGISTERED:
+				return "TERMINATING_UNREGISTERED";
+			case ORIGINATING_UNREGISTERED:
+				return "ORIGINATING_UNREGISTERED";
+			default:
+				return "Unknown id " + id;
+			}
+		}
 	}
 }

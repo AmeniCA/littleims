@@ -11,17 +11,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.ifc;
 
-package org.cipango.ims.hss.db;
 
-import java.util.List;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.web.spt.EditSptsPage;
 
-import org.cipango.ims.hss.model.ApplicationServer;
+@SuppressWarnings("unchecked")
+public class ContextPanel extends Panel {
 
-public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
-{
-	void save(ApplicationServer as);
-	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
-	List<ApplicationServer> getAll();
+	
+	public ContextPanel(InitialFilterCriteria ifc) {
+		super("contextMenu");
+		setOutputMarkupId(true);
+		add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters("id=" + ifc.getName())));
+		add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class, new PageParameters("id=" + ifc.getName())));
+		add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, new PageParameters("id=" + ifc.getName())));
+	}
+
+
 }

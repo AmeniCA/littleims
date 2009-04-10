@@ -11,17 +11,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.spt;
 
-package org.cipango.ims.hss.db;
+import java.util.Arrays;
 
-import java.util.List;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.cipango.ims.hss.model.spt.SPT;
+import org.cipango.ims.hss.model.spt.SessionCaseSpt.SessionCase;
 
-import org.cipango.ims.hss.model.ApplicationServer;
-
-public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
+public class SessionCaseSptPanel extends Panel
 {
-	void save(ApplicationServer as);
-	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
-	List<ApplicationServer> getAll();
+	@SuppressWarnings("unchecked")
+	public SessionCaseSptPanel(String id, IModel<SPT> sptModel)
+	{
+		super(id, sptModel);
+		add(new DropDownChoice("sessionCase",
+				Arrays.asList(new Short[]{0,1,2,3}),
+				new ChoiceRenderer<Short>()
+		{
+			@Override
+			public Object getDisplayValue(Short sessionCase)
+			{
+				return SessionCase.toString(sessionCase);
+			}
+			
+		}));
+	}
 }

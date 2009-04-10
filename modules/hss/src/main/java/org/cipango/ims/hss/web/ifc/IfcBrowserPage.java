@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web.as;
+package org.cipango.ims.hss.web.ifc;
 
 import java.util.Iterator;
 
@@ -21,7 +21,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataT
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -29,34 +28,28 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
-import org.cipango.ims.hss.model.ApplicationServer;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 
-public class AsBrowserPage extends AsPage
+public class IfcBrowserPage extends IfcPage
 {
 	
 	@SuppressWarnings("unchecked")
-	public AsBrowserPage()
+	public IfcBrowserPage()
 	{		
-		add(new BookmarkablePageLink("createLink", EditAsPage.class));
+		add(new BookmarkablePageLink("createLink", EditIfcPage.class));
 		
 		IColumn[] columns = new IColumn[4];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
-		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".serverName", this, null),
-				"server_name", "serverName");
-		columns[2] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbIfcs", this, null)) 
-		{
-			public void populateItem(Item cellItem, String componentId, IModel model)
-			{
-				cellItem.add(new Label(componentId, new Model(_dao.getNbIfcs((ApplicationServer) model.getObject()))));
-			}
-			
-		};
+		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".priority", this, null),
+				"priority", "priority");
+		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".applicationServer", this, null),
+				"application_server", "applicationServerName");
 		columns[3] = new AbstractColumn(new Model("Actions"))
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
-				cellItem.add(new ActionsPanel(componentId, (ApplicationServer) model.getObject()));
+				cellItem.add(new ActionsPanel(componentId, (InitialFilterCriteria) model.getObject()));
 			}
 		};
 
@@ -76,17 +69,17 @@ public class AsBrowserPage extends AsPage
 	private static class ActionsPanel extends Panel
 	{
 
-		public ActionsPanel(String id, ApplicationServer applicationServer)
+		public ActionsPanel(String id, InitialFilterCriteria ifc)
 		{
 			super(id);
 			String key = null;
-			if (applicationServer != null)
+			if (ifc != null)
 			{
-				key = applicationServer.getName();
+				key = ifc.getName();
 			}
-			add(new BookmarkablePageLink("editLink", EditAsPage.class, new PageParameters(
+			add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters(
 					"id=" + key)));
-			add(new BookmarkablePageLink("deleteLink", DeleteAsPage.class,
+			add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class,
 					new PageParameters("id=" + key)));
 		}
 
@@ -113,7 +106,7 @@ public class AsBrowserPage extends AsPage
 
 		public IModel model(Object o)
 		{
-			return new CompoundPropertyModel(new DaoDetachableModel((ApplicationServer) o));
+			return new CompoundPropertyModel(new DaoDetachableModel((InitialFilterCriteria) o));
 		}
 	}
 

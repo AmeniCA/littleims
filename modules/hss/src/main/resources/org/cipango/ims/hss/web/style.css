@@ -82,7 +82,7 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
 }
 
 .elementPanel { 
-    width:400px;
+    width:600px;
     border-color:#BBBBBB;
     border-style:dashed;
     border-width:0pt 1px 1px;

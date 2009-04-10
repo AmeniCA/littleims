@@ -14,55 +14,39 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
-import java.util.List;
-
-import org.cipango.ims.hss.db.ApplicationServerDao;
-import org.cipango.ims.hss.model.ApplicationServer;
+import org.cipango.ims.hss.db.IfcDao;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-public class ApplicationServerDaoImpl extends AbstractHibernateDao<ApplicationServer> implements ApplicationServerDao
+public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> implements IfcDao
 {
 	private static final String GET_BY_NAME =
-		"FROM ApplicationServer WHERE _name = :key";
+		"FROM InitialFilterCriteria WHERE _name = :key";
 	
-	private static final String NB_IFCS =
-		"SELECT count(*) FROM InitialFilterCriteria AS ifc WHERE ifc._applicationServer.id = :as";
-	
-	private static final String GET_ALL =
-		"FROM ApplicationServer ORDER BY _name";
-	
-	public ApplicationServerDaoImpl(SessionFactory sessionFactory) 
+	public IfcDaoImpl(SessionFactory sessionFactory) 
 	{
 		super(sessionFactory);
 	}
 	
-	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void save(ApplicationServer applicationServer)
+	@Transactional (readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void save(InitialFilterCriteria ifc)
 	{
-		currentSession().saveOrUpdate(applicationServer);
+		currentSession().saveOrUpdate(ifc);
 	}
 
-	public ApplicationServer findById(String id)
+	public InitialFilterCriteria findById(String id)
 	{
 		Query query = currentSession().createQuery(GET_BY_NAME);
 		query.setParameter("key", id);
-		return (ApplicationServer) query.uniqueResult();
-	}
-	
-	public long getNbIfcs(ApplicationServer applicationServer)
-	{
-		Query query = currentSession().createQuery(NB_IFCS);
-		query.setParameter("as", applicationServer.getId());
-		return (Long) query.uniqueResult();
+		return (InitialFilterCriteria) query.uniqueResult();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ApplicationServer> getAll()
+	public InitialFilterCriteria findByRealKey(Long id)
 	{
-		return currentSession().createQuery(GET_ALL).list();
+		return get(id);
 	}
 
 }

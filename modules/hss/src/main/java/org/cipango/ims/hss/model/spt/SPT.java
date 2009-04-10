@@ -40,7 +40,7 @@ public abstract class SPT implements XML.Convertible
 	private int _groupId;
 	
 	@ManyToOne
-	@JoinColumn (nullable = false, insertable=false, updatable=false)
+	@JoinColumn (nullable = false)
 	private InitialFilterCriteria _initialFilterCriteria;
 	
 
