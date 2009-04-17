@@ -40,4 +40,21 @@ public class MethodSpt extends SPT
 		out.add("Method", _method);	
 	}
 
+	@Override
+	public String doExpression()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Method ");
+		if (isRegex(_method))
+		{
+			if (isConditionNegated())
+				sb.append("NOT ");
+			sb.append("LIKE");
+		}
+		else
+			sb.append(isConditionNegated() ? "!=" : "=");
+		sb.append(" \"").append(_method).append("\"");
+		return sb.toString();
+	}
+
 }

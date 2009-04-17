@@ -49,5 +49,17 @@ public class SessionDescriptionSpt extends SPT
 		out.add("Content", _content);
 		out.close("SessionDescription");
 	}
+	
+	@Override
+	public String doExpression()
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("Line = \"" + _line + "\"");
+		if (_content != null)
+		{
+			sb.append(" Content = \"" + _content + "\"");
+		}
+		return sb.toString();
+	}
 
 }

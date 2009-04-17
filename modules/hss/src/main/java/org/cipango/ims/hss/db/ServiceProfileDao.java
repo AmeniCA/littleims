@@ -11,23 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web.scscf;
 
+package org.cipango.ims.hss.db;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.ims.hss.model.Scscf;
+import java.util.List;
 
-@SuppressWarnings("unchecked")
-public class ContextPanel extends Panel {
+import org.cipango.ims.hss.model.ServiceProfile;
 
-	
-	public ContextPanel(Scscf scscf) {
-		super("contextMenu");
-		add(new BookmarkablePageLink("editLink", EditScscfPage.class, new PageParameters("id=" + scscf.getName())));
-		add(new BookmarkablePageLink("deleteLink", DeleteScscfPage.class, new PageParameters("id=" + scscf.getName())));
-	}
-
-
+public interface ServiceProfileDao extends Dao, ImsDao<ServiceProfile>
+{
+	void save(ServiceProfile serviceProfile);
+	ServiceProfile findById(String id);
+	List<String> getAvailableIfc(ServiceProfile serviceProfile);
 }

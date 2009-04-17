@@ -34,7 +34,14 @@
   <!-- categories -->
 
 
-  <category name="org.cipango.littleims">
+  <category name="org.cipango.ims">
+    <param name="additivity" value="false"/>
+    <priority value="debug"/>
+    <appender-ref ref="console"/>
+    <appender-ref ref="littleims"/>
+  </category>
+  
+  <category name="org.cipango">
     <param name="additivity" value="false"/>
     <priority value="info"/>
     <appender-ref ref="console"/>
@@ -42,7 +49,7 @@
   </category>
   
   <root>
-    <priority value="info"/>
+    <priority value="warn"/>
     <appender-ref ref="console"/>
     <appender-ref ref="cipango"/>
   </root>

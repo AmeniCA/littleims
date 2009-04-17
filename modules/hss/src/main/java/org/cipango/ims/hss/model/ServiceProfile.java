@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,6 +35,9 @@ public class ServiceProfile
 {
 	@Id @GeneratedValue
 	private Long _id;
+	
+	@Column (unique = true)
+	private String _name;
 	
 	@ManyToMany
 	@JoinTable (
@@ -83,7 +87,30 @@ public class ServiceProfile
 	
 	public void addIfc(InitialFilterCriteria ifc)
 	{
-		_ifcs.add(ifc);
+		if (ifc != null)
+		{
+			_ifcs.add(ifc);
+			ifc.getServiceProfiles().add(this);
+		}
+	}
+	
+	public void removeIfc(InitialFilterCriteria ifc)
+	{
+		if (ifc != null)
+		{
+			_ifcs.remove(ifc);
+			ifc.getServiceProfiles().remove(this);
+		}
+	}
+
+	public String getName()
+	{
+		return _name;
+	}
+
+	public void setName(String name)
+	{
+		_name = name;
 	}
 
 }

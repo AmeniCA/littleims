@@ -88,6 +88,13 @@ public abstract class SPT implements XML.Convertible
 		out.add("ConditionNegated", _conditionNegated);	
 		doPrint(out);
 	}
-
+	
+	public abstract String doExpression();
+	
 	protected abstract void doPrint(Output out);
+	
+	public static boolean isRegex(String expression)
+	{
+		return expression.indexOf('!') != -1;
+	}
 }

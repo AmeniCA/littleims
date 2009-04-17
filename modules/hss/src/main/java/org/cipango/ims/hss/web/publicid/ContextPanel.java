@@ -27,7 +27,9 @@ public class ContextPanel extends Panel {
 		super("contextMenu");
 		add(new BookmarkablePageLink("editLink", EditPublicIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));
-		
+		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
+				new PageParameters("id=" + publicIdentity.getIdentity())));
+
 		final List<String> privateIds = new ArrayList<String>();
 		Iterator<PublicPrivate> it = publicIdentity.getPrivateIdentities().iterator();
 		while (it.hasNext())

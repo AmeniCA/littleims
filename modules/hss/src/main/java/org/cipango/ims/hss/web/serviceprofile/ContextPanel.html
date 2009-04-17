@@ -1,0 +1,33 @@
+<html>
+<head>
+    <wicket:link>
+    	<link rel="stylesheet" href="style.css" />
+    </wicket:link>
+</head>   
+<body>
+<wicket:panel>
+	<ul>
+		<li>
+			<a href="#" wicket:id="editLink"><wicket:message key="contextPanel.edit">Edit</wicket:message></a>
+		</li>
+		<li>
+			<a href="#" wicket:id="deleteLink"><wicket:message key="contextPanel.delete">Delete</wicket:message></a>
+		</li>
+		<li>
+			<wicket:message key="contextPanel.ifcs"/>
+			<ul>
+				<li wicket:id="ifcs">
+					<a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
+				</li>
+				<li>
+					<a href="#" wicket:id="ifcsLink"><wicket:message key="contextPanel.ifcs.edit">IFCS</wicket:message></a>
+				</li>
+				<li>
+					<a href="#" wicket:id="newIfcLink"><wicket:message key="ifc.new.link"/></a>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</wicket:panel>     
+</body>
+</html>

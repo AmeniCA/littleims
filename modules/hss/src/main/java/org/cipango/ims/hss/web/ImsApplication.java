@@ -43,21 +43,26 @@ import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 import org.cipango.ims.hss.web.scscf.DeleteScscfPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.scscf.ScscfBrowserPage;
+import org.cipango.ims.hss.web.serviceprofile.DeleteServiceProfilePage;
+import org.cipango.ims.hss.web.serviceprofile.EditIfcsPage;
+import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
+import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
+import org.cipango.ims.hss.web.util.ClassResolver;
 
 
 public class ImsApplication extends WebApplication {
 
-	private static ImsApplication instance;
+	private static ImsApplication __instance;
 	private PrivateIdentityDao _privateIdentityDao;
-	private SpringComponentInjector injector;
+	private SpringComponentInjector _injector;
 
-	private boolean wicketStarted = false;
+	private boolean _wicketStarted = false;
 	
 	private ImsApplication() {	
 	}
@@ -65,14 +70,14 @@ public class ImsApplication extends WebApplication {
 	public void springStart() {
 		// If Wicket not started could not addComponentInstantiationListener.
 		// As Wicket is not managed, ensure a new injector is set after refresh.
-		if (wicketStarted) {
-			injector = new SpringComponentInjector(this);
-			addComponentInstantiationListener(injector);	
+		if (_wicketStarted) {
+			_injector = new SpringComponentInjector(this);
+			addComponentInstantiationListener(_injector);	
 		}
 	}
 	
 	public void springStop() {
-		removeComponentInstantiationListener(injector);	
+		removeComponentInstantiationListener(_injector);	
 	}
 	
 	@Override
@@ -82,9 +87,7 @@ public class ImsApplication extends WebApplication {
 		// Need to change class resolver due a weird ClassNotFound (on Java 6 only) thrown on
 		// Classes.resolveClass("[B]")		
 		getApplicationSettings().setClassResolver(new ClassResolver());
-		
-		getMarkupSettings().setStripWicketTags(true);
-		
+				
 		String[] id = new String[] {"id"};
 		
 		mountBookmarkablePage("/subscriptions/browser", SubscriptionBrowserPage.class); 
@@ -112,11 +115,16 @@ public class ImsApplication extends WebApplication {
 		
 		mount(new MixedParamUrlCodingStrategy("/ifc/edit", EditIfcPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/ifc/delete", DeleteIfcPage.class, id));
-		mountBookmarkablePage("/ics/browser", IfcBrowserPage.class);
+		mountBookmarkablePage("/icfs/browser", IfcBrowserPage.class);
+		
+		mount(new MixedParamUrlCodingStrategy("/service-profile/edit", EditServiceProfilePage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/service-profile/ifcs", EditIfcsPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/service-profile/delete", DeleteServiceProfilePage.class, id));
+		mountBookmarkablePage("/service-profiles/browser", ServiceProfileBrowserPage.class);
 		
 		mount(new MixedParamUrlCodingStrategy("/spt/edit", EditSptsPage.class, id));
 				
-		wicketStarted = true;
+		_wicketStarted = true;
 		springStart();
 	}
 	
@@ -152,9 +160,9 @@ public class ImsApplication extends WebApplication {
 	 * @return
 	 */
 	public static ImsApplication getInstance() {
-		if (instance == null)
-			instance = new ImsApplication();
-		return instance;
+		if (__instance == null)
+			__instance = new ImsApplication();
+		return __instance;
 	}
 	
 	class ByteArrayConverter implements IConverter {

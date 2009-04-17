@@ -39,6 +39,23 @@ public class RequestUriSpt extends SPT
 	{
 		out.add("RequestURI", _requestUri);	
 	}
+
+	@Override
+	public String doExpression()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("RequestURI ");
+		if (isRegex(_requestUri))
+		{
+			if (isConditionNegated())
+				sb.append("NOT ");
+			sb.append("LIKE");
+		}
+		else
+			sb.append(isConditionNegated() ? "!=" : "=");
+		sb.append(" \"").append(_requestUri).append("\"");
+		return sb.toString();
+	}
 	
 
 }

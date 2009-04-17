@@ -15,6 +15,7 @@ package org.cipango.ims.hss.web.ifc;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -30,10 +31,11 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.ApplicationServerDao;
+import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
-import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 public class EditIfcPage extends IfcPage
 {
@@ -42,11 +44,19 @@ public class EditIfcPage extends IfcPage
 	private String _title;
 	@SpringBean
 	private ApplicationServerDao _applicationServerDao;
+	@SpringBean
+	private ServiceProfileDao _serviceProfileDao;
+	
+	private String _serviceProfileKey;
+	
+	private static final Logger __log = Logger.getLogger(EditIfcPage.class);
 	
 	@SuppressWarnings("unchecked")
 	public EditIfcPage(PageParameters pageParameters)
 	{
 		_key = pageParameters.getString("id");
+		_serviceProfileKey = pageParameters.getString("serviceProfile");
+		// TODO add with service profile
 		InitialFilterCriteria ifc = null;
 		if (_key != null)
 		{
@@ -152,12 +162,23 @@ public class EditIfcPage extends IfcPage
 			InitialFilterCriteria ifc = (InitialFilterCriteria) form.getModelObject();
 			ApplicationServer as = (ApplicationServer) form.get("applicationServer").getDefaultModelObject();
 			ifc.setApplicationServer(as);
-			_dao.save(ifc);
+			
+			if (_serviceProfileKey != null)
+			{
+				ServiceProfile profile = _serviceProfileDao.findById(_serviceProfileKey);
+				if (profile != null)
+				{
+					profile.addIfc(ifc);
+				}
+			}
 
+			_dao.save(ifc);
+			
 			getSession().info(getString("modification.success"));
 		}
 		catch (Exception e)
 		{
+			__log.debug(e.getMessage(), e);
 			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
 		}
 

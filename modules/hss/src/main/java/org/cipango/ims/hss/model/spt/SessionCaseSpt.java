@@ -39,6 +39,12 @@ public class SessionCaseSpt extends SPT
 	{
 		out.add("SessionCase", _sessionCase);
 	}
+	
+	@Override
+	public String doExpression()
+	{
+		return "SessionCase " + (isConditionNegated() ? "!=" : "")  + SessionCase.toString(_sessionCase);
+	}
 
 	public static class SessionCase
 	{
@@ -67,4 +73,5 @@ public class SessionCaseSpt extends SPT
 			}
 		}
 	}
+
 }

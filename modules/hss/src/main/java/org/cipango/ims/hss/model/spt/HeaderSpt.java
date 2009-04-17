@@ -53,5 +53,17 @@ public class HeaderSpt extends SPT
 		out.close("SIPHeader");
 	}
 	
+	@Override
+	public String doExpression()
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("Header = \"" + _header + "\"");
+		if (_content != null)
+		{
+			sb.append(" Content = \"" + _content + "\"");
+		}
+		return sb.toString();
+	}
+	
 
 }

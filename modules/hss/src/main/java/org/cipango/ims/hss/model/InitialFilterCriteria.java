@@ -52,7 +52,7 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	private Set<SPT> _spts = new HashSet<SPT>();
 	
 	@ManyToMany (mappedBy = "_ifcs")
-	private Set<ServiceProfile> _serviceProfiles;
+	private Set<ServiceProfile> _serviceProfiles = new HashSet<ServiceProfile>();
 	
 	public Set<ServiceProfile> getServiceProfiles()
 	{
