@@ -124,6 +124,11 @@ public class ApplicationServer implements Convertible
 		_name = name;
 	}
 	
+	public String toString()
+	{
+		return _name;
+	}
+	
 	public void print(Output out)
 	{
 		out.add("ServerName", _serverName);

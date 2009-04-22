@@ -14,6 +14,8 @@
 package org.cipango.ims.hss.web.subscription;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -36,24 +38,29 @@ public class EditSubscriptionPage extends SubscriptionPage
 		
 		IModel model = new DaoDetachableModel(subscription);
 		
-		if (isAdding()) {
-			_title = getString(getPrefix() + ".add.title");
-		} else {
-			_title = getString(getPrefix() + ".edit.title", model);
-		}
-		
-		add(new Label("title", getTitle()));
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		
+		if (isAdding()) 
+		{
+			_title = getString(getPrefix() + ".add.title");
+			form.add(new Label("title", "")).setVisible(false);
+		} 
+		else 
+		{
+			_title = getString(getPrefix() + ".edit.title", model);
+			form.add(new Label("title", subscription.getName()));
+		}
+		
 		form.add(new RequiredTextField<String>("name"));
 		form.add(new Label("scscf"));
 		
-		form.add(new Button("submit")
+		form.add(new AjaxFallbackButton("submit", form)
 		{
 			@Override
-			public void onSubmit()
+			protected void onSubmit(AjaxRequestTarget target, Form<?> f)
 			{
-				apply(getForm());
+				apply(f);
 			}
 		});
 		form.add(new Button("ok")

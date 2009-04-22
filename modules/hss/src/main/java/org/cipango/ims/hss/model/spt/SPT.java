@@ -32,7 +32,7 @@ import org.cipango.ims.hss.util.XML.Output;
 @DiscriminatorColumn(
 		name = "SPT_TYPE",
 		discriminatorType = DiscriminatorType.STRING)
-public abstract class SPT implements XML.Convertible
+public abstract class SPT implements XML.Convertible, Comparable<SPT>
 {
 	@Id @GeneratedValue
 	private Long _id;
@@ -89,7 +89,15 @@ public abstract class SPT implements XML.Convertible
 		doPrint(out);
 	}
 	
-	public abstract String doExpression();
+	public int compareTo(SPT o)
+	{
+		int delta1 = getGroupId() - o.getGroupId();
+		int delta2 = (int) (_id - o.getId());
+		
+		return delta1 * 16384 + (delta2 > 0 ? (delta2 & 0xFF) : -(-delta2 & 0xFF));
+	}
+	
+	public abstract String getExpression();
 	
 	protected abstract void doPrint(Output out);
 	
@@ -97,4 +105,6 @@ public abstract class SPT implements XML.Convertible
 	{
 		return expression.indexOf('!') != -1;
 	}
+	
+	
 }

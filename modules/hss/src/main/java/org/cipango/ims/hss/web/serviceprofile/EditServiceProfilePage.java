@@ -29,7 +29,7 @@ public class EditServiceProfilePage extends ServiceProfilePage
 {
 
 	private String _key;
-	private DaoDetachableModel _model;
+	private String _title;
 
 
 	@SuppressWarnings("unchecked")
@@ -47,10 +47,16 @@ public class EditServiceProfilePage extends ServiceProfilePage
 				_key = null;
 			}
 		}
-		_model = new DaoDetachableModel(serviceProfile);
+		DaoDetachableModel model = new DaoDetachableModel(serviceProfile);
 
-		add(new Label("title", getTitle()));
-		Form form = new Form("form", new CompoundPropertyModel(_model));
+		if (isAdding()) {
+			_title = getString(getPrefix() + ".add.title");
+		} else {
+			_title = getString(getPrefix() + ".edit.title", model);
+		}
+		
+		add(new Label("title", _title));
+		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 		form.add(new RequiredTextField<String>("name", String.class));
 		
@@ -113,11 +119,7 @@ public class EditServiceProfilePage extends ServiceProfilePage
 	@Override
 	public String getTitle()
 	{
-		if (isAdding()) {
-			return getString(getPrefix() + ".add.title");
-		} else {
-			return getString(getPrefix() + ".edit.title", _model);
-		}
+		return _title;
 	}
 }
 

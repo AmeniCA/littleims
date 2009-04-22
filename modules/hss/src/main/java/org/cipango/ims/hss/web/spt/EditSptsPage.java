@@ -140,6 +140,9 @@ public class EditSptsPage extends BasePage
 					}
 					
 				});
+				
+				boolean conditonType =  _ifcDao.findByRealKey(_ifcId).isConditionTypeCnf();
+				item.add(new Label("conditionType", conditonType ? "OR" : "AND"));
 			}
 		});	
 		
@@ -265,6 +268,8 @@ public class EditSptsPage extends BasePage
 						}
 					}
 				}.setDefaultFormProcessing(false));
+				boolean conditonType = item.getModelObject().getInitialFilterCriteria().isConditionTypeCnf();
+				item.add(new Label("conditionType", conditonType ? "AND" : "OR"));
 			}
 			
 		};

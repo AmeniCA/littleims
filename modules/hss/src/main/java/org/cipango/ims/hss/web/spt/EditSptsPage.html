@@ -8,30 +8,34 @@
 <wicket:extend>
 	<h1 wicket:id="title"></h1>
 	<form wicket:id="sptsForm">
-		<div class="elementPanel" wicket:id="groups">
-			<div class="title">
-				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
-				<wicket:message key="spt.groupId"/><b><span wicket:id="groupId"></span></b>
+		<span  wicket:id="groups">
+			<div class="elementPanel">
+				<div class="title">
+					<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+					<wicket:message key="spt.groupId"/><b><span wicket:id="groupId"></span></b>
+				</div>
+				<div class="body">
+					<ul>
+						<li wicket:id="spts">
+							<form wicket:id="form">
+								<wicket:message key="spt.not"/>
+								<input wicket:id="conditionNegated" type="checkbox"/>
+								<span wicket:id="spt.specific"></span>
+								<input type="submit" wicket:id="delete" wicket:message="value:button.delete" />
+							</form>
+							<li wicket:id="conditionType">OR</li>
+						</li>	
+						<li>
+							<select wicket:id="sptType">
+				        	</select>
+				        	<input type="submit" wicket:id="add" wicket:message="value:button.add" />
+						</li>
+					</ul>
+				</div>
 			</div>
-			<div class="body">
-				<ul>
-					<li wicket:id="spts">
-						<form wicket:id="form">
-							<wicket:message key="spt.not"/>
-							<input wicket:id="conditionNegated" type="checkbox"/>
-							<span wicket:id="spt.specific"></span>
-							<input type="submit" wicket:id="delete" wicket:message="value:button.delete" />
-						</form>
-						
-					</li>
-					<li>
-						<select wicket:id="sptType">
-			        	</select>
-			        	<input type="submit" wicket:id="add" wicket:message="value:button.add" />
-					</li>
-				</ul>
-			</div>
-		</div>
+			<div wicket:id="conditionType">OR</div>
+		</span>
+		<br/>
 		<input type="submit" wicket:id="add" wicket:message="value:spt.addGroup"/>
 		<input type="submit" wicket:id="ok" wicket:message="value:button.ok"/>
 	</form>

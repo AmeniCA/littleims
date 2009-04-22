@@ -6,11 +6,11 @@
 		<div class="elementPanel" wicket:id="privateIds">
 			<div class="title">
 				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
-				<wicket:message key="view.privateId.title"/><b><span wicket:id="identity"></span></b>
+				<wicket:message key="view.privateId.title"/><b wicket:id="identity"></b>
 			</div>
 			<div class="body">
 				<ul>
-					<li><wicket:message key="privateId.password"/>: <span wicket:id="password"></span></li>
+					<li><wicket:message key="privateId.password"/>: <span wicket:id="passwordAsString"></span></li>
 					<li><wicket:message key="privateId.operatorId"/>: <span wicket:id="operatorId"></span></li>
 					<li>
 						<wicket:message key="contextPanel.publicIdentities"/>

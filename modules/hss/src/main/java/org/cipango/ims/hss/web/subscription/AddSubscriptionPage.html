@@ -1,7 +1,7 @@
 <html>
 <body>        
 <wicket:extend>
-	<h2 wicket:id="title">User Account configuration</h2>
+	<h2 wicket:id="title"></h2>
 	<form wicket:id="form">
 		<table wicket:id="privateIdentity" class="dataDetails">
 			<tr class="title">
@@ -14,7 +14,7 @@
 			<tr>
 				<th><wicket:message key="privateId.password">Password</wicket:message></th>
 				<td>
-					<input wicket:id="password" type="text"/>
+					<input wicket:id="passwordAsString" type="text"/>
 				</td>
 			</tr>
 			<tr>
@@ -32,7 +32,7 @@
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="identity" type="text" /></td>
+				<td><input wicket:id="identity" type="text" onChange="setSubscriptionName(this);"/></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.barred">Barred</wicket:message></th>
@@ -51,6 +51,13 @@
 				<th><wicket:message key="publicId.displayName"></wicket:message></th>
 				<td><input wicket:id="displayName" type="text" /></td>
 			</tr>
+			<tr>
+				<th><wicket:message key="publicId.serviceProfile"/></th>
+				<td>
+	            	<select wicket:id="serviceProfile">
+	            	</select>
+	            </td>
+			</tr>
 		</table>
 		
 		<table wicket:id="subscription" class="dataDetails" >
@@ -59,7 +66,7 @@
 			</tr>
 			<tr>
 				<th><wicket:message key="subscription.name">Private URI</wicket:message></th>
-				<td><input wicket:id="name" type="text" /></td>
+				<td><input id="subscriptionName" wicket:id="name" type="text" /></td>
 			</tr>
 		</table>
 		

@@ -33,6 +33,7 @@ import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
+import org.hibernate.annotations.Index;
 
 @Entity
 public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
@@ -41,6 +42,7 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	private Long _id;
 	
 	@Column (unique = true)
+	@Index (name = "IDX_IDENTITY")
 	private String _identity;
 
 	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.REMOVE })
@@ -57,6 +59,10 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
 	
+	public PublicIdentity() 
+	{
+		_identityType = IdentityType.PUBLIC_USER_IDENTITY;
+	}
 	
 	public Long getId()
 	{

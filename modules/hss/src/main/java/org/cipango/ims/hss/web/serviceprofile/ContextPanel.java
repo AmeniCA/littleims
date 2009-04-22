@@ -15,7 +15,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
-import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -24,6 +23,10 @@ public class ContextPanel extends Panel {
 	public ContextPanel(ServiceProfile serviceProfile) {
 		super("contextMenu");
 		setOutputMarkupId(true);
+		
+		add(new BookmarkablePageLink("viewLink", ViewServiceProfilePage.class, 
+				new PageParameters("id=" + serviceProfile.getName())));
+		
 		add(new BookmarkablePageLink("editLink", EditServiceProfilePage.class, 
 				new PageParameters("id=" + serviceProfile.getName())));
 		

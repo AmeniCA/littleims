@@ -29,6 +29,8 @@ th { background:#0068B2 none repeat scroll 0% 50%; color:#FFFFFF; font-weight:bo
 tr.odd { background-color: #ECF2F6; }
 tr.even { background-color: #FFFFFF; }
 
+a {color:#003399;}
+
 
 /* ------------------------------------------------------------------------- */
 /*                                Wicket                                     */
@@ -82,7 +84,7 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
 }
 
 .elementPanel { 
-    width:600px;
+    width:700px;
     border-color:#BBBBBB;
     border-style:dashed;
     border-width:0pt 1px 1px;
@@ -90,7 +92,11 @@ table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.p
 }
 .elementPanel .title { background-color: #CCCCCC; padding:4px;}
 .elementPanel .title a { float:right;  }
+.elementPanel .title b a { float:none; text-decoration:none; color:#000000;}
 .elementPanel .body {padding:4px;}
+.elementPanel .body a { float:none;}
+.elementPanel .body ul {padding:0px 10px;}
+.elementPanel .body ul li {list-style-type:none; }
 
 /* Autocomplete field */
 div.wicket-aa { font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; font-size: 12px;

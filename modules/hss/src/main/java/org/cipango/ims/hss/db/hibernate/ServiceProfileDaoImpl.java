@@ -33,9 +33,8 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._serviceProfiles AS s WITH s.id = :profileId) ORDER BY i._name";
 	
 	
-	private static final String GET_AVAILABLE_GROUPS =
-		"SELECT g FROM Group AS g WHERE g.id NOT IN (" +
-			"SELECT g.id FROM Group AS g JOIN g.users AS u WITH u.id = :user) ORDER BY g.name";
+	private static final String GET_ALL =
+		"FROM ServiceProfile ORDER BY _name";
 	
 	public ServiceProfileDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -61,6 +60,12 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 		Query query = currentSession().createQuery(GET_AVAILABLE_IFCS);
     	query.setLong("profileId", serviceProfile.getId());
     	return query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ServiceProfile> getAllServiceProfile()
+	{
+		return currentSession().createQuery(GET_ALL).list();
 	}
 
 }

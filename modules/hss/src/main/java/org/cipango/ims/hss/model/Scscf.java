@@ -59,4 +59,9 @@ public class Scscf
 	{
 		_uri = uri;
 	}
+	
+	public String toString()
+	{
+		return _name;
+	}
 }

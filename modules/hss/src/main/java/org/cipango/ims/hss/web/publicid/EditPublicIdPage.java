@@ -25,13 +25,17 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
+import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 
 public class EditPublicIdPage extends PublicIdentityPage
@@ -43,6 +47,9 @@ public class EditPublicIdPage extends PublicIdentityPage
 	
 	@SpringBean
 	private PrivateIdentityDao _privateIdentityDao;
+	
+	@SpringBean
+	private ServiceProfileDao _serviceProfileDao;
 
 	@SuppressWarnings("unchecked")
 	public EditPublicIdPage(PageParameters pageParameters)
@@ -81,6 +88,26 @@ public class EditPublicIdPage extends PublicIdentityPage
 		}));
 		form.add(new TextField("displayName", String.class));
 		form.add(new Label("stateAsString"));
+		
+		form.add(new DropDownChoice("serviceProfile",
+				new LoadableDetachableModel() {
+			
+					@Override
+					protected Object load()
+					{
+						return _serviceProfileDao.getAllServiceProfile();
+					}
+			
+				},
+				new ChoiceRenderer<ServiceProfile>()
+				{
+					@Override
+					public Object getDisplayValue(ServiceProfile profile)
+					{
+						return profile.getName();
+					}
+					
+				}));
 		
 		form.add(new CheckBox("anotherUser", new Model<Boolean>()).setVisible(isAdding()));
 

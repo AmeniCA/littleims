@@ -41,7 +41,7 @@ public class RequestUriSpt extends SPT
 	}
 
 	@Override
-	public String doExpression()
+	public String getExpression()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("RequestURI ");

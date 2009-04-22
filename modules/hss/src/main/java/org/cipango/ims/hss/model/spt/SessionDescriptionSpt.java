@@ -51,7 +51,7 @@ public class SessionDescriptionSpt extends SPT
 	}
 	
 	@Override
-	public String doExpression()
+	public String getExpression()
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append("Line = \"" + _line + "\"");

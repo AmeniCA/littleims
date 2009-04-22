@@ -18,6 +18,7 @@ import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
+import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -29,6 +30,8 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + publicIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));
+		add(new BookmarkablePageLink("serviceProfileLink", ViewServiceProfilePage.class, 
+				new PageParameters("id=" + publicIdentity.getServiceProfile().getName())));
 
 		final List<String> privateIds = new ArrayList<String>();
 		Iterator<PublicPrivate> it = publicIdentity.getPrivateIdentities().iterator();

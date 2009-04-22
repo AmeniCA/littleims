@@ -23,4 +23,5 @@ public interface ServiceProfileDao extends Dao, ImsDao<ServiceProfile>
 	void save(ServiceProfile serviceProfile);
 	ServiceProfile findById(String id);
 	List<String> getAvailableIfc(ServiceProfile serviceProfile);
+	List<ServiceProfile> getAllServiceProfile();
 }

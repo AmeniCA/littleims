@@ -17,8 +17,6 @@ import java.util.Iterator;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -41,22 +39,8 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 	
 	@SuppressWarnings("unchecked")
 	public SubscriptionBrowserPage()
-	{
-		add(new AjaxFallbackLink("createLink") {
-			@Override
-			public void onClick(AjaxRequestTarget target)
-			{
-				Subscription subscription = new Subscription();
-				_dao.save(subscription);
-				info(getString("add.success"));	
-				if (target != null) {
-					target.addComponent(getPage().get("feedback"));
-					target.addComponent(getPage().get("browser"));
-				}
-			}	
-		});
-		
-		add(new BookmarkablePageLink("createLink2", AddSubscriptionPage.class));
+	{		
+		add(new BookmarkablePageLink("createLink", AddSubscriptionPage.class));
 		
 		IColumn[] columns = new IColumn[3];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),

@@ -1,9 +1,14 @@
 <html>
 <body>        
 <wicket:extend>
-	<h2 wicket:id="title"></h2>
 	<form wicket:id="form">
 		<table class="dataDetails">
+			<tr class="title">
+				<th colspan="2">
+					<wicket:message key="view.subscription.title"></wicket:message>
+					<b wicket:id="title"></b>
+				</th>
+			</tr>
 			<tr>
 				<th><wicket:message key="subscription.name"></wicket:message></th>
 				<td><input wicket:id="name" type="text"/></td>

@@ -54,14 +54,16 @@ public class HeaderSpt extends SPT
 	}
 	
 	@Override
-	public String doExpression()
+	public String getExpression()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("Header = \"" + _header + "\"");
+		sb.append("getHeader(\"" + _header + "\")");
 		if (_content != null)
 		{
-			sb.append(" Content = \"" + _content + "\"");
+			sb.append(" = \"" + _content + "\"");
 		}
+		else
+			sb.append(" != null");
 		return sb.toString();
 	}
 	

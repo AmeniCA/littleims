@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.cipango.ims.hss.db.PrivateIdentityDao;
@@ -64,6 +65,8 @@ public class PrivateIdentityDaoImpl extends AbstractHibernateDao<PrivateIdentity
 	@SuppressWarnings("unchecked")
 	public List<String> getAvalaiblePublicIds(PrivateIdentity privateIdentity)
 	{
+		if (privateIdentity == null)
+			return Collections.EMPTY_LIST;
 		Query query = currentSession().createQuery(GET_AVAILABLE_PUBLIC_IDS);
     	query.setParameter("privateId", privateIdentity);
     	query.setLong("subscription", privateIdentity.getSubscription().getId());

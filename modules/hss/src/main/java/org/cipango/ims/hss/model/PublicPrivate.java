@@ -94,12 +94,10 @@ public class PublicPrivate implements Convertible
 	
 	public void refresh()
 	{
-		System.out.println(">>>_id._publicId: " +_id._publicId + "/" + _id._privateId);
 		if (_id._privateId == null)
 			_id._privateId = _privateIdentity.getId();
 		if (_id._publicId == null)
 			_id._publicId = _publicIdentity.getId();
-		System.out.println(">>>_id._publicId: " +_id._publicId + "/" + _id._privateId);
 	}
 	
 	public Id getId()

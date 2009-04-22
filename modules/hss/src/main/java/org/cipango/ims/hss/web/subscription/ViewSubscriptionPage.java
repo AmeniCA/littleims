@@ -72,7 +72,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			protected void populateItem(Item item)
 			{
 				item.add(new Label("identity"));
-				item.add(new Label("password"));
+				item.add(new Label("passwordAsString"));
 				item.add(new Label("operatorId"));
 				
 				PrivateIdentity privateIdentity = (PrivateIdentity) item.getModelObject();

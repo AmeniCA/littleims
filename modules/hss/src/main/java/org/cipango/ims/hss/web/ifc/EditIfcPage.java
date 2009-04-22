@@ -36,6 +36,7 @@ import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
+import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 public class EditIfcPage extends IfcPage
 {
@@ -56,7 +57,7 @@ public class EditIfcPage extends IfcPage
 	{
 		_key = pageParameters.getString("id");
 		_serviceProfileKey = pageParameters.getString("serviceProfile");
-		// TODO add with service profile
+
 		InitialFilterCriteria ifc = null;
 		if (_key != null)
 		{
@@ -137,7 +138,10 @@ public class EditIfcPage extends IfcPage
 			public void onSubmit()
 			{
 				apply(getForm());
-				goToBackPage(IfcBrowserPage.class);
+				if (isAdding())
+					setResponsePage(EditSptsPage.class, new PageParameters("id=" + _key));
+				else
+					goToBackPage(IfcBrowserPage.class);
 			}
 		});
 		form.add(new Button("cancel")
@@ -171,7 +175,7 @@ public class EditIfcPage extends IfcPage
 					profile.addIfc(ifc);
 				}
 			}
-
+			_key = ifc.getName();
 			_dao.save(ifc);
 			
 			getSession().info(getString("modification.success"));

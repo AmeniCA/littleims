@@ -41,9 +41,11 @@ public abstract class PublicIdentityPage extends BasePage
 
 		public DaoDetachableModel(PublicIdentity publicIdentity)
 		{
-			super(publicIdentity);
+			// Create new PublicIdentity() if null, to have right default value.
+			super(publicIdentity == null ? new PublicIdentity() : publicIdentity);
 			if (publicIdentity != null)
 				this.key = publicIdentity.getIdentity();
+
 		}
 
 		@Override

@@ -1,0 +1,28 @@
+<html>
+<body>        
+<wicket:extend>
+	<h2 wicket:id="title"></h2>
+	<div id="subscription">
+		<div class="elementPanel" wicket:id="ifcs">
+			<div class="title">
+				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+				<wicket:message key="view.ifc.title"/>
+				<b><a wicket:id="elementLink"><span wicket:id="name"></span></a></b>
+			</div>
+			<div class="body">
+				<ul>
+					<li><wicket:message key="ifc.priority"/>: <span wicket:id="priority"></span></li>
+					<li><wicket:message key="ifc.profilePartIndicator"/>: <span wicket:id="profilePartIndicatorAsString"></span></li>
+					<li><wicket:message key="ifc.applicationServer"/>: <a wicket:id="asLink"><span wicket:id="applicationServer"></span></a></li>
+					<li>
+						<wicket:message key="ifc.expression"/>: 
+						<span wicket:id="expression"></span>&nbsp;&nbsp; 
+						<a wicket:id="sptLink">(<wicket:message key="button.edit"/>)</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</wicket:extend>
+</body>
+</html>

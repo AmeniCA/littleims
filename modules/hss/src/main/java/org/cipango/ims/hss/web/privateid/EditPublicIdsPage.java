@@ -64,8 +64,10 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		add(new Label("title", getTitle()));
 		
 		Form form = new Form("form");
-		form.setOutputMarkupId(true);
 		add(form);
+		form.setVisible(privateIdentity != null);
+		form.setOutputMarkupId(true);
+		
 		form.add(new AjaxFallbackButton("join.noSub", form) {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
@@ -110,10 +112,13 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		});
 		
 		List publics = new ArrayList();
-		Iterator<PublicPrivate> it = _dao.findById(_key).getPublicIdentities().iterator();
-		while (it.hasNext()) {
-			publics.add(it.next().getPublicId());
-		}		
+		if (privateIdentity != null)
+		{
+			Iterator<PublicPrivate> it = privateIdentity.getPublicIdentities().iterator();
+			while (it.hasNext()) {
+				publics.add(it.next().getPublicId());
+			}
+		}
 		form.add(new ListMultipleChoice(
 				"publics", 
 				new Model(new ArrayList()),

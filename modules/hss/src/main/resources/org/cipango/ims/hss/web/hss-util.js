@@ -37,3 +37,11 @@ function hide(id, linkId, hideText, showText) {
     var link = document.getElementById(linkId);
     link.replaceChild(linkText, link.firstChild);
 }
+
+function setSubscriptionName(element)
+{
+    var subscriptionName = document.getElementById("subscriptionName");
+    if (subscriptionName.value == null || subscriptionName.value == "")
+        subscriptionName.value = element.value;
+    
+}

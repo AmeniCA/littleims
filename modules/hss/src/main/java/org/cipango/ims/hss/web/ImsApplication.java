@@ -47,6 +47,7 @@ import org.cipango.ims.hss.web.serviceprofile.DeleteServiceProfilePage;
 import org.cipango.ims.hss.web.serviceprofile.EditIfcsPage;
 import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
 import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
+import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
@@ -117,6 +118,7 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/ifc/delete", DeleteIfcPage.class, id));
 		mountBookmarkablePage("/icfs/browser", IfcBrowserPage.class);
 		
+		mount(new MixedParamUrlCodingStrategy("/service-profile", ViewServiceProfilePage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/service-profile/edit", EditServiceProfilePage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/service-profile/ifcs", EditIfcsPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/service-profile/delete", DeleteServiceProfilePage.class, id));

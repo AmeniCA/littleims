@@ -14,7 +14,10 @@
 package org.cipango.ims.hss.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,6 +32,8 @@ import javax.persistence.OneToMany;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 
 @Entity
 public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>, Convertible
@@ -49,7 +54,8 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	private boolean _conditionTypeCnf;
 	
 	@OneToMany(mappedBy = "_initialFilterCriteria", cascade = { CascadeType.ALL })
-	private Set<SPT> _spts = new HashSet<SPT>();
+	@Sort (type = SortType.NATURAL)
+	private SortedSet<SPT> _spts = new TreeSet<SPT>();
 	
 	@ManyToMany (mappedBy = "_ifcs")
 	private Set<ServiceProfile> _serviceProfiles = new HashSet<ServiceProfile>();
@@ -88,11 +94,11 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	{
 		_conditionTypeCnf = conditionTypeCnf;
 	}
-	public Set<SPT> getSpts()
+	public SortedSet<SPT> getSpts()
 	{
 		return _spts;
 	}
-	public void setSpts(Set<SPT> spts)
+	public void setSpts(SortedSet<SPT> spts)
 	{
 		_spts = spts;
 	}
@@ -120,6 +126,11 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	{
 		return _profilePartIndicator;
 	}
+	
+	public String getProfilePartIndicatorAsString()
+	{
+		return ProfilePartIndicator.toString(_profilePartIndicator);
+	}
 
 	public void setProfilePartIndicator(Short profilePartIndicator)
 	{
@@ -134,7 +145,7 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	public int compareTo(InitialFilterCriteria o)
 	{
 		if (getPriority() == o.getPriority())
-			return hashCode() - o.hashCode();
+			return (int) (_id - o.getId());
 		return getPriority() - o.getPriority();
 	}
 	
@@ -148,6 +159,39 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 		out.add("ApplicationServer", _applicationServer);
 		out.add("ProfilePartIndicator", _profilePartIndicator);
 	}
+	
+	public String getExpression()
+	{
+		if (_spts.isEmpty())
+			return "";
+		if (_spts.size() == 1)
+			return _spts.iterator().next().getExpression();
+		Iterator<SPT> it = _spts.iterator();
+		Integer groupId = null;
+		StringBuilder sb = new StringBuilder();
+		while (it.hasNext())
+		{
+			SPT spt = (SPT) it.next();
+			if (groupId == null)
+			{
+				groupId = spt.getGroupId();
+				sb.append('(');
+			} else if (groupId != spt.getGroupId())
+			{
+				sb.append(')');
+				sb.append(_conditionTypeCnf ? " || " : " && ");
+				sb.append('(');
+			}
+			else
+			{
+				sb.append(_conditionTypeCnf ? " && " : " || ");
+			}
+			sb.append(spt.getExpression());
+		}
+		sb.append(')');
+		return sb.toString();
+	}
+	
 	public String getName()
 	{
 		return _name;

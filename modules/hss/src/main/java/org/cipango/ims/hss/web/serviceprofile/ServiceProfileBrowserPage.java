@@ -84,6 +84,8 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 			if (serviceProfile != null)
 				key = serviceProfile.getName();
 
+			add(new BookmarkablePageLink("viewLink", ViewServiceProfilePage.class, new PageParameters(
+					"id=" + key)));
 			add(new BookmarkablePageLink("editLink", EditServiceProfilePage.class, new PageParameters(
 					"id=" + key)));
 			add(new BookmarkablePageLink("deleteLink", DeleteServiceProfilePage.class,

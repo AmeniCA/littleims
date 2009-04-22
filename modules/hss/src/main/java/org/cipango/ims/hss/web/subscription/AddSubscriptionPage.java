@@ -28,16 +28,21 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
+import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 
 public class AddSubscriptionPage extends SubscriptionPage
 {
-
+	@SpringBean
+	private ServiceProfileDao _serviceProfileDao;
+	
 	@SuppressWarnings("unchecked")
 	public AddSubscriptionPage()
 	{
@@ -45,7 +50,8 @@ public class AddSubscriptionPage extends SubscriptionPage
 		Form form = new Form("form");
 		add(form);
 		
-		WebMarkupContainer privateId = new WebMarkupContainer("privateIdentity", new CompoundPropertyModel( new LoadableDetachableModel(new PrivateIdentity()) {
+		WebMarkupContainer privateId = new WebMarkupContainer("privateIdentity", 
+				new CompoundPropertyModel( new LoadableDetachableModel(new PrivateIdentity()) {
 			@Override
 			protected Object load()
 			{
@@ -56,7 +62,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 		form.add(privateId);
 		
 		privateId.add(new RequiredTextField<String>("identity"));
-		privateId.add(new TextField("password", byte[].class));
+		privateId.add(new TextField("passwordAsString", String.class));
 		privateId.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
 		{
 			@Override
@@ -67,7 +73,8 @@ public class AddSubscriptionPage extends SubscriptionPage
 			}
 		}));
 		
-		WebMarkupContainer publicId = new WebMarkupContainer("publicIdentity", new CompoundPropertyModel( new LoadableDetachableModel() {
+		WebMarkupContainer publicId = new WebMarkupContainer("publicIdentity", 
+				new CompoundPropertyModel( new LoadableDetachableModel(new PublicIdentity()) {
 			@Override
 			protected Object load()
 			{
@@ -91,6 +98,25 @@ public class AddSubscriptionPage extends SubscriptionPage
 			
 		}));
 		publicId.add(new TextField("displayName", String.class));
+		publicId.add(new DropDownChoice("serviceProfile",
+				new LoadableDetachableModel() {
+			
+					@Override
+					protected Object load()
+					{
+						return _serviceProfileDao.getAllServiceProfile();
+					}
+			
+				},
+				new ChoiceRenderer<ServiceProfile>()
+				{
+					@Override
+					public Object getDisplayValue(ServiceProfile profile)
+					{
+						return profile.getName();
+					}
+					
+				}));
 		
 		WebMarkupContainer subscriptionMarkup = new WebMarkupContainer("subscription", new CompoundPropertyModel( new LoadableDetachableModel() {
 			@Override

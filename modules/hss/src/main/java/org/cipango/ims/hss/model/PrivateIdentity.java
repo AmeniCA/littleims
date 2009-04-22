@@ -32,6 +32,7 @@ import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.util.XML;
 import org.cipango.ims.hss.util.XML.Output;
+import org.hibernate.annotations.Index;
 
 /**
  * Private Identity
@@ -46,6 +47,7 @@ public class PrivateIdentity
 	private Long _id;
 	
 	@Column (unique = true)
+	@Index (name = "IDX_IDENTITY")
 	private String _identity;
 
 	private byte[] _password;
@@ -104,6 +106,21 @@ public class PrivateIdentity
 	public void setPassword(byte[] password)
 	{
 		_password = password;
+	}
+	
+	public String getPasswordAsString()
+	{
+		if (_password == null)
+			return null;
+		return new String(_password); // TODO encoding
+	}
+
+	public void setPasswordAsString(String password)
+	{
+		if (password == null)
+			_password = null;
+		else
+			_password = password.getBytes();
 	}
 
 	public byte[] getOperatorId()

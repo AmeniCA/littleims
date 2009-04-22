@@ -41,7 +41,7 @@ public class MethodSpt extends SPT
 	}
 
 	@Override
-	public String doExpression()
+	public String getExpression()
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Method ");
