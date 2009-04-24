@@ -84,7 +84,7 @@ public abstract class SPT implements XML.Convertible, Comparable<SPT>
 
 	public void print(Output out)
 	{
-		out.add("group", _groupId);
+		out.add("Group", _groupId);
 		out.add("ConditionNegated", _conditionNegated);	
 		doPrint(out);
 	}

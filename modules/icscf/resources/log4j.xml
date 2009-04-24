@@ -12,7 +12,7 @@
   </appender>
 
   <appender name="littleims" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="${jetty.home}/logs/littleims-hss.log" />
+    <param name="File" value="${jetty.home}/logs/littleims-icscf.log" />
     <param name="Append" value="false" />
     <param name="MaxFileSize" value="3000KB" />
     <param name="MaxBackupIndex" value="10000" />
@@ -34,22 +34,15 @@
   <!-- categories -->
 
 
-  <category name="org.cipango.ims">
+  <category name="org.cipango.littleims">
     <param name="additivity" value="false"/>
     <priority value="debug"/>
     <appender-ref ref="console"/>
     <appender-ref ref="littleims"/>
   </category>
   
-  <category name="org.cipango">
-    <param name="additivity" value="false"/>
-    <priority value="info"/>
-    <appender-ref ref="console"/>
-    <appender-ref ref="littleims"/>
-  </category>
-  
   <root>
-    <priority value="warn"/>
+    <priority value="info"/>
     <appender-ref ref="console"/>
     <appender-ref ref="cipango"/>
   </root>

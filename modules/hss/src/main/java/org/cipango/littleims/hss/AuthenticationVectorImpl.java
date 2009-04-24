@@ -17,13 +17,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 
 import org.apache.log4j.Logger;
-import org.cipango.littleims.cx.AuthenticationVector;
 import org.cipango.littleims.util.Base64;
 import org.cipango.littleims.util.HexString;
 
 
 
-public class AuthenticationVectorImpl implements AuthenticationVector {
+public class AuthenticationVectorImpl {
 
 	private static final Logger logger = Logger.getLogger(AuthenticationVectorImpl.class);
 	

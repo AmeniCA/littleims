@@ -1,5 +1,5 @@
 // ========================================================================
-// Copyright 2009 NEXCOM Systems
+// Copyright 2008-2009 NEXCOM Systems
 // ------------------------------------------------------------------------
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,45 +13,9 @@
 // ========================================================================
 package org.cipango.littleims.cx;
 
-public class LIA extends Answer
+public class UserAuthorizationType
 {
-	private String _scscfName;
-	private String _wilcardPublicId;
-	private String _wilcardPSI;
-	
-	public LIA(int resultCode)
-	{
-		super(resultCode);
-	}
-
-	public String getScscfName()
-	{
-		return _scscfName;
-	}
-
-	public void setScscfName(String scscfName)
-	{
-		_scscfName = scscfName;
-	}
-
-	public String getWilcardPublicId()
-	{
-		return _wilcardPublicId;
-	}
-
-	public void setWilcardPublicId(String wilcardPublicId)
-	{
-		_wilcardPublicId = wilcardPublicId;
-	}
-
-	public String getWilcardPSI()
-	{
-		return _wilcardPSI;
-	}
-
-	public void setWilcardPSI(String wilcardPSI)
-	{
-		_wilcardPSI = wilcardPSI;
-	}
-
+	public static final int REGISTRATION = 0; 
+	public static final int DE_REGISTRATION = 1; 
+	public static final int REGISTRATION_AND_CAPABILITIES = 2; 
 }

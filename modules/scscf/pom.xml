@@ -38,10 +38,50 @@
               <name>sip.port</name>
               <value>5070</value>
             </systemProperty>
+            <systemProperty>
+              <name>sip.host</name>
+              <value>s-cscf.nexcom.voip</value>
+            </systemProperty>
+            <systemProperty>
+              <name>jetty.port</name>
+              <value>8090</value>
+            </systemProperty>
+            <systemProperty>
+              <name>jetty.home</name>
+              <value>.</value>
+            </systemProperty>
           </systemProperties>
+          <diameterNode implementation="org.cipango.diameter.Node">
+            <connectors>
+              <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
+                <port>3878</port>
+                <host>s-cscf.nexcom.voip</host>
+              </connector>
+            </connectors>
+            <identity>s-cscf.nexcom.voip</identity>
+            <peers>
+              <peer implementation="org.cipango.diameter.Peer">
+                <host>hss-nicolas.nexcom.voip</host>
+              </peer>
+            </peers>
+          </diameterNode>
+
           <stopKey>foo</stopKey>
           <stopPort>9999</stopPort>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <executions>
+           <execution>
+              <goals>
+                 <goal>xmlbeans</goal>
+              </goals>
+           </execution>
+        </executions>
+        <inherited>true</inherited>
       </plugin>
       
     </plugins>
@@ -70,6 +110,14 @@
     <dependency>
        <groupId>dom4j</groupId>
        <artifactId>dom4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>stax</groupId>
+      <artifactId>stax-api</artifactId>
     </dependency>
   </dependencies>
   

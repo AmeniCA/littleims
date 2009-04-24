@@ -53,7 +53,18 @@
               <name>log4j.configuration</name>
               <value>file:resources/log4j.xml</value>
             </systemProperty>
+            <systemProperty>
+              <name>sip.port</name>
+              <value>5050</value>
+            </systemProperty>
           </systemProperties>
+          <diameterNode implementation="org.cipango.diameter.Node">
+            <connectors>
+              <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
+                <port>3868</port>
+              </connector>
+            </connectors>
+          </diameterNode>
           <stopKey>foo</stopKey>
           <stopPort>9998</stopPort>
         </configuration>

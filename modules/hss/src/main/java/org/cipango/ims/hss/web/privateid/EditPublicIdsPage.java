@@ -146,15 +146,13 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 			}
 			else
 			{
-				id.addPublicId(_publicIdentityDao.findById(publicId));
+				_publicIdentityDao.save(id.addPublicId(_publicIdentityDao.findById(publicId)));
 				publicsModel.add(publicId);
 				((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
 			}
 			choosen.remove(publicId);
 			it.remove();
 		}
-		if (!remove)
-			_dao.save(id);
 				
 		if (target != null)
 		{

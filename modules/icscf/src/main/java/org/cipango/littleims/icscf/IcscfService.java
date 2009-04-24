@@ -28,10 +28,10 @@ import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.littleims.cx.Cx;
-import org.cipango.littleims.cx.LIA;
-import org.cipango.littleims.cx.UAA;
-import org.cipango.littleims.cx.Cx.UserAuthorizationType;
+import org.cipango.diameter.AVP;
+import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.ims.IMS;
+import org.cipango.littleims.cx.UserAuthorizationType;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Digest;
 import org.cipango.littleims.util.Headers;
@@ -42,13 +42,14 @@ public class IcscfService
 
 	private static final Logger __log = Logger.getLogger(IcscfService.class);
 
+	private static final String ORIG_PARAM = "orig";
+	private static final String TERM_PARAM = "term";	
 	
-	private Cx _cx;
+	private CxManager _cxManager;
 	private SipFactory _sipFactory;
 	private boolean _terminatingDefault;
 	private List<String> _psiSubDomains;
-		
-
+	
 	public void doRegister(SipServletRequest request) throws ServletException, IOException
 	{
 		// TS 22229 §5.3.
@@ -66,21 +67,119 @@ public class IcscfService
 		if (ah != null)
 			privateUserId = ah.getParameter(Digest.USERNAME_PARAM);
 		
-		UAA uaa = _cx.uar(aor.toString(), privateUserId, 
-				request.getHeader(Headers.P_VISITED_NETWORK_ID), getUserAuthorizationType(request));
-		
-		if (!uaa.isSuccess())
-		{
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-			return;
-		}
-		
-		request.setRequestURI(_sipFactory.createURI(uaa.getScscfName()));
-		
-		proxy(request);
+		_cxManager.sendUAR(aor.toString(), privateUserId,
+				request.getHeader(Headers.P_VISITED_NETWORK_ID), 
+				getUserAuthorizationType(request), request);
 	}
 	
-	private UserAuthorizationType getUserAuthorizationType(SipServletRequest request) throws ServletParseException
+	public void handleUAA(DiameterAnswer uaa)
+	{
+		SipServletRequest request = (SipServletRequest) uaa.getRequest().getAttribute(SipServletRequest.class.getName());
+		try
+		{
+			if ( uaa.getResultCode() >= 3000)
+			{
+				__log.debug("Diameter UAA answer is not valid: " + uaa.getResultCode() + ". Sending 403 response");
+	
+				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+				return;
+			}
+			
+			String scscfName = uaa.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString();
+			request.setRequestURI(_sipFactory.createURI(scscfName));
+			AVP avp = uaa.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
+			if (avp != null)
+			{
+				request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+			}
+			proxy(request);
+		}
+		catch (Throwable e) 
+		{
+			__log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
+			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
+		}
+		finally
+		{
+			request.getApplicationSession().invalidate();
+		}
+	}
+	
+	public void handleLIA(DiameterAnswer lia)
+	{
+		SipServletRequest request = (SipServletRequest) lia.getRequest().getAttribute(SipServletRequest.class.getName());
+		try
+		{
+			if ( lia.getResultCode() >= 3000)
+			{
+				__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 403 response");
+	
+				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+				return;
+			}
+			
+			if (isOriginating(request))
+			{
+				if (lia.getResultCode() >= 3000)
+				{
+					__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 404 response");	
+					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					return;
+				}
+				
+				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString());
+				scscfUri.setLrParam(true);
+				scscfUri.setParameter(ORIG_PARAM, "");
+				request.pushRoute(scscfUri);
+				
+				AVP avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
+				if (avp != null)
+					request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+			}
+			else
+			{
+				URI requestUri = request.getRequestURI();
+				String scheme = requestUri.getScheme();
+				if (lia.getResultCode() >= 3000)
+				{
+					if (scheme.equals("tel"))
+					{
+						// TODO send to bgcf.
+						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					}
+					else
+						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					return;
+				}
+				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString());
+				scscfUri.setLrParam(true);
+				request.pushRoute(scscfUri);
+				AVP avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
+				if (avp != null)
+					request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+				else
+				{
+					avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_PSI);
+					if (avp != null)
+						request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+				}
+				
+			}
+
+			proxy(request);
+		}
+		catch (Throwable e) 
+		{
+			__log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
+			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
+		}
+		finally
+		{
+			request.getApplicationSession().invalidate();
+		}
+	}
+	
+	private int getUserAuthorizationType(SipServletRequest request) throws ServletParseException
 	{
 		Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
 
@@ -94,96 +193,60 @@ public class IcscfService
 			return UserAuthorizationType.REGISTRATION;
 	}
 
-	
-	public void doTerminatingRequest(SipServletRequest request) throws IOException, ServletException
+		
+	public void doRequest(SipServletRequest request) throws IOException, ServletException
 	{
-		// TS 24229 §5.3.2.1
-		if(!comesFromTrustedDomain(request))
-		{
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-			return;
-		}
-		request.removeHeader(Headers.P_PROFILE_KEY);
 		
-		URI requestUri = request.getRequestURI();
-		String scheme = requestUri.getScheme();
-		// a pres: or an im: URI, then translate the pres: or im: URI to a public user identity
-		// and replace the Request-URI of the incoming request with that public user identity; or
-		if ("im".equals(scheme) || "pres".equals(scheme))
-		{
-			// TODO translate
-		}
-		else if (requestUri.isSipURI())
-		{
-			SipURI uri = (SipURI) requestUri;
-			// b)	 a SIP-URI that is not a GRUU and with the user part starting with a + and 
-			// the "user" SIP URI parameter equals "phone" then replace the Request-URI with a 
-			// tel-URI with the user part of the SIP-URI in the telephone-subscriber element in 
-			// the tel-URI, and carry forward the tel-URI parameters that may be present in the Request-URI; or
-			
-			// c)	a SIP URI that is a GRUU, then obtain the public user identity from the Request-URI
-			// and use it for location query procedure to the HSS. When forwarding the request, the 
-			// I-CSCF shall not modify the Request-URI of the incoming request;
-			// TODO
-			
-			// 3)	check if the domain name of the Request-URI matches with one of the PSI subdomains
-			// configured in the I-CSCF
-			if (_psiSubDomains.contains(uri.getHost()))
-			{
-				proxy(request);
-				return;
-			}
-		}
-		
-		LIA lia = _cx.lir(requestUri.toString(), null, false);
-		if (!lia.isSuccess())
-		{
-			if (scheme.equals("tel"))
-			{
-				// TODO send to bgcf.
-				request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
-			}
-			else
-				request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
-			return;
-		}
-		SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getScscfName());
-		scscfUri.setLrParam(true);
-		request.pushRoute(scscfUri);
-		if (lia.getWilcardPublicId() != null)
-			request.addHeader(Headers.P_PROFILE_KEY, lia.getWilcardPublicId());
-		if (lia.getWilcardPSI() != null)
-			request.addHeader(Headers.P_PROFILE_KEY, lia.getWilcardPSI());
-		
-		proxy(request);
-	}
-	
-	public void doOriginatingRequest(SipServletRequest request) throws IOException, ServletException
-	{
 		// TS 24229 §5.3.2.1A
 		if(!comesFromTrustedDomain(request))
 		{
 			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
 			return;
 		}
-		URI pAssertedId = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER).getURI();
-		LIA lia = _cx.lir(pAssertedId.toString(), null, true);
 		
-		if (!lia.isSuccess())
+		if (isOriginating(request))
 		{
-			request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
-			return;
+			URI pAssertedId = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER).getURI();
+			
+			request.removeHeader(Headers.P_PROFILE_KEY);
+			
+			_cxManager.sendLIR(pAssertedId.toString(), true, null, request);
 		}
-		
-		SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getScscfName());
-		scscfUri.setLrParam(true);
-		scscfUri.setParameter(IcscfServlet.ORIG_PARAM, "");
-		request.pushRoute(scscfUri);
-		
-		if (lia.getWilcardPublicId() != null)
-			request.addHeader(Headers.P_PROFILE_KEY, lia.getWilcardPublicId());
-		
-		proxy(request);
+		else
+		{
+			request.removeHeader(Headers.P_PROFILE_KEY);
+			
+			URI requestUri = request.getRequestURI();
+			String scheme = requestUri.getScheme();
+			// a pres: or an im: URI, then translate the pres: or im: URI to a public user identity
+			// and replace the Request-URI of the incoming request with that public user identity; or
+			if ("im".equals(scheme) || "pres".equals(scheme))
+			{
+				// TODO translate
+			}
+			else if (requestUri.isSipURI())
+			{
+				SipURI uri = (SipURI) requestUri;
+				// b)	 a SIP-URI that is not a GRUU and with the user part starting with a + and 
+				// the "user" SIP URI parameter equals "phone" then replace the Request-URI with a 
+				// tel-URI with the user part of the SIP-URI in the telephone-subscriber element in 
+				// the tel-URI, and carry forward the tel-URI parameters that may be present in the Request-URI; or
+				
+				// c)	a SIP URI that is a GRUU, then obtain the public user identity from the Request-URI
+				// and use it for location query procedure to the HSS. When forwarding the request, the 
+				// I-CSCF shall not modify the Request-URI of the incoming request;
+				// TODO
+				
+				// 3)	check if the domain name of the Request-URI matches with one of the PSI subdomains
+				// configured in the I-CSCF
+				if (_psiSubDomains.contains(uri.getHost()))
+				{
+					proxy(request);
+					return;
+				}
+			}
+			_cxManager.sendLIR(requestUri.toString(), false, null, request);
+		}
 	}
 	
 	private void proxy(SipServletRequest request) throws TooManyHopsException
@@ -198,19 +261,6 @@ public class IcscfService
 		// 3GPP TS 33.210 
 		return true;
 	}
-
-
-	public Cx getCx()
-	{
-		return _cx;
-	}
-
-
-	public void setCx(Cx cx)
-	{
-		_cx = cx;
-	}
-
 
 	public SipFactory getSipFactory()
 	{
@@ -245,6 +295,27 @@ public class IcscfService
 	public void setPsiSubDomains(List<String> psiSubDomains)
 	{
 		_psiSubDomains = psiSubDomains;
+	}
+	
+	private boolean isOriginating(SipServletRequest request)
+	{
+		String orig = request.getParameter(ORIG_PARAM);
+		String term = request.getParameter(TERM_PARAM);
+		__log.debug("Orig param is: *" + orig + "*. Term param is: *" + term + "*");
+		if (isTerminatingDefault()) // default standard mode
+			return orig != null;
+		else
+			return term != null;
+	}
+
+	public CxManager getCxManager()
+	{
+		return _cxManager;
+	}
+
+	public void setCxManager(CxManager cxManager)
+	{
+		_cxManager = cxManager;
 	}
 
 }

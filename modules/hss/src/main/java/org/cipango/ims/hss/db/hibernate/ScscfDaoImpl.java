@@ -25,8 +25,16 @@ public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDa
 {
 	private static final String GET_BY_NAME =
 		"FROM Scscf WHERE _name = :key";
+	private static final String GET_BY_URI =
+		"FROM Scscf WHERE _uri = :key";
 	private static final String NB_SUBSCRIPTIONS =
 		"SELECT count(*) FROM Subscription AS s WHERE s._scscf.id = :scscf";
+	
+	private static final String FIND_AVAILABLE_SCSCF =
+		"SELECT s._scscf.id FROM Subscription AS s GROUP BY s._scscf.id ORDER BY count(s)";
+	
+	private static final String FIND_UNUSE_SCSCF =
+		"FROM Scscf AS s WHERE s._subscriptions IS EMPTY";
 	
 	public ScscfDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -51,5 +59,20 @@ public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDa
 		Query query = currentSession().createQuery(NB_SUBSCRIPTIONS);
 		query.setParameter("scscf", scscf.getId());
 		return (Long) query.uniqueResult();
+	}
+
+	public Scscf findAvailableScscf()
+	{
+		Scscf scscf = (Scscf) currentSession().createQuery(FIND_UNUSE_SCSCF).uniqueResult();
+		if (scscf != null)
+			return scscf;
+		return get((Long) currentSession().createQuery(FIND_AVAILABLE_SCSCF).uniqueResult());
+	}
+
+	public Scscf findByUri(String uri)
+	{
+		Query query = currentSession().createQuery(GET_BY_URI);
+		query.setParameter("key", uri);
+		return (Scscf) query.uniqueResult();
 	}
 }

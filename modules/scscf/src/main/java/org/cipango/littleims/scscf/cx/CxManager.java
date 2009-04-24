@@ -189,7 +189,7 @@ public class CxManager
 		String scheme = null;
 		String algorithm = authorizationHeader.getParameter(Digest.ALGORITHM_PARAM);
 		if (algorithm == null)
-			scheme = AuthenticationScheme.DIGEST_AKA_MD5.getName();
+			scheme = AuthenticationScheme.SIP_DIGEST.getName();
 		else
 		{
 			scheme = AuthenticationScheme.getFromAlgorithm(algorithm).getName();

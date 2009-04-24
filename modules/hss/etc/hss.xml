@@ -20,18 +20,6 @@
 		</property>
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	</bean>
-
-	<bean id="hssDao"
-		class="org.cipango.littleims.hss.FileHssDao"
-		init-method="init">
-		<property name="hssDirectory" value="file://${jetty.home}/hss" />
-	</bean>
-
-	<bean id="cx" class="org.cipango.littleims.hss.FileHSS">
-		<property name="dao" ref="hssDao" />
-		<property name="realm" value="cipango.org" />
-		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.port}" />
-	</bean>
 -->
 
 	<bean id="dataSource" class="org.hsqldb.jdbc.jdbcDataSource">
@@ -97,8 +85,7 @@
 		<constructor-arg ref="sessionFactory"/>
 	</bean>
 	
-	<bean id="hss" class="org.cipango.ims.hss.Hss">
-		<property name="privateIdentityDao" ref="privateIdentityDao"></property>
+	<bean id="hss" class="org.cipango.ims.hss.Hss" autowire="byName" >
 	</bean>
 	
 	<bean id="transactionManager"
@@ -108,18 +95,6 @@
 
 	<tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <!--  
-	<bean id="hss" 
-		class="org.cipango.ims.hss.HSS">
-		<property name="transactionTemplate">
-			<bean class="org.springframework.transaction.support.TransactionTemplate">
-				<property name="transactionManager" ref="transactionManager"/>
-			</bean>
-		</property>
-		
-		<property name="dao" ref="subscriptionDAO"/>
-	</bean>
-	-->
 	
 	<bean id="webApplication" 
 			class="org.cipango.ims.hss.web.ImsApplication" 

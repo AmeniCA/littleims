@@ -62,6 +62,7 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	public PublicIdentity() 
 	{
 		_identityType = IdentityType.PUBLIC_USER_IDENTITY;
+		_state = State.NOT_REGISTERED;
 	}
 	
 	public Long getId()
@@ -145,7 +146,8 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 
 	public void setState(Short state)
 	{
-		_state = state;
+		if (state != null)
+			_state = state;
 	}
 
 	public void setPrivateIdentities(Set<PublicPrivate> privateIdentities)

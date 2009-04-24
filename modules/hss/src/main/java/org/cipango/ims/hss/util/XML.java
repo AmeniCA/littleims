@@ -21,7 +21,9 @@ import java.util.Map;
 
 public class XML
 {
-	private static XML __default = new XML();
+	private static XML __default = new XML(false);
+	private static XML __pretty = new XML(true);
+	
 	private Map<Class<?>, Convertor> _convertors = new HashMap<Class<?>, Convertor>();
 	
 	private boolean _prettyPrint;
@@ -30,6 +32,16 @@ public class XML
     {
         return __default;
     }
+	
+	public static XML getPretty()
+    {
+        return __pretty;
+    }
+	
+	public XML(boolean prettyPrint)
+	{
+		_prettyPrint = prettyPrint;
+	}
 	
 	public String toXml(String name, Object value)
 	{

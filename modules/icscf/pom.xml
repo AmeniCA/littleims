@@ -19,16 +19,37 @@
         <configuration>
           <systemProperties>
             <systemProperty>
-              <name>icscf.port</name>
-              <value>5070</value>
+              <name>log4j.configuration</name>
+              <value>file:resources/log4j.xml</value>
+            </systemProperty>
+            <systemProperty>
+              <name>jetty.home</name>
+              <value>.</value>
+            </systemProperty>
+            <systemProperty>
+              <name>sip.port</name>
+              <value>5080</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
-              <value>8090</value>
+              <value>9000</value>
             </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>
-          <stopPort>9998</stopPort>
+          <stopPort>9997</stopPort>
+          <diameterNode implementation="org.cipango.diameter.Node">
+            <connectors>
+              <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
+                <port>3888</port>
+              </connector>
+            </connectors>
+            <identity>i-cscf.nexcom.voip</identity>
+            <peers>
+              <peer implementation="org.cipango.diameter.Peer">
+                <host>hss-nicolas.nexcom.voip</host>
+              </peer>
+            </peers>
+          </diameterNode>
         </configuration>
       </plugin>
       
@@ -41,16 +62,15 @@
        <artifactId>littleims-common</artifactId>
        <version>${project.version}</version>
     </dependency>
-    <dependency>
-       <groupId>org.cipango.littleims</groupId>
-       <artifactId>littleims-hss</artifactId>
-       <version>${project.version}</version>
-       <scope>runtime</scope>
-    </dependency>
      <dependency>
        <groupId>org.springframework</groupId>
        <artifactId>spring</artifactId>
      </dependency>
+     <dependency>
+      <groupId>org.cipango</groupId>
+      <artifactId>cipango-diameter</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   
   <profiles>

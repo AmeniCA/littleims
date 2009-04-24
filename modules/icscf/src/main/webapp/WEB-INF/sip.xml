@@ -11,13 +11,15 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			file:${jetty.home}/etc/cx.xml
 			file:${jetty.home}/etc/i-cscf.xml
 		</param-value>
 	</context-param>
 		
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.cipango.littleims.icscf.IcscfServlet</listener-class>
 	</listener>
 
   <servlet>

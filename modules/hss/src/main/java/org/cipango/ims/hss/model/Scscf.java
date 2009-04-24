@@ -13,10 +13,14 @@
 // ========================================================================
 package org.cipango.ims.hss.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Scscf
@@ -29,6 +33,9 @@ public class Scscf
 	
 	@Column (unique=true)
 	private String _uri;
+	
+	@OneToMany(mappedBy = "_scscf")
+	private Set<Subscription> _subscriptions = new HashSet<Subscription>();
 
 	public Long getId()
 	{
@@ -63,5 +70,15 @@ public class Scscf
 	public String toString()
 	{
 		return _name;
+	}
+
+	public Set<Subscription> getSubscriptions()
+	{
+		return _subscriptions;
+	}
+
+	public void setSubscriptions(Set<Subscription> subscriptions)
+	{
+		_subscriptions = subscriptions;
 	}
 }

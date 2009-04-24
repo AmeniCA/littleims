@@ -32,6 +32,8 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
+import org.cipango.ims.hss.util.XML;
+import org.cipango.ims.hss.util.XML.Output;
 import org.cipango.ims.hss.web.as.EditAsPage;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
@@ -102,6 +104,11 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 						new PageParameters("id=" + ifc.getName()));
 				item.add(sptLink);
 				item.add(new Label("expression"));
+				
+				Output out = XML.getPretty().newOutput();
+				ifc.print(out);
+				String xml = out.toString();//.replaceAll("<", "&lgt;").replaceAll(">", "&gt;");
+				item.add(new Label("xml", xml));
 												
 				item.setOutputMarkupId(true);
 				item.add(new HideableLink("hideLink", item.getMarkupId()));

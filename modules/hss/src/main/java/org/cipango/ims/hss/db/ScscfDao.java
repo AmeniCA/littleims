@@ -21,4 +21,6 @@ public interface ScscfDao extends Dao, ImsDao<Scscf>
 	void save(Scscf scscf);
 	Scscf findById(String id);
 	long getNbSubscriptions(Scscf scscf);
+	Scscf findAvailableScscf();
+	Scscf findByUri(String uri);
 }

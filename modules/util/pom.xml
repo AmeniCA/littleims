@@ -9,33 +9,4 @@
   <artifactId>littleims-common</artifactId>
   <packaging>jar</packaging>
   <name>littleIMS :: Common</name>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xmlbeans-maven-plugin</artifactId>
-        <executions>
-           <execution>
-              <goals>
-                 <goal>xmlbeans</goal>
-              </goals>
-           </execution>
-        </executions>
-        <inherited>true</inherited>
-      </plugin>
-    </plugins>
-  </build>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.xmlbeans</groupId>
-      <artifactId>xmlbeans</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>stax</groupId>
-      <artifactId>stax-api</artifactId>
-    </dependency>
-  </dependencies>
-
 </project>

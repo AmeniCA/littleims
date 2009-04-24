@@ -21,18 +21,20 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 
 import org.apache.log4j.Logger;
+import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterMessage;
+import org.cipango.diameter.app.DiameterListener;
+import org.cipango.diameter.ims.IMS;
 import org.cipango.littleims.util.Methods;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class IcscfServlet extends SipServlet
+public class IcscfServlet extends SipServlet implements DiameterListener
 {
 
 	private static final Logger __log = Logger.getLogger(IcscfServlet.class);
 	private IcscfService _service;
-	public static final String ORIG_PARAM = "orig";
-	public static final String TERM_PARAM = "term";	
 	
 	@Override
 	public void init() throws ServletException
@@ -54,25 +56,34 @@ public class IcscfServlet extends SipServlet
 		{
 			_service.doRegister(request);
 		}
-		else if (isOriginating(request))
-		{
-			_service.doOriginatingRequest(request);
-		}
 		else
 		{
-			_service.doTerminatingRequest(request);
+			_service.doRequest(request);
 		}
 	}
-	
-	private boolean isOriginating(SipServletRequest request)
+
+
+	public void handle(DiameterMessage message) throws IOException
 	{
-		String orig = request.getParameter(ORIG_PARAM);
-		String term = request.getParameter(TERM_PARAM);
-		__log.debug("Orig param is: *" + orig + "*. Term param is: *" + term + "*");
-		if (_service.isTerminatingDefault()) // default standard mode
-			return orig != null;
+		if (message.isRequest())
+		{
+			__log.warn("No handler for diameter request with command " + message.getCommand());
+		}
 		else
-			return term != null;
+		{
+			DiameterAnswer answer = (DiameterAnswer) message;
+			int command = message.getCommand();
+			if ( command == IMS.UAA)
+				_service.handleUAA(answer);
+			else if (command == IMS.LIA)
+			{
+				_service.handleLIA(answer);
+			}
+			else
+			{
+				__log.warn("No handler for diameter answer with command " + command);
+			}
+		}
 	}
 
 

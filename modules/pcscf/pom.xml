@@ -19,8 +19,12 @@
         <configuration>
           <systemProperties>
             <systemProperty>
+              <name>jetty.home</name>
+              <value>.</value>
+            </systemProperty>
+            <systemProperty>
               <name>icscf.port</name>
-              <value>5070</value>
+              <value>5080</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
@@ -28,7 +32,7 @@
             </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>
-          <stopPort>9998</stopPort>
+          <stopPort>9996</stopPort>
         </configuration>
       </plugin>
       
