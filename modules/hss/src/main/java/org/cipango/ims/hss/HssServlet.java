@@ -84,6 +84,9 @@ public class HssServlet extends SipServlet implements DiameterListener
 		{
 			switch (command) 
 			{
+			case IMS.LIR:
+				_hss.doLir(request);
+				break;
 			case IMS.MAR:
 				_hss.doMar(request);
 				break;
@@ -111,7 +114,7 @@ public class HssServlet extends SipServlet implements DiameterListener
 			}
 			answer.send();
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			if (__log.isDebugEnabled())
 				__log.debug("Unable to process request: " + command, e);

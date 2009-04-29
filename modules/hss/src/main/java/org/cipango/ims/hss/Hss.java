@@ -34,9 +34,11 @@ import org.cipango.ims.hss.diameter.DiameterException;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.RegistrationState;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
+import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.littleims.cx.ServerAssignmentType;
 import org.cipango.littleims.cx.UserAuthorizationType;
 import org.cipango.littleims.util.HexString;
@@ -55,6 +57,65 @@ public class Hss
 	public void setPrivateIdentityDao(PrivateIdentityDao dao)
 	{
 		_privateIdentityDao = dao;
+	}
+	
+	@Transactional
+	public void doLir(DiameterRequest lir) throws Exception
+	{
+		AVPList avps = lir.getAVPs();
+		String impu = getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
+		
+		PublicIdentity publicIdentity = _publicIdentityDao.findById(impu);
+		if (publicIdentity == null)
+			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN,
+					"Could not find public identity with IMPU: " + impu);
+		
+		if (publicIdentity.getIdentityType() == IdentityType.DISTINCT_PSI
+				|| publicIdentity.getIdentityType() == IdentityType.WILDCARDED_PSI)
+		{
+			if (publicIdentity.isBarred())
+				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN,
+						"PSI with IMPU " + impu + " PSI Activation State set to inactive");
+			
+			// FIXME add support to direct routing to AS
+			int userAuthorizationType = avps.getInt(IMS.IMS_VENDOR_ID, IMS.USER_AUTHORIZATION_TYPE);
+			if (userAuthorizationType == UserAuthorizationType.REGISTRATION_AND_CAPABILITIES)
+			{
+				// TODO support Server-Capabilities 
+			}
+		}
+
+		// FIXME how get subscription for PSI ???
+		Subscription subscription = 
+			publicIdentity.getPrivateIdentities().iterator().next().getPrivateIdentity().getSubscription();
+		Scscf scscf = subscription.getScscf();
+		Short state = publicIdentity.getImplicitRegistrationSet().getState();
+		if (state != State.REGISTERED)
+		{
+			if (avps.getAVP(IMS.IMS_VENDOR_ID, IMS.ORIGININATING_REQUEST) != null
+					|| publicIdentity.getServiceProfile().hasUnregisteredServices())
+			{
+				if (scscf == null)
+				{
+					scscf = _scscfDao.findAvailableScscf();
+					if (scscf == null)
+						throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+								"Coud not found any available SCSCF for public identity: " 
+								+ publicIdentity.getIdentity());
+					subscription.setScscf(scscf);
+				}	
+			}
+			else
+			{
+				lir.createAnswer(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED).send();
+				return;
+			}
+		}
+		DiameterAnswer lia = lir.createAnswer(Base.DIAMETER_SUCCESS);
+		lia.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, 
+				subscription.getScscf().getUri()));
+		lia.send();
+		
 	}
 	
 	@Transactional
@@ -163,11 +224,10 @@ public class Hss
 				{
 					Scscf scscf = _scscfDao.findAvailableScscf();
 					if (scscf == null)
-					{
-						__log.warn("Coud not found any available SCSCF for public identity: " 
+						throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+								"Coud not found any available SCSCF for public identity: " 
 								+ publicIdentity.getIdentity());
-						throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY);
-					}
+
 					subscription.setScscf(scscf);
 					_subscriptionDao.save(subscription);
 					answer = uar.createAnswer(IMS.IMS_VENDOR_ID, IMS.DIAMETER_FIRST_REGISTRATION);
@@ -224,7 +284,6 @@ public class Hss
 			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_AUTH_SCHEME_NOT_SUPPORTED);
 		}
 		
-		//DiameterAnswer answer = 
 	}
 	
 	private PublicIdentity getPublicIdentity(PrivateIdentity privateIdentity, String impu) throws DiameterException
@@ -301,8 +360,8 @@ public class Hss
 			
 		String serverName = getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString();
 						
-		int userDataAlreadyAvailable = 
-			getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.USER_DATA_ALREADY_AVAILABLE).getInt();
+		boolean userDataAlreadyAvailable = 
+			getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.USER_DATA_ALREADY_AVAILABLE).getInt() == 1;
 		
 		//TODO if (IdentityType.WILDCARDED_PSI == publicIdentity.getIdentityType()
 		//		&& publicIdentity.getPSI Activation State )
@@ -323,14 +382,12 @@ public class Hss
 
 			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.REGISTERED);
 			answer.getAVPs().addString(Base.USER_NAME, impi);
-			String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
-			answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
-			AVPList associatedIds = new AVPList();
-			for (String identity : subscription.getPrivateIds())
+			if (!userDataAlreadyAvailable)
 			{
-				if (!impi.equals(identity))
-					associatedIds.addString(Base.USER_NAME, identity);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
+				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
+			AVPList associatedIds = getAssociatedIdentities(subscription, impi);
 			if (!associatedIds.isEmpty())
 				answer.getAVPs().add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES, associatedIds));
 			break;
@@ -355,15 +412,13 @@ public class Hss
 			
 			answer.getAVPs().addString(Base.USER_NAME, privateIdentity.getIdentity());
 			
-			serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
-			answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
-			
-			associatedIds = new AVPList();
-			for (String identity : subscription.getPrivateIds())
+			if (!userDataAlreadyAvailable)
 			{
-				if (!impi.equals(identity))
-					associatedIds.addString(Base.USER_NAME, identity);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(null);
+				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
+			
+			associatedIds = getAssociatedIdentities(subscription, impi);
 			if (!associatedIds.isEmpty())
 				answer.getAVPs().add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES, associatedIds));
 
@@ -375,18 +430,55 @@ public class Hss
 		case ServerAssignmentType.ADMINISTRATIVE_DEREGISTRATION:
 			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.NOT_REGISTERED);
 			if (State.REGISTERED == state)
-			{
 				checkClearScscf(subscription);
-			}
 			break;
+			
 		case ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME:
 		case ServerAssignmentType.USER_DEREGISTRATION_STORE_SERVER_NAME:
 			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.UNREGISTERED);
+			break;
+			
+		case ServerAssignmentType.NO_ASSIGNEMENT:
+			scscf =  subscription.getScscf();
+			if (scscf == null)
+				throw new IllegalStateException("No S-CSCF assigned");
+			else if (!serverName.equals(scscf.getUri()))
+				throw new IllegalStateException("Requesting S-CSCF: " + serverName 
+						+ " is not the same as the assigned S-CSCF: " + scscf.getUri());
+				
+			if (!userDataAlreadyAvailable)
+			{
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
+				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
+			}
+			associatedIds = getAssociatedIdentities(subscription, impi);
+			if (!associatedIds.isEmpty())
+				answer.getAVPs().add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES, associatedIds));
+			break;
+			
+		case ServerAssignmentType.AUTHENTICATION_FAILURE:
+		case ServerAssignmentType.AUTHENTICATION_TIMEOUT:
+			RegistrationState registrationState = publicIdentity.getImplicitRegistrationSet().getRegistrationState(impu);
+			if (registrationState.getState() == State.AUTH_PENDING)
+				registrationState.setState(State.NOT_REGISTERED);
+			
+			checkClearScscf(subscription);
 			break;
 		default:
 			throw new IllegalArgumentException("Unsuported ServerAssignmentType: " + serverAssignmentType);
 		}
 		answer.send();
+	}
+	
+	private AVPList getAssociatedIdentities(Subscription subscription, String impi)
+	{
+		AVPList associatedIds = new AVPList();
+		for (String identity : subscription.getPrivateIds())
+		{
+			if (!impi.equals(identity))
+				associatedIds.addString(Base.USER_NAME, identity);
+		}
+		return associatedIds;
 	}
 	
 	private void checkClearScscf(Subscription subscription)

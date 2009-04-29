@@ -17,9 +17,12 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
 import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
+import org.cipango.ims.hss.web.subscription.EditImplicitSetPage;
+import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -31,6 +34,29 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + publicIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));
+		
+		boolean foundSub = false;
+		if (!publicIdentity.getPrivateIdentities().isEmpty())
+		{
+			Subscription subscription = 
+				publicIdentity.getPrivateIdentities().iterator().next().getPrivateIdentity().getSubscription();
+			if (subscription != null)
+			{
+				add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, 
+						new PageParameters("id=" + subscription.getName())));
+				add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
+						new PageParameters("id=" + subscription.getName())));
+				foundSub = true;
+			}
+		}
+		
+		if (!foundSub)
+		{
+			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class).setVisible(false));
+			add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class)).setVisible(false);
+		}
+		
+		
 		if (publicIdentity.getServiceProfile() == null)
 			add(new BookmarkablePageLink("serviceProfileLink", EditServiceProfilePage.class));
 		else

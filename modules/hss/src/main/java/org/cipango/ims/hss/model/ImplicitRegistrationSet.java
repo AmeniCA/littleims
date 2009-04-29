@@ -79,6 +79,18 @@ public class ImplicitRegistrationSet
 		return state;
 	}
 	
+	public RegistrationState getRegistrationState(String privateIdentity)
+	{
+		for (RegistrationState registrationState : _states)
+		{
+			if (registrationState.getPrivateIdentity().equals(privateIdentity))
+			{
+				return registrationState;
+			}
+		}
+		return new RegistrationState(this, privateIdentity, State.NOT_REGISTERED);
+	}
+		
 	public String getStateAsString()
 	{
 		return State.toString(getState());

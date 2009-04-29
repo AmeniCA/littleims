@@ -27,6 +27,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
+import org.cipango.ims.hss.model.spt.SPT;
+import org.cipango.ims.hss.model.spt.SessionCaseSpt;
+import org.cipango.ims.hss.model.spt.SessionCaseSpt.SessionCase;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
 
@@ -92,6 +96,46 @@ public class ServiceProfile
 			_ifcs.add(ifc);
 			ifc.getServiceProfiles().add(this);
 		}
+	}
+	
+	public boolean hasUnregisteredServices()
+	{
+		for (InitialFilterCriteria ifc : getIfcs())
+		{
+			Short profilePartIndicator = ifc.getProfilePartIndicator();
+			if (profilePartIndicator == null)
+			{
+				boolean hasSessionCase = false;
+				for (SPT spt : ifc.getSpts())
+				{
+					if (spt instanceof SessionCaseSpt)
+					{
+						hasSessionCase = true;
+						Short sessionCase = ((SessionCaseSpt) spt).getSessionCase();
+						switch (sessionCase)
+						{
+						case SessionCase.ORIGINATING_UNREGISTERED:
+						case SessionCase.TERMINATING_UNREGISTERED:
+							// No check of isConditionNegated() as in this case it could match on the other
+							// UNREGISTERED session case.
+							return true;
+						case SessionCase.ORIGINATING_SESSION:
+						case SessionCase.TERMINATING_REGISTERED:
+							if (spt.isConditionNegated())
+								return true;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+				if (!hasSessionCase)
+					return true;
+			} 
+			else if (profilePartIndicator == ProfilePartIndicator.UNREGISTERED)
+				return true;
+		}
+		return false;
 	}
 	
 	public void removeIfc(InitialFilterCriteria ifc)

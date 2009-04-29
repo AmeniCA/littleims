@@ -18,6 +18,18 @@ public class DiameterException extends Exception
 		_resultCode = resultCode;
 	}
 	
+	public DiameterException(int vendorId, int resultCode, String message) 
+	{ 
+		super(message);
+		_vendorId = vendorId;
+		_resultCode = resultCode;
+	}
+	
+	public DiameterException(int resultCode, String message)
+	{
+		this(Base.IETF_VENDOR_ID, resultCode, message);
+	}
+	
 	public DiameterException(int resultCode)
 	{
 		this(Base.IETF_VENDOR_ID, resultCode);

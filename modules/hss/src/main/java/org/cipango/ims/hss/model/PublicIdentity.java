@@ -217,7 +217,11 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	{
 		Output out = XML.getDefault().newOutput();
 		out.open("IMSSubscription");
-		out.add("PrivateID", privateIdentity.getIdentity());
+		if (privateIdentity == null)
+			// If no private identity is registered, use the first private identity.
+			out.add("PrivateID", _privateIdentities.iterator().next().getPrivateId());
+		else
+			out.add("PrivateID", privateIdentity.getIdentity());
 		out.add("ServiceProfile", _implicitRegistrationSet.getPublicIdentities());
 		out.close("IMSSubscription");
 		return out.toString();

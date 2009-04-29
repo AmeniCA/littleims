@@ -31,7 +31,7 @@ public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDa
 		"SELECT count(*) FROM Subscription AS s WHERE s._scscf.id = :scscf";
 	
 	private static final String FIND_AVAILABLE_SCSCF =
-		"SELECT s._scscf.id FROM Subscription AS s GROUP BY s._scscf.id ORDER BY count(s)";
+		"SELECT s._scscf.id FROM Subscription AS s  WHERE s._scscf.id != null GROUP BY s._scscf.id ORDER BY count(s)";
 	
 	private static final String FIND_UNUSE_SCSCF =
 		"FROM Scscf AS s WHERE s._subscriptions IS EMPTY";
@@ -63,10 +63,13 @@ public class ScscfDaoImpl extends AbstractHibernateDao<Scscf> implements ScscfDa
 
 	public Scscf findAvailableScscf()
 	{
-		Scscf scscf = (Scscf) currentSession().createQuery(FIND_UNUSE_SCSCF).uniqueResult();
+		Scscf scscf = (Scscf) currentSession().createQuery(FIND_UNUSE_SCSCF).setMaxResults(1).uniqueResult();
 		if (scscf != null)
 			return scscf;
-		return get((Long) currentSession().createQuery(FIND_AVAILABLE_SCSCF).uniqueResult());
+		Long id =  (Long) currentSession().createQuery(FIND_AVAILABLE_SCSCF).setMaxResults(1).uniqueResult();
+		if (id == null)
+			return null;
+		return get(id);
 	}
 
 	public Scscf findByUri(String uri)

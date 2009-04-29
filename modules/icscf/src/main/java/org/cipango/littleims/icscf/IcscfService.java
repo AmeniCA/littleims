@@ -140,7 +140,7 @@ public class IcscfService
 			{
 				URI requestUri = request.getRequestURI();
 				String scheme = requestUri.getScheme();
-				if (lia.getResultCode() >= 3000)
+				if (lia.getResultCode() == IMS.DIAMETER_ERROR_USER_UNKNOWN)
 				{
 					if (scheme.equals("tel"))
 					{
@@ -151,6 +151,18 @@ public class IcscfService
 						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
 					return;
 				}
+				else if (lia.getResultCode() == IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED)
+				{
+					request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
+					return;
+				}
+				else if (lia.getResultCode() >= 3000)
+				{
+					__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 404 response");
+					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					return;
+				}
+					
 				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString());
 				scscfUri.setLrParam(true);
 				request.pushRoute(scscfUri);
