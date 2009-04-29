@@ -36,7 +36,7 @@ import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.model.PublicIdentity.State;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.littleims.cx.ServerAssignmentType;
 import org.cipango.littleims.cx.UserAuthorizationType;
 import org.cipango.littleims.util.HexString;
@@ -116,7 +116,8 @@ public class Hss
 		
 		Subscription subscription = privateIdentity.getSubscription();
 		DiameterAnswer answer;
-		if (publicIdentity.getState() == State.REGISTERED)
+		Short state = publicIdentity.getImplicitRegistrationSet().getState();	
+		if (State.REGISTERED == state)
 		{
 			if (userAuthorizationType == -1 || userAuthorizationType == UserAuthorizationType.REGISTRATION)
 			{
@@ -130,7 +131,7 @@ public class Hss
 			answer.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, 
 					subscription.getScscf().getUri()));
 		}
-		else if (publicIdentity.getState() == State.UNREGISTERED)
+		else if (State.UNREGISTERED == state)
 		{
 			if (userAuthorizationType == -1 || userAuthorizationType == UserAuthorizationType.REGISTRATION)
 			{
@@ -274,13 +275,16 @@ public class Hss
 		else
 			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
 		
-		if (publicIdentity == null && privateIdentity != null)
+		if (publicIdentity == null)
 		{
-			publicIdentity = privateIdentity.getPublicIdentities().iterator().next().getPublicIdentity();
-			impu = publicIdentity.getIdentity();
+			if (privateIdentity != null)
+			{
+				publicIdentity = privateIdentity.getPublicIdentities().iterator().next().getPublicIdentity();
+				impu = publicIdentity.getIdentity();
+			}
+			else
+				throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
 		}
-		else
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
 		
 		if (impu == null 
 				&& serverAssignmentType != ServerAssignmentType.TIMEOUT_DEREGISTRATION
@@ -305,6 +309,7 @@ public class Hss
 		
 		Subscription subscription = privateIdentity.getSubscription();
 		DiameterAnswer answer = sar.createAnswer(Base.DIAMETER_SUCCESS);
+		Short state = publicIdentity.getImplicitRegistrationSet().getState();
 		switch (serverAssignmentType)
 		{
 		case ServerAssignmentType.REGISTRATION:
@@ -315,9 +320,10 @@ public class Hss
 				AVP avp = AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, scscf.getUri());
 				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_ALREADY_REGISTERED).addAvp(avp);
 			}
-			publicIdentity.setState(State.REGISTERED);
+
+			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.REGISTERED);
 			answer.getAVPs().addString(Base.USER_NAME, impi);
-			String serviceProfile = privateIdentity.toXml();
+			String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
 			answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			AVPList associatedIds = new AVPList();
 			for (String identity : subscription.getPrivateIds())
@@ -344,12 +350,12 @@ public class Hss
 				subscription.setScscf(scscf);
 			}
 			
-			if (State.NOT_REGISTERED == publicIdentity.getState() || State.REGISTERED == publicIdentity.getState())
-				publicIdentity.setState(State.UNREGISTERED);
+			if (State.NOT_REGISTERED == state || State.REGISTERED == state)
+				publicIdentity.getImplicitRegistrationSet().updateState(impu, State.UNREGISTERED);
 			
 			answer.getAVPs().addString(Base.USER_NAME, privateIdentity.getIdentity());
 			
-			serviceProfile = privateIdentity.toXml();
+			serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity);
 			answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			
 			associatedIds = new AVPList();
@@ -367,17 +373,16 @@ public class Hss
 		case ServerAssignmentType.USER_DEREGISTRATION:
 		case ServerAssignmentType.DEREGISTRATION_TOO_MUCH_DATA:
 		case ServerAssignmentType.ADMINISTRATIVE_DEREGISTRATION:
-			if (State.REGISTERED == publicIdentity.getState())
+			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.NOT_REGISTERED);
+			if (State.REGISTERED == state)
 			{
-				if (publicIdentity.getPrivateIdentities().size() == 1)
-				{
-					publicIdentity.setState(State.NOT_REGISTERED);
-					checkClearScscf(subscription);
-				}
-				// FIXME end
+				checkClearScscf(subscription);
 			}
 			break;
-			
+		case ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME:
+		case ServerAssignmentType.USER_DEREGISTRATION_STORE_SERVER_NAME:
+			publicIdentity.getImplicitRegistrationSet().updateState(impu, State.UNREGISTERED);
+			break;
 		default:
 			throw new IllegalArgumentException("Unsuported ServerAssignmentType: " + serverAssignmentType);
 		}
@@ -389,7 +394,8 @@ public class Hss
 		boolean activePublic = false;
 		for (PublicIdentity publicIdentity : subscription.getPublicIdentities())
 		{
-			if (State.NOT_REGISTERED != publicIdentity.getState())
+			Short state = publicIdentity.getImplicitRegistrationSet().getState();
+			if (State.NOT_REGISTERED != state)
 				activePublic = true;
 		}
 		if (!activePublic)
@@ -453,4 +459,5 @@ public class Hss
 	{
 		_publicIdentityDao = publicIdentityDao;
 	}
+
 }

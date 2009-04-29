@@ -15,7 +15,6 @@ package org.cipango.ims.hss.model;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
@@ -23,35 +22,32 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.cipango.ims.hss.util.XML.Convertible;
-import org.cipango.ims.hss.util.XML.Output;
-
 @Entity
-public class PublicPrivate implements Convertible
+public class RegistrationState
 {
-	
+
 	@Embeddable
 	public static class Id implements Serializable {
 		@Column (name = "private_identity")
-		private Long _privateId;
-		@Column (name = "public_identity")
-		private Long _publicId;
+		private String _privateId;
+		@Column (name = "implicit_registration_set")
+		private Long _implicitRegistrationSetId;
 		
 		public Id()
 		{
 		}
 
-		public Id(Long publicId, Long privateId)
+		public Id(Long implicitRegistrationSetId, String privateId)
 		{
 			_privateId = privateId;
-			_publicId = publicId;
+			_implicitRegistrationSetId = implicitRegistrationSetId;
 		}
 		public boolean equals(Object o)
 		{
 			if(o != null && o instanceof Id)
 			{
 				Id that = (Id)o;
-				return _publicId.equals(that._publicId) &&
+				return _implicitRegistrationSetId.equals(that._implicitRegistrationSetId) &&
 				_privateId.equals(that._privateId);
 			}
 			else
@@ -60,87 +56,67 @@ public class PublicPrivate implements Convertible
 		@Override
 		public int hashCode()
 		{
-			return (int) (_privateId * 31 + _publicId);
+			return (int) (_privateId.hashCode() * 31 + _implicitRegistrationSetId);
 		}
 	}
 
 
 	@EmbeddedId
 	private Id _id = new Id();
-
-	@ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn (nullable = false, insertable=false, updatable=false)
-	private PrivateIdentity _privateIdentity;
 	
-	@ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToOne
 	@JoinColumn (nullable = false, insertable=false, updatable=false)
-	private PublicIdentity _publicIdentity;
+	private ImplicitRegistrationSet _implicitRegistrationSet;
 	
-	public PublicPrivate()
+	@Column (name = "private_identity", nullable = false, insertable=false, updatable=false)
+	private String _privateIdentity;
+	private Short _state;
+	
+	public RegistrationState()
 	{
 	}
-		
-	public PublicPrivate(PublicIdentity publicIdentity, PrivateIdentity privateIdentity)
+	
+	public RegistrationState(ImplicitRegistrationSet implicitRegistrationSet, String privateIdentity, Short state)
 	{
+		_implicitRegistrationSet = implicitRegistrationSet;
 		_privateIdentity = privateIdentity;
-		_publicIdentity = publicIdentity;
-		_id._privateId = privateIdentity.getId();
-		_id._publicId = publicIdentity.getId();
-		publicIdentity.getPrivateIdentities().add(this);
-		privateIdentity.getPublicIdentities().add(this);
-	}
-	
-	public void refresh()
-	{
-		if (_id._privateId == null)
-			_id._privateId = _privateIdentity.getId();
-		if (_id._publicId == null)
-			_id._publicId = _publicIdentity.getId();
+		_state = state;
+		_id._implicitRegistrationSetId = implicitRegistrationSet.getId();
+		_id._privateId = privateIdentity;
+		implicitRegistrationSet.getStates().add(this);
 	}
 	
 	public Id getId()
 	{
 		return _id;
 	}
-
 	public void setId(Id id)
 	{
 		_id = id;
 	}
-
-	
-	public String getPublicId()
+	public ImplicitRegistrationSet getImplicitRegistrationSet()
 	{
-		return _publicIdentity.getIdentity();
+		return _implicitRegistrationSet;
 	}
-	
-	public String getPrivateId()
+	public void setImplicitRegistrationSet(ImplicitRegistrationSet implicitRegistrationSet)
 	{
-		return _privateIdentity.getIdentity();
+		_implicitRegistrationSet = implicitRegistrationSet;
 	}
-	
-	public PrivateIdentity getPrivateIdentity()
+	public String getPrivateIdentity()
 	{
 		return _privateIdentity;
 	}
-	public void setPrivateIdentity(PrivateIdentity privateIdentity)
+	public void setPrivateIdentity(String privateIdentity)
 	{
 		_privateIdentity = privateIdentity;
 	}
-	public PublicIdentity getPublicIdentity()
+	public Short getState()
 	{
-		return _publicIdentity;
+		return _state;
 	}
-	public void setPublicIdentity(PublicIdentity publicIdentity)
+	public void setState(Short state)
 	{
-		_publicIdentity = publicIdentity;
+		_state = state;
 	}
-	public void print(Output out)
-	{
-		_publicIdentity.print(out);
-	}
-
-
-	
 	
 }

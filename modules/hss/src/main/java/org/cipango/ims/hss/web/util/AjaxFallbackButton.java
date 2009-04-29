@@ -16,6 +16,7 @@ package org.cipango.ims.hss.web.util;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.IModel;
 
 
 public abstract class AjaxFallbackButton extends org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton
@@ -26,6 +27,11 @@ public abstract class AjaxFallbackButton extends org.apache.wicket.ajax.markup.h
 	public AjaxFallbackButton(String id, Form<?> form)
 	{
 		super(id, form);
+	}
+	
+	public AjaxFallbackButton(String id, IModel<String> model, Form<?> form)
+	{
+		super(id, model, form);
 	}
 	
 	@Override

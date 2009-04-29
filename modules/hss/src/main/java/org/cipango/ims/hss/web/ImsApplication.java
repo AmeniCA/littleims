@@ -51,6 +51,7 @@ import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
+import org.cipango.ims.hss.web.subscription.EditImplicitSetPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
@@ -125,6 +126,7 @@ public class ImsApplication extends WebApplication {
 		mountBookmarkablePage("/service-profiles/browser", ServiceProfileBrowserPage.class);
 		
 		mount(new MixedParamUrlCodingStrategy("/spt/edit", EditSptsPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/implicit-registration-state/edit", EditImplicitSetPage.class, id));
 				
 		_wicketStarted = true;
 		springStart();

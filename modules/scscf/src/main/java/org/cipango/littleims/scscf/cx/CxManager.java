@@ -192,12 +192,14 @@ public class CxManager
 			scheme = AuthenticationScheme.SIP_DIGEST.getName();
 		else
 		{
-			scheme = AuthenticationScheme.getFromAlgorithm(algorithm).getName();
-			if (scheme == null)
+			AuthenticationScheme authScheme = AuthenticationScheme.getFromAlgorithm(algorithm);
+			if (authScheme == null)
 			{
 				__log.warn("Unknown algorithm " + algorithm);
 				scheme = "Unknown";
 			}
+			else
+				scheme = authScheme.getName();
 		}
 		
 		String auts = authorizationHeader.getParameter(Digest.AUTS);

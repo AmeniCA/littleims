@@ -178,13 +178,4 @@ public class PrivateIdentity
 		return new PublicPrivate(publicId, this);
 	}
 	
-	public String toXml()
-	{
-		Output out = XML.getDefault().newOutput();
-		out.open("IMSSubscription");
-		out.add("PrivateID", _identity);
-		out.add("ServiceProfile", _publicIdentities);
-		out.close("IMSSubscription");
-		return out.toString();
-	}
 }

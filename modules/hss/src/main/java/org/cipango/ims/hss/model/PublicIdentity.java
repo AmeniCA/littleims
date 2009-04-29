@@ -31,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.cipango.ims.hss.util.XML;
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
 import org.hibernate.annotations.Index;
@@ -53,16 +54,16 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	private String _displayName;
 	
 	private Short _identityType;
-	
-	private Short _state;
-	
+		
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
+	
+	@ManyToOne
+	private ImplicitRegistrationSet _implicitRegistrationSet;
 	
 	public PublicIdentity() 
 	{
 		_identityType = IdentityType.PUBLIC_USER_IDENTITY;
-		_state = State.NOT_REGISTERED;
 	}
 	
 	public Long getId()
@@ -134,22 +135,6 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 		_identityType = identityType;
 	}
 
-	public Short getState()
-	{
-		return _state;
-	}
-	
-	public String getStateAsString()
-	{
-		return State.toString(_state);
-	}
-
-	public void setState(Short state)
-	{
-		if (state != null)
-			_state = state;
-	}
-
 	public void setPrivateIdentities(Set<PublicPrivate> privateIdentities)
 	{
 		_privateIdentities = privateIdentities;
@@ -212,6 +197,32 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 		return getIdentity().compareTo(o.getIdentity());
 	}
 	
+	public ImplicitRegistrationSet getImplicitRegistrationSet()
+	{
+		return _implicitRegistrationSet;
+	}
+
+	public void setImplicitRegistrationSet(ImplicitRegistrationSet implicitRegistrationSet)
+	{
+		if (_implicitRegistrationSet != null)
+			_implicitRegistrationSet.getPublicIdentities().remove(this);
+		
+		_implicitRegistrationSet = implicitRegistrationSet;
+		
+		if (implicitRegistrationSet != null)
+			implicitRegistrationSet.getPublicIdentities().add(this);
+	}
+
+	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity)
+	{
+		Output out = XML.getDefault().newOutput();
+		out.open("IMSSubscription");
+		out.add("PrivateID", privateIdentity.getIdentity());
+		out.add("ServiceProfile", _implicitRegistrationSet.getPublicIdentities());
+		out.close("IMSSubscription");
+		return out.toString();
+	}
+	
 	public static class IdentityType
 	{
 		public static final short PUBLIC_USER_IDENTITY = 0;
@@ -234,34 +245,6 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 				return "WILDCARDED_PSI";
 			case WILDCARDED_IMPU:
 				return "WILDCARDED_IMPU";
-			default:
-				return "Unknown id " + id;
-			}
-		}
-	}
-	
-	public static class State
-	{
-		public static final short UNREGISTERED = 0;
-		public static final short NOT_REGISTERED = 1;
-		public static final short AUTH_PENDING = 2;
-		public static final short REGISTERED = 3;	
-		
-		public static String toString(Short id)
-		{
-			if (id == null)
-				return "";
-			
-			switch (id)
-			{
-			case UNREGISTERED:
-				return "UNREGISTERED";
-			case NOT_REGISTERED:
-				return "NOT_REGISTERED";
-			case AUTH_PENDING:
-				return "AUTH_PENDING";
-			case REGISTERED:
-				return "REGISTERED";
 			default:
 				return "Unknown id " + id;
 			}

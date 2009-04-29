@@ -32,6 +32,8 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + subscription.getName())));
 		add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
+		add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
+				new PageParameters("id=" + subscription.getName())));
 		
 		final Set<String> privateIds = subscription.getPrivateIds();
 		

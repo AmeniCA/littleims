@@ -19,6 +19,7 @@ public class Cx
 		static AuthenticationScheme add(int ordinal, String name, String algorithm)
 		{
 			AuthenticationScheme scheme = new AuthenticationScheme(ordinal, name, algorithm);
+			__algoritms.put(scheme._algorithm, scheme);
 			__schemes.put(scheme._name, scheme);
 			return scheme;
 		}

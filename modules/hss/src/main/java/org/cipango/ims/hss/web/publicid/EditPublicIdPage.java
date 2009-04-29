@@ -15,6 +15,7 @@ package org.cipango.ims.hss.web.publicid;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -25,14 +26,15 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.ImplicitRegistrationSetDao;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
@@ -45,11 +47,16 @@ public class EditPublicIdPage extends PublicIdentityPage
 	private DaoDetachableModel _model;
 	private String _privateIdKey;
 	
+	private static final Logger __log = Logger.getLogger(EditPublicIdPage.class);
+	
 	@SpringBean
 	private PrivateIdentityDao _privateIdentityDao;
 	
 	@SpringBean
 	private ServiceProfileDao _serviceProfileDao;
+	
+	@SpringBean
+	private ImplicitRegistrationSetDao _implicitRegistrationSetDao;
 
 	@SuppressWarnings("unchecked")
 	public EditPublicIdPage(PageParameters pageParameters)
@@ -87,7 +94,7 @@ public class EditPublicIdPage extends PublicIdentityPage
 			
 		}));
 		form.add(new TextField("displayName", String.class));
-		form.add(new Label("stateAsString"));
+		form.add(new Label("implicitRegistrationSet.stateAsString"));
 		
 		form.add(new DropDownChoice("serviceProfile",
 				new LoadableDetachableModel() {
@@ -149,6 +156,13 @@ public class EditPublicIdPage extends PublicIdentityPage
 		{
 			PublicIdentity publicIdentity = (PublicIdentity) form.getModelObject();
 
+			if (publicIdentity.getImplicitRegistrationSet() == null)
+			{
+				ImplicitRegistrationSet implicitRegistrationSet = new ImplicitRegistrationSet();
+				_implicitRegistrationSetDao.save(implicitRegistrationSet);
+				publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
+			}
+			
 			_dao.save(publicIdentity);
 			if (_privateIdKey != null)
 			{
@@ -163,6 +177,7 @@ public class EditPublicIdPage extends PublicIdentityPage
 		}
 		catch (Exception e)
 		{
+			__log.debug("Failed to apply edit", e);
 			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
 		}
 

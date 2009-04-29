@@ -57,7 +57,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".identityType", this, null),
 				"identity_type", "identityTypeAsString");
 		columns[3] = new PropertyColumn(new StringResourceModel(getPrefix() + ".state", this, null),
-				"state","stateAsString");
+				"implicitRegistrationSet.stateAsString");
 		columns[4] = new FilteredAbstractColumn(new Model("Actions"))
 		{
 

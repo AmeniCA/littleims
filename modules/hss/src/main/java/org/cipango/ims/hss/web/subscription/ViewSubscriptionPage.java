@@ -35,6 +35,7 @@ import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
 import org.cipango.ims.hss.web.util.HideableLink;
+import org.cipango.ims.hss.web.util.StringModelIterator;
 
 public class ViewSubscriptionPage extends SubscriptionPage
 {
@@ -126,7 +127,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 				item.add(new Label("barred"));
 				item.add(new Label("identityTypeAsString"));
 				item.add(new Label("displayName"));
-				item.add(new Label("stateAsString"));
+				item.add(new Label("implicitRegistrationSet.stateAsString"));
 				item.setOutputMarkupId(true);
 				item.add(new HideableLink("hideLink", item.getMarkupId()));
 				
@@ -185,17 +186,5 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			});
 		}
 	}
-	
-	class StringModelIterator extends ModelIteratorAdapter<String> {
-		public StringModelIterator(Collection<String> modelObject) {
-			super(modelObject.iterator());
-		}
-		
-		@Override
-		protected IModel<String> model(String id)
-		{
-			return new Model<String>(id);
-		}
-	}
-	
+
 }
