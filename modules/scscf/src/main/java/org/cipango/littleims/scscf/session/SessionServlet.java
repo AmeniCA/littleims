@@ -100,29 +100,37 @@ public class SessionServlet extends SipServlet implements DiameterListener
 
 	public void handle(DiameterMessage message) throws IOException
 	{
-		if (message.isRequest())
+		try
 		{
-			__log.warn("No handler for diameter request with command " + message.getCommand());
-		}
-		else
-		{
-			DiameterAnswer answer = (DiameterAnswer) message;
-			int command = message.getCommand();
-			if ( command == IMS.MAA)
-				_authenticator.handleMaa(answer);
-			else if (command == IMS.SAA)
+			if (message.isRequest())
 			{
-				SipServletRequest request =  
-					(SipServletRequest) answer.getRequest().getAttribute(SipServletRequest.class.getName());
-				if (Methods.REGISTER.equalsIgnoreCase(request.getMethod()))
-					_sessionManager.getRegistrar().handleSaa(answer);
-				else
-					_sessionManager.handleSaa(answer);
+				__log.warn("No handler for diameter request with command " + message.getCommand());
 			}
 			else
 			{
-				__log.warn("No handler for diameter answer with command " + command);
+				DiameterAnswer answer = (DiameterAnswer) message;
+				int command = message.getCommand();
+				if ( command == IMS.MAA)
+					_authenticator.handleMaa(answer);
+				else if (command == IMS.SAA)
+				{
+					SipServletRequest request =  
+						(SipServletRequest) answer.getRequest().getAttribute(SipServletRequest.class.getName());
+					if (Methods.REGISTER.equalsIgnoreCase(request.getMethod()))
+						_sessionManager.getRegistrar().handleSaa(answer);
+					else
+						_sessionManager.handleSaa(answer);
+				}
+				else
+				{
+					__log.warn("No handler for diameter answer with command " + command);
+				}
 			}
+		}
+		catch (Throwable e) 
+		{
+			__log.warn("Received unexpected exception when handing Diameter " + 
+					(message.isRequest() ? "request" : "answer") + ": " + message.getCommand(), e);
 		}
 	}
 

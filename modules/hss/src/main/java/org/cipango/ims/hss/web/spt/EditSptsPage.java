@@ -127,6 +127,11 @@ public class EditSptsPage extends BasePage
 					{
 						saveSpts(form);
 						Class<SPT> clazz = (Class<SPT>) item.get("sptType").getDefaultModelObject();
+						if (clazz == null)
+						{
+							getPage().warn("No SPT selected");
+							return;
+						}
 						SPT spt = clazz.newInstance();
 						spt.setConditionNegated(false);
 						spt.setGroupId(groupId);
@@ -142,7 +147,7 @@ public class EditSptsPage extends BasePage
 				});
 				
 				boolean conditonType =  _ifcDao.findByRealKey(_ifcId).isConditionTypeCnf();
-				item.add(new Label("conditionType", conditonType ? "OR" : "AND"));
+				item.add(new Label("conditionType", conditonType ? "AND" : "OR"));
 			}
 		});	
 		
@@ -269,7 +274,7 @@ public class EditSptsPage extends BasePage
 					}
 				}.setDefaultFormProcessing(false));
 				boolean conditonType = item.getModelObject().getInitialFilterCriteria().isConditionTypeCnf();
-				item.add(new Label("conditionType", conditonType ? "AND" : "OR"));
+				item.add(new Label("conditionType", conditonType ? "OR" : "AND"));
 			}
 			
 		};

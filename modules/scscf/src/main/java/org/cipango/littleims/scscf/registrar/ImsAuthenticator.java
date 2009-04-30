@@ -218,7 +218,10 @@ public class ImsAuthenticator implements Authenticator
 		}
 		finally
 		{
-			request.getApplicationSession().invalidate();
+			// The SipApplicationSession can be invalid if this thread is interrupted before
+			// sending the response.
+			if (request.getApplicationSession().isValid())
+				request.getApplicationSession().invalidate();
 		}	
 	}
 

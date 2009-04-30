@@ -178,6 +178,7 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 				sb.append('(');
 			} else if (groupId != spt.getGroupId())
 			{
+				groupId = spt.getGroupId();
 				sb.append(')');
 				sb.append(_conditionTypeCnf ? " || " : " && ");
 				sb.append('(');

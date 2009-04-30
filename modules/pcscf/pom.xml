@@ -28,7 +28,7 @@
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
-              <value>8090</value>
+              <value>8070</value>
             </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>

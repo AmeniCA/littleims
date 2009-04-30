@@ -192,7 +192,7 @@ public class Registrar
 		{
 			__log.info("Registration expiration (" + expires + ") is greater"
 					+ " than maximum value (" + _maxExpires
-					+ "). Setting expires to maxEpires");
+					+ "). Setting expires to max expires");
 			expires = _maxExpires;
 		}
 
@@ -333,7 +333,8 @@ public class Registrar
 		}
 		finally
 		{
-			request.getApplicationSession().invalidate();
+			if (request.getApplicationSession().isValid())
+				request.getApplicationSession().invalidate();
 		}
 	}
 

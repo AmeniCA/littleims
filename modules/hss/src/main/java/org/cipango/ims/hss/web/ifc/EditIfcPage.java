@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
@@ -37,6 +38,7 @@ import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
+import org.cipango.ims.hss.web.util.AjaxFallbackButton;
 
 public class EditIfcPage extends IfcPage
 {
@@ -124,33 +126,25 @@ public class EditIfcPage extends IfcPage
 				},
 				new ChoiceRenderer<ApplicationServer>("name", "id")));
 		
-		form.add(new Button("submit")
+
+		form.add(new AjaxFallbackButton("ok", form)
 		{
 			@Override
-			public void onSubmit()
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
-				apply(getForm());
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
+				apply(form1);
 				if (isAdding())
 					setResponsePage(EditSptsPage.class, new PageParameters("id=" + _key));
 				else
-					goToBackPage(IfcBrowserPage.class);
+					setResponsePage(EditIfcPage.class, new PageParameters("id=" + _key));
 			}
 		});
-		form.add(new Button("cancel")
+		form.add(new AjaxFallbackButton("cancel", form)
 		{
 			@Override
-			public void onSubmit()
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				getSession().info(getString("modification.cancel"));
-				goToBackPage(IfcBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
