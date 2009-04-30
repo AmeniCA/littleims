@@ -19,7 +19,7 @@ import javax.persistence.Entity;
 import org.cipango.ims.hss.util.XML.Output;
 
 @Entity
-@DiscriminatorValue("SC")
+@DiscriminatorValue("SD")
 public class SessionDescriptionSpt extends SPT
 {
 	private String _line;
