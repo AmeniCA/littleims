@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -37,6 +36,7 @@ import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
+import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.util.AjaxFallbackButton;
 
@@ -44,6 +44,7 @@ public class EditIfcPage extends IfcPage
 {
 
 	private String _key;
+	private boolean _copy;
 	private String _title;
 	@SpringBean
 	private ApplicationServerDao _applicationServerDao;
@@ -58,6 +59,7 @@ public class EditIfcPage extends IfcPage
 	public EditIfcPage(PageParameters pageParameters)
 	{
 		_key = pageParameters.getString("id");
+		_copy = pageParameters.getBoolean("copy");
 		_serviceProfileKey = pageParameters.getString("serviceProfile");
 
 		InitialFilterCriteria ifc = null;
@@ -72,7 +74,10 @@ public class EditIfcPage extends IfcPage
 			}
 		}
 		
-		IModel model = new DaoDetachableModel(ifc);
+		IModel model = new DaoDetachableModel(ifc, _copy);
+		
+		if (_copy)
+			ifc.setName(getCopyName(ifc.getName()));	
 		
 		if (isAdding()) {
 			_title = getString(getPrefix() + ".add.title");
@@ -132,8 +137,9 @@ public class EditIfcPage extends IfcPage
 			@Override
 			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
+				boolean adding = isAdding();
 				apply(form1);
-				if (isAdding())
+				if (adding)
 					setResponsePage(EditSptsPage.class, new PageParameters("id=" + _key));
 				else
 					setResponsePage(EditIfcPage.class, new PageParameters("id=" + _key));
@@ -169,6 +175,14 @@ public class EditIfcPage extends IfcPage
 					profile.addIfc(ifc);
 				}
 			}
+			if (_copy)
+			{
+				InitialFilterCriteria template = _dao.findById(_key);
+				for (SPT spt: template.getSpts())
+				{
+					ifc.addSpt(spt.clone());
+				}
+			}
 			_key = ifc.getName();
 			_dao.save(ifc);
 			
@@ -184,7 +198,7 @@ public class EditIfcPage extends IfcPage
 
 	private boolean isAdding()
 	{
-		return _key == null;
+		return _key == null || _copy;
 	}
 
 	@Override

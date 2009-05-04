@@ -104,7 +104,11 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	}
 	public void addSpt(SPT spt)
 	{
-		_spts.add(spt);
+		if (spt != null)
+		{
+			_spts.add(spt);
+			spt.setInitialFilterCriteria(this);
+		}
 	}
 
 	public int getPriority()

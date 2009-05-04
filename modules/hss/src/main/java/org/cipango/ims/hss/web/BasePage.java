@@ -60,4 +60,26 @@ public abstract class BasePage extends WebPage {
 			setResponsePage(backPage);
 		}
 	}
+	
+	protected String getCopyName(String name)
+	{
+		String copy  = getString("copyOf");
+		if (name.startsWith(copy))
+		{
+			int index = name.lastIndexOf(' ');
+			if (index == -1)
+				return name + " 2";
+			String end = name.substring(index);
+			try 
+			{
+				return name + ' ' + Integer.parseInt(end);
+			}
+			catch (Exception e) 
+			{
+				return name + " 2";
+			}
+		}
+		else
+			return copy + name;
+	}
 }

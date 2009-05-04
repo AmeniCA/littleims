@@ -41,8 +41,13 @@ public abstract class IfcPage extends BasePage
 
 		public DaoDetachableModel(InitialFilterCriteria o)
 		{
+			this(o, false);
+		}
+		
+		public DaoDetachableModel(InitialFilterCriteria o, boolean copy)
+		{
 			super(o);
-			if (o != null)
+			if (!copy && o != null)
 				this.key = o.getName();
 		}
 

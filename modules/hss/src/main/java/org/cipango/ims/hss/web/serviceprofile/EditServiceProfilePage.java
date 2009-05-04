@@ -23,6 +23,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 
 public class EditServiceProfilePage extends ServiceProfilePage
@@ -30,12 +31,14 @@ public class EditServiceProfilePage extends ServiceProfilePage
 
 	private String _key;
 	private String _title;
+	private boolean _copy;
 
 
 	@SuppressWarnings("unchecked")
 	public EditServiceProfilePage(PageParameters pageParameters)
 	{
 		_key = pageParameters.getString("id");
+		_copy = pageParameters.getBoolean("copy");
 		ServiceProfile serviceProfile = null;
 		if (_key != null)
 		{
@@ -47,8 +50,11 @@ public class EditServiceProfilePage extends ServiceProfilePage
 				_key = null;
 			}
 		}
-		DaoDetachableModel model = new DaoDetachableModel(serviceProfile);
+		DaoDetachableModel model = new DaoDetachableModel(serviceProfile, _copy);
 
+		if (_copy)
+			serviceProfile.setName(getCopyName(serviceProfile.getName()));	
+		
 		if (isAdding()) {
 			_title = getString(getPrefix() + ".add.title");
 		} else {
@@ -100,6 +106,13 @@ public class EditServiceProfilePage extends ServiceProfilePage
 		{
 			ServiceProfile serviceProfile = (ServiceProfile) form.getModelObject();
 
+			if (_copy)
+			{
+				ServiceProfile original = _dao.findById(_key);
+				for (InitialFilterCriteria ifc : original.getIfcs())
+					serviceProfile.addIfc(ifc);
+			}
+			
 			_dao.save(serviceProfile);
 		
 			getSession().info(getString("modification.success"));
@@ -113,7 +126,7 @@ public class EditServiceProfilePage extends ServiceProfilePage
 
 	private boolean isAdding()
 	{
-		return _key == null;
+		return _copy || _key == null;
 	}
 
 	@Override

@@ -32,7 +32,7 @@ import org.cipango.ims.hss.util.XML.Output;
 @DiscriminatorColumn(
 		name = "SPT_TYPE",
 		discriminatorType = DiscriminatorType.STRING)
-public abstract class SPT implements XML.Convertible, Comparable<SPT>
+public abstract class SPT implements XML.Convertible, Comparable<SPT>, Cloneable
 {
 	@Id @GeneratedValue
 	private Long _id;
@@ -92,7 +92,11 @@ public abstract class SPT implements XML.Convertible, Comparable<SPT>
 	public int compareTo(SPT o)
 	{
 		int delta1 = getGroupId() - o.getGroupId();
-		int delta2 = (int) (_id - o.getId());
+		int delta2;
+		if (_id != null && o.getId() != null)
+			delta2 = (int) (_id - o.getId());
+		else
+			delta2 = hashCode() - o.hashCode();
 		
 		return delta1 * 16384 + (delta2 > 0 ? (delta2 & 0xFF) : -(-delta2 & 0xFF));
 	}
@@ -104,6 +108,19 @@ public abstract class SPT implements XML.Convertible, Comparable<SPT>
 	public static boolean isRegex(String expression)
 	{
 		return expression.indexOf('!') != -1;
+	}
+	
+	@Override
+	public SPT clone()
+	{
+		try {
+			SPT spt = (SPT) super.clone();
+			spt._id = null;
+			spt._initialFilterCriteria = null;
+			return spt;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	

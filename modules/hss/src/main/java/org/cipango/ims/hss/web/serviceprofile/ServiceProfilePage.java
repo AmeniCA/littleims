@@ -45,6 +45,13 @@ public abstract class ServiceProfilePage extends BasePage
 			if (serviceProfile != null)
 				this.key = serviceProfile.getName();
 		}
+		
+		public DaoDetachableModel(ServiceProfile serviceProfile, boolean copy)
+		{
+			super(serviceProfile);
+			if (!copy && serviceProfile != null)
+				this.key = serviceProfile.getName();
+		}
 
 		@Override
 		protected ServiceProfile load()

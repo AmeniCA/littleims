@@ -88,6 +88,8 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 					"id=" + key)));
 			add(new BookmarkablePageLink("editLink", EditServiceProfilePage.class, new PageParameters(
 					"id=" + key)));
+			add(new BookmarkablePageLink("copyLink", EditServiceProfilePage.class, new PageParameters(
+					"id=" + key + ",copy=true")));
 			add(new BookmarkablePageLink("deleteLink", DeleteServiceProfilePage.class,
 					new PageParameters("id=" + key)));
 		}

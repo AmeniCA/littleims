@@ -29,6 +29,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 public class IfcBrowserPage extends IfcPage
 {
@@ -79,6 +80,10 @@ public class IfcBrowserPage extends IfcPage
 			}
 			add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters(
 					"id=" + key)));
+			add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, new PageParameters(
+					"id=" + key)));
+			add(new BookmarkablePageLink("copyLink", EditIfcPage.class, new PageParameters(
+					"id=" + key + ",copy=true")));
 			add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class,
 					new PageParameters("id=" + key)));
 		}
