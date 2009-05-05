@@ -41,6 +41,11 @@
 		<filter-name>osiv</filter-name>
 		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>osiv</filter-name>
+		<url-pattern>/svg/subscription.svg</url-pattern>
+	</filter-mapping>
 
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -52,10 +57,20 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
 
+   <servlet>
+    <servlet-name>SvgServlet</servlet-name>
+    <servlet-class>org.cipango.ims.hss.web.SvgServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
   
   <servlet-mapping>
     <servlet-name>api</servlet-name>
     <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>SvgServlet</servlet-name>
+    <url-pattern>/svg/subscription.svg</url-pattern>
   </servlet-mapping>
 	
 </web-app>
