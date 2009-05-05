@@ -107,7 +107,7 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 				
 				Output out = XML.getPretty().newOutput();
 				ifc.print(out);
-				String xml = out.toString();//.replaceAll("<", "&lgt;").replaceAll(">", "&gt;");
+				String xml = out.toString();
 				item.add(new Label("xml", xml));
 												
 				item.setOutputMarkupId(true);

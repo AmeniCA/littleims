@@ -36,6 +36,7 @@ import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
+import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.util.HideableLink;
 import org.cipango.ims.hss.web.util.StringModelIterator;
 
@@ -81,11 +82,15 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			@Override
 			protected void populateItem(Item item)
 			{
-				item.add(new Label("identity"));
+				PrivateIdentity privateIdentity = (PrivateIdentity) item.getModelObject();
+				MarkupContainer link = new BookmarkablePageLink("identityLink", 
+						EditPrivateIdPage.class, 
+						new PageParameters("id=" + privateIdentity.getIdentity()));
+				link.add(new Label("identity"));
+				item.add(link);
 				item.add(new Label("passwordAsString"));
 				item.add(new Label("operatorId"));
 				
-				PrivateIdentity privateIdentity = (PrivateIdentity) item.getModelObject();
 								
 				item.add(new RefreshingView("publicIds", new Model((Serializable) privateIdentity.getPublicIds())){
 
@@ -132,7 +137,12 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			@Override
 			protected void populateItem(Item item)
 			{
-				item.add(new Label("identity"));
+				PublicIdentity publicIdentity = (PublicIdentity) item.getModelObject();
+				MarkupContainer link = new BookmarkablePageLink("identityLink", 
+						EditPublicIdPage.class, 
+						new PageParameters("id=" + publicIdentity.getIdentity()));
+				link.add(new Label("identity"));
+				item.add(link);
 				item.add(new Label("barred"));
 				item.add(new Label("identityTypeAsString"));
 				item.add(new Label("displayName"));
@@ -140,7 +150,6 @@ public class ViewSubscriptionPage extends SubscriptionPage
 				item.setOutputMarkupId(true);
 				item.add(new HideableLink("hideLink", item.getMarkupId()));
 				
-				PublicIdentity publicIdentity = (PublicIdentity) item.getModelObject();
 				
 				item.add(new RefreshingView("privateIds", new Model((Serializable) publicIdentity.getPrivateIds())){
 
@@ -163,6 +172,31 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			}
 			
 		});
+		
+		IModel scscfModel = new CompoundPropertyModel(new LoadableDetachableModel(subscription == null ? null : subscription.getScscf()) {
+			@Override
+			protected Object load()
+			{
+				return _dao.findById(_key).getScscf();
+			}		
+		});
+		
+		WebMarkupContainer scscf = new WebMarkupContainer("scscf", scscfModel);
+		add(scscf);
+		if (scscf.getDefaultModelObject() == null)
+			scscf.setVisible(false);
+		else
+		{
+			MarkupContainer link = new BookmarkablePageLink("link", 
+					EditScscfPage.class, 
+					new PageParameters("id=" + subscription.getScscf().getName()));
+			link.add(new Label("name"));
+			scscf.add(link);
+			scscf.add(new Label("uri"));
+			scscf.setOutputMarkupId(true);
+			scscf.add(new HideableLink("hideLink", scscf.getMarkupId()));
+		}
+		
 		
 		if (subscription != null)
 			setContextMenu(new ContextPanel(subscription));

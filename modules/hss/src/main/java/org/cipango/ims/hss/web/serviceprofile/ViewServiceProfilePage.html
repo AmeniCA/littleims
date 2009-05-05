@@ -5,9 +5,10 @@
 	<div id="subscription">
 		<div class="elementPanel" wicket:id="ifcs">
 			<div class="title">
-				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
-				<wicket:message key="view.ifc.title"/>
-				<b><a wicket:id="elementLink"><span wicket:id="name"></span></a></b>
+				<a href="#" wicket:id="hideLink" class="hideLink"><wicket:message key="elementPanel.hide"/></a>
+				<a wicket:id="elementLink">
+					<wicket:message key="view.ifc.title"/><b wicket:id="name"></b>
+				</a>
 			</div>
 			<div class="body">
 				<ul>

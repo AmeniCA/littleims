@@ -7,8 +7,10 @@
 	<div id="subscription">
 		<div class="elementPanel" wicket:id="privateIds">
 			<div class="title">
-				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
-				<wicket:message key="view.privateId.title"/><b wicket:id="identity"></b>
+				<a href="#" class="hideLink" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+				<a href="#" wicket:id="identityLink">
+					<wicket:message key="view.privateId.title"/><b wicket:id="identity"></b>
+				</a>
 			</div>
 			<div class="body">
 				<ul>
@@ -25,10 +27,13 @@
 				</ul>
 			</div>
 		</div>
+		
 		<div class="elementPanel" wicket:id="publicIds">
 			<div class="title">
-				<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
-				<wicket:message key="view.publicId.title"/><b><span wicket:id="identity"></span></b>
+				<a href="#" class="hideLink" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+				<a href="#" wicket:id="identityLink">
+					<wicket:message key="view.publicId.title"/><b><span wicket:id="identity"></span></b>
+				</a>
 			</div>
 			<div class="body">
 				<ul>
@@ -44,6 +49,20 @@
 							</li>
 						</ul>
 					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="elementPanel" wicket:id="scscf">
+			<div class="title">
+				<a href="#" class="hideLink" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+				<a href="#" wicket:id="link">
+					<wicket:message key="view.scscf.title"/><b><span wicket:id="name"></span></b>
+				</a>
+			</div>
+			<div class="body">
+				<ul>
+					<li><wicket:message key="scscf.uri"/>: <span wicket:id="uri"></span></li>
 				</ul>
 			</div>
 		</div>
