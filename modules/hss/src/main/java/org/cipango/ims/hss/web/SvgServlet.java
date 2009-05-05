@@ -165,7 +165,6 @@ public class SvgServlet extends HttpServlet
 	{
 		try
 		{
-			__log.warn(">>>>>>>>>" + new String(source));
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			StreamResult result = new StreamResult(os);
 			TransformerFactory factory = TransformerFactory.newInstance();
@@ -178,9 +177,7 @@ public class SvgServlet extends HttpServlet
 			Transformer transformer = factory.newTransformer(
 					new StreamSource(getServletContext().getResourceAsStream("/svg/subscriptionToSvg.xsl")));
 			transformer.transform(new DOMSource(doc), result);
-			byte[] out = os.toByteArray();
-			__log.warn(">>>>>>>>>" + new String(out));
-			return out;
+			return os.toByteArray();
 		}
 		catch (Throwable e)
 		{
