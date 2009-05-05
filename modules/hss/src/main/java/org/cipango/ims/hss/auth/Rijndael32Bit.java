@@ -22,7 +22,7 @@
  * EEVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.´
  */
 
-package org.cipango.littleims.hss;
+package org.cipango.ims.hss.auth;
 
 import java.security.InvalidKeyException;
 

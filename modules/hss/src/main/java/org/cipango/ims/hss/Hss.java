@@ -14,7 +14,10 @@
 
 package org.cipango.ims.hss;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
@@ -24,8 +27,10 @@ import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.ims.Cx;
+import org.cipango.ims.hss.auth.AkaAuthenticationVector;
 import org.cipango.ims.hss.auth.AuthenticationVector;
 import org.cipango.ims.hss.auth.DigestAuthenticationVector;
+import org.cipango.ims.hss.auth.Milenage;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.db.ScscfDao;
@@ -53,6 +58,8 @@ public class Hss
 	private PublicIdentityDao _publicIdentityDao;
 	private SubscriptionDao _subscriptionDao;
 	private ScscfDao _scscfDao;
+	private SequenceNumberManager _sequenceNumberManager = new SequenceNumberManager();
+	private Random _random = new Random();
 	
 	public void setPrivateIdentityDao(PrivateIdentityDao dao)
 	{
@@ -255,7 +262,7 @@ public class Hss
 		if (privateIdentity == null)
 			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN);
 		
-		PublicIdentity publicIdentity = getPublicIdentity(privateIdentity, impu);
+		getPublicIdentity(privateIdentity, impu);
 		
 		
 		AVP avp = avps.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTH_DATA_ITEM);
@@ -266,7 +273,9 @@ public class Hss
 		Cx.AuthenticationScheme scheme = Cx.AuthenticationScheme.get(s);
 		
 		if (scheme == null)
-			System.out.println("Unknown scheme " + s); // TODO
+			throw new DiameterException(IMS.IMS_VENDOR_ID, 
+					IMS.DIAMETER_ERROR_AUTH_SCHEME_NOT_SUPPORTED, 
+					"Unknown scheme: " + s);
 		
 		switch (scheme.getOrdinal())
 		{
@@ -275,6 +284,21 @@ public class Hss
 			AuthenticationVector[] authVectors = getDigestAuthVectors(1, mar.getDestinationRealm(), privateIdentity);
 			
 			DiameterAnswer answer = mar.createAnswer(Base.DIAMETER_SUCCESS);
+			answer.getAVPs().addString(Base.USER_NAME, impi);
+			
+			answer.add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.SIP_AUTH_DATA_ITEM, authVectors[0].asAuthItem()));
+			answer.send();
+			break;
+			
+		case Cx.AuthenticationScheme.DIGEST_AKA_MD5_ORDINAL:
+			AVP sipAuthorization = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHORIZATION);
+			if (sipAuthorization != null)
+			{
+				procesResynchronisation(sipAuthorization.getBytes(), privateIdentity);
+			}
+			authVectors = getAkaAuthVectors(1, privateIdentity);
+			
+			answer = mar.createAnswer(Base.DIAMETER_SUCCESS);
 			answer.getAVPs().addString(Base.USER_NAME, impi);
 			
 			answer.add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.SIP_AUTH_DATA_ITEM, authVectors[0].asAuthItem()));
@@ -536,6 +560,21 @@ public class Hss
 		
 		return new AuthenticationVector[] {vector};
 	}
+	
+	protected AuthenticationVector[] getAkaAuthVectors(int nb, PrivateIdentity identity) throws InvalidKeyException, ArrayIndexOutOfBoundsException, UnsupportedEncodingException
+	{
+		byte[] sqn = _sequenceNumberManager.getNextSqn(identity.getSqn());
+		byte[] rand = new byte[16];
+		_random.nextBytes(rand);
+		AkaAuthenticationVector vector = new AkaAuthenticationVector(
+				identity.getAkaPassword(),
+				sqn,
+				rand,
+				identity.getOperatorId());
+		identity.setSqn(sqn);
+		
+		return new AuthenticationVector[] {vector};
+	}
 
 	public void setSubscriptionDao(SubscriptionDao subscriptionDao)
 	{
@@ -550,6 +589,101 @@ public class Hss
 	public void setPublicIdentityDao(PublicIdentityDao publicIdentityDao)
 	{
 		_publicIdentityDao = publicIdentityDao;
+	}
+	
+	private void procesResynchronisation(byte[] sipAuthorization, PrivateIdentity identity) {
+		__log.debug("SQN Desynchronization detected on user " + identity.getIdentity());
+		byte[] sqn = new byte[6];
+		byte[] macs = new byte[8];
+		
+		byte[] rand = new byte[16];
+		byte[] auts = new byte[sqn.length + macs.length];
+		for (int i = 0; i < rand.length; i++)
+		{
+			if (i < rand.length)
+				rand[i] = sipAuthorization[i];
+			else
+				auts[i - rand.length] = sipAuthorization[i];
+		}
+
+
+		try
+		{
+			byte[] k = identity.getAkaPassword();
+			byte[] opC = Milenage.computeOpC(k, identity.getOperatorId());
+			byte[] ak = Milenage.f5star(k, rand, opC);
+			for (int i = 0; i < auts.length; i++) {
+				if (i < sqn.length) {
+					sqn[i] =  (byte) (auts[i] ^ ak[i]);
+				} else {
+					macs[i - sqn.length] = auts[i];
+				}
+			}
+			byte[] computeMacs = Milenage.f1star(k, rand, opC, sqn, AkaAuthenticationVector.getAmf());
+			for (int i = 0; i < macs.length; i++) {
+				if (computeMacs[i] != macs[i]) {
+					__log.info("MACS verification failed user " + identity.getIdentity());
+					return;
+				}
+			}
+			identity.setSqn(sqn);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Based on C.3.1	Profile 1: management of sequence numbers which are partly time-based
+	 */
+	static class SequenceNumberManager {
+
+		private static final int D = 65536;
+		private static final int SEQ_LENGTH = 48;
+		private static final int SEQ2_LENGTH = 24;
+		private static final int IND_LENGTH = 5;
+		private static final int A = (int) Math.pow(2, IND_LENGTH);
+		private static final int P = (int) Math.pow(2, SEQ2_LENGTH);
+
+		private long _glcStart = System.currentTimeMillis();
+
+
+		public byte[] getNextSqn(byte[] sqn) {
+			long sqnLong;
+			if (sqn == null)
+				sqnLong = 0;
+			else
+				sqnLong = HexString.byteArrayToLong(sqn);
+			
+			long seq1 = sqnLong >> (SEQ2_LENGTH + IND_LENGTH);
+			long seq2 = (sqnLong - (seq1 << (SEQ2_LENGTH + IND_LENGTH))) >> IND_LENGTH;
+			long ind = sqnLong - (seq1 << (SEQ2_LENGTH + IND_LENGTH)) - (seq2 << IND_LENGTH);
+			long glc = getGlc();
+			
+			long seq;
+			if (seq2 < glc && glc < (seq2 + P - D + 1)) {
+				// If SEQ2HE < GLC < SEQ2HE + p – D + 1 then HE sets SEQ= SEQ1HE || GLC
+				seq = (seq1 << SEQ2_LENGTH) + glc;
+			} else if ((glc <= seq2 && seq2 <= (glc + D - 1))
+					|| ((seq2 + P - D + 1) <= glc )) {
+				// if GLC <= SEQ2HE <= GLC+D - 1 or SEQ2HE + p – D + 1 <= GLC then HE sets SEQ = SEQHE +1;
+				seq = (seq1 << SEQ2_LENGTH) + seq2 + 1;
+			} else if ((glc + D + 1) < seq2) {
+				// if GLC+D - 1 <  SEQ2HE then HE sets SEQ = (SEQ1HE +1) || GLC.
+				seq = ((seq1 + 1) << SEQ2_LENGTH) + glc;
+			} else
+				seq = (seq1 << SEQ2_LENGTH) + seq2;
+			
+			ind = (ind + 1)%A;
+			return HexString.longToByteArray((seq << IND_LENGTH) + ind, SEQ_LENGTH/8);
+		}
+
+
+
+		private long getGlc() {
+			return ((System.currentTimeMillis() - _glcStart) / 1000)%P;
+		}
 	}
 
 }

@@ -15,7 +15,9 @@ package org.cipango.littleims.util;
 
 public class HexString
 {
-
+	private static final char __kHexChars[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'a', 'b', 'c', 'd', 'e', 'f' };
+	
 	/**
 	 * Contains utility functions for converting between hexadecimal strings and
 	 * their equivalent byte buffers or String objects.
@@ -184,13 +186,29 @@ public class HexString
 	 */
 	private static void appendHexPair(byte b, StringBuffer hexString)
 	{
-		char highNibble = kHexChars[(b & 0xF0) >> 4];
-		char lowNibble = kHexChars[b & 0x0F];
+		char highNibble = __kHexChars[(b & 0xF0) >> 4];
+		char lowNibble = __kHexChars[b & 0x0F];
 
 		hexString.append(highNibble);
 		hexString.append(lowNibble);
 	}
 
-	private static final char kHexChars[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-			'a', 'b', 'c', 'd', 'e', 'f' };
+
+	
+	public static long byteArrayToLong(byte[] array) {
+		long l = 0;
+		for (int i = 0; i < array.length; i++) {
+			l = (l << 8) + (array[i] & 0xff);
+		}
+		return l;
+	}
+
+	public static byte[] longToByteArray(long l, int lentgh) {
+		byte[] array = new byte[lentgh];
+		for (int i = array.length; i-- > 0;) {
+			array[i] = (byte) (l & 0xff);
+			l = l >> 8;
+		}
+		return array;
+	}
 }

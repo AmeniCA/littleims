@@ -20,7 +20,7 @@
  * Initial developer(s): Miguel Freitas <it-j-freitas@ptinovacao.pt>, <a23875@gmail.com>
  */
 
-package org.cipango.littleims.hss;
+package org.cipango.ims.hss.auth;
 
 import java.security.InvalidKeyException;
 

@@ -90,7 +90,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 				item.add(link);
 				item.add(new Label("passwordAsString"));
 				item.add(new Label("operatorId"));
-				
+				item.add(new Label("sqn"));
 								
 				item.add(new RefreshingView("publicIds", new Model((Serializable) privateIdentity.getPublicIds())){
 

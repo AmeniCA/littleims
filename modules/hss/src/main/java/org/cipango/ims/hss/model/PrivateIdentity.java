@@ -102,6 +102,19 @@ public class PrivateIdentity
 	{
 		return _password;
 	}
+	
+	public byte[] getAkaPassword()
+	{
+		byte[] k = new byte[16];
+		for (int i = 0; i < k.length; i++)
+		{
+			if (i < _password.length)
+				k[i] = _password[i];
+			else
+				k[i] = 0;
+		}
+		return k;
+	}
 
 	public void setPassword(byte[] password)
 	{
