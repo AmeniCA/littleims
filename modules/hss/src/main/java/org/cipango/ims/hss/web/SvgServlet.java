@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
 import org.springframework.context.ApplicationContext;
@@ -90,22 +90,23 @@ public class SvgServlet extends HttpServlet
 		List<ImplicitRegistrationSet> implicitSets = new ArrayList<ImplicitRegistrationSet>();
 		List<ServiceProfile> serviceProfiles = new ArrayList<ServiceProfile>();
 		
-		for (PublicIdentity publicIdentity : subscription.getPublicIdentities())
+		for (PublicUserIdentity publicIdentity : subscription.getPublicIdentities())
 		{
 			if (!implicitSets.contains(publicIdentity.getImplicitRegistrationSet()))
 				implicitSets.add(publicIdentity.getImplicitRegistrationSet());
-			if (!serviceProfiles.contains(publicIdentity.getServiceProfile()))
-				serviceProfiles.add(publicIdentity.getServiceProfile());
+			ServiceProfile sp = publicIdentity.getServiceProfile();
+			if (sp != null && !serviceProfiles.contains(sp))
+				serviceProfiles.add(sp);
 		}
 		
-		List<PublicIdentity> publicIds = new ArrayList<PublicIdentity>();
+		List<PublicUserIdentity> publicIds = new ArrayList<PublicUserIdentity>();
 		
 		out.append("\t<ImplicitSets>\n");
 		for (ImplicitRegistrationSet set : implicitSets)
 		{
 			int min = Integer.MAX_VALUE;
 			int max = Integer.MIN_VALUE;
-			for (PublicIdentity publicIdentity : set.getPublicIdentities())
+			for (PublicUserIdentity publicIdentity : set.getPublicIdentities())
 			{
 				if (!publicIds.contains(publicIdentity))
 					publicIds.add(publicIdentity);
@@ -124,7 +125,7 @@ public class SvgServlet extends HttpServlet
 		out.append("\t</ImplicitSets>\n");
 		
 		out.append("\t<PublicIdentities>\n");
-		for (PublicIdentity publicIdentity : publicIds)
+		for (PublicUserIdentity publicIdentity : publicIds)
 		{
 			out.append("\t\t<PublicIdentity>\n");
 			out.append("\t\t\t<Identity>").append(publicIdentity.getIdentity()).append("</Identity>\n");

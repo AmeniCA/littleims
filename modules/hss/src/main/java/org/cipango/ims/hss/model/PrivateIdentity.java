@@ -30,8 +30,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.cipango.ims.hss.util.XML;
-import org.cipango.ims.hss.util.XML.Output;
 import org.hibernate.annotations.Index;
 
 /**
@@ -186,7 +184,7 @@ public class PrivateIdentity
 		_publicIdentities = publicIdentities;
 	}
 	
-	public PublicPrivate addPublicId(PublicIdentity publicId)
+	public PublicPrivate addPublicId(PublicUserIdentity publicId)
 	{
 		return new PublicPrivate(publicId, this);
 	}

@@ -74,13 +74,13 @@ public class PublicPrivate implements Convertible
 	
 	@ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn (nullable = false, insertable=false, updatable=false)
-	private PublicIdentity _publicIdentity;
+	private PublicUserIdentity _publicIdentity;
 	
 	public PublicPrivate()
 	{
 	}
 		
-	public PublicPrivate(PublicIdentity publicIdentity, PrivateIdentity privateIdentity)
+	public PublicPrivate(PublicUserIdentity publicIdentity, PrivateIdentity privateIdentity)
 	{
 		_privateIdentity = privateIdentity;
 		_publicIdentity = publicIdentity;
@@ -127,11 +127,11 @@ public class PublicPrivate implements Convertible
 	{
 		_privateIdentity = privateIdentity;
 	}
-	public PublicIdentity getPublicIdentity()
+	public PublicUserIdentity getPublicIdentity()
 	{
 		return _publicIdentity;
 	}
-	public void setPublicIdentity(PublicIdentity publicIdentity)
+	public void setPublicIdentity(PublicUserIdentity publicIdentity)
 	{
 		_publicIdentity = publicIdentity;
 	}

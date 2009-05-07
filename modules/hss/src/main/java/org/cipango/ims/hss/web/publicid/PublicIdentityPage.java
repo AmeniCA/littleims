@@ -16,7 +16,9 @@ package org.cipango.ims.hss.web.publicid;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PublicIdentityDao;
+import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.web.BasePage;
 
 public abstract class PublicIdentityPage extends BasePage
@@ -32,29 +34,39 @@ public abstract class PublicIdentityPage extends BasePage
 
 	public class DaoDetachableModel extends LoadableDetachableModel<PublicIdentity>
 	{
-		private String key;
+		private String _key;
+		private boolean _psi;
 
 		public DaoDetachableModel(String key)
 		{
-			this.key = key;
+			_key = key;
+			_psi = false;
 		}
 
 		public DaoDetachableModel(PublicIdentity publicIdentity)
 		{
+			this(publicIdentity, false);
+		}
+		
+		public DaoDetachableModel(PublicIdentity publicIdentity, boolean psi)
+		{
 			// Create new PublicIdentity() if null, to have right default value.
-			super(publicIdentity == null ? new PublicIdentity() : publicIdentity);
+			super(publicIdentity == null ? (psi ? new PSI() : new PublicUserIdentity()) : publicIdentity);
+			_psi = psi;
 			if (publicIdentity != null)
-				this.key = publicIdentity.getIdentity();
+				_key = publicIdentity.getIdentity();
 
 		}
 
 		@Override
 		protected PublicIdentity load()
 		{
-			if (key == null)
-				return new PublicIdentity();
+			if (_key == null && _psi)
+				return new PSI();
+			else if (_key == null)
+				return new PublicUserIdentity();
 			else
-				return _dao.findById(key);
+				return _dao.findById(_key);
 		}
 	}
 

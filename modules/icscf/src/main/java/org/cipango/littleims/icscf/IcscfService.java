@@ -101,7 +101,8 @@ public class IcscfService
 		}
 		finally
 		{
-			request.getApplicationSession().invalidate();
+			if (request.getApplicationSession().isValid())
+				request.getApplicationSession().invalidate();
 		}
 	}
 	
@@ -187,7 +188,8 @@ public class IcscfService
 		}
 		finally
 		{
-			request.getApplicationSession().invalidate();
+			if (request.getApplicationSession().isValid())
+				request.getApplicationSession().invalidate();
 		}
 	}
 	

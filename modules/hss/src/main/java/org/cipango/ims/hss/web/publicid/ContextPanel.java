@@ -15,8 +15,8 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
@@ -28,9 +28,9 @@ import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 public class ContextPanel extends Panel {
 
 	
-	public ContextPanel(PublicIdentity publicIdentity) {
+	public ContextPanel(PublicUserIdentity publicIdentity) {
 		super("contextMenu");
-		add(new BookmarkablePageLink("editLink", EditPublicIdPage.class, 
+		add(new BookmarkablePageLink("editLink", EditPublicUserIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));

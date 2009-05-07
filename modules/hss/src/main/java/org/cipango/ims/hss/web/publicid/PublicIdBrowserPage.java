@@ -38,6 +38,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 
 public class PublicIdBrowserPage extends PublicIdentityPage
 {
@@ -47,7 +48,8 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	{
 		
 		addSearchField();
-		add(new BookmarkablePageLink("createLink", EditPublicIdPage.class));
+		add(new BookmarkablePageLink("createLink", EditPublicUserIdPage.class));
+		add(new BookmarkablePageLink("createPsiLink", EditPsiPage.class));
 
 		IColumn[] columns = new IColumn[5];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
@@ -57,7 +59,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".identityType", this, null),
 				"identity_type", "identityTypeAsString");
 		columns[3] = new PropertyColumn(new StringResourceModel(getPrefix() + ".state", this, null),
-				"implicitRegistrationSet.stateAsString");
+				"stateAsString");
 		columns[4] = new FilteredAbstractColumn(new Model("Actions"))
 		{
 
@@ -110,7 +112,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			{
 				String id = (String) getForm().get("searchInput").getDefaultModelObject();
 				if (!Strings.isEmpty(id))
-					setResponsePage(EditPublicIdPage.class, new PageParameters("id=" + id));
+					setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + id));
 			}
 		});
 	}
@@ -125,17 +127,20 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	private static class ActionsPanel extends Panel
 	{
 
-		public ActionsPanel(String id, PublicIdentity privateIdentity)
+		public ActionsPanel(String id, PublicIdentity identity)
 		{
 			super(id);
 			String key = null;
-			if (privateIdentity != null)
+			if (identity != null)
 			{
-				key = privateIdentity.getIdentity();
+				key = identity.getIdentity();
 			}
-
-			add(new BookmarkablePageLink("editLink", EditPublicIdPage.class, new PageParameters(
-					"id=" + key)));
+			if (identity instanceof PublicUserIdentity)
+				add(new BookmarkablePageLink("editLink", EditPublicUserIdPage.class, new PageParameters(
+						"id=" + key)));
+			else
+				add(new BookmarkablePageLink("editLink", EditPsiPage.class, new PageParameters(
+						"id=" + key)));
 			add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class,
 					new PageParameters("id=" + key)));
 		}

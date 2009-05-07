@@ -1,0 +1,34 @@
+<html>
+<head>
+    <wicket:link>
+    	<link rel="stylesheet" href="style.css" />
+    </wicket:link>
+</head>   
+<body>
+<wicket:panel>
+	<ul>
+		<li>
+			<a href="#" wicket:id="editLink"><wicket:message key="contextPanel.edit">Edit</wicket:message></a>
+		</li>
+		<li>
+			<a href="#" wicket:id="deleteLink"><wicket:message key="contextPanel.delete">Delete</wicket:message></a>
+		</li>
+		<wicket:enclosure>
+			<li>
+				<a href="#" wicket:id="scscfLink"><wicket:message key="contextPanel.scscf">S-CSCF</wicket:message></a>
+			</li>
+		</wicket:enclosure>
+		<wicket:enclosure>
+			<li>
+				<a href="#" wicket:id="asLink"><wicket:message key="contextPanel.applicationServer">AS</wicket:message></a>
+			</li>
+		</wicket:enclosure>
+		<wicket:enclosure>
+			<li>
+				<a href="#" wicket:id="serviceProfileLink"><wicket:message key="contextPanel.serviceProfile"/></a>
+			</li>
+		</wicket:enclosure>
+	</ul>
+</wicket:panel>     
+</body>
+</html>

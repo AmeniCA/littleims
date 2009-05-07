@@ -36,6 +36,19 @@ public class Scscf
 	
 	@OneToMany(mappedBy = "_scscf")
 	private Set<Subscription> _subscriptions = new HashSet<Subscription>();
+	
+	@OneToMany(mappedBy = "_scscf")
+	private Set<PSI> _psis = new HashSet<PSI>();
+
+	public Set<PSI> getPsis()
+	{
+		return _psis;
+	}
+
+	public void setPsis(Set<PSI> psis)
+	{
+		_psis = psis;
+	}
 
 	public Long getId()
 	{

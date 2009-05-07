@@ -40,9 +40,9 @@ import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.ImplicitRegistrationSetDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
-import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.util.AjaxFallbackButton;
 import org.cipango.ims.hss.web.util.StringModelIterator;
 
@@ -177,7 +177,7 @@ public class EditImplicitSetPage extends SubscriptionPage
 					protected void populateItem(Item item2)
 					{
 						MarkupContainer link = new BookmarkablePageLink("identity", 
-								EditPublicIdPage.class, 
+								EditPublicUserIdPage.class, 
 								new PageParameters("id=" + item2.getModelObject()));
 						item2.add(link);
 						link.add(new Label("name", item2.getModel()));
@@ -199,7 +199,7 @@ public class EditImplicitSetPage extends SubscriptionPage
 	{
 		Iterator it = ((List) form.get("publicIds").getDefaultModelObject()).iterator();
 		while (it.hasNext()) {
-			PublicIdentity publicIdentity = _publicIdentityDao.findById((String) it.next());
+			PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById((String) it.next());
 			ImplicitRegistrationSet previous = publicIdentity.getImplicitRegistrationSet();
 			publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
 			if (previous != null && previous.getPublicIdentities().isEmpty())

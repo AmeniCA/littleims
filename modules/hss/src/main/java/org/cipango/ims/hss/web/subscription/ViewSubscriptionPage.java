@@ -32,10 +32,10 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
-import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.util.HideableLink;
 import org.cipango.ims.hss.web.util.StringModelIterator;
@@ -104,7 +104,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 					protected void populateItem(Item item2)
 					{
 						MarkupContainer link = new BookmarkablePageLink("identity", 
-								EditPublicIdPage.class, 
+								EditPublicUserIdPage.class, 
 								new PageParameters("id=" + item2.getModelObject()));
 						item2.add(link);
 						link.add(new Label("name", item2.getModel()));
@@ -137,9 +137,9 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			@Override
 			protected void populateItem(Item item)
 			{
-				PublicIdentity publicIdentity = (PublicIdentity) item.getModelObject();
+				PublicUserIdentity publicIdentity = (PublicUserIdentity) item.getModelObject();
 				MarkupContainer link = new BookmarkablePageLink("identityLink", 
-						EditPublicIdPage.class, 
+						EditPublicUserIdPage.class, 
 						new PageParameters("id=" + publicIdentity.getIdentity()));
 				link.add(new Label("identity"));
 				item.add(link);

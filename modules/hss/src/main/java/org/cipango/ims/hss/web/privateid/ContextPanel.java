@@ -29,7 +29,7 @@ import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.web.publicid.EditPublicIdPage;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 
 @SuppressWarnings("unchecked")
@@ -66,14 +66,14 @@ public class ContextPanel extends Panel {
 			protected void populateItem(Item item)
 			{
 				MarkupContainer link = new BookmarkablePageLink("identity", 
-						EditPublicIdPage.class, 
+						EditPublicUserIdPage.class, 
 						new PageParameters("id=" + item.getModelObject()));
 				item.add(link);
 				link.add(new Label("name", item.getModel()));
 			}
 		});
 		add(new BookmarkablePageLink("editPublicIdsLink", EditPublicIdsPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-		add(new BookmarkablePageLink("newPublicIdLink", EditPublicIdPage.class, new PageParameters("privateId=" + privateIdentity.getIdentity())));
+		add(new BookmarkablePageLink("newPublicIdLink", EditPublicUserIdPage.class, new PageParameters("privateId=" + privateIdentity.getIdentity())));
 	}
 
 

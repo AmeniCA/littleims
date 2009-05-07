@@ -19,7 +19,9 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 
 
 public class DeletePublicIdPage extends PublicIdentityPage {
@@ -67,7 +69,12 @@ public class DeletePublicIdPage extends PublicIdentityPage {
 		add(form);
 		
 		if (publicIdentity != null)
-			setContextMenu(new ContextPanel(publicIdentity));
+		{
+			if (publicIdentity instanceof PublicUserIdentity)
+				setContextMenu(new ContextPanel((PublicUserIdentity) publicIdentity));
+			else
+				setContextMenu(new PsiContextPanel((PSI) publicIdentity));
+		}
 	}
 
 	@Override

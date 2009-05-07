@@ -81,9 +81,9 @@ public class Subscription
 		return publicIds;
 	}
 	
-	public SortedSet<PublicIdentity> getPublicIdentities()
+	public SortedSet<PublicUserIdentity> getPublicIdentities()
 	{
-		TreeSet<PublicIdentity> publicIds = new TreeSet<PublicIdentity>();
+		TreeSet<PublicUserIdentity> publicIds = new TreeSet<PublicUserIdentity>();
 		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
 		while (it.hasNext()) 
 		{

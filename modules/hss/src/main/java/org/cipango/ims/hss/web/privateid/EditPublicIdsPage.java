@@ -37,6 +37,7 @@ import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 
 
 public class EditPublicIdsPage extends PrivateIdentityPage
@@ -146,7 +147,7 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 			}
 			else
 			{
-				_publicIdentityDao.save(id.addPublicId(_publicIdentityDao.findById(publicId)));
+				_publicIdentityDao.save(id.addPublicId((PublicUserIdentity) _publicIdentityDao.findById(publicId)));
 				publicsModel.add(publicId);
 				((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
 			}

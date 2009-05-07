@@ -17,27 +17,27 @@
  */
 package org.cipango.ims.hss.model;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
-import org.cipango.ims.hss.util.XML;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
 import org.hibernate.annotations.Index;
 
 @Entity
-public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+		name = "TYPE",
+		discriminatorType = DiscriminatorType.STRING)
+public abstract class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 {
 	@Id @GeneratedValue
 	private Long _id;
@@ -45,9 +45,6 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	@Column (unique = true)
 	@Index (name = "IDX_IDENTITY")
 	private String _identity;
-
-	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.REMOVE })
-	private Set<PublicPrivate> _privateIdentities = new HashSet<PublicPrivate>();
 
 	private boolean _barred;
 	
@@ -57,13 +54,10 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 		
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
-	
-	@ManyToOne
-	private ImplicitRegistrationSet _implicitRegistrationSet;
-	
+		
 	public PublicIdentity() 
 	{
-		_identityType = IdentityType.PUBLIC_USER_IDENTITY;
+		
 	}
 	
 	public Long getId()
@@ -84,20 +78,6 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	public void setIdentity(String identity)
 	{
 		_identity = identity;
-	}
-
-	public Set<PublicPrivate> getPrivateIdentities()
-	{
-		return _privateIdentities;
-	}
-	
-	public SortedSet<String> getPrivateIds()
-	{
-		TreeSet<String> publicIds = new TreeSet<String>();
-		Iterator<PublicPrivate> it = getPrivateIdentities().iterator();
-		while (it.hasNext())
-			publicIds.add(it.next().getPrivateId());
-		return publicIds;
 	}
 
 	public boolean isBarred()
@@ -133,11 +113,6 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 	public void setIdentityType(Short identityType)
 	{
 		_identityType = identityType;
-	}
-
-	public void setPrivateIdentities(Set<PublicPrivate> privateIdentities)
-	{
-		_privateIdentities = privateIdentities;
 	}
 
 	public ServiceProfile getServiceProfile()
@@ -197,35 +172,20 @@ public class PublicIdentity implements Convertible, Comparable<PublicIdentity>
 		return getIdentity().compareTo(o.getIdentity());
 	}
 	
-	public ImplicitRegistrationSet getImplicitRegistrationSet()
+	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity);
+	
+	public abstract Short getState();
+	
+	public String getStateAsString()
 	{
-		return _implicitRegistrationSet;
+		return State.toString(getState());
 	}
+	
+	public abstract void updateState(String privateIdentity, Short state);
+	
+	public abstract Scscf getScscf();
 
-	public void setImplicitRegistrationSet(ImplicitRegistrationSet implicitRegistrationSet)
-	{
-		if (_implicitRegistrationSet != null)
-			_implicitRegistrationSet.getPublicIdentities().remove(this);
-		
-		_implicitRegistrationSet = implicitRegistrationSet;
-		
-		if (implicitRegistrationSet != null)
-			implicitRegistrationSet.getPublicIdentities().add(this);
-	}
-
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity)
-	{
-		Output out = XML.getDefault().newOutput();
-		out.open("IMSSubscription");
-		if (privateIdentity == null)
-			// If no private identity is registered, use the first private identity.
-			out.add("PrivateID", _privateIdentities.iterator().next().getPrivateId());
-		else
-			out.add("PrivateID", privateIdentity.getIdentity());
-		out.add("ServiceProfile", _implicitRegistrationSet.getPublicIdentities());
-		out.close("IMSSubscription");
-		return out.toString();
-	}
+	public abstract void setScscf(Scscf scscf);
 	
 	public static class IdentityType
 	{

@@ -44,6 +44,9 @@ public class ApplicationServer implements Convertible
 	@OneToMany(mappedBy = "_applicationServer")
 	private Set<InitialFilterCriteria> _icfc = new HashSet<InitialFilterCriteria>();
 	
+	@OneToMany(mappedBy = "_applicationServer")
+	private Set<PSI> _psis = new HashSet<PSI>();
+	
 	public Set<InitialFilterCriteria> getIcfc()
 	{
 		return _icfc;
@@ -137,6 +140,15 @@ public class ApplicationServer implements Convertible
 		out.add("IncludeRegisterRequest", _includeRegisterRequest);
 		out.add("IncludeRegisterResponse", _includeRegisterResponse);
 	}
+	public Set<PSI> getPsis()
+	{
+		return _psis;
+	}
+
+	public void setPsis(Set<PSI> psis)
+	{
+		_psis = psis;
+	}
 	
 	public static class DefaultHandling
 	{
@@ -159,6 +171,4 @@ public class ApplicationServer implements Convertible
 			}
 		}
 	}
-
-
 }

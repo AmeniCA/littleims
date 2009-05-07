@@ -36,7 +36,7 @@ import org.cipango.ims.hss.db.ImplicitRegistrationSetDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
@@ -82,11 +82,11 @@ public class AddSubscriptionPage extends SubscriptionPage
 		}));
 		
 		WebMarkupContainer publicId = new WebMarkupContainer("publicIdentity", 
-				new CompoundPropertyModel( new LoadableDetachableModel(new PublicIdentity()) {
+				new CompoundPropertyModel( new LoadableDetachableModel(new PublicUserIdentity()) {
 			@Override
 			protected Object load()
 			{
-				return new PublicIdentity();
+				return new PublicUserIdentity();
 			}
 			
 		}));
@@ -95,7 +95,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 		publicId.add(new CheckBox("barred"));
 
 		publicId.add(new DropDownChoice("identityType",
-				Arrays.asList(new Short[]{0,1,2,3}),
+				Arrays.asList(new Short[]{IdentityType.PUBLIC_USER_IDENTITY, IdentityType.WILDCARDED_IMPU}),
 				new ChoiceRenderer<Short>()
 		{
 			@Override
@@ -150,7 +150,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 					PrivateIdentity privateIdentity = (PrivateIdentity) form.get("privateIdentity").getDefaultModelObject();  
 					privateIdentity.setSubscription(subscription);
 					
-					PublicIdentity publicIdentity = (PublicIdentity) form.get("publicIdentity").getDefaultModelObject(); 
+					PublicUserIdentity publicIdentity = (PublicUserIdentity) form.get("publicIdentity").getDefaultModelObject(); 
 					privateIdentity.addPublicId(publicIdentity);
 					
 					ImplicitRegistrationSet implicitRegistrationSet = new ImplicitRegistrationSet();

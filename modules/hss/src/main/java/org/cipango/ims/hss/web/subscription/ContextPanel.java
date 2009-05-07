@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -19,6 +20,7 @@ import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
+import org.cipango.ims.hss.web.scscf.EditScscfPage;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -34,6 +36,12 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + subscription.getName())));
 		add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
 				new PageParameters("id=" + subscription.getName())));
+		
+		if (subscription.getScscf() != null)
+			add(new BookmarkablePageLink("scscfLink", EditScscfPage.class, 
+					new PageParameters("id=" + subscription.getScscf().getName())));
+		else
+			add(new WebMarkupContainer("scscfLink").setVisible(false));
 		
 		final Set<String> privateIds = subscription.getPrivateIds();
 		

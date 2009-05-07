@@ -52,37 +52,53 @@ public class IcscfServlet extends SipServlet implements DiameterListener
 	@Override
 	protected void doRequest(SipServletRequest request) throws ServletException, IOException
 	{
-		if (Methods.REGISTER.equals(request.getMethod()))
+		try
 		{
-			_service.doRegister(request);
+			if (Methods.REGISTER.equals(request.getMethod()))
+			{
+				_service.doRegister(request);
+			}
+			else
+			{
+				_service.doRequest(request);
+			}
 		}
-		else
+		catch (Throwable e) 
 		{
-			_service.doRequest(request);
+			__log.warn("Received unexpected exception:" + e, e);
+			throw new RuntimeException(e);
 		}
 	}
 
 
 	public void handle(DiameterMessage message) throws IOException
 	{
-		if (message.isRequest())
+		try
 		{
-			__log.warn("No handler for diameter request with command " + message.getCommand());
-		}
-		else
-		{
-			DiameterAnswer answer = (DiameterAnswer) message;
-			int command = message.getCommand();
-			if ( command == IMS.UAA)
-				_service.handleUAA(answer);
-			else if (command == IMS.LIA)
+			if (message.isRequest())
 			{
-				_service.handleLIA(answer);
+				__log.warn("No handler for diameter request with command " + message.getCommand());
 			}
 			else
 			{
-				__log.warn("No handler for diameter answer with command " + command);
+				DiameterAnswer answer = (DiameterAnswer) message;
+				int command = message.getCommand();
+				if ( command == IMS.UAA)
+					_service.handleUAA(answer);
+				else if (command == IMS.LIA)
+				{
+					_service.handleLIA(answer);
+				}
+				else
+				{
+					__log.warn("No handler for diameter answer with command " + command);
+				}
 			}
+		}
+		catch (Throwable e) 
+		{
+			__log.warn("Received unexpected exception when handing Diameter " + 
+					(message.isRequest() ? "request" : "answer") + ": " + message.getCommand(), e);
 		}
 	}
 

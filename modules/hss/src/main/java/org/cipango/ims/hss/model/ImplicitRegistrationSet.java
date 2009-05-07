@@ -31,7 +31,7 @@ public class ImplicitRegistrationSet
 	private Long _id;
 	
 	@OneToMany (mappedBy="_implicitRegistrationSet")
-	private Set<PublicIdentity> _publicIdentities = new HashSet<PublicIdentity>();
+	private Set<PublicUserIdentity> _publicIdentities = new HashSet<PublicUserIdentity>();
 	
 	@OneToMany (mappedBy="_implicitRegistrationSet", cascade = { CascadeType.ALL })
 	private Set<RegistrationState> _states = new HashSet<RegistrationState>();
@@ -46,12 +46,12 @@ public class ImplicitRegistrationSet
 		_id = id;
 	}
 
-	public Set<PublicIdentity> getPublicIdentities()
+	public Set<PublicUserIdentity> getPublicIdentities()
 	{
 		return _publicIdentities;
 	}
 
-	public void setPublicIdentities(Set<PublicIdentity> publicIdentities)
+	public void setPublicIdentities(Set<PublicUserIdentity> publicIdentities)
 	{
 		_publicIdentities = publicIdentities;
 	}
