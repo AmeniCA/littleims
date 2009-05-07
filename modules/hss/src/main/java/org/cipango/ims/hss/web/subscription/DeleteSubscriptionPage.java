@@ -29,7 +29,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 
 
@@ -126,10 +126,10 @@ public class DeleteSubscriptionPage extends SubscriptionPage {
 				while (it2.hasNext())
 				{
 					PrivateIdentity privateIdentity = it2.next();
-					Iterator<PublicPrivate> it3 = privateIdentity.getPublicIdentities().iterator();
+					Iterator<PublicUserIdentity> it3 = privateIdentity.getPublicIdentities().iterator();
 					while (it3.hasNext())
 					{
-						_publicIdentityDao.delete(it3.next().getPublicIdentity());	
+						_publicIdentityDao.delete(it3.next());	
 					}
 					_privateIdentityDao.delete(privateIdentity);
 					

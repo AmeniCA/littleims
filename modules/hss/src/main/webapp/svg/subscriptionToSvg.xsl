@@ -19,7 +19,16 @@
 	<xsl:variable name="X_SERVICE_PROFILE">610</xsl:variable>
 	<xsl:variable name="RECT_WIDTH">140</xsl:variable>
 	<xsl:variable name="RECT_HEIGHT">40</xsl:variable>
-	<xsl:variable name="DELTA_Y">100</xsl:variable>
+	<xsl:variable name="DELTA_Y">
+		<xsl:choose>
+			<xsl:when test="count(/subscription/PublicIdentities/PublicIdentity) &gt; count(/subscription/PrivateIDs/PrivateID)">
+				100
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="(count(/subscription/PrivateIDs/PrivateID) * 100 + 100 ) div (1 + count(/subscription/PublicIdentities/PublicIdentity))"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 	<xsl:variable name="BASE_Y">-49</xsl:variable>
 	<xsl:variable name="Y_SUBSCRIPTION" select="(count(/subscription/PublicIdentities/PublicIdentity) * $DELTA_Y + $DELTA_Y) div 2 + $BASE_Y"/>
 	<xsl:variable name="DELTA_Y_PRIVATE" select="(count(/subscription/PublicIdentities/PublicIdentity) * $DELTA_Y  + $DELTA_Y) div (1 + count(/subscription/PrivateIDs/PrivateID))"/>

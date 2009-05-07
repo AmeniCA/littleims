@@ -39,13 +39,11 @@ import org.cipango.ims.hss.diameter.DiameterException;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.RegistrationState;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
-import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.littleims.cx.ServerAssignmentType;
 import org.cipango.littleims.cx.UserAuthorizationType;
 import org.cipango.littleims.util.HexString;
@@ -157,9 +155,9 @@ public class Hss
 			if (!emergencyReg)
 			{
 				boolean allBarred = true;
-				for (PublicPrivate publicPrivate :privateIdentity.getPublicIdentities())
+				for (PublicUserIdentity publicUserIdentity :privateIdentity.getPublicIdentities())
 				{
-					if (!publicPrivate.getPublicIdentity().isBarred())
+					if (!publicUserIdentity.isBarred())
 					{
 						allBarred = false;
 						break;
@@ -319,10 +317,10 @@ public class Hss
 	
 	private PublicIdentity getPublicIdentity(PrivateIdentity privateIdentity, String impu) throws DiameterException
 	{
-		for (PublicPrivate id : privateIdentity.getPublicIdentities())
+		for (PublicUserIdentity id : privateIdentity.getPublicIdentities())
 		{
-			if (id.getPublicIdentity().getIdentity().equals(impu))
-				return id.getPublicIdentity();
+			if (id.getIdentity().equals(impu))
+				return id;
 		}
 		
 		throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITIES_DONT_MATCH);
@@ -364,7 +362,7 @@ public class Hss
 			if (publicIdentity instanceof PublicUserIdentity)
 			{
 				PublicUserIdentity userId = (PublicUserIdentity) publicIdentity;
-				privateIdentity = userId.getPrivateIdentities().iterator().next().getPrivateIdentity();
+				privateIdentity = userId.getPrivateIdentities().iterator().next();
 				impi = privateIdentity.getIdentity();
 			}
 			else
@@ -380,7 +378,7 @@ public class Hss
 		{
 			if (privateIdentity != null)
 			{
-				publicIdentity = privateIdentity.getPublicIdentities().iterator().next().getPublicIdentity();
+				publicIdentity = privateIdentity.getPublicIdentities().iterator().next();
 				impu = publicIdentity.getIdentity();
 			}
 			else

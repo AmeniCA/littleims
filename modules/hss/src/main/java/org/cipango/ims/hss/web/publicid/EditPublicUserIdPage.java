@@ -172,16 +172,16 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 				publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
 			}
 			
-			_dao.save(publicIdentity);
 			if (_privateIdKey != null)
 			{
 				PrivateIdentity privateIdentity = _privateIdentityDao.findById(_privateIdKey);
 				if (privateIdentity != null)
 				{
-					_dao.save(privateIdentity.addPublicId(publicIdentity));
+					privateIdentity.addPublicId(publicIdentity);
 				}
 			}
 
+			_dao.save(publicIdentity);
 			getSession().info(getString("modification.success"));
 		}
 		catch (Exception e)

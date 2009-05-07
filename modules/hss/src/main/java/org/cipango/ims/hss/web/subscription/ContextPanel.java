@@ -71,7 +71,7 @@ public class ContextPanel extends Panel {
 				link.add(new Label("name", item.getModel()));
 			}
 		});
-		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, new PageParameters("subscription=" + subscription.getId())));
+		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, new PageParameters("subscription=" + subscription.getName())));
 	}
 
 

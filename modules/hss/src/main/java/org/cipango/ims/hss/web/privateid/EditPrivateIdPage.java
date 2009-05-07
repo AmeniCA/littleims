@@ -117,9 +117,10 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 			{
 				Subscription subscription = _subscriptionDao.findById(_subscriptionId);
 				if (subscription != null)
-				{
 					privateIdentity.setSubscription(subscription);
-				}
+				else
+					error(MapVariableInterpolator.interpolate(getString("subscription.error.notFound"),
+						new MicroMap("name", _subscriptionId)));
 			}
 			_dao.save(privateIdentity);
 			getSession().info(getString("modification.success"));

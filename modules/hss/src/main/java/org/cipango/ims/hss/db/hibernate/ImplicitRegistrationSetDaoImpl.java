@@ -26,7 +26,7 @@ public class ImplicitRegistrationSetDaoImpl extends AbstractHibernateDao<Implici
 	
 	private static final String GET_IMPLICIT_REGISTRATION_SET =
 		"SELECT DISTINCT i FROM ImplicitRegistrationSet  AS i INNER JOIN i._publicIdentities AS pu " +
-		"INNER JOIN pu._privateIdentities AS pr WHERE pr._privateIdentity._subscription.id = :key";
+		"INNER JOIN pu._privateIdentities AS pr WHERE pr._subscription.id = :key";
 	
 	public ImplicitRegistrationSetDaoImpl(SessionFactory sessionFactory)
 	{

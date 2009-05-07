@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PublicIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
@@ -53,13 +52,6 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 	{
 		currentSession().saveOrUpdate(impu);
 	}
-
-	@Transactional  (readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void save(PublicPrivate publicPrivate) 
-	{
-		currentSession().saveOrUpdate(publicPrivate);
-	}
-
 	
 	@SuppressWarnings("unchecked")
 	public List<String> findLike(String id, int maxResults)

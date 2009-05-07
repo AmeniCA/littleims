@@ -6,11 +6,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.util.XML;
 import org.cipango.ims.hss.util.XML.Output;
@@ -22,15 +21,15 @@ public class PublicUserIdentity extends PublicIdentity
 	@ManyToOne
 	private ImplicitRegistrationSet _implicitRegistrationSet;
 	
-	@OneToMany (mappedBy="_publicIdentity", cascade = { CascadeType.REMOVE })
-	private Set<PublicPrivate> _privateIdentities = new HashSet<PublicPrivate>();
+	@ManyToMany (mappedBy="_publicIdentities")
+	private Set<PrivateIdentity> _privateIdentities = new HashSet<PrivateIdentity>();
 	
 	public PublicUserIdentity()
 	{
 		setIdentityType(IdentityType.PUBLIC_USER_IDENTITY);
 	}
 	
-	public Set<PublicPrivate> getPrivateIdentities()
+	public Set<PrivateIdentity> getPrivateIdentities()
 	{
 		return _privateIdentities;
 	}
@@ -38,13 +37,13 @@ public class PublicUserIdentity extends PublicIdentity
 	public SortedSet<String> getPrivateIds()
 	{
 		TreeSet<String> publicIds = new TreeSet<String>();
-		Iterator<PublicPrivate> it = getPrivateIdentities().iterator();
+		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
 		while (it.hasNext())
-			publicIds.add(it.next().getPrivateId());
+			publicIds.add(it.next().getIdentity());
 		return publicIds;
 	}
 	
-	public void setPrivateIdentities(Set<PublicPrivate> privateIdentities)
+	public void setPrivateIdentities(Set<PrivateIdentity> privateIdentities)
 	{
 		_privateIdentities = privateIdentities;
 	}
@@ -83,7 +82,7 @@ public class PublicUserIdentity extends PublicIdentity
 		out.open("IMSSubscription");
 		if (privateIdentity == null)
 			// If no private identity is registered, use the first private identity.
-			out.add("PrivateID", getPrivateIdentities().iterator().next().getPrivateId());
+			out.add("PrivateID", getPrivateIdentities().iterator().next().getIdentity());
 		else
 			out.add("PrivateID", privateIdentity.getIdentity());
 		out.add("ServiceProfile", _implicitRegistrationSet.getPublicIdentities());
@@ -105,12 +104,12 @@ public class PublicUserIdentity extends PublicIdentity
 	@Override
 	public Scscf getScscf()
 	{
-		return getPrivateIdentities().iterator().next().getPrivateIdentity().getSubscription().getScscf();
+		return getPrivateIdentities().iterator().next().getSubscription().getScscf();
 	}
 
 	@Override
 	public void setScscf(Scscf scscf)
 	{
-		getPrivateIdentities().iterator().next().getPrivateIdentity().getSubscription().setScscf(scscf);
+		getPrivateIdentities().iterator().next().getSubscription().setScscf(scscf);
 	}
 }

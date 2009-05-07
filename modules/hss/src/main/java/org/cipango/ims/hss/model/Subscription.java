@@ -74,11 +74,11 @@ public class Subscription
 	
 	public SortedSet<String> getPrivateIds()
 	{
-		TreeSet<String> publicIds = new TreeSet<String>();
+		TreeSet<String> ids = new TreeSet<String>();
 		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
 		while (it.hasNext())
-			publicIds.add(it.next().getIdentity());
-		return publicIds;
+			ids.add(it.next().getIdentity());
+		return ids;
 	}
 	
 	public SortedSet<PublicUserIdentity> getPublicIdentities()
@@ -87,9 +87,9 @@ public class Subscription
 		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
 		while (it.hasNext()) 
 		{
-			Iterator<PublicPrivate> it2 = it.next().getPublicIdentities().iterator();
+			Iterator<PublicUserIdentity> it2 = it.next().getPublicIdentities().iterator();
 			while (it2.hasNext())
-				publicIds.add(it2.next().getPublicIdentity());
+				publicIds.add(it2.next());
 		}
 		return publicIds;
 	}
@@ -100,9 +100,9 @@ public class Subscription
 		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
 		while (it.hasNext()) 
 		{
-			Iterator<PublicPrivate> it2 = it.next().getPublicIdentities().iterator();
+			Iterator<PublicUserIdentity> it2 = it.next().getPublicIdentities().iterator();
 			while (it2.hasNext())
-				publicIds.add(it2.next().getPublicId());
+				publicIds.add(it2.next().getIdentity());
 		}
 		return publicIds;
 	}

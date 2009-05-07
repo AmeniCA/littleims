@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -50,13 +50,11 @@ public class SubscriptionDaoImpl extends AbstractHibernateDao<Subscription> impl
 		{
 			PrivateIdentity privateIdentity = it.next();
 			currentSession().saveOrUpdate(privateIdentity);
-			Iterator<PublicPrivate> it2 = privateIdentity.getPublicIdentities().iterator();
+			Iterator<PublicUserIdentity> it2 = privateIdentity.getPublicIdentities().iterator();
 			while (it2.hasNext())
 			{
-				PublicPrivate publicPrivate = it2.next();
-				currentSession().saveOrUpdate(publicPrivate.getPublicIdentity());
-				publicPrivate.refresh();
-				currentSession().saveOrUpdate(publicPrivate);
+				PublicUserIdentity publicUserIdentity = it2.next();
+				currentSession().saveOrUpdate(publicUserIdentity);
 			}
 		}
 		

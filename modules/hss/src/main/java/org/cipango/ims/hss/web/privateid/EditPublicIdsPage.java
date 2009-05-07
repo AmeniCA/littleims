@@ -35,8 +35,6 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 
 
@@ -115,9 +113,9 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		List publics = new ArrayList();
 		if (privateIdentity != null)
 		{
-			Iterator<PublicPrivate> it = privateIdentity.getPublicIdentities().iterator();
+			Iterator<PublicUserIdentity> it = privateIdentity.getPublicIdentities().iterator();
 			while (it.hasNext()) {
-				publics.add(it.next().getPublicId());
+				publics.add(it.next().getIdentity());
 			}
 		}
 		form.add(new ListMultipleChoice(
@@ -133,28 +131,28 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 	{
 		Iterator it = ((List) component.getDefaultModelObject()).iterator();
 		List choosen = ((AbstractChoice) component).getChoices();
-		PrivateIdentity id = _dao.findById(_key);
+		PrivateIdentity privateIdentity = _dao.findById(_key);
 
 		RefreshingView publics = (RefreshingView) getPage().get("contextMenu:publicIds");
 		Collection<String> publicsModel = (Collection<String>) publics.getDefaultModelObject();
 		while (it.hasNext()) {
 			String publicId = (String) it.next();
-			PublicIdentity publicIdentity = _publicIdentityDao.findById(publicId);
+			PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById(publicId);
 			if (remove)
 			{
-				_dao.delete(_dao.getPublicPrivate(publicIdentity, id));
+				privateIdentity.removePublicId(publicIdentity);
 				publicsModel.remove(publicId);
 			}
 			else
 			{
-				_publicIdentityDao.save(id.addPublicId((PublicUserIdentity) _publicIdentityDao.findById(publicId)));
+				privateIdentity.addPublicId(publicIdentity);
 				publicsModel.add(publicId);
 				((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
 			}
 			choosen.remove(publicId);
 			it.remove();
 		}
-				
+		_dao.save(privateIdentity);		
 		if (target != null)
 		{
 			target.addComponent(form1);

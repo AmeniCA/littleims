@@ -14,23 +14,23 @@
 
 package org.cipango.ims.hss.model;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 
 /**
  * Private Identity
@@ -59,13 +59,14 @@ public class PrivateIdentity
 	@JoinColumn (nullable = true)
 	private Subscription _subscription;
 	
-	@OneToMany (mappedBy = "_privateIdentity", cascade = {CascadeType.REMOVE })
-	private Set<PublicPrivate> _publicIdentities = new HashSet<PublicPrivate>();
-	
 	@ManyToMany
-	private Set<ServiceProfile> _serviceProfiles;
-	
-	
+	@JoinTable (
+			name = "PUBLIC_PRIVATE",
+			joinColumns = {@JoinColumn(name = "privateIdentity")},
+			inverseJoinColumns = {@JoinColumn(name = "publicIdentity")})
+	@Sort (type = SortType.NATURAL)
+	private SortedSet<PublicUserIdentity> _publicIdentities = new TreeSet<PublicUserIdentity>();
+		
 	public Long getId()
 	{
 		return _id;
@@ -76,16 +77,6 @@ public class PrivateIdentity
 		_id = id;
 	}
 	
-	public Set<ServiceProfile> getServiceProfiles()
-	{
-		return _serviceProfiles;
-	}
-
-	public void setServiceProfiles(Set<ServiceProfile> serviceProfiles)
-	{
-		_serviceProfiles = serviceProfiles;
-	}
-
 	public String getIdentity()
 	{
 		return _identity;
@@ -165,7 +156,7 @@ public class PrivateIdentity
 		subscription.getPrivateIdentities().add(this);
 	}
 
-	public Set<PublicPrivate> getPublicIdentities()
+	public Set<PublicUserIdentity> getPublicIdentities()
 	{
 		return _publicIdentities;
 	}
@@ -173,20 +164,27 @@ public class PrivateIdentity
 	public SortedSet<String> getPublicIds()
 	{
 		TreeSet<String> publicIds = new TreeSet<String>();
-		Iterator<PublicPrivate> it = getPublicIdentities().iterator();
+		Iterator<PublicUserIdentity> it = getPublicIdentities().iterator();
 		while (it.hasNext())
-			publicIds.add(it.next().getPublicId());
+			publicIds.add(it.next().getIdentity());
 		return publicIds;
 	}
 
-	public void setPublicIdentities(Set<PublicPrivate> publicIdentities)
+	public void setPublicIdentities(SortedSet<PublicUserIdentity> publicIdentities)
 	{
 		_publicIdentities = publicIdentities;
 	}
 	
-	public PublicPrivate addPublicId(PublicUserIdentity publicId)
+	public void addPublicId(PublicUserIdentity publicIdentity)
 	{
-		return new PublicPrivate(publicId, this);
+		getPublicIdentities().add(publicIdentity);
+		publicIdentity.getPrivateIdentities().add(this);
+	}
+	
+	public void removePublicId(PublicUserIdentity publicIdentity)
+	{
+		getPublicIdentities().remove(publicIdentity);
+		publicIdentity.getPrivateIdentities().add(this);
 	}
 	
 }

@@ -15,7 +15,7 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cipango.ims.hss.model.PublicPrivate;
+import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
@@ -39,7 +39,7 @@ public class ContextPanel extends Panel {
 		if (!publicIdentity.getPrivateIdentities().isEmpty())
 		{
 			Subscription subscription = 
-				publicIdentity.getPrivateIdentities().iterator().next().getPrivateIdentity().getSubscription();
+				publicIdentity.getPrivateIdentities().iterator().next().getSubscription();
 			if (subscription != null)
 			{
 				add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, 
@@ -64,9 +64,9 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + publicIdentity.getServiceProfile().getName())));
 
 		final List<String> privateIds = new ArrayList<String>();
-		Iterator<PublicPrivate> it = publicIdentity.getPrivateIdentities().iterator();
+		Iterator<PrivateIdentity> it = publicIdentity.getPrivateIdentities().iterator();
 		while (it.hasNext())
-			privateIds.add(it.next().getPrivateId());
+			privateIds.add(it.next().getIdentity());
 		
 		add(new RefreshingView("privateIds"){
 

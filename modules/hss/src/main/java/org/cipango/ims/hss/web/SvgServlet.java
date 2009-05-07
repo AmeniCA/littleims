@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
@@ -133,10 +132,10 @@ public class SvgServlet extends HttpServlet
 			out.append(Integer.toString(serviceProfiles.indexOf(publicIdentity.getServiceProfile()) + 1));
 			out.append("</ServiceProfile>\n");
 			out.append("\t\t\t<Privates>\n");
-			for (PublicPrivate publicPrivate : publicIdentity.getPrivateIdentities())
+			for (PrivateIdentity privateIdentity : publicIdentity.getPrivateIdentities())
 			{
 				out.append("\t\t\t\t<Id>");
-				out.append(Integer.toString(privateIds.indexOf(publicPrivate.getPrivateIdentity()) + 1));
+				out.append(Integer.toString(privateIds.indexOf(privateIdentity) + 1));
 				out.append("</Id>\n");
 			}
 			out.append("\t\t\t</Privates>\n");

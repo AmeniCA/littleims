@@ -17,12 +17,10 @@ package org.cipango.ims.hss.db;
 import java.util.List;
 
 import org.cipango.ims.hss.model.PublicIdentity;
-import org.cipango.ims.hss.model.PublicPrivate;
 
 public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 {
 	void save(PublicIdentity impu);
-	void save(PublicPrivate publicPrivate);
 	PublicIdentity findById(String id);
 	List<String> findLike(String id, int maxResults);
 	List<PublicIdentity> findAll();
