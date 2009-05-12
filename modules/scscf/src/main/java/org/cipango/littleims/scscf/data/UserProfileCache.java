@@ -15,6 +15,8 @@ package org.cipango.littleims.scscf.data;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +32,7 @@ import org.cipango.littleims.cx.data.userprofile.TSharedIFC;
 import org.cipango.littleims.scscf.data.trigger.CriteriaMatch;
 import org.cipango.littleims.scscf.data.trigger.TriggerPointCompiler;
 import org.cipango.littleims.util.LittleimsException;
+import org.cipango.littleims.util.RegexUtil;
 
 
 public class UserProfileCache
@@ -37,6 +40,8 @@ public class UserProfileCache
 
 	private URL _sharedIfcsUrl;
 	private Map<String, UserProfile> _serviceProfiles = new ConcurrentHashMap<String, UserProfile>();
+	private Map<String, UserProfile> _wildcardServiceProfiles = new ConcurrentHashMap<String, UserProfile>();
+	
 	private TriggerPointCompiler _tpCompiler = new TriggerPointCompiler();
 	private Map<Integer, InitialFilterCriteria> _sharedIFCs = new ConcurrentHashMap<Integer, InitialFilterCriteria>();
 
@@ -127,12 +132,17 @@ public class UserProfileCache
 				for (int j = 0; j < publicIDs.length; j++)
 				{
 					TPublicIdentity publicID = publicIDs[j];
-					UserProfile userProfile = new UserProfile(publicID.getIdentity());
+					boolean wildcard =publicID.getExtension() != null && publicID.getExtension().getWildcardedPSI() != null; 
+					String identity = wildcard ? publicID.getExtension().getWildcardedPSI() : publicID.getIdentity();
+					UserProfile userProfile = new UserProfile(identity);
 					userProfile.setBarred(publicID.getBarringIndication());
 					userProfile.setServiceProfile(serviceProfile);
-
-					__log.debug("Cache user profile for identity " + publicID.getIdentity());
-					_serviceProfiles.put(publicID.getIdentity(), userProfile);
+					__log.debug("Cache user profile for identity " + identity);
+					
+					if (wildcard)
+						_wildcardServiceProfiles.put(RegexUtil.extendedRegexToJavaRegex(identity), userProfile);	
+					else
+						_serviceProfiles.put(identity, userProfile);
 				}
 			}
 		}
@@ -142,13 +152,30 @@ public class UserProfileCache
 		}
 	}
 
-	public UserProfile getProfile(String publicID)
+	public UserProfile getProfile(String publicID, String pProfileKey)
 	{
-		UserProfile userProfile = _serviceProfiles.get(publicID);
+		UserProfile userProfile;
 		
+		if (pProfileKey != null)
+		{
+			userProfile = _wildcardServiceProfiles.get(pProfileKey);
+			if (userProfile != null)
+				return userProfile;
+		}
+		userProfile = _serviceProfiles.get(publicID);
 		if (userProfile != null)
 		{
 			return userProfile;
+		}
+		else
+		{
+			Iterator<String> it = _wildcardServiceProfiles.keySet().iterator();
+			while (it.hasNext())
+			{
+				String wilcard = (String) it.next();
+				if (publicID.matches(wilcard))
+					return _wildcardServiceProfiles.get(wilcard);
+			}
 		}
 
 		__log.debug("Could not found profile for public identity " + publicID);
@@ -173,6 +200,16 @@ public class UserProfileCache
 	public void setSharedIfcsUrl(URL sharedIfcsUrl)
 	{
 		_sharedIfcsUrl = sharedIfcsUrl;
+	}
+	
+	public Collection<UserProfile> getUserProfiles()
+	{
+		return _serviceProfiles.values();
+	}
+	
+	public Collection<UserProfile> getWildcardUserProfiles()
+	{
+		return _wildcardServiceProfiles.values();
 	}
 
 }

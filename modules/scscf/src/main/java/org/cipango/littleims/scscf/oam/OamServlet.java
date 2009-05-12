@@ -87,12 +87,39 @@ public class OamServlet extends HttpServlet
 				out.println("</td>");
 				out.println("</tr>");
 			}
+			out.println("</table>");
+		}
+	}
+	
+	public void printProfiles(Iterator<UserProfile> it, PrintWriter out)
+	{
+		synchronized (it)
+		{
+			out.println("<table border=\"1\" cellspacing=\"0\">" +
+			"<th>AOR</th><th>Barred</th><th>Service Profile</th>");
+			while (it.hasNext())
+			{
+				UserProfile profile = it.next();
+				out.println("<tr>");
+				out.println("<td>" + profile.getURI() + "</td>");
+				out.println("<td>" + profile.isBarred() +  "</td>");
+				out.println("<td>");
+				printProfile(profile, out);
+				out.println("</td>");
+				out.println("</tr>");
+				
+			}
+			out.println("</table>");
 		}
 	}
 	
 	public void printProfile(String aor, PrintWriter out)
 	{
-		UserProfile userProfile = _sessionManager.getUserProfileCache().getProfile(aor);
+		printProfile(_sessionManager.getUserProfileCache().getProfile(aor, null), out);
+	}
+	
+	public void printProfile(UserProfile userProfile, PrintWriter out)
+	{
 		if (userProfile == null) 
 		{
 			out.write("No user profile");
@@ -141,6 +168,12 @@ public class OamServlet extends HttpServlet
 		out.println("<html><head><title>OAM</title></head><body>");
 		printSessions(out);
 		printUsers(out);
+		
+		out.println("<h2>Cache user profiles</h2>");
+		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getUserProfiles().iterator(), out);
+		out.println("<h2>Cache wilcard user profiles</h2>");
+		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getWildcardUserProfiles().iterator(), out);
+		
 		out.println("</body></html>");
 	}
 }

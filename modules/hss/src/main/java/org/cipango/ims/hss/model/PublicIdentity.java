@@ -30,6 +30,7 @@ import javax.persistence.ManyToOne;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
+import org.cipango.littleims.util.RegexUtil;
 import org.hibernate.annotations.Index;
 
 @Entity
@@ -38,19 +39,19 @@ import org.hibernate.annotations.Index;
 		name = "TYPE",
 		discriminatorType = DiscriminatorType.STRING)
 public abstract class PublicIdentity implements Convertible, Comparable<PublicIdentity>
-{
+{	
 	@Id @GeneratedValue
 	private Long _id;
 	
 	@Column (unique = true)
 	@Index (name = "IDX_IDENTITY")
 	private String _identity;
-
+	
 	private boolean _barred;
 	
 	private String _displayName;
-	
-	private Short _identityType;
+		
+	private String _regex;
 		
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
@@ -59,7 +60,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	{
 		
 	}
-	
+		
 	public Long getId()
 	{
 		return _id;
@@ -78,6 +79,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	public void setIdentity(String identity)
 	{
 		_identity = identity;
+		updateRegex();
 	}
 
 	public boolean isBarred()
@@ -100,20 +102,14 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		_displayName = displayName;
 	}
 
-	public Short getIdentityType()
-	{
-		return _identityType;
-	}
+	public abstract Short getIdentityType();
 	
 	public String getIdentityTypeAsString()
 	{
-		return IdentityType.toString(_identityType);
+		return IdentityType.toString(getIdentityType());
 	}
 
-	public void setIdentityType(Short identityType)
-	{
-		_identityType = identityType;
-	}
+	public abstract void setIdentityType(Short identityType);
 
 	public ServiceProfile getServiceProfile()
 	{
@@ -141,21 +137,24 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	{
 		out.open("PublicIdentity");
 		out.add("BarringIndication", _barred);
-		out.add("Identity", _identity); // TODO set identity that has matched
-		if (_identityType != null || _displayName != null)
+		String realImpu = (String) out.getParameter("realImpu");
+		if (realImpu != null)
+			out.add("Identity", realImpu);
+		else
+			out.add("Identity", _identity);
+
+		out.open("Extension");
+		out.add("IdentityType", getIdentityType());
+		if (_regex != null)
+			out.add("WildcardedPSI", _identity);
+		if (_displayName != null)
 		{
 			out.open("Extension");
-			out.add("IdentityType", _identityType);
-			if (_identityType == IdentityType.WILDCARDED_IMPU || _identityType == IdentityType.WILDCARDED_PSI)
-				out.add("WildcardedPSI", _identity);
-			if (_displayName != null)
-			{
-				out.open("Extension");
-				out.add("DisplayName", _displayName);
-				out.close("Extension");
-			}
+			out.add("DisplayName", _displayName);
 			out.close("Extension");
 		}
+		out.close("Extension");
+
 		out.close("PublicIdentity");
 		out.add("InitialFilterCriteria", _serviceProfile.getIfcs());
 		
@@ -172,7 +171,13 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		return getIdentity().compareTo(o.getIdentity());
 	}
 	
-	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity);
+	/**
+	 * 
+	 * @param privateIdentity
+	 * @param realImpu In case of wildcard, the IMPU is not the identity.
+	 * @return
+	 */
+	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu);
 	
 	public abstract Short getState();
 	
@@ -186,6 +191,35 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	public abstract Scscf getScscf();
 
 	public abstract void setScscf(Scscf scscf);
+	
+	public String getRegex()
+	{
+		return _regex;
+	}
+
+	private void setRegex(String regex)
+	{
+		_regex = regex;
+	}
+	
+	protected void updateRegex()
+	{
+		if (_regex != null)
+			setRegex(RegexUtil.extendedRegexToSqlRegex(getIdentity()));
+	}
+	
+	protected void setWilcard(boolean isWilcard)
+	{
+		if (isWilcard)
+			setRegex(RegexUtil.extendedRegexToSqlRegex(getIdentity()));
+		else
+			setRegex(null);
+	}
+	
+	public boolean isWilcard()
+	{
+		return _regex != null;
+	}
 	
 	public static class IdentityType
 	{
@@ -214,5 +248,6 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 			}
 		}
 	}
+
 
 }

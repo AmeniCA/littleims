@@ -29,6 +29,7 @@ public abstract class BasePage extends WebPage {
 	}
 	
 	public void setContextMenu(Component panel) {
+		panel.setOutputMarkupId(true);
 		addOrReplace(panel);
 	}
 	

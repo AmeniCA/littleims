@@ -76,9 +76,11 @@ public class PublicUserIdentity extends PublicIdentity
 		getImplicitRegistrationSet().updateState(privateIdentity, state);
 	}
 	
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity)
+	@Override
+	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu)
 	{
 		Output out = XML.getDefault().newOutput();
+		out.setParameter("realImpu", realImpu);
 		out.open("IMSSubscription");
 		if (privateIdentity == null)
 			// If no private identity is registered, use the first private identity.
@@ -93,12 +95,23 @@ public class PublicUserIdentity extends PublicIdentity
 	@Override
 	public void setIdentityType(Short identityType)
 	{
-		if (IdentityType.PUBLIC_USER_IDENTITY == identityType
-				|| IdentityType.WILDCARDED_IMPU == identityType)
-			super.setIdentityType(identityType);
+		if (IdentityType.PUBLIC_USER_IDENTITY == identityType)
+			setWilcard(false);
+		else if (IdentityType.WILDCARDED_IMPU == identityType)
+			setWilcard(true);
 		else
 			throw new IllegalStateException("Could not identity type: " + IdentityType.toString(identityType)
 					 + " to a public user identity");
+	}
+	
+
+	@Override
+	public Short getIdentityType()
+	{
+		if (getRegex() == null)
+			return IdentityType.PUBLIC_USER_IDENTITY;
+		else
+			return IdentityType.WILDCARDED_IMPU;
 	}
 
 	@Override
@@ -112,4 +125,6 @@ public class PublicUserIdentity extends PublicIdentity
 	{
 		getPrivateIdentities().iterator().next().getSubscription().setScscf(scscf);
 	}
+
+
 }

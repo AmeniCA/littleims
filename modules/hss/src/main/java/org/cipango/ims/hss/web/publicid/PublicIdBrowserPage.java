@@ -115,6 +115,22 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 					setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + id));
 			}
 		});
+        
+        form.add(new Button("match")
+		{
+			@Override
+			public void onSubmit()
+			{
+				String id = (String) getForm().get("searchInput").getDefaultModelObject();
+				PublicIdentity publicIdentity = _dao.findById(id);
+				if (publicIdentity == null)
+					publicIdentity = _dao.findWilcard(id);
+				if (publicIdentity != null)
+					setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + publicIdentity.getIdentity()));
+				else
+					warn("Could not found identity with IMPU: " + id);
+			} 
+		});
 	}
 
 	@Override

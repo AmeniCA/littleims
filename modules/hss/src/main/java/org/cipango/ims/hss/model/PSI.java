@@ -72,9 +72,10 @@ public class PSI extends PublicIdentity
 	}
 	
 	@Override
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity)
+	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu)
 	{
 		Output out = XML.getDefault().newOutput();
+		out.setParameter("realImpu", realImpu);
 		out.open("IMSSubscription");
 		out.add("PrivateID", _privateServiceIdentity);
 		
@@ -86,12 +87,23 @@ public class PSI extends PublicIdentity
 	@Override
 	public void setIdentityType(Short identityType)
 	{
-		if (IdentityType.DISTINCT_PSI == identityType
-				|| IdentityType.WILDCARDED_PSI == identityType)
-			super.setIdentityType(identityType);
+		if (IdentityType.DISTINCT_PSI == identityType)
+			setWilcard(false);
+		else if (IdentityType.WILDCARDED_PSI == identityType)
+			setWilcard(true);
 		else
 			throw new IllegalStateException("Could not identity type: " + IdentityType.toString(identityType)
 					 + " to a public user identity");
+	}
+	
+
+	@Override
+	public Short getIdentityType()
+	{
+		if (getRegex() == null)
+			return IdentityType.DISTINCT_PSI;
+		else
+			return IdentityType.WILDCARDED_PSI;
 	}
 
 	public ApplicationServer getApplicationServer()
@@ -103,5 +115,6 @@ public class PSI extends PublicIdentity
 	{
 		_applicationServer = applicationServer;
 	}
+
 	
 }

@@ -147,7 +147,7 @@ public class SessionManagerImpl implements SessionManager
 					request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
 					return;
 				}
-				profile = _userProfileCache.getProfile(served.toString());
+				profile = _userProfileCache.getProfile(served.toString(), request.getHeader(Headers.P_PROFILE_KEY));
 				session = new OriginatingSession(profile);
 				session.setSessionManager(this);
 				__log.debug("Creating originating session for served user: " + served);
@@ -176,14 +176,15 @@ public class SessionManagerImpl implements SessionManager
 				__log.debug("Creating terminating session for served user: " + served
 						+ (registered ? " (registered)" : " (unregistered)"));
 
+				String pProfileKey = request.getHeader(Headers.P_PROFILE_KEY);
 				// check if we have user profile and, if not, download it
-				profile = _userProfileCache.getProfile(served.toString());
+				profile = _userProfileCache.getProfile(served.toString(), pProfileKey);
 				if (profile == null && !registered && !sarAnswer)
 				{
 					// S-CSCF does not have user profile, download user profile
 					_cxManager.sendSAR(served.toString(), 
 							null, 
-							request.getHeader(Headers.P_PROFILE_KEY), 
+							pProfileKey, 
 							ServerAssignmentType.UNREGISTERED_USER, 
 							false, 
 							request);

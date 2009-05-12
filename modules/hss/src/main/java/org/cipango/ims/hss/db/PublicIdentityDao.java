@@ -24,5 +24,5 @@ public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 	PublicIdentity findById(String id);
 	List<String> findLike(String id, int maxResults);
 	List<PublicIdentity> findAll();
-	
+	PublicIdentity findWilcard(String id);
 }

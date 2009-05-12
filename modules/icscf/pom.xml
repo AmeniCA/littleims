@@ -31,6 +31,10 @@
               <value>5080</value>
             </systemProperty>
             <systemProperty>
+              <name>sip.host</name>
+              <value>i-cscf.nexcom.voip</value>
+            </systemProperty>
+            <systemProperty>
               <name>jetty.port</name>
               <value>9000</value>
             </systemProperty>

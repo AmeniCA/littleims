@@ -91,6 +91,9 @@ public class XML
     	public void open(String name);
     	public void close(String name);
         public void add(String name, Object value);
+        
+        public Object getParameter(String name);
+        public void setParameter(String name, Object value);
     }
     
     public interface Convertible
@@ -107,6 +110,7 @@ public class XML
     {
     	private StringBuilder _sb = new StringBuilder();
     	private int _indexTab;
+    	private HashMap<String, Object> _parameters;
     	
     	public void open(String name)
     	{
@@ -221,6 +225,20 @@ public class XML
 		public String toString()
 		{
 			return _sb.toString();
+		}
+
+		public Object getParameter(String name)
+		{
+			if (_parameters == null)
+				return null;
+			return _parameters.get(name);
+		}
+
+		public void setParameter(String name, Object value)
+		{
+			if (_parameters == null)
+				_parameters = new HashMap<String, Object>();
+			_parameters.put(name, value);
 		}
 
     	

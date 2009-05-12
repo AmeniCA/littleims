@@ -525,7 +525,7 @@ public class Registrar
 		while (it.hasNext())
 		{
 			String sURI = it.next();
-			UserProfile profile = _userProfileCache.getProfile(sURI);
+			UserProfile profile = _userProfileCache.getProfile(sURI, null);
 			Iterator<InitialFilterCriteria> ifcs = profile.getServiceProfile().getIFCsIterator();
 
 			while (ifcs.hasNext())
