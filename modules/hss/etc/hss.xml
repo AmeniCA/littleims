@@ -22,10 +22,10 @@
 	</bean>
 -->
 
-	<bean id="dataSource" class="org.hsqldb.jdbc.jdbcDataSource">
-		<property name="database"
-			value="jdbc:hsqldb:file:db/hss;shutdown=true"/>
-		<property name="user" value="sa" />
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:file:db/hss;shutdown=true"/>
+		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
 	
