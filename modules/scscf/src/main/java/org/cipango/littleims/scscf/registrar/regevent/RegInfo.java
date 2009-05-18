@@ -22,65 +22,74 @@ import org.cipango.littleims.scscf.registrar.ContactEvent;
 public class RegInfo
 {
 
+	private String _aor;
+	private RegState _aorState;
+
+	private List<ContactInfo> _contacts = new ArrayList<ContactInfo>();
+	
 	public RegInfo(String aor, RegState state)
 	{
-		this.aor = aor;
-		this.aorState = state;
+		this._aor = aor;
+		this._aorState = state;
 	}
 
-	public void addContactInfo(String contact, RegState state, ContactEvent event)
+	public void addContactInfo(String contact, String displayName, RegState state, ContactEvent event)
 	{
-		contacts.add(new ContactInfo(contact, event, state));
+		_contacts.add(new ContactInfo(contact, displayName, event, state));
 	}
 
 	public String getAor()
 	{
-		return aor;
+		return _aor;
 	}
 
 	public RegState getAorState()
 	{
-		return aorState;
+		return _aorState;
 	}
 
 	public List<ContactInfo> getContacts()
 	{
-		return contacts;
+		return _contacts;
 	}
 
 	class ContactInfo
 	{
 
-		public ContactInfo(String contact, ContactEvent event, RegState state)
+		private String _contact;
+		private String _displayName;
+		private RegState _contactState;
+		private ContactEvent _contactEvent;
+
+		public ContactInfo(String contact, String displayName, ContactEvent event, RegState state)
 		{
-			this.contact = contact;
-			contactEvent = event;
-			contactState = state;
+			this._contact = contact;
+			_contactEvent = event;
+			_contactState = state;
+			_displayName = displayName;
 		}
 
 		public String getContact()
 		{
-			return contact;
+			return _contact;
 		}
 
 		public ContactEvent getContactEvent()
 		{
-			return contactEvent;
+			return _contactEvent;
 		}
 
 		public RegState getContactState()
 		{
-			return contactState;
+			return _contactState;
 		}
 
-		private String contact;
-		private RegState contactState;
-		private ContactEvent contactEvent;
+		public String getDisplayName()
+		{
+			return _displayName;
+		}
+
 	}
 
-	private String aor;
-	private RegState aorState;
-
-	private List<ContactInfo> contacts = new ArrayList<ContactInfo>();
 
 }

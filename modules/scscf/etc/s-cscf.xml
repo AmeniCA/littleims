@@ -69,7 +69,7 @@
 		<!-- 
 		S-CSCF policy for maximum registration time in seconds
 		-->
-		<property name="maxExpires" value="3600" />
+		<property name="maxExpires" value="600000" />
 		<!--
 		List of realms managed by this server.
 		If a REGISTER is received with a domain not present in this list, it is refused
@@ -104,6 +104,14 @@
 			class="org.cipango.littleims.scscf.registrar.regevent.RegEventManager"
 			init-method="start">
 		<property name="registrar" ref="registrar" />
+		<!-- 
+		S-CSCF policy for minimun reg event subscription time in seconds
+		-->
+		<property name="minExpires" value="60" />
+		<!-- 
+		S-CSCF policy for maximum reg event subscription time in seconds
+		-->
+		<property name="maxExpires" value="600000" />
 	</bean>
 		
 	<bean id="enumClient" 

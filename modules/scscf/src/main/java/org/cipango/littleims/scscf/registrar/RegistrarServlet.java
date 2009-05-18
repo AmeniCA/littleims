@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
@@ -83,20 +84,7 @@ public class RegistrarServlet extends SipServlet
 
 	public void doSubscribe(SipServletRequest subscribe) throws IOException
 	{
-		subscribe.createResponse(200).send();
-		// Wait a little to ensure 200/SUBSCRIBE is received before NOTIFY
-		try
-		{
-			Thread.sleep(100);
-		}
-		catch (Exception e)
-		{
-		}
-
-		URI aor = subscribe.getRequestURI();
-		SipSession session = subscribe.getSession();
-
-		_regEventManager.addSubscription(aor.toString(), session, subscribe.getExpires());
+		_regEventManager.doSubscribe(subscribe);
 	}
 
 	

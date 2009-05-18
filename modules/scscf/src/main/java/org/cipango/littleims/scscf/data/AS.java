@@ -13,32 +13,54 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data;
 
+import org.cipango.littleims.cx.data.userprofile.TApplicationServer;
+
 public class AS
 {
 
-	public AS(String uri, int defaultHandling, String serviceInfo)
+	private String _uri;
+	private int _defaultHandling;
+	private String _serviceInfo;
+	private boolean _includeRegisterRequest;
+	private boolean _includeRegisterResponse;
+	
+	public AS(TApplicationServer as)
 	{
-		this.uri = uri;
-		this.defaultHandling = defaultHandling;
-		this.serviceInfo = serviceInfo;
+		_uri = as.getServerName();
+		_defaultHandling = as.getDefaultHandling();
+		_serviceInfo = as.getServiceInfo();
+		if (as.getExtension() != null)
+		{
+			_includeRegisterRequest = as.getExtension().getIncludeRegisterRequest() != null;
+			_includeRegisterResponse = as.getExtension().getIncludeRegisterResponse() != null;
+		}
+		else
+			_includeRegisterRequest = _includeRegisterResponse = false;
 	}
-
+	
 	public int getDefaultHandling()
 	{
-		return defaultHandling;
+		return _defaultHandling;
 	}
 
 	public String getServiceInfo()
 	{
-		return serviceInfo;
+		return _serviceInfo;
 	}
 
 	public String getURI()
 	{
-		return uri;
+		return _uri;
 	}
 
-	private String uri;
-	private int defaultHandling;
-	private String serviceInfo;
+	public boolean getIncludeRegisterRequest()
+	{
+		return _includeRegisterRequest;
+	}
+
+	public boolean getIncludeRegisterResponse()
+	{
+		return _includeRegisterResponse;
+	}
+
 }

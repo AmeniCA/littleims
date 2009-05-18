@@ -33,17 +33,18 @@ public class TerminatingSession extends Session
 	public static final String PRIVACY_ID = "id";
 	
 	private static final Logger __log = Logger.getLogger(TerminatingSession.class);
-	private URI originalURI;
-	private List<Binding> contacts;
+	private URI _originalURI;
+	private List<Binding> _contacts;
 
-	private Context context;
+	private Context _context;
 
 	public TerminatingSession(UserProfile profile, Context context)
 	{
 		super(profile);
-		this.context = context;
+		_context = context;
 	}
 
+	@Override
 	public boolean handleInitialRequest(SipServletRequest request) throws IOException,
 			ServletException
 	{
@@ -52,10 +53,10 @@ public class TerminatingSession extends Session
 
 		// get contact list if user is registered
 
-		if (context != null)
+		if (_context != null)
 		{
 			// user is registered, get contact information
-			contacts = context.getBindings();
+			_contacts = _context.getBindings();
 		}
 
 		// 1. Check that user is not barred
@@ -86,11 +87,8 @@ public class TerminatingSession extends Session
 
 			// forward the request
 			if (__log.isDebugEnabled())
-			{
-				__log
-						.debug("Request URI has changed (new is " + requestURI
+				__log.debug("Request URI has changed (new is " + requestURI
 								+ "). Forwarding request");
-			}
 			routeRequest(request);
 			return true;
 
@@ -105,14 +103,11 @@ public class TerminatingSession extends Session
 			while ((ifc = nextIFC()) != null)
 			{
 				SessionCase sessionCase;
-				if (context != null)
-				{
+				if (_context != null)
 					sessionCase = SessionCase.TERMINATING_REGISTERED;
-				}
 				else
-				{
 					sessionCase = SessionCase.TERMINATING_UNREGISTERED;
-				}
+				
 				__log.debug("Evaluating filter criteria with priority: " + ifc.getPriority());
 				ifcMatched = ifc.matches(request, sessionCase);
 				if (ifcMatched)
@@ -137,7 +132,7 @@ public class TerminatingSession extends Session
 				}
 			}
 			__log.debug("No more Initial Filter Criterias");
-			if (context == null)
+			if (_context == null)
 			{
 				// No AS or only proxy AS, send 480 (Temporarily unavailable)
 				__log.debug("User is not registered. Sending 480 response");
@@ -149,7 +144,7 @@ public class TerminatingSession extends Session
 
 				// insert a P-Called-Party header with original request URI
 				request.setAddressHeader(Headers.P_CALLED_PARTY_HEADER, 
-						getSessionManager().getSipFactory().createAddress(originalURI));
+						getSessionManager().getSipFactory().createAddress(_originalURI));
 
 				// 11. apply privacy to P-Asserted-ID
 				String privacy = request.getHeader(Headers.PRIVACY_HEADER);
@@ -159,15 +154,15 @@ public class TerminatingSession extends Session
 					request.removeHeader(Headers.PRIVACY_HEADER);
 				}
 
-				if (contacts.size() == 0)
+				if (_contacts.size() == 0)
 				{
 					// should not happen
 					__log.warn("No Contact found for registered user! Sending 480 response");
 					request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
 				}
-				else if (contacts.size() == 1)
+				else if (_contacts.size() == 1)
 				{
-					Binding b = (Binding) contacts.get(0);
+					Binding b = (Binding) _contacts.get(0);
 					__log.debug("Forwarding request to contact: " + b);
 
 					if (b.getPath() != null)
@@ -190,14 +185,14 @@ public class TerminatingSession extends Session
 					request.getSession().setAttribute(
 							SessionManager.SCSCF_ROLE, SessionManager.ROLE_TERMINATING);
 					List<URI> targets = new ArrayList<URI>();
-					Iterator<Binding> it = contacts.iterator();
+					Iterator<Binding> it = _contacts.iterator();
 					while (it.hasNext())
 					{
 						Binding b = (Binding) it.next();
 						targets.add(b.getContact().getURI());
 					}
 					// Cannot use different routes for forked requests
-					Binding b = (Binding) contacts.get(0);
+					Binding b = (Binding) _contacts.get(0);
 					if (b.getPath() != null)
 					{
 						request.pushRoute(b.getPath());
@@ -213,14 +208,14 @@ public class TerminatingSession extends Session
 
 	public void setOriginalURI(URI uri)
 	{
-		this.originalURI = uri;
+		this._originalURI = uri;
 	}
 
 	public boolean isOriginalURI(URI uri)
 	{
-		if (originalURI.isSipURI())
+		if (_originalURI.isSipURI())
 		{
-			SipURI origSipURI = (SipURI) originalURI;
+			SipURI origSipURI = (SipURI) _originalURI;
 			if (!uri.isSipURI())
 			{
 				return false;
@@ -231,7 +226,7 @@ public class TerminatingSession extends Session
 		}
 		else
 		{
-			return originalURI.toString().equals(uri.toString());
+			return _originalURI.toString().equals(uri.toString());
 		}
 	}
 

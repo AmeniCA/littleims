@@ -40,7 +40,7 @@ public class OamServlet extends HttpServlet
 		}
 	}
 	
-	public void printSessions(PrintWriter out)
+	private void printSessions(PrintWriter out)
 	{
 
 		out.println("<h2>Sessions</h2>");
@@ -67,7 +67,7 @@ public class OamServlet extends HttpServlet
 	}
 
 	
-	public void printUsers(PrintWriter out)
+	private void printUsers(PrintWriter out)
 	{
 		out.println("<h2>Registered users</h2>");
 		Iterator<Context> it = _sessionManager.getRegistrar().getRegContextsIt();
@@ -91,7 +91,7 @@ public class OamServlet extends HttpServlet
 		}
 	}
 	
-	public void printProfiles(Iterator<UserProfile> it, PrintWriter out)
+	private void printProfiles(Iterator<UserProfile> it, PrintWriter out)
 	{
 		synchronized (it)
 		{
@@ -113,12 +113,12 @@ public class OamServlet extends HttpServlet
 		}
 	}
 	
-	public void printProfile(String aor, PrintWriter out)
+	private void printProfile(String aor, PrintWriter out)
 	{
 		printProfile(_sessionManager.getUserProfileCache().getProfile(aor, null), out);
 	}
 	
-	public void printProfile(UserProfile userProfile, PrintWriter out)
+	private void printProfile(UserProfile userProfile, PrintWriter out)
 	{
 		if (userProfile == null) 
 		{
@@ -169,6 +169,7 @@ public class OamServlet extends HttpServlet
 		printSessions(out);
 		printUsers(out);
 		
+		clearProfiles(req, out);
 		out.println("<h2>Cache user profiles</h2>");
 		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getUserProfiles().iterator(), out);
 		out.println("<h2>Cache wilcard user profiles</h2>");
@@ -176,4 +177,18 @@ public class OamServlet extends HttpServlet
 		
 		out.println("</body></html>");
 	}
+	
+	private void clearProfiles(HttpServletRequest req, PrintWriter out)
+	{
+		String action = req.getParameter("action");
+		if (action != null && action.equals("clear user profiles cache"))
+		{
+			_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
+		}
+		out.print("<form method=\"get\" action=\"#\">");
+		out.print("<input type=\"submit\" name=\"action\" value=\"clear user profiles cache\"/>");
+		out.print("</form>");
+		
+	}
+	
 }

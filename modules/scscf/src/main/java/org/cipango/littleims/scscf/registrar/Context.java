@@ -108,7 +108,11 @@ public class Context
 		RegInfo regInfo = new RegInfo(publicUserIdentity.toString(), state);
 		
 		// Use binding.getContact() in case of unregister with wilcard address.
-		regInfo.addContactInfo(binding.getContact().getURI().toString(), binding.getState(), binding.getEvent());
+		regInfo.addContactInfo(
+				binding.getContact().getURI().toString(), 
+				binding.getContact().getDisplayName(),
+				binding.getState(), 
+				binding.getEvent());
 
 		if (binding.getRegTimer() != null)
 		{
@@ -128,8 +132,11 @@ public class Context
 			while (it.hasNext())
 			{
 				Binding binding = (Binding) it.next();
-				regInfo.addContactInfo(binding.getContact().getURI().toString(),
-						binding.getState(), binding.getEvent());
+				regInfo.addContactInfo(
+						binding.getContact().getURI().toString(),
+						binding.getContact().getDisplayName(),
+						binding.getState(), 
+						binding.getEvent());
 			}
 		}
 		return regInfo;
@@ -180,8 +187,11 @@ public class Context
 		else
 		{
 			RegInfo regInfo = new RegInfo(publicUserIdentity.toString(), state);
-			regInfo.addContactInfo(contact.getURI().toString(), binding.getState(), binding
-					.getEvent());
+			regInfo.addContactInfo(
+					contact.getURI().toString(), 
+					contact.getDisplayName(),
+					binding.getState(), 
+					binding.getEvent());
 			return regInfo;
 		}
 	}

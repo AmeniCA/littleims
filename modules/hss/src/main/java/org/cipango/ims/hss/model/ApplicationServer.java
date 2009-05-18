@@ -136,9 +136,17 @@ public class ApplicationServer implements Convertible
 	{
 		out.add("ServerName", _serverName);
 		out.add("DefaultHandling", _defaultHandling);
-		out.add("ServiceInfo", _serviceInformation);
-		out.add("IncludeRegisterRequest", _includeRegisterRequest);
-		out.add("IncludeRegisterResponse", _includeRegisterResponse);
+		if (_serviceInformation != null && !_serviceInformation.trim().equals(""))
+			out.add("ServiceInfo", _serviceInformation);
+		if (_includeRegisterRequest || _includeRegisterResponse)
+		{
+			out.open("Extension");
+			if (_includeRegisterRequest)
+				out.add("IncludeRegisterRequest", null);
+			if (_includeRegisterResponse)
+				out.add("IncludeRegisterResponse", null);
+			out.close("Extension");
+		}
 	}
 	public Set<PSI> getPsis()
 	{

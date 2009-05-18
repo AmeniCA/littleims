@@ -18,6 +18,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -94,6 +95,10 @@ public class SessionManagerImpl implements SessionManager
 	{
 		if (!sarAnswer && __log.isDebugEnabled())
 			__log.debug("Received initial request: \n" + request);
+		
+		if (!isComeFromTrustedDomain(request))
+			request.removeHeader(Headers.P_SERVED_USER);
+		
 		// check if original dialog identifier is present
 		String odi = request.getParameter(Session.ORIGINAL_DIALOG_IDENTIFIER_PARAM);
 		if (odi == null)
@@ -111,75 +116,49 @@ public class SessionManagerImpl implements SessionManager
 			boolean isOrig = isOriginating(request);
 			__log.debug("Processing request in " + (isOrig ? "originating" : "terminating")
 					+ " mode.");
-
+			String pProfileKey = request.getHeader(Headers.P_PROFILE_KEY);
+			
 			if (isOrig)
 			{
-				// Couple of sanity checks first
-				Address paAddr = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER);
-				if (paAddr == null)
-				{
-					paAddr = request.getAddressHeader(Headers.P_PREFERRED_IDENTITY);
-					if (paAddr != null)
-						__log.debug("No P-Asserted-Identity. Using P-Preferred-Identity");
-					else
-					{
-						paAddr = request.getFrom();
-						__log.debug("No P-Asserted-Identity. Using From identity");
-					}
-				}
-				if (paAddr == null)
-				{
-					__log.debug("No Identity found in Originating session. Sending 403 response.");
-					request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-					return;
-				}
-				URI served = paAddr.getURI();
-
-				if (served.isSipURI())
-				{
-					served = URIHelper.getCanonicalForm(sipFactory, (SipURI) served);
-				}
+				URI served = getServerUser(request, true);
 
 				Context context = _registrar.getContext(served);
-				if (context == null)
+				
+				profile = _userProfileCache.getProfile(served.toString(), pProfileKey);
+				
+				if (profile == null && !sarAnswer)
 				{
-					__log.info("User " + served + " is not registered. Sending 403 response");
-					request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+					// S-CSCF does not have user profile, download user profile
+					_cxManager.sendSAR(served.toString(), 
+							null, 
+							pProfileKey, 
+							ServerAssignmentType.UNREGISTERED_USER, 
+							false, 
+							request);
 					return;
 				}
-				profile = _userProfileCache.getProfile(served.toString(), request.getHeader(Headers.P_PROFILE_KEY));
-				session = new OriginatingSession(profile);
+				
+				// TODO add support to P-Asserted-Service
+				session = new OriginatingSession(profile, context != null);
+				
 				session.setSessionManager(this);
 				__log.debug("Creating originating session for served user: " + served);
 
 			}
 			else
 			{
-				URI served = request.getRequestURI();
-
-				if (served.isSipURI())
-				{
-					served = URIHelper.getCanonicalForm(sipFactory, (SipURI) served);
-				}
+				URI served = getServerUser(request, false);
 
 				// find out whether the user is registered or not
-				boolean registered;
 				Context context = _registrar.getContext(served);
-				if (context != null)
-				{
-					registered = true;
-				}
-				else
-				{
-					registered = false;
-				}
+				boolean registered = context != null;
+				
 				__log.debug("Creating terminating session for served user: " + served
 						+ (registered ? " (registered)" : " (unregistered)"));
 
-				String pProfileKey = request.getHeader(Headers.P_PROFILE_KEY);
 				// check if we have user profile and, if not, download it
 				profile = _userProfileCache.getProfile(served.toString(), pProfileKey);
-				if (profile == null && !registered && !sarAnswer)
+				if (profile == null && !sarAnswer)
 				{
 					// S-CSCF does not have user profile, download user profile
 					_cxManager.sendSAR(served.toString(), 
@@ -231,8 +210,9 @@ public class SessionManagerImpl implements SessionManager
 					}
 
 				}
-
 				// ----------- End
+				
+
 				session = new TerminatingSession(profile, context);
 				session.setSessionManager(this);
 
@@ -395,6 +375,54 @@ public class SessionManagerImpl implements SessionManager
 			return orig != null;
 		else
 			return term != null;
+	}
+	
+	private URI getServerUser(SipServletRequest request, boolean originating) throws ServletParseException
+	{
+		
+		Address served = request.getAddressHeader(Headers.P_SERVED_USER);
+		URI servedUri;
+		if (served == null)
+		{
+			if (originating)
+			{
+				// Couple of sanity checks first
+				served = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER);
+				if (served != null)
+					__log.debug("No P-Served-User. Using P-Asserted-Identity");
+				else
+				{
+					served = request.getAddressHeader(Headers.P_PREFERRED_IDENTITY);
+					if (served != null)
+						__log.debug("No P-Asserted-Identity. Using P-Preferred-Identity");
+					else
+					{
+						served = request.getFrom();
+						__log.debug("No P-Asserted-Identity. Using From identity");
+					}
+				}
+			}
+			else
+			{
+				servedUri = request.getRequestURI();
+				if (servedUri.isSipURI())
+					servedUri = URIHelper.getCanonicalForm(sipFactory, (SipURI) servedUri);
+				
+				return servedUri;
+			}
+		}
+		servedUri = served.getURI();
+
+		if (servedUri.isSipURI())
+			servedUri = URIHelper.getCanonicalForm(sipFactory, (SipURI) servedUri);
+		
+		return servedUri;
+	}
+	
+	private boolean isComeFromTrustedDomain(SipServletRequest request)
+	{
+		// TODO implements
+		return true;
 	}
 
 	public SipFactory getSipFactory()

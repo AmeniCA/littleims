@@ -184,12 +184,12 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 			{
 				groupId = spt.getGroupId();
 				sb.append(')');
-				sb.append(_conditionTypeCnf ? " || " : " && ");
+				sb.append(_conditionTypeCnf ? " && " : " || ");
 				sb.append('(');
 			}
 			else
 			{
-				sb.append(_conditionTypeCnf ? " && " : " || ");
+				sb.append(_conditionTypeCnf ? " || " : " && ");
 			}
 			sb.append(spt.getExpression());
 		}

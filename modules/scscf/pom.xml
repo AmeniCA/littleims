@@ -50,6 +50,10 @@
               <name>jetty.home</name>
               <value>.</value>
             </systemProperty>
+            <systemProperty>
+              <name>org.cipango.dar.matchOnNewOutgoingRequests</name>
+              <value>false</value>
+            </systemProperty>
           </systemProperties>
           <diameterNode implementation="org.cipango.diameter.Node">
             <connectors>

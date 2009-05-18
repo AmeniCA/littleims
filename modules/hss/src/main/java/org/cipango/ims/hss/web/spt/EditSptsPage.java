@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
@@ -105,12 +106,14 @@ public class EditSptsPage extends BasePage
 			protected void populateItem(final ListItem<Integer> item)
 			{
 				final Integer groupId = item.getModelObject();
-				item.setOutputMarkupId(true);		
-				item.add(new HideableLink("hideLink", item.getMarkupId()));
-				item.add(new Label("groupId", item.getModel()));
-				item.add(getSpts(groupId));
+				WebMarkupContainer panel = new WebMarkupContainer("panel");
+				item.add(panel);
+				panel.setOutputMarkupId(true);		
+				panel.add(new HideableLink("hideLink", panel.getMarkupId()));
+				panel.add(new Label("groupId", item.getModel()));
+				panel.add(getSpts(groupId));
 
-				item.add(new DropDownChoice("sptType",
+				panel.add(new DropDownChoice("sptType",
 						new Model(),
 						SPT_CLASSES,
 						new ChoiceRenderer<Class<SPT>>() {
@@ -120,13 +123,13 @@ public class EditSptsPage extends BasePage
 							}
 				}));
 				
-				item.add(new AjaxFallbackButton("add", sptsForm) {
+				panel.add(new AjaxFallbackButton("add", sptsForm) {
 
 					@Override
 					protected void doSubmit(AjaxRequestTarget target, Form<?> form) throws InstantiationException, IllegalAccessException
 					{
 						saveSpts(form);
-						Class<SPT> clazz = (Class<SPT>) item.get("sptType").getDefaultModelObject();
+						Class<SPT> clazz = (Class<SPT>) item.get("panel:sptType").getDefaultModelObject();
 						if (clazz == null)
 						{
 							getPage().warn("No SPT selected");
@@ -208,7 +211,7 @@ public class EditSptsPage extends BasePage
 		while (it.hasNext())
 		{
 			ListItem<?> listItem = (ListItem<?>) it.next();
-			Collection<SPT> spts = (Collection<SPT>) listItem.get("spts").getDefaultModelObject();
+			Collection<SPT> spts = (Collection<SPT>) listItem.get("panel:spts").getDefaultModelObject();
 			Iterator<SPT> it2 = spts.iterator();
 			while (it2.hasNext())
 			{

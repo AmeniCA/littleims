@@ -8,10 +8,10 @@
 <wicket:extend>
 	<h1 wicket:id="title"></h1>
 	<form wicket:id="sptsForm">
-		<span  wicket:id="groups">
-			<div class="elementPanel">
+		<span wicket:id="groups">
+			<div class="elementPanel" wicket:id="panel">
 				<div class="title">
-					<a href="#" wicket:id="hideLink"><wicket:message key="elementPanel.hide"/></a>
+					<a href="#" wicket:id="hideLink" class="hideLink"><wicket:message key="elementPanel.hide"/></a>
 					<wicket:message key="spt.groupId"/><b><span wicket:id="groupId"></span></b>
 				</div>
 				<div class="body">

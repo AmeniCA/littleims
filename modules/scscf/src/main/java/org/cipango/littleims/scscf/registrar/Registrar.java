@@ -57,8 +57,10 @@ import org.cipango.littleims.util.URIHelper;
 
 public class Registrar
 {
-	private static final int DEFAULT_EXPIRES = 3600;
+	public static final int DEFAULT_EXPIRES = 3600;
 	private static final String ORIG_PARAM = "orig";
+	private static final String MSG_SIP_CONTENT_TYPE = "message/sip";
+	private static final String SERVICE_INFO_TYPE = "application/3gpp-ims+xml";
 	
 	private static final Logger __log = Logger.getLogger(Registrar.class);
 	
@@ -77,15 +79,12 @@ public class Registrar
 	private int _minExpires;
 	private int _maxExpires;
 	
-	private ServiceInfoGenerator _serviceInfoGen;
-
 	private RegEventListener _regEventListener;
 	private CxManager _cxManager;
 	
 	public Registrar()
 	{
 		_timer = new Timer();
-		_serviceInfoGen = new ServiceInfoGenerator();
 	}
 	
 	public void init()
@@ -320,7 +319,7 @@ public class Registrar
 			if (_cdf.isEnabled())
 				_cdf.event(request, CDF.ROLE_NODE_TERMINATING);
 	
-			sendThirdPartyRegister(request, expires, regInfo);
+			sendThirdPartyRegister(request, response, expires, regInfo);
 		}
 		catch (LittleimsException e) {
 			__log.warn(e.getMessage(), e);
@@ -516,7 +515,7 @@ public class Registrar
 		
 	}
 	
-	private void sendThirdPartyRegister(SipServletRequest request, int expires, RegistrationInfo regInfo)
+	private void sendThirdPartyRegister(SipServletRequest request, SipServletResponse response, int expires, RegistrationInfo regInfo)
 	throws ServletParseException, IOException
 	{
 		// send third-party registration to relevant application servers
@@ -537,7 +536,7 @@ public class Registrar
 				if (ifc.matches(request,
 						InitialFilterCriteria.SessionCase.ORIGINATING_SESSION))
 				{
-					__log.debug("IFC matches. Sending Third-Party REGISTER");
+					__log.debug("IFC matches for URI: " + sURI + ". Sending Third-Party REGISTER");
 					SipServletRequest register = _sipFactory.createRequest(request
 							.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
 					register.setExpires(expires);
@@ -545,21 +544,40 @@ public class Registrar
 					
 					String pAccessNetworkInfo = request.getHeader(Headers.P_ACCESS_NETWORK_INFO);
 					if (pAccessNetworkInfo != null)
+						register.setHeader(Headers.P_ACCESS_NETWORK_INFO, pAccessNetworkInfo);
+					
+					String pChargingVector = request.getHeader(Headers.P_CHARCHING_VECTOR);
+					if (pChargingVector != null)
+						register.setHeader(Headers.P_CHARCHING_VECTOR, pChargingVector);
+					
+					String serviceInfo = ifc.getAS().getServiceInfo();
+					if (serviceInfo != null && !serviceInfo.trim().equals(""))
 					{
-						register.setHeader(Headers.P_ACCESS_NETWORK_INFO,
-								pAccessNetworkInfo);
+						register.setContent(
+								generateXML(serviceInfo).getBytes(),
+								SERVICE_INFO_TYPE);
 					}
-					if (ifc.getAS().getServiceInfo() != null)
-					{
-						register.setContent(_serviceInfoGen.generateXML(
-								ifc.getAS().getServiceInfo()).getBytes(),
-								ServiceInfoGenerator.MIME_TYPE);
-					}
+					if (ifc.getAS().getIncludeRegisterRequest())
+						register.setContent(request.toString().getBytes(), MSG_SIP_CONTENT_TYPE);
+					if (ifc.getAS().getIncludeRegisterResponse())
+						register.setContent(response.toString().getBytes(), MSG_SIP_CONTENT_TYPE);
+					
+					// TODO support multipart
 					register.setAddressHeader(Headers.CONTACT_HEADER, _sipFactory.createAddress(_scscfUri));
 					register.send();
 				}
 			}
 		}
+	}
+	
+	private String generateXML(String serviceInfo)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("<?xml version=\"1.0\"?>\n");
+		sb.append("<ims-3gpp>\n");
+		sb.append("<service-info>").append(serviceInfo).append("</service-info>\n");
+		sb.append("</ims-3gpp>\n");
+		return sb.toString();
 	}
 	
 	public UserProfileCache getUserProfileCache()
@@ -640,16 +658,6 @@ public class Registrar
 	public void setMaxExpires(int maxExpires)
 	{
 		_maxExpires = maxExpires;
-	}
-
-	public ServiceInfoGenerator getServiceInfoGen()
-	{
-		return _serviceInfoGen;
-	}
-
-	public void setServiceInfoGen(ServiceInfoGenerator serviceInfoGen)
-	{
-		_serviceInfoGen = serviceInfoGen;
 	}
 
 	public Iterator<Context> getRegContextsIt()

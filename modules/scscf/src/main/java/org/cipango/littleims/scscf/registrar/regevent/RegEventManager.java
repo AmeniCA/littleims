@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.littleims.scscf.registrar.regevent;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,65 +22,110 @@ import java.util.Map;
 import java.util.Timer;
 
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar;
+import org.cipango.littleims.scscf.registrar.regevent.RegInfo.ContactInfo;
+import org.cipango.littleims.util.Headers;
 
 
 public class RegEventManager implements Runnable, RegEventListener
 {
 
-	private Map<String, SipSession> subscriptions = new HashMap<String, SipSession>();
-	private LinkedList<RegEvent> queue = new LinkedList<RegEvent>();
-	private Registrar _registrar;
-
-	private RegEventGenerator regEventGen;
-
-	private static final Logger log = Logger.getLogger(RegEventManager.class);
+	private static final Logger __log = Logger.getLogger(RegEventManager.class);
 	private static final String ABSOLUTE_EXPIRES = "absoluteExpires";
 	private static final String NOTIFY_VERSION = "notifyVersion";
-
-	private static Timer timer = new Timer();
 	
-	public RegEventManager() throws Exception
-	{
-		regEventGen = new RegEventGenerator();
-	}
+
+	private Timer _timer = new Timer("RegEventTimer");
+	
+	private Map<String, SipSession> _subscriptions = new HashMap<String, SipSession>();
+	private LinkedList<RegEvent> _queue = new LinkedList<RegEvent>();
+	private Registrar _registrar;
+
+	private int _minExpires;
+	private int _maxExpires;
 
 	public void start()
 	{
-		new Thread(this).start();
+		new Thread(this, "RegEventManager").start();
 	}
 
 	public void registrationEvent(RegEvent e)
 	{
-		synchronized (queue)
+		synchronized (_queue)
 		{
-			queue.addLast(e);
-			queue.notifyAll();
+			_queue.addLast(e);
+			_queue.notifyAll();
 		}
 	}
-
-	public void addSubscription(String aor, SipSession session, int expires)
+	
+	public void doSubscribe(SipServletRequest subscribe) throws IOException
 	{
+		// TODO check if user if authorized
+		int expires = subscribe.getExpires();
 		if (expires == -1)
 		{
-			expires = 3600;
+			// no expires values specified, use default value
+			expires = Registrar.DEFAULT_EXPIRES;
+		}
+		// check that expires is shorter than minimum value
+		if (expires != 0 && _minExpires != -1 && expires < _minExpires)
+		{
+			__log.info("Reg event subscription expiration (" + expires + ") is shorter"
+					+ " than minimum value (" + _minExpires + "). Sending 423 response");
+			SipServletResponse response = 
+				subscribe.createResponse(SipServletResponse.SC_INTERVAL_TOO_BRIEF);
+			response.setHeader(Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
+			response.send();
+			subscribe.getApplicationSession().invalidate();
+			return;
 		}
 
-		synchronized (subscriptions)
+		// if expires is longer than maximum value, reduce it
+		if (_maxExpires != -1 && expires > _maxExpires)
+		{
+			__log.info("Reg event subscription expiration (" + expires + ") is greater"
+					+ " than maximum value (" + _maxExpires
+					+ "). Setting expires to max expires");
+			expires = _maxExpires;
+		}
+
+		SipServletResponse response = subscribe.createResponse(SipServletResponse.SC_OK);
+		response.setExpires(expires);
+		response.send();
+		// Wait a little to ensure 200/SUBSCRIBE is received before NOTIFY
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch (Exception e)
+		{
+		}
+
+		URI aor = subscribe.getRequestURI();
+		SipSession session = subscribe.getSession();
+
+		addSubscription(aor.toString(), session, expires);
+	}
+
+	private void addSubscription(String aor, SipSession session, int expires)
+	{
+		synchronized (_subscriptions)
 		{
 			if (expires != 0)
 			{
-				subscriptions.put(aor, session);
+				_subscriptions.put(aor, session);
 			}
 			else
 			{
-				Object o = subscriptions.get(aor);
+				Object o = _subscriptions.get(aor);
 				if (session.equals(o))
 				{
-					subscriptions.remove(aor);
+					_subscriptions.remove(aor);
 				}
 			}
 		}
@@ -105,7 +151,7 @@ public class RegEventManager implements Runnable, RegEventListener
 		else
 		{
 			task = new ExpiryTask(session, this);
-			timer.schedule(task, expires * 1000);
+			_timer.schedule(task, expires * 1000);
 			session.setAttribute(ExpiryTask.class.getName(), task);
 			session.getApplicationSession().setExpires(expires / 60 + 2);
 		}
@@ -115,35 +161,42 @@ public class RegEventManager implements Runnable, RegEventListener
 	{
 		while (true)
 		{
-			RegEvent e;
-			synchronized (queue)
+			try
 			{
-				while (queue.size() == 0)
+				RegEvent e;
+				synchronized (_queue)
 				{
-					try
+					while (_queue.size() == 0)
 					{
-						queue.wait();
+						try
+						{
+							_queue.wait();
+						}
+						catch (InterruptedException _)
+						{
+						}
 					}
-					catch (InterruptedException _)
+					e = _queue.removeFirst();
+				}
+	
+				Iterator<RegInfo> it = e.getRegInfos().iterator();
+				while (it.hasNext())
+				{
+					RegInfo regInfo = it.next();
+					String aor = regInfo.getAor();
+					synchronized (_subscriptions)
 					{
+						if (_subscriptions.containsKey(aor))
+						{
+							SipSession session = (SipSession) _subscriptions.get(aor);
+							sendNotification(e, session, "partial");
+						}
 					}
 				}
-				e = queue.removeFirst();
-			}
-
-			Iterator<RegInfo> it = e.getRegInfos().iterator();
-			while (it.hasNext())
+			} 
+			catch (Throwable e)
 			{
-				RegInfo regInfo = it.next();
-				String aor = regInfo.getAor();
-				synchronized (subscriptions)
-				{
-					if (subscriptions.containsKey(aor))
-					{
-						SipSession session = (SipSession) subscriptions.get(aor);
-						sendNotification(e, session, "partial");
-					}
-				}
+				__log.warn("Got unexpected exception on regEvent manager", e);
 			}
 		}
 	}
@@ -167,14 +220,14 @@ public class RegEventManager implements Runnable, RegEventListener
 			}
 			session.setAttribute(NOTIFY_VERSION, version);
 
-			String body = regEventGen.generateRegInfo(e, state, version.intValue());
+			String body = generateRegInfo(e, state, version.intValue());
 			byte[] content = body.getBytes();
 			notify.setContent(content, "application/reginfo+xml");
 			notify.send();			
 		}
 		catch (Exception ex)
 		{
-			log.warn("Failed to send NOTIFY", ex);
+			__log.warn("Failed to send NOTIFY", ex);
 		}
 	}
 
@@ -191,12 +244,45 @@ public class RegEventManager implements Runnable, RegEventListener
 			return "active;expires=" + expires;
 		}
 	}
+	
+	private String generateRegInfo(RegEvent e, String state, int version)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("<?xml version=\"1.0\"?>\n");
+		sb.append("<reginfo xmlns=\"urn:ietf:params:xml:ns:reginfo\" ");
+		sb.append("version=\"").append(version).append("\" ");
+		sb.append("state=\"").append(state).append("\">\n");
+		
+		Iterator<RegInfo> it = e.getRegInfos().iterator();
+		while (it.hasNext())
+		{
+			RegInfo regInfo = it.next();
+			sb.append("<registration aor=\"").append(regInfo.getAor()).append("\" ");
+			sb.append("id=\"").append("123").append("\" ");
+			sb.append("state=\"").append(regInfo.getAorState().getValue()).append("\">\n");
+
+			Iterator<ContactInfo> it2 = regInfo.getContacts().iterator();
+			while (it2.hasNext())
+			{
+				ContactInfo contactInfo = it2.next();
+				sb.append("<contact state=\"").append(contactInfo.getContactState().getValue()).append("\" ");
+				sb.append("event=\"").append(contactInfo.getContactEvent().getValue()).append("\">\n");
+				sb.append("<uri>").append(contactInfo.getContact()).append("</uri>\n");
+				if (contactInfo.getDisplayName() != null)
+					sb.append("<display-name>").append(contactInfo.getDisplayName()).append("</display-name>\n");
+				sb.append("</contact>\n");
+			}
+			sb.append("</registration>\n");
+		}
+		sb.append("</reginfo>\n");
+		return sb.toString();
+	}
 
 	protected void removeSubscription(String aor)
 	{
-		synchronized (subscriptions)
+		synchronized (_subscriptions)
 		{
-			subscriptions.remove(aor);
+			_subscriptions.remove(aor);
 		}
 	}
 
@@ -209,5 +295,25 @@ public class RegEventManager implements Runnable, RegEventListener
 	{
 		_registrar = registrar;
 		_registrar.setListener(this);
+	}
+
+	public int getMinExpires()
+	{
+		return _minExpires;
+	}
+
+	public void setMinExpires(int minExpires)
+	{
+		_minExpires = minExpires;
+	}
+
+	public int getMaxExpires()
+	{
+		return _maxExpires;
+	}
+
+	public void setMaxExpires(int maxExpires)
+	{
+		_maxExpires = maxExpires;
 	}
 }

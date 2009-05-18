@@ -162,10 +162,10 @@ public abstract class Session
 							+ " using request URI");
 				}
 
-				// }
 			}
 		}
 		__log.info("Proxying request to: " + request.getAddressHeader(Headers.ROUTE));
+		request.removeHeader(Headers.P_SERVED_USER);
 		request.getProxy().proxyTo(request.getRequestURI());
 	}
 

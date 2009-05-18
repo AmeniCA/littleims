@@ -25,15 +25,21 @@ import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
+import org.cipango.littleims.util.Headers;
 
 
 public class OriginatingSession extends Session
 {
 	private static final Logger __log = Logger.getLogger(OriginatingSession.class);
+	private SessionCase _sessionCase;
 	
-	public OriginatingSession(UserProfile profile)
+	public OriginatingSession(UserProfile profile, boolean registered)
 	{
 		super(profile);
+		if (registered)
+			_sessionCase = SessionCase.ORIGINATING_SESSION;
+		else
+			_sessionCase = SessionCase.ORIGINATING_UNREGISTERED;
 	}
 
 	public boolean handleInitialRequest(SipServletRequest request) throws IOException,
@@ -66,7 +72,7 @@ public class OriginatingSession extends Session
 		{
 
 			__log.debug("Evaluating filter criteria with priority: " + ifc.getPriority());
-			ifcMatched = ifc.matches(request, SessionCase.ORIGINATING_SESSION);
+			ifcMatched = ifc.matches(request, _sessionCase);
 			if (ifcMatched)
 			{
 				SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAS().getURI());
@@ -75,6 +81,8 @@ public class OriginatingSession extends Session
 				request.pushRoute(getOwnURI());
 				request.pushRoute(asURI);
 				request.getProxy().setRecordRoute(false);
+				request.setHeader(Headers.P_SERVED_USER, getProfile().getURI());
+				
 				request.getProxy().proxyTo(request.getRequestURI());
 				return false;
 			}

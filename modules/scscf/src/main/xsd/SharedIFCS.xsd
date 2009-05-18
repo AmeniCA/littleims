@@ -20,6 +20,8 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	<xs:element name="InitialFilterCriteria" type="tInitialFilterCriteria"/>
 
 </xs:schema>
 

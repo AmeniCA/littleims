@@ -16,31 +16,39 @@ package org.cipango.littleims.scscf.data.trigger;
 import javax.servlet.sip.SipServletRequest;
 
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
+import org.cipango.littleims.util.RegexUtil;
 
 public class RURICriteria implements CriteriaMatch
 {
 
+	private String _ruri;
+	private boolean _regex;
+	
 	public RURICriteria(String ruri)
 	{
-		this.ruri = ruri;
+		if (ruri.indexOf('!') != -1)
+		{
+			_regex = true;
+			_ruri = RegexUtil.extendedRegexToJavaRegex(ruri);
+		}
+		else
+		{
+			_ruri = ruri;
+			_regex = false;
+		}
 	}
 
 	public boolean matches(SipServletRequest request, SessionCase sessionCase)
 	{
-		if (ruri.indexOf('!') != -1)
-		{
-			return request.getRequestURI().toString().matches(ruri.replaceAll("!", ""));
-		}
+		if (_regex)
+			return request.getRequestURI().toString().matches(_ruri);
 		else
-		{
-			return request.getRequestURI().toString().equals(ruri);
-		}
+			return request.getRequestURI().toString().equals(_ruri);	
 	}
 
 	public String getExpression()
 	{
-		return "RequestURI = " + ruri;
+		return "RequestURI = " + _ruri;
 	}
 
-	private String ruri;
 }

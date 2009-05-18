@@ -185,8 +185,7 @@ public class UserProfileCache
 	private InitialFilterCriteria createIFC(TInitialFilterCriteria tifc)
 	{
 		CriteriaMatch trigger = _tpCompiler.compile(tifc.getTriggerPoint());
-		AS as = new AS(tifc.getApplicationServer().getServerName(), tifc.getApplicationServer()
-				.getDefaultHandling(), tifc.getApplicationServer().getServiceInfo());
+		AS as = new AS(tifc.getApplicationServer());
 
 		InitialFilterCriteria ifc = new InitialFilterCriteria(tifc.getPriority(), trigger, as);
 		return ifc;
@@ -210,6 +209,12 @@ public class UserProfileCache
 	public Collection<UserProfile> getWildcardUserProfiles()
 	{
 		return _wildcardServiceProfiles.values();
+	}
+	
+	public void clearAllProfiles()
+	{
+		_wildcardServiceProfiles.clear();
+		_serviceProfiles.clear();
 	}
 
 }
