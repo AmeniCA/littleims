@@ -225,9 +225,8 @@ public class Hss
 		else
 		{
 			if (userAuthorizationType == UserAuthorizationType.DE_REGISTRATION)
-			{
-				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED);
-			}
+				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED,
+						"Public identity " + impu + " is not registered");
 			else
 			{
 				if (subscription.getScscf() != null)
@@ -439,7 +438,7 @@ public class Hss
 				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_ALREADY_REGISTERED).addAvp(avp);
 			}
 
-			publicIdentity.updateState(impu, State.REGISTERED);
+			publicIdentity.updateState(impi, State.REGISTERED);
 			answer.getAVPs().addString(Base.USER_NAME, impi);
 			if (!userDataAlreadyAvailable)
 			{
@@ -466,7 +465,7 @@ public class Hss
 			}
 			
 			if (State.NOT_REGISTERED == state || State.REGISTERED == state)
-				publicIdentity.updateState(impu, State.UNREGISTERED);
+				publicIdentity.updateState(impi, State.UNREGISTERED);
 			
 			answer.getAVPs().addString(Base.USER_NAME, impi);
 			
@@ -486,14 +485,14 @@ public class Hss
 		case ServerAssignmentType.USER_DEREGISTRATION:
 		case ServerAssignmentType.DEREGISTRATION_TOO_MUCH_DATA:
 		case ServerAssignmentType.ADMINISTRATIVE_DEREGISTRATION:
-			publicIdentity.updateState(impu, State.NOT_REGISTERED);
+			publicIdentity.updateState(impi, State.NOT_REGISTERED);
 			if (State.REGISTERED == state)
 				checkClearScscf(publicIdentity);
 			break;
 			
 		case ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME:
 		case ServerAssignmentType.USER_DEREGISTRATION_STORE_SERVER_NAME:
-			publicIdentity.updateState(impu, State.UNREGISTERED);
+			publicIdentity.updateState(impi, State.UNREGISTERED);
 			break;
 			
 		case ServerAssignmentType.NO_ASSIGNEMENT:

@@ -116,7 +116,7 @@ public class SessionServlet extends SipServlet implements DiameterListener
 				{
 					SipServletRequest request =  
 						(SipServletRequest) answer.getRequest().getAttribute(SipServletRequest.class.getName());
-					if (Methods.REGISTER.equalsIgnoreCase(request.getMethod()))
+					if (request == null || Methods.REGISTER.equalsIgnoreCase(request.getMethod()))
 						_sessionManager.getRegistrar().handleSaa(answer);
 					else
 						_sessionManager.handleSaa(answer);

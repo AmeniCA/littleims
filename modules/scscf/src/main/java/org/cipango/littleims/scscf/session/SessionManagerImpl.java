@@ -260,7 +260,7 @@ public class SessionManagerImpl implements SessionManager
 		try
 		{
 			
-			if (saa.getResultCode() != Base.DIAMETER_SUCCESS)
+			if (saa.getResultCode() >= 3000)
 			{
 				// FIXME what to do ????
 				__log.debug("Diameter SAA answer is not valid: " + saa.getResultCode());

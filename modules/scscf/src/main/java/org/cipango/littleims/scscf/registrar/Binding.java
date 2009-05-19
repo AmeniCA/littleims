@@ -28,79 +28,94 @@ import org.cipango.littleims.scscf.registrar.regevent.RegState;
  */
 public class Binding
 {
-	private String privateUserIdentity;
-	private Address contact;
-	private SipURI path;
-	private int expires;
-	private ContactEvent event;
-	private RegState state;
+	private String _privateUserIdentity;
+	private Address _contact;
+	private SipURI _path;
+	private long _absExpires;
+	private ContactEvent _event;
+	private RegState _state;
 
-	private TimerTask regTimer;
+	private TimerTask _regTimer;
 
 	public Binding(String privateUserIdentity, Address contact, SipURI path, int expires)
 	{
-		this.privateUserIdentity = privateUserIdentity;
-		this.contact = contact;
-		this.path = path;
-		this.expires = expires;
+		this._privateUserIdentity = privateUserIdentity;
+		this._contact = contact;
+		this._path = path;
+		setExpires(expires);
 	}
 
 	public void setEvent(ContactEvent event)
 	{
-		this.event = event;
+		this._event = event;
 	}
 
 	public ContactEvent getEvent()
 	{
-		return event;
+		return _event;
 	}
 
 	public void setState(RegState state)
 	{
-		this.state = state;
+		this._state = state;
 	}
 
 	public RegState getState()
 	{
-		return state;
+		return _state;
 	}
 
 	public void refresh(Address contact, SipURI path, int expires)
 	{
-		this.contact = contact;
-		this.path = path;
-		this.expires = expires;
+		this._contact = contact;
+		this._path = path;
+		setExpires(expires);
+	}
+	
+	private void setExpires(int expires)
+	{
+		_absExpires = System.currentTimeMillis() + expires * 1000;
+	}
+	
+	public int getExpires()
+	{
+		return (int) ((_absExpires - System.currentTimeMillis()) / 1000);
 	}
 
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append(contact.getURI().toString());
+		sb.append(_contact.getURI().toString());
 		sb.append(" / ");
-		sb.append(privateUserIdentity);
+		sb.append(_privateUserIdentity);
 		sb.append(" / ");
-		sb.append(expires);
+		sb.append(getExpires());
 		return sb.toString();
 	}
 
 	public Address getContact()
 	{
-		return contact;
+		return _contact;
 	}
 
 	public SipURI getPath()
 	{
-		return path;
+		return _path;
 	}
 
 	public void setRegTimer(TimerTask task)
 	{
-		this.regTimer = task;
+		this._regTimer = task;
 	}
 
 	public TimerTask getRegTimer()
 	{
-		return regTimer;
+		return _regTimer;
+	}
+
+	public String getPrivateUserIdentity()
+	{
+		return _privateUserIdentity;
 	}
 
 }

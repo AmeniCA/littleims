@@ -59,6 +59,7 @@
 		<property name="sharedIfcsUrl" value="file://${jetty.home}/hss/ifcs.xml" />
 	</bean>
 	
+	
 	<bean id="registrar" 
 			class="org.cipango.littleims.scscf.registrar.Registrar"
 			init-method="init">
@@ -94,11 +95,17 @@
 		This number is unlimited if set to -1
 		-->
 		<property name="maxUsers" value="-1" />
+		
+		<!--
+		On unregister keep the user profile in cache if set to true.
+		-->
+		<property name="permanentAssignation" value="false" />
 		<property name="cxManager" ref="cxManager" />
 		<property name="userProfileCache" ref="userProfileCache" />
 		<property name="cdf" ref="cdf" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
+	
 	
 	<bean id="regEventManager" 
 			class="org.cipango.littleims.scscf.registrar.regevent.RegEventManager"
@@ -114,11 +121,13 @@
 		<property name="maxExpires" value="600000" />
 	</bean>
 		
+	
 	<bean id="enumClient" 
 			class="org.cipango.littleims.scscf.session.EnumClient">
 		<property name="domain" value="e164.org" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
+	
 	
 	<!--
 	Policy to accept of refused media function of request and user profile

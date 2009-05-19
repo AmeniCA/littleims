@@ -82,6 +82,8 @@ public class Registrar
 	private RegEventListener _regEventListener;
 	private CxManager _cxManager;
 	
+	private boolean _permanentAssignation;
+	
 	public Registrar()
 	{
 		_timer = new Timer();
@@ -164,7 +166,12 @@ public class Registrar
 		int serverAssignmentType;
 		boolean userDataAlreadyAvailable = false;
 		if (expires == 0)
-			serverAssignmentType = ServerAssignmentType.USER_DEREGISTRATION;
+		{
+			if (_permanentAssignation)
+				serverAssignmentType = ServerAssignmentType.USER_DEREGISTRATION_STORE_SERVER_NAME;
+			else
+				serverAssignmentType = ServerAssignmentType.USER_DEREGISTRATION;
+		}
 		else if ( _regContexts.get(aor.toString()) == null)
 			serverAssignmentType = ServerAssignmentType.REGISTRATION; 
 		else
@@ -240,9 +247,15 @@ public class Registrar
 	public void handleSaa(DiameterAnswer saa)
 	{
 		SipServletRequest request = (SipServletRequest) saa.getRequest().getAttribute(SipServletRequest.class.getName());
+		if (request == null)
+		{
+			String publicIdentity = saa.getRequest().getAVP(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
+			__log.debug("Received SAA answer for timeout registration of " + publicIdentity);
+			return;
+		}
 		try
 		{
-			if (saa.getResultCode() != Base.DIAMETER_SUCCESS)
+			if (saa.getResultCode() >= 3000)
 			{
 				__log.debug("Diameter SAA answer is not valid: " + saa.getResultCode() + ". Sending 403 response");
 				try
@@ -258,10 +271,8 @@ public class Registrar
 			
 			String privateUserIdentity = saa.getRequest().getAVP(Base.USER_NAME).getString();
 
-	
 			SipURI aor = getAor(request);
-			RegistrationInfo regInfo;
-			
+			RegistrationInfo regInfo;	
 	
 			Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
 			int expires = contact.getExpires();
@@ -320,6 +331,8 @@ public class Registrar
 				_cdf.event(request, CDF.ROLE_NODE_TERMINATING);
 	
 			sendThirdPartyRegister(request, response, expires, regInfo);
+			
+			
 		}
 		catch (LittleimsException e) {
 			__log.warn(e.getMessage(), e);
@@ -476,13 +489,38 @@ public class Registrar
 
 			RegistrationInfo info = new RegistrationInfo();
 			info.setAssociatedURIs(associatedURIs);
+			
+			if (!_permanentAssignation && regContext.getBindings().isEmpty())
+				_userProfileCache.clearUserProfile(to.toString());
+			
 			return info;
 		}
 	}
 
-	public void regTimerExpired(URI uri, String privateID)
+	protected void regTimerExpired(URI uri, String privateID)
 	{
 		unregister(uri, privateID, ContactEvent.EXPIRED);
+		__log.debug("Registration expired due to timeout for URI " + uri);
+		int serverAssignmentType;
+		if (_permanentAssignation)
+			serverAssignmentType = ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME;
+		else
+			serverAssignmentType = ServerAssignmentType.TIMEOUT_DEREGISTRATION;
+		
+		try
+		{
+			_cxManager.sendSAR(
+					uri.toString(), 
+					privateID, 
+					null, 
+					serverAssignmentType, 
+					true, 
+					null);
+		} 
+		catch (IOException e)
+		{
+			__log.debug("Failed to notify HSS about timeout registration for " + uri, e);
+		}
 	}
 
 	public void setListener(RegEventListener listener)
@@ -676,6 +714,16 @@ public class Registrar
 		_cxManager = cxManager;
 	}
 
+	public boolean isPermanentAssignation()
+	{
+		return _permanentAssignation;
+	}
+
+	public void setPermanentAssignation(boolean permanentAssignation)
+	{
+		_permanentAssignation = permanentAssignation;
+	}
+
 	class RegTimerTask extends TimerTask
 	{
 
@@ -691,10 +739,10 @@ public class Registrar
 		public void run()
 		{
 			regTimerExpired(_uri, _privateID);
-			// TODO send SAR
 		}
 
 	}
+
 
 
 }

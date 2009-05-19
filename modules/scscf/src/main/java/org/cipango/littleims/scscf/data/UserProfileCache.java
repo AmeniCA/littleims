@@ -152,6 +152,14 @@ public class UserProfileCache
 		}
 	}
 
+	public void clearUserProfile(String publicID)
+	{
+		if (_serviceProfiles.remove(publicID) == null)
+			__log.debug("Could not remove profile for public identity " + publicID 
+					+ ": Profile not found");
+
+	}
+	
 	public UserProfile getProfile(String publicID, String pProfileKey)
 	{
 		UserProfile userProfile;

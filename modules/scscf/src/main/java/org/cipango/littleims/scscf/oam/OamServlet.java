@@ -3,6 +3,7 @@ package org.cipango.littleims.scscf.oam;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.ServiceProfile;
 import org.cipango.littleims.scscf.data.UserProfile;
+import org.cipango.littleims.scscf.registrar.Binding;
 import org.cipango.littleims.scscf.registrar.Context;
 import org.cipango.littleims.scscf.session.Session;
 import org.cipango.littleims.scscf.session.SessionManager;
@@ -74,18 +76,37 @@ public class OamServlet extends HttpServlet
 		synchronized (it)
 		{
 			out.println("<table border=\"1\" cellspacing=\"0\">" +
-			"<th>AOR</th><th>State</th><th>Service Profile</th>");
+				"<th>AOR</th><th>State</th><th>Contact</th><th>Private identity</th>" +
+				"<th>Expires</th><th>Path</th><th>Service Profile</th>");
 			while (it.hasNext())
 			{
 				Context context = it.next();
 							
 				out.println("<tr>");
-				out.println("<td>" + context.getRegInfo().getAor() + "</td>");
-				out.println("<td>" + context.getState().getValue() +  "</td>");
-				out.println("<td>");
-				printProfile(context.getRegInfo().getAor(), out);
-				out.println("</td>");
-				out.println("</tr>");
+				List<Binding> bindings = context.getBindings();
+				String tdRowspan = "<td rowspan=\"" + bindings.size() + "\">" ;
+				out.println(tdRowspan + context.getRegInfo().getAor() + "</td>");
+				out.println(tdRowspan + context.getState().getValue() +  "</td>");
+				Iterator<Binding> it2 = bindings.iterator();
+				boolean first = true;
+				while (it2.hasNext())
+				{
+					Binding binding = (Binding) it2.next();
+					if (!first)
+						out.println("<tr>");
+					out.println("<td>" + binding.getContact().getURI()  +  "</td>");
+					out.println("<td>" + binding.getPrivateUserIdentity()  +  "</td>");
+					out.println("<td>" + binding.getExpires()  +  "</td>");
+					out.println("<td>" + binding.getPath()  +  "</td>");
+					if (first)
+					{
+						first = false;
+						out.println(tdRowspan);
+						printProfile(context.getRegInfo().getAor(), out);
+						out.println("</td>");
+					}
+					out.println("</tr>");
+				}
 			}
 			out.println("</table>");
 		}
@@ -164,6 +185,12 @@ public class OamServlet extends HttpServlet
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
 			IOException
 	{
+		String action = req.getParameter("action");
+		if (action != null && action.equals("clear user profiles cache"))
+		{
+			_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
+			resp.sendRedirect(req.getRequestURI());
+		}
 		PrintWriter out = resp.getWriter();
 		out.println("<html><head><title>OAM</title></head><body>");
 		printSessions(out);
@@ -180,11 +207,6 @@ public class OamServlet extends HttpServlet
 	
 	private void clearProfiles(HttpServletRequest req, PrintWriter out)
 	{
-		String action = req.getParameter("action");
-		if (action != null && action.equals("clear user profiles cache"))
-		{
-			_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
-		}
 		out.print("<form method=\"get\" action=\"#\">");
 		out.print("<input type=\"submit\" name=\"action\" value=\"clear user profiles cache\"/>");
 		out.print("</form>");
