@@ -50,20 +50,7 @@ public class UserProfileCache
 
 	public void init() throws XmlException, IOException
 	{
-		if (_sharedIfcsUrl != null)
-		{
-			SharedIFCsDocument sharedIFCs = SharedIFCsDocument.Factory.parse(_sharedIfcsUrl);
-			TSharedIFC[] sifcs = sharedIFCs.getSharedIFCs().getSharedIFCArray();
-			for (int i = 0; i < sifcs.length; i++)
-			{
-				TSharedIFC sifc = sifcs[i];
-				int id = sifc.getID();
-				TInitialFilterCriteria tifc = sifc.getInitialFilterCriteria();
-				InitialFilterCriteria ifc = createIFC(tifc);
-				__log.info("Added Shared IFC: " + ifc);
-				_sharedIFCs.put(new Integer(id), ifc);
-			}
-		}
+		refreshSharedIFCs();
 	}
 
 	public void cacheUserProfile(IMSSubscriptionDocument imsSub)
@@ -223,6 +210,29 @@ public class UserProfileCache
 	{
 		_wildcardServiceProfiles.clear();
 		_serviceProfiles.clear();
+	}
+
+	public Map<Integer, InitialFilterCriteria> getSharedIFCs()
+	{
+		return _sharedIFCs;
+	}
+	
+	public void refreshSharedIFCs() throws XmlException, IOException
+	{
+		if (_sharedIfcsUrl != null)
+		{
+			SharedIFCsDocument sharedIFCs = SharedIFCsDocument.Factory.parse(_sharedIfcsUrl);
+			TSharedIFC[] sifcs = sharedIFCs.getSharedIFCs().getSharedIFCArray();
+			for (int i = 0; i < sifcs.length; i++)
+			{
+				TSharedIFC sifc = sifcs[i];
+				int id = sifc.getID();
+				TInitialFilterCriteria tifc = sifc.getInitialFilterCriteria();
+				InitialFilterCriteria ifc = createIFC(tifc);
+				__log.info("Added Shared IFC: " + ifc);
+				_sharedIFCs.put(new Integer(id), ifc);
+			}
+		}
 	}
 
 }

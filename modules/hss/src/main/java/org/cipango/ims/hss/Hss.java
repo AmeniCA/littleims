@@ -442,7 +442,7 @@ public class Hss
 			answer.getAVPs().addString(Base.USER_NAME, impi);
 			if (!userDataAlreadyAvailable)
 			{
-				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu, false);
 				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
 			AVPList associatedIds = getAssociatedIdentities(privateIdentity);
@@ -471,7 +471,7 @@ public class Hss
 			
 			if (!userDataAlreadyAvailable)
 			{
-				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(null, impu);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(null, impu, false);
 				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
 			
@@ -504,7 +504,7 @@ public class Hss
 				
 			if (!userDataAlreadyAvailable)
 			{
-				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu, false);
 				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
 			associatedIds = getAssociatedIdentities(privateIdentity);

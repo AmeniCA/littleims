@@ -14,6 +14,8 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.List;
+
 import org.cipango.ims.hss.db.IfcDao;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.hibernate.Query;
@@ -25,6 +27,9 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 {
 	private static final String GET_BY_NAME =
 		"FROM InitialFilterCriteria WHERE _name = :key";
+	
+	private static final String GET_ALL_SHARED =
+		"FROM InitialFilterCriteria  AS ifc WHERE ifc._sharedServiceProfiles IS NOT EMPTY";
 	
 	public IfcDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -44,9 +49,15 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 		return (InitialFilterCriteria) query.uniqueResult();
 	}
 
-	public InitialFilterCriteria findByRealKey(Long id)
+	public InitialFilterCriteria findByRealKey(Integer id)
 	{
 		return get(id);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<InitialFilterCriteria> getAllSharedIfcs()
+	{
+		return currentSession().createQuery(GET_ALL_SHARED).list();
 	}
 
 }

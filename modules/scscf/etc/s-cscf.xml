@@ -52,11 +52,13 @@
 		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.port}" />
 	</bean>
 
-	<bean id="userProfileCache" class="org.cipango.littleims.scscf.data.UserProfileCache">
+	<bean id="userProfileCache" 
+			class="org.cipango.littleims.scscf.data.UserProfileCache"
+			init-method="init">
 		<!--
 		Shared IFCs URL
 		-->
-		<property name="sharedIfcsUrl" value="file://${jetty.home}/hss/ifcs.xml" />
+		<property name="sharedIfcsUrl" value="http://${hss.host}:${hss.http.port}/littleims-hss/sharedIFCs.xml" />
 	</bean>
 	
 	

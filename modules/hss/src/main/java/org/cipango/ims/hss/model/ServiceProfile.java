@@ -13,8 +13,6 @@
 // ========================================================================
 package org.cipango.ims.hss.model;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -25,7 +23,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
@@ -51,22 +48,18 @@ public class ServiceProfile
 	@Sort (type = SortType.NATURAL)
 	private SortedSet<InitialFilterCriteria> _ifcs = new TreeSet<InitialFilterCriteria>();
 	
-	@OneToMany(mappedBy="_serviceProfile")
-	private Set<SharedIfc> _sharedIfcs = new HashSet<SharedIfc>();
+	@ManyToMany
+	@JoinTable (
+			name = "SP_SHARED_IFC",
+			joinColumns = {@JoinColumn(name = "serviceProfile")},
+			inverseJoinColumns = {@JoinColumn(name = "ifc")})
+	@Sort (type = SortType.NATURAL)
+	private SortedSet<InitialFilterCriteria> _sharedIfcs = new TreeSet<InitialFilterCriteria>();
+
 
 	public boolean hasSharedIfcs()
 	{
 		return _sharedIfcs != null && !_sharedIfcs.isEmpty();
-	}
-	
-	public Set<SharedIfc> getSharedIfcs()
-	{
-		return _sharedIfcs;
-	}
-
-	public void setSharedIfcs(Set<SharedIfc> sharedIfcs)
-	{
-		_sharedIfcs = sharedIfcs;
 	}
 
 	public Long getId()
@@ -95,6 +88,15 @@ public class ServiceProfile
 		{
 			_ifcs.add(ifc);
 			ifc.getServiceProfiles().add(this);
+		}
+	}
+	
+	public void addSharedIfc(InitialFilterCriteria ifc)
+	{
+		if (ifc != null)
+		{
+			_sharedIfcs.add(ifc);
+			ifc.getSharedServiceProfiles().add(this);
 		}
 	}
 	
@@ -146,6 +148,15 @@ public class ServiceProfile
 			ifc.getServiceProfiles().remove(this);
 		}
 	}
+	
+	public void removeSharedIfc(InitialFilterCriteria ifc)
+	{
+		if (ifc != null)
+		{
+			_sharedIfcs.remove(ifc);
+			ifc.getSharedServiceProfiles().remove(this);
+		}
+	}
 
 	public String getName()
 	{
@@ -155,6 +166,20 @@ public class ServiceProfile
 	public void setName(String name)
 	{
 		_name = name;
+	}
+
+
+
+	public SortedSet<InitialFilterCriteria> getSharedIfcs()
+	{
+		return _sharedIfcs;
+	}
+
+
+
+	public void setSharedIfcs(SortedSet<InitialFilterCriteria> sharedIfcs)
+	{
+		_sharedIfcs = sharedIfcs;
 	}
 
 }

@@ -30,7 +30,9 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 	
 	private static final String GET_AVAILABLE_IFCS =
 		"SELECT i._name FROM InitialFilterCriteria AS i WHERE i.id NOT IN (" +
-			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._serviceProfiles AS s WITH s.id = :profileId) ORDER BY i._name";
+			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._serviceProfiles AS s WITH s.id = :profileId)" +
+			"AND i.id NOT IN (" +
+			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._sharedServiceProfiles AS s WITH s.id = :profileId) ORDER BY i._name";
 	
 	
 	private static final String GET_ALL =

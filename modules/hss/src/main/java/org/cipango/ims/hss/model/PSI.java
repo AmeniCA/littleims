@@ -72,9 +72,13 @@ public class PSI extends PublicIdentity
 	}
 	
 	@Override
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu)
+	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu, boolean prettyPrint)
 	{
-		Output out = XML.getDefault().newOutput();
+		Output out;
+		if (prettyPrint)
+			out = XML.getPretty().newOutput();
+		else
+			out = XML.getDefault().newOutput();
 		out.setParameter("realImpu", realImpu);
 		out.open("IMSSubscription");
 		out.add("PrivateID", _privateServiceIdentity);

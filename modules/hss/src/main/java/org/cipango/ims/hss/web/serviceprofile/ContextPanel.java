@@ -42,6 +42,10 @@ public class ContextPanel extends Panel {
 		while (it.hasNext())
 			ifcs.add(it.next().getName());
 		
+		it = serviceProfile.getSharedIfcs().iterator();
+		while (it.hasNext())
+			ifcs.add(it.next().getName());
+		
 		add(new ListView("ifcs", ifcs){
 
 			@Override

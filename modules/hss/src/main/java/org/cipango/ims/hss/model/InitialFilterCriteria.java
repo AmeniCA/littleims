@@ -39,7 +39,7 @@ import org.hibernate.annotations.SortType;
 public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>, Convertible
 {
 	@Id @GeneratedValue
-	private Long _id;
+	private Integer _id;
 	
 	@Column (unique = true)
 	private String _name;
@@ -50,7 +50,7 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	@ManyToOne
 	@JoinColumn (nullable = false)
 	private ApplicationServer _applicationServer;
-	
+		
 	private boolean _conditionTypeCnf;
 	
 	@OneToMany(mappedBy = "_initialFilterCriteria", cascade = { CascadeType.ALL })
@@ -59,6 +59,9 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	
 	@ManyToMany (mappedBy = "_ifcs")
 	private Set<ServiceProfile> _serviceProfiles = new HashSet<ServiceProfile>();
+	
+	@ManyToMany (mappedBy = "_sharedIfcs")
+	private Set<ServiceProfile> _sharedServiceProfiles = new HashSet<ServiceProfile>();
 	
 	public Set<ServiceProfile> getServiceProfiles()
 	{
@@ -116,12 +119,12 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 		return _priority;
 	}
 
-	public Long getId()
+	public Integer getId()
 	{
 		return _id;
 	}
 
-	public void setId(Long id)
+	public void setId(Integer id)
 	{
 		_id = id;
 	}
@@ -205,6 +208,14 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	{
 		_name = name;
 	}
+	public Set<ServiceProfile> getSharedServiceProfiles()
+	{
+		return _sharedServiceProfiles;
+	}
+	public void setSharedServiceProfiles(Set<ServiceProfile> sharedServiceProfiles)
+	{
+		_sharedServiceProfiles = sharedServiceProfiles;
+	}
 	
 	public static class ProfilePartIndicator
 	{
@@ -227,5 +238,4 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 			}
 		}
 	}
-
 }

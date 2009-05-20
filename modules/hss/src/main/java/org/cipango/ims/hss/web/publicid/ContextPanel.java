@@ -34,6 +34,8 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + publicIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + publicIdentity.getIdentity())));
+		add(new BookmarkablePageLink("xmlSubscriptionLink", XmlSubscriptionPage.class, 
+				new PageParameters("id=" + publicIdentity.getIdentity())));
 		
 		boolean foundSub = false;
 		if (!publicIdentity.getPrivateIdentities().isEmpty())

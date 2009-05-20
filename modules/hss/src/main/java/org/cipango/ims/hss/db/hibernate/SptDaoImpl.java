@@ -48,7 +48,7 @@ public class SptDaoImpl extends AbstractHibernateDao<SPT> implements SptDao
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<SPT> getSptsByIfc(Long ifcId, Integer groupId)
+	public List<SPT> getSptsByIfc(Integer ifcId, Integer groupId)
 	{
 		Query query = currentSession().createQuery(GET_SPTS_BY_IFC);
 		query.setParameter("ifcId", ifcId);
@@ -57,7 +57,7 @@ public class SptDaoImpl extends AbstractHibernateDao<SPT> implements SptDao
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getGroups(Long ifcId)
+	public List<Integer> getGroups(Integer ifcId)
 	{
 		return currentSession().createQuery(GET_GROUPS_BY_IFC).setParameter("ifcId", ifcId).list();
 	}

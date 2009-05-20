@@ -68,7 +68,7 @@ public class EditSptsPage extends BasePage
 	@SpringBean
 	private IfcDao _ifcDao;
 	
-	private Long _ifcId;
+	private Integer _ifcId;
 	
 	private List<Integer> groupIds;
 	private String _title;

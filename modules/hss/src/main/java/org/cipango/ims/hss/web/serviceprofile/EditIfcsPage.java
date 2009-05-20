@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
@@ -45,6 +44,16 @@ public class EditIfcsPage extends ServiceProfilePage
 	@SpringBean
 	private IfcDao _ifcDao;
 	
+	private enum Action 
+	{
+		REMOVE_FROM_IFC,
+		REMOVE_FROM_SHARED,
+		ADD_TO_IFC,
+		ADD_TO_SHARED,
+		MOVE_TO_IFC,
+		MOVE_TO_SHARED;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public EditIfcsPage(PageParameters pageParameters) {
 		_key = pageParameters.getString("id");
@@ -64,25 +73,52 @@ public class EditIfcsPage extends ServiceProfilePage
 		Form form = new Form("form");
 		form.setOutputMarkupId(true);
 		add(form);
+
+		addAvailable(form, serviceProfile);
+		addUsed(form, serviceProfile);
+		addShared(form, serviceProfile);
 		
-		form.add(new AjaxFallbackButton("join", form) {
+	}
+	
+	@SuppressWarnings({"unchecked" })
+	private void addAvailable(Form form, ServiceProfile serviceProfile)
+	{
+		form.add(new AjaxFallbackButton("useAsIFC", form) {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
-				apply(target, form1, form1.get("available"), false);
+				apply(target, form1, Action.ADD_TO_IFC);
+			}
+		});
+		form.add(new AjaxFallbackButton("useAsShared", form) {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, Action.ADD_TO_SHARED);
 			}
 		});
 		form.add(new ListMultipleChoice(
 				"available",  
 				new Model(new ArrayList()),
 				new Model((Serializable) _dao.getAvailableIfc(serviceProfile))));
-		
-		
+	}
+	
+	@SuppressWarnings({"unchecked" })
+	private void addUsed(Form form, ServiceProfile serviceProfile)
+	{
 		form.add(new AjaxFallbackButton("leave", form) {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
-				apply(target, form1, form1.get("used"), true);			
+				apply(target, form1, Action.REMOVE_FROM_IFC);			
+			}
+		});
+		
+		form.add(new AjaxFallbackButton("moveToShared", form) {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, Action.MOVE_TO_SHARED);			
 			}
 		});
 		
@@ -98,15 +134,71 @@ public class EditIfcsPage extends ServiceProfilePage
 				"used", 
 				new Model(new ArrayList()),
 				new Model((Serializable) used)));
-		
 	}
 	
+	@SuppressWarnings({"unchecked" })
+	private void addShared(Form form, ServiceProfile serviceProfile)
+	{
+		List shared = new ArrayList();
+		if (serviceProfile != null)
+		{
+			Iterator<InitialFilterCriteria> it = serviceProfile.getSharedIfcs().iterator();
+			while (it.hasNext()) {
+				shared.add(it.next().getName());
+			}	
+		}
+		form.add(new ListMultipleChoice(
+				"shared", 
+				new Model(new ArrayList()),
+				new Model((Serializable) shared)));
+		
+		form.add(new AjaxFallbackButton("moveToIFC", form) {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, Action.MOVE_TO_IFC);
+			}
+		});
+		
+		form.add(new AjaxFallbackButton("sharedLeave", form) {
+			@Override
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			{
+				apply(target, form1, Action.REMOVE_FROM_SHARED);
+			}
+		});
+	}
 	
 	@SuppressWarnings("unchecked")
-	private void apply(AjaxRequestTarget target, Form<?> form1, Component component, boolean remove)
+	private void apply(AjaxRequestTarget target, Form<?> form1, Action action)
 	{
-		Iterator it = ((List) component.getDefaultModelObject()).iterator();
-		List choosen = ((AbstractChoice) component).getChoices();
+		AbstractChoice available = (AbstractChoice) form1.get("available");
+		AbstractChoice used = (AbstractChoice) form1.get("used");
+		AbstractChoice shared = (AbstractChoice) form1.get("shared");
+		
+		Iterator it; 
+		List choosen;
+		switch (action)
+		{
+		case ADD_TO_IFC:
+		case ADD_TO_SHARED:
+			it = ((List) available.getDefaultModelObject()).iterator();
+			choosen = available.getChoices();
+			break;
+		case MOVE_TO_SHARED:
+		case REMOVE_FROM_IFC:
+			it = ((List) used.getDefaultModelObject()).iterator();
+			choosen = used.getChoices();
+			break;
+		case MOVE_TO_IFC:
+		case REMOVE_FROM_SHARED:
+			it = ((List) shared.getDefaultModelObject()).iterator();
+			choosen = shared.getChoices();
+			break;
+		default:
+			throw new IllegalStateException("Unknown action " + action);
+		}
+		
 		ServiceProfile profile = _dao.findById(_key);
 
 		ListView ifcs = (ListView) getPage().get("contextMenu:ifcs");
@@ -114,17 +206,40 @@ public class EditIfcsPage extends ServiceProfilePage
 		while (it.hasNext()) {
 			String ifcName = (String) it.next();
 			InitialFilterCriteria ifc = _ifcDao.findById(ifcName);
-			if (remove)
+			switch (action)
 			{
+			case ADD_TO_IFC:
+				profile.addIfc(ifc);
+				used.getChoices().add(ifcName);
+				contextModel.add(ifcName);
+				break;
+			case ADD_TO_SHARED:
+				profile.addSharedIfc(ifc);
+				shared.getChoices().add(ifcName);
+				contextModel.add(ifcName);
+				break;
+			case MOVE_TO_IFC:
+				profile.removeSharedIfc(ifc);
+				profile.addIfc(ifc);
+				used.getChoices().add(ifcName);
+				break;
+			case MOVE_TO_SHARED:
+				profile.removeIfc(ifc);
+				profile.addSharedIfc(ifc);
+				shared.getChoices().add(ifcName);
+				break;
+			case REMOVE_FROM_IFC:
 				profile.removeIfc(ifc);
 				contextModel.remove(ifcName);
-				((AbstractChoice) form1.get("available")).getChoices().add(ifcName);
-			}
-			else
-			{
-				profile.addIfc(_ifcDao.findById(ifcName));
-				contextModel.add(ifcName);
-				((AbstractChoice) form1.get("used")).getChoices().add(ifcName);
+				available.getChoices().add(ifcName);
+				break;
+			case REMOVE_FROM_SHARED:
+				profile.removeSharedIfc(ifc);
+				contextModel.remove(ifcName);
+				available.getChoices().add(ifcName);
+				break;
+			default:
+				break;
 			}
 			choosen.remove(ifcName);
 			it.remove();
@@ -137,6 +252,7 @@ public class EditIfcsPage extends ServiceProfilePage
 			target.addComponent(getPage().get("contextMenu"));
 		}
 	}
+	
 	
 	@Override
 	public String getTitle() {

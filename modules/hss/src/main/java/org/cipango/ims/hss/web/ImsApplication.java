@@ -41,6 +41,7 @@ import org.cipango.ims.hss.web.publicid.DeletePublicIdPage;
 import org.cipango.ims.hss.web.publicid.EditPsiPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.publicid.XmlSubscriptionPage;
 import org.cipango.ims.hss.web.scscf.DeleteScscfPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.scscf.ScscfBrowserPage;
@@ -105,8 +106,9 @@ public class ImsApplication extends WebApplication {
 		mountBookmarkablePage("/private-identities/browser", PrivateIdBrowserPage.class); 
 		
 		mount(new MixedParamUrlCodingStrategy("/public-user-identity/edit", EditPublicUserIdPage.class, id));
-		mount(new MixedParamUrlCodingStrategy("/public-user-identity/delete", DeletePublicIdPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/public-identity/delete", DeletePublicIdPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/public-service-identity/edit", EditPsiPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/public-identity/xml", XmlSubscriptionPage.class, id));
 		mountBookmarkablePage("/public-identities/browser", PublicIdBrowserPage.class); 
 		
 		mount(new MixedParamUrlCodingStrategy("/s-cscf/edit", EditScscfPage.class, id));

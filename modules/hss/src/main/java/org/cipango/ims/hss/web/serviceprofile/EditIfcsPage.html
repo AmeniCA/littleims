@@ -5,7 +5,8 @@
 	<form class="editUserGroup" wicket:id="form">
 		<div>
 			<li><b><wicket:message key="serviceProfile.ifcs.available">Available</wicket:message></b></li>
-			<li><input type="submit" wicket:id="join" wicket:message="value:button.join" /></li>
+			<li><input type="submit" wicket:id="useAsIFC" wicket:message="value:button.serviceProfile.useAsIFC" /></li>
+			<li><input type="submit" wicket:id="useAsShared" wicket:message="value:button.serviceProfile.useAsShared" /></li>
 			<li>
 				<select wicket:id="available" size="6">
 	    			<option>Admin</option><option>Sales</option>
@@ -13,10 +14,21 @@
 	    	</li>
 	    </div>
 		<div>
-			<li><b><wicket:message key="serviceProfile.ifcs">Groups</wicket:message></b></li>
+			<li><b><wicket:message key="serviceProfile.ifcs"/></b></li>
+			<li><input type="submit" wicket:id="moveToShared" wicket:message="value:button.serviceProfile.useAsShared" /></li>
 			<li><input type="submit" wicket:id="leave" wicket:message="value:button.leave" /></li>
 			<li>
 				<select wicket:id="used" size="6">
+	    			<option>Group2</option>
+	    		</select>
+	    	</li>
+	    </div>
+		<div>
+			<li><b><wicket:message key="serviceProfile.sharedIfcs"/></b></li>
+			<li><input type="submit" wicket:id="moveToIFC" wicket:message="value:button.serviceProfile.useAsIFC" /></li>
+			<li><input type="submit" wicket:id="sharedLeave" wicket:message="value:button.leave" /></li>
+			<li>
+				<select wicket:id="shared" size="6">
 	    			<option>Group2</option>
 	    		</select>
 	    	</li>

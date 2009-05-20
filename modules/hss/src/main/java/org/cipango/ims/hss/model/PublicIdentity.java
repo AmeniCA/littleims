@@ -17,6 +17,8 @@
  */
 package org.cipango.ims.hss.model;
 
+import java.util.Iterator;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -147,7 +149,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.add("IdentityType", getIdentityType());
 		if (_regex != null)
 			out.add("WildcardedPSI", _identity);
-		if (_displayName != null)
+		if (_displayName != null && !_displayName.trim().equals(""))
 		{
 			out.open("Extension");
 			out.add("DisplayName", _displayName);
@@ -161,7 +163,9 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		if (_serviceProfile.hasSharedIfcs())
 		{
 			out.open("Extension");
-			out.add("SharedIFCSetID", _serviceProfile.getSharedIfcs());
+			Iterator<InitialFilterCriteria> it = _serviceProfile.getSharedIfcs().iterator();
+			while (it.hasNext())
+				out.add("SharedIFCSetID", it.next().getId());
 			out.close("Extension");
 		}
 	}
@@ -177,7 +181,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	 * @param realImpu In case of wildcard, the IMPU is not the identity.
 	 * @return
 	 */
-	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu);
+	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu, boolean prettyPrint);
 	
 	public abstract Short getState();
 	

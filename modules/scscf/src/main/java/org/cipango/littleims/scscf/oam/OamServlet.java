@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.ServiceProfile;
 import org.cipango.littleims.scscf.data.UserProfile;
@@ -26,6 +28,7 @@ public class OamServlet extends HttpServlet
 {
 
 	private SessionManager _sessionManager;
+	private static final Logger __log = Logger.getLogger(OamServlet.class);
 	
 	public void init() throws ServletException
 	{
@@ -139,6 +142,26 @@ public class OamServlet extends HttpServlet
 		printProfile(_sessionManager.getUserProfileCache().getProfile(aor, null), out);
 	}
 	
+	private void printSharedIfc(PrintWriter out)
+	{
+		Map<Integer, InitialFilterCriteria> sharedIfc = _sessionManager.getUserProfileCache().getSharedIFCs();
+		Iterator<Integer> it = sharedIfc.keySet().iterator();
+		out.println("<table border=\"1\" cellspacing=\"0\">" +
+		"<th>ID</th><th>Priority</th><th>Trigger point</th><th>AS</th>");
+		while (it.hasNext())
+		{
+			Integer id = (Integer) it.next();
+			InitialFilterCriteria ifc = sharedIfc.get(id);
+			out.println("<tr>");
+			out.println("<td>" + id + "</td>");
+			out.println("<td>" + ifc.getPriority() + "</td>");
+			out.println("<td>" + ifc.getTriggerPoint() +  "</td>");
+			out.println("<td>" + ifc.getAS().getURI() + "</td>");
+			out.println("</tr>");
+		}
+		out.println("</table>");
+	}
+	
 	private void printProfile(UserProfile userProfile, PrintWriter out)
 	{
 		if (userProfile == null) 
@@ -186,9 +209,18 @@ public class OamServlet extends HttpServlet
 			IOException
 	{
 		String action = req.getParameter("action");
-		if (action != null && action.equals("clear user profiles cache"))
+		if (action != null)
 		{
-			_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
+			if (action.equals("clear user profiles cache"))
+				_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
+			else if (action.equals("refresh shared IFCs"))
+				try
+				{
+					_sessionManager.getRegistrar().getUserProfileCache().refreshSharedIFCs();
+				} catch (Throwable e)
+				{
+					__log.warn("Failed to refesh shared IFCs", e);
+				}
 			resp.sendRedirect(req.getRequestURI());
 		}
 		PrintWriter out = resp.getWriter();
@@ -196,19 +228,24 @@ public class OamServlet extends HttpServlet
 		printSessions(out);
 		printUsers(out);
 		
-		clearProfiles(req, out);
 		out.println("<h2>Cache user profiles</h2>");
 		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getUserProfiles().iterator(), out);
 		out.println("<h2>Cache wilcard user profiles</h2>");
 		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getWildcardUserProfiles().iterator(), out);
 		
+		out.println("<h2>Shared IFCs</h2>");
+		printSharedIfc(out);
+		
+		actions(req, out);
+		
 		out.println("</body></html>");
 	}
 	
-	private void clearProfiles(HttpServletRequest req, PrintWriter out)
+	private void actions(HttpServletRequest req, PrintWriter out)
 	{
 		out.print("<form method=\"get\" action=\"#\">");
 		out.print("<input type=\"submit\" name=\"action\" value=\"clear user profiles cache\"/>");
+		out.print("<input type=\"submit\" name=\"action\" value=\"refresh shared IFCs\"/>");
 		out.print("</form>");
 		
 	}

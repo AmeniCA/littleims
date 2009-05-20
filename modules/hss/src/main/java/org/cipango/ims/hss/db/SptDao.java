@@ -22,6 +22,6 @@ public interface SptDao extends Dao, ImsDao<SPT>
 {
 	void save(SPT spt);
 	SPT findById(Long id);
-	List<SPT> getSptsByIfc(Long ifcId, Integer groupId);
-	List<Integer> getGroups(Long ifcId);
+	List<SPT> getSptsByIfc(Integer ifcId, Integer groupId);
+	List<Integer> getGroups(Integer ifcId);
 }

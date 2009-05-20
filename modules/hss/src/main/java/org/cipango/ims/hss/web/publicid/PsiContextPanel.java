@@ -21,6 +21,8 @@ public class PsiContextPanel extends Panel
 				new PageParameters("id=" + psi.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + psi.getIdentity())));
+		add(new BookmarkablePageLink("xmlSubscriptionLink", XmlSubscriptionPage.class, 
+				new PageParameters("id=" + psi.getIdentity())));
 		
 		if (psi.getScscf() != null)
 			add(new BookmarkablePageLink("scscfLink", EditScscfPage.class, 
