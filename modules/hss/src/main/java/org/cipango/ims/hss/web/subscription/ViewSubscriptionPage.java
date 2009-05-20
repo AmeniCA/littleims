@@ -37,6 +37,7 @@ import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
+import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
 import org.cipango.ims.hss.web.util.HideableLink;
 import org.cipango.ims.hss.web.util.StringModelIterator;
 
@@ -147,10 +148,13 @@ public class ViewSubscriptionPage extends SubscriptionPage
 				item.add(new Label("identityTypeAsString"));
 				item.add(new Label("displayName"));
 				item.add(new Label("implicitRegistrationSet.stateAsString"));
+				MarkupContainer serviceProfileLink = new BookmarkablePageLink("serviceProfileLink", ViewServiceProfilePage.class, 
+						new PageParameters("id=" + publicIdentity.getServiceProfile().getName()));
+				item.add(serviceProfileLink);
+				serviceProfileLink.add(new Label("serviceProfile", publicIdentity.getServiceProfile().getName()));
 				item.setOutputMarkupId(true);
 				item.add(new HideableLink("hideLink", item.getMarkupId()));
-				
-				
+					
 				item.add(new RefreshingView("privateIds", new Model((Serializable) publicIdentity.getPrivateIds())){
 
 					@Override
