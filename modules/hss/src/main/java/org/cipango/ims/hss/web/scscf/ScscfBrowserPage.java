@@ -30,6 +30,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.Scscf;
+import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 
 public class ScscfBrowserPage extends ScscfPage
 {
@@ -39,21 +41,28 @@ public class ScscfBrowserPage extends ScscfPage
 	{		
 		add(new BookmarkablePageLink("createLink", EditScscfPage.class));
 		
-		IColumn[] columns = new IColumn[4];
+		IColumn[] columns = new IColumn[5];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".uri", this, null),
 				"uri", "uri");
 		columns[2] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbSubscriptions", this, null)) 
 		{
-
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
-				cellItem.add(new Label(componentId, new Model(_dao.getNbSubscriptions((Scscf) model.getObject()))));
+				cellItem.add(new NbElemsPanel(componentId, (Scscf) model.getObject(), false));
 			}
 			
 		};
-		columns[3] = new AbstractColumn(new Model("Actions"))
+		columns[3] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPsi", this, null)) 
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				cellItem.add(new NbElemsPanel(componentId, (Scscf) model.getObject(), true));
+			}
+			
+		};
+		columns[4] = new AbstractColumn(new Model("Actions"))
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
@@ -91,6 +100,20 @@ public class ScscfBrowserPage extends ScscfPage
 					new PageParameters("id=" + key)));
 		}
 
+	}
+	
+	private static class NbElemsPanel extends Panel
+	{
+
+		@SuppressWarnings("unchecked")
+		public NbElemsPanel(String id, Scscf scscf, boolean psi)
+		{
+			super(id);
+			int nb = psi ? scscf.getPsis().size() : scscf.getSubscriptions().size();
+			add(new Label("nb", String.valueOf(nb)));
+			add(new BookmarkablePageLink("link", psi ? PublicIdBrowserPage.class : SubscriptionBrowserPage.class,
+					new PageParameters("scscf=" + scscf.getName())));
+		}
 	}
 
 	class DaoDataProvider extends SortableDataProvider<Scscf>

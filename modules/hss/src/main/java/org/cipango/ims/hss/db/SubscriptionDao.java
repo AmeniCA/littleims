@@ -14,8 +14,10 @@
 
 package org.cipango.ims.hss.db;
 
+import java.util.Iterator;
 import java.util.List;
 
+import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 
 public interface SubscriptionDao extends Dao, ImsDao<Subscription>
@@ -24,4 +26,6 @@ public interface SubscriptionDao extends Dao, ImsDao<Subscription>
 	void saveWithCascade(Subscription subscription);
 	Subscription findById(String id);
 	List<Subscription> findAll();
+	public Iterator<Subscription> iterator(int first, int count,
+			String sort, boolean sortAsc, Scscf scscf);
 }

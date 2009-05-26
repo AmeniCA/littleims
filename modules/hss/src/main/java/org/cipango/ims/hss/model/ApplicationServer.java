@@ -42,19 +42,19 @@ public class ApplicationServer implements Convertible
 	private Boolean _includeRegisterResponse;
 	
 	@OneToMany(mappedBy = "_applicationServer")
-	private Set<InitialFilterCriteria> _icfc = new HashSet<InitialFilterCriteria>();
+	private Set<InitialFilterCriteria> _ifcs = new HashSet<InitialFilterCriteria>();
 	
 	@OneToMany(mappedBy = "_applicationServer")
 	private Set<PSI> _psis = new HashSet<PSI>();
 	
-	public Set<InitialFilterCriteria> getIcfc()
+	public Set<InitialFilterCriteria> getIfcs()
 	{
-		return _icfc;
+		return _ifcs;
 	}
 
-	public void setIcfc(Set<InitialFilterCriteria> icfc)
+	public void setIfcs(Set<InitialFilterCriteria> ifcs)
 	{
-		_icfc = icfc;
+		_ifcs = ifcs;
 	}
 
 	public Long getId()

@@ -41,9 +41,13 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.ApplicationServerDao;
+import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
+import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
+import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.web.serviceprofile.ContextPanel;
 
@@ -52,12 +56,21 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	@SpringBean
 	private ServiceProfileDao _serviceProfileDao;
 	
+	@SpringBean
+	private ApplicationServerDao _applicationServerDao;
+	
+	@SpringBean
+	private ScscfDao _scscfDao;
+	
 	private String _title;
 
 	@SuppressWarnings("unchecked")
 	public PublicIdBrowserPage(PageParameters pageParameters)
 	{
 		String serviceProfile = pageParameters.getString("serviceProfile");
+		String applicationServer = pageParameters.getString("applicationServer");
+		String scscf = pageParameters.getString("scscf");
+		
 		addSearchField();
 		add(new BookmarkablePageLink("createLink", EditPublicUserIdPage.class));
 		add(new BookmarkablePageLink("createPsiLink", EditPsiPage.class));
@@ -87,12 +100,14 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			}
 
 		};
-		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile);
+		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile, applicationServer, scscf);
 
 		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		add(table);
 		
 		serviceProfile = daoDataProvider.getServiceProfile();
+		applicationServer = daoDataProvider.getApplicationServer();
+		scscf = daoDataProvider.getScscf();
 		
 		if (!Strings.isEmpty(serviceProfile))
 		{
@@ -100,12 +115,25 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			_title = MapVariableInterpolator.interpolate(getString( "serviceProfile.publicIds.browser.title"),
 						new MicroMap("name", serviceProfile));
 		}
+		else if (!Strings.isEmpty(applicationServer))
+		{
+			setContextMenu(new org.cipango.ims.hss.web.as.ContextPanel(_applicationServerDao.findById(applicationServer)));
+			_title = MapVariableInterpolator.interpolate(getString( "as.psi.browser.title"),
+						new MicroMap("name", applicationServer));
+		}
+		else if (!Strings.isEmpty(scscf))
+		{
+			setContextMenu(new org.cipango.ims.hss.web.scscf.ContextPanel(_scscfDao.findById(scscf)));
+			_title = MapVariableInterpolator.interpolate(getString( "scscf.psi.browser.title"),
+						new MicroMap("name", scscf));
+		}
 		else
 			_title = getString(getPrefix() + ".browser.title");
 		
 		add(new Label("title", _title));
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addSearchField()
 	{
 		Form form = new Form("form");
@@ -190,23 +218,50 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	class DaoDataProvider extends SortableDataProvider<PublicIdentity>
 	{
 		private String _serviceProfile;
+		private String _applicationServer;	
+		private String _scscf;
+
 		private Long _key;
 		
-		public DaoDataProvider(String sortProperty, String serviceProfile)
+		public DaoDataProvider(String sortProperty, 
+				String serviceProfile, 
+				String applicationServer,
+				String scscf)
 		{
 			setSort(sortProperty, true);
 			setServiceProfile(serviceProfile);
+			if (Strings.isEmpty(_serviceProfile))
+			{
+				setApplicationServer(applicationServer);
+				if (Strings.isEmpty(_applicationServer))
+					setScscf(scscf);
+			}
 		}
 
 		public Iterator<PublicIdentity> iterator(int first, int count)
-		{
+		{		
+			if (!Strings.isEmpty(_serviceProfile))
+				return _dao.iterator(first, count, getSort().getProperty(), getSort()
+						.isAscending(), "_serviceProfile", _key);
+			if (!Strings.isEmpty(_applicationServer))
+				return _dao.iterator(first, count, getSort().getProperty(), getSort()
+						.isAscending(), "_applicationServer", _key);
+			if (!Strings.isEmpty(_scscf))
+				return _dao.iterator(first, count, getSort().getProperty(), getSort()
+						.isAscending(), "_applicationServer", _key);
 			return _dao.iterator(first, count, getSort().getProperty(), getSort()
-					.isAscending(), _key);
+					.isAscending());	
 		}
 
 		public int size()
 		{
-			return _dao.count(_key);
+			if (!Strings.isEmpty(_serviceProfile))
+				return _serviceProfileDao.findById(_serviceProfile).getPublicIdentites().size();
+			if (!Strings.isEmpty(_applicationServer))
+				return _applicationServerDao.findById(_applicationServer).getPsis().size();
+			if (!Strings.isEmpty(_scscf))
+				return _scscfDao.findById(_scscf).getPsis().size();
+			return _dao.count();
 		}
 		
 		public void setServiceProfile(String name)
@@ -232,9 +287,65 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			}
 		}
 		
+		public void setApplicationServer(String name)
+		{
+			_applicationServer = name;
+			if (Strings.isEmpty(_applicationServer))
+			{
+				_applicationServer = "";
+				_key = null;
+			}
+			else
+			{
+				ApplicationServer as = _applicationServerDao.findById(_applicationServer);
+				if (as == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("as.error.notFound"),
+							new MicroMap("id", _applicationServer)));
+					_applicationServer = "";
+					_key = null;
+				}
+				else
+					_key = as.getId();
+			}
+		}
+		
+		public void setScscf(String name)
+		{
+			_scscf = name;
+			if (Strings.isEmpty(_scscf))
+			{
+				_scscf = "";
+				_key = null;
+			}
+			else
+			{
+				Scscf scscf = _scscfDao.findById(_scscf);
+				if (scscf == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("scscf.error.notFound"),
+							new MicroMap("id", _scscf)));
+					_scscf = "";
+					_key = null;
+				}
+				else
+					_key = scscf.getId();
+			}
+		}
+		
+		public String getScscf()
+		{
+			return _scscf;
+		}
+		
 		public String getServiceProfile()
 		{
 			return _serviceProfile;
+		}
+		
+		public String getApplicationServer()
+		{
+			return _applicationServer;
 		}
 
 		public IModel<PublicIdentity> model(PublicIdentity o)

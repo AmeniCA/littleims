@@ -38,11 +38,7 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 	
 	private static final String GET_ALL_WILCARDS = 
 		"FROM PublicIdentity WHERE _regex != null";
-	
-	private static final String COUNT_BY_SERVICE_PROFILE =
-		"SELECT count(*) FROM PublicIdentity AS p WHERE p._serviceProfile.id = :id";
-
-	
+			
 	public PublicIdentityDaoImpl(SessionFactory sessionFactory)
 	{
 		super(sessionFactory);
@@ -99,35 +95,31 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		return null;
 	}
 
-	public int count(Long serviceProfileId)
-	{
-		if (serviceProfileId == null)
-			return count();
-		Query query = query(COUNT_BY_SERVICE_PROFILE);
-		query.setLong("id", serviceProfileId);
-		return ((Long) query.uniqueResult()).intValue();
-	}
-
-	@SuppressWarnings("unchecked")
 	public Iterator<PublicIdentity> iterator(int first, int count, String sort,
-			boolean sortAsc, Long serviceProfileId)
+			boolean sortAsc, String foreignKeyName, Long foreignKeyId)
 	{
-		if (serviceProfileId == null)
+		if (foreignKeyId == null || foreignKeyName == null)
 			return iterator(first, count, sort, sortAsc);
 		
 		StringBuilder hql = new StringBuilder();
-    	hql.append("FROM PublicIdentity AS p");
-		hql.append(" WHERE p._serviceProfile.id = :id ");
+    	hql.append("FROM ").append(isPsiField(foreignKeyName) ? "PSI" : "PublicIdentity").append(" AS p");
+		hql.append(" WHERE p.").append(foreignKeyName).append(".id = :id ");
 		if (sort != null && !sort.trim().equals("")) 
 			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
 		
 		Query query = query(hql.toString());
 		if (count > 0)
 			query.setMaxResults(count);
-		query.setParameter("id", serviceProfileId);
+		query.setParameter("id", foreignKeyId);
 		query.setFirstResult(first);
 		
     	return query.list().iterator();	
 	}
+
+	private boolean isPsiField(String name)
+	{
+		return "_scscf".equals(name) || "_applicationServer".equals(name) || "_privateServiceIdentity".equals(name);
+	}
+
 	
 }

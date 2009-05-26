@@ -79,7 +79,7 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	{
 		_applicationServer = applicationServer;
 		if (applicationServer != null)
-			applicationServer.getIcfc().add(this);
+			applicationServer.getIfcs().add(this);
 	}
 	public String getApplicationServerName()
 	{

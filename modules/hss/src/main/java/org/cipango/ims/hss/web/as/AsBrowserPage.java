@@ -31,6 +31,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
+import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 
 public class AsBrowserPage extends AsPage
 {
@@ -40,7 +41,7 @@ public class AsBrowserPage extends AsPage
 	{		
 		add(new BookmarkablePageLink("createLink", EditAsPage.class));
 		
-		IColumn[] columns = new IColumn[4];
+		IColumn[] columns = new IColumn[5];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".serverName", this, null),
@@ -49,11 +50,19 @@ public class AsBrowserPage extends AsPage
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
-				cellItem.add(new NbIfcsPanel(componentId, (ApplicationServer) model.getObject()));
+				cellItem.add(new NbElemsPanel(componentId, (ApplicationServer) model.getObject(), false));
 			}
 			
 		};
-		columns[3] = new AbstractColumn(new Model("Actions"))
+		columns[3] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPsi", this, null)) 
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				cellItem.add(new NbElemsPanel(componentId, (ApplicationServer) model.getObject(), true));
+			}
+			
+		};
+		columns[4] = new AbstractColumn(new Model("Actions"))
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
@@ -93,19 +102,20 @@ public class AsBrowserPage extends AsPage
 
 	}
 	
-	private static class NbIfcsPanel extends Panel
+	private static class NbElemsPanel extends Panel
 	{
 
 		@SuppressWarnings("unchecked")
-		public NbIfcsPanel(String id, ApplicationServer as)
+		public NbElemsPanel(String id, ApplicationServer as, boolean psi)
 		{
 			super(id);
-			add(new Label("nb", String.valueOf(as.getIcfc().size())));
-			add(new BookmarkablePageLink("link", IfcBrowserPage.class,
+			int nb = psi ? as.getPsis().size() : as.getIfcs().size();
+			add(new Label("nb", String.valueOf(nb)));
+			add(new BookmarkablePageLink("link", psi ? PublicIdBrowserPage.class : IfcBrowserPage.class,
 					new PageParameters("applicationServer=" + as.getName())));
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	class DaoDataProvider extends SortableDataProvider
 	{

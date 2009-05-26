@@ -25,8 +25,8 @@ public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 	PublicIdentity findById(String id);
 	List<String> findLike(String id, int maxResults);
 	List<PublicIdentity> findAll();
-	PublicIdentity findWilcard(String id);
-	int count(Long serviceProfileId);
+	PublicIdentity findWilcard(String id);	
 	public Iterator<PublicIdentity> iterator(int first, int count,
-			String sort, boolean sortAsc, Long serviceProfileId);
+			String sort, boolean sortAsc, String foreignKeyName, Long foreignKeyId);
+	
 }

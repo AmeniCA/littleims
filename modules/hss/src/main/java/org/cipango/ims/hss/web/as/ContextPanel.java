@@ -19,6 +19,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
+import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -30,6 +31,7 @@ public class ContextPanel extends Panel {
 		add(new BookmarkablePageLink("editLink", EditAsPage.class, new PageParameters("id=" + applicationServer.getName())));
 		add(new BookmarkablePageLink("deleteLink", DeleteAsPage.class, new PageParameters("id=" + applicationServer.getName())));
 		add(new BookmarkablePageLink("ifcsLink", IfcBrowserPage.class, new PageParameters("applicationServer=" + applicationServer.getName())));
+		add(new BookmarkablePageLink("psiLink", PublicIdBrowserPage.class, new PageParameters("applicationServer=" + applicationServer.getName())));
 	}
 
 

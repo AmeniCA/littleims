@@ -20,6 +20,7 @@ import java.util.List;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
+import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -70,5 +71,27 @@ public class SubscriptionDaoImpl extends AbstractHibernateDao<Subscription> impl
 	public List<Subscription> findAll()
 	{
 		return all();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Iterator<Subscription> iterator(int first, int count, String sort,
+			boolean sortAsc, Scscf scscf)
+	{
+		if (scscf == null)
+			return iterator(first, count, sort, sortAsc);
+		
+		StringBuilder hql = new StringBuilder();
+    	hql.append("FROM Subscription AS s");
+		hql.append(" WHERE s._scscf = :scscf ");
+		if (sort != null && !sort.trim().equals("")) 
+			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		
+		Query query = query(hql.toString());
+		if (count > 0)
+			query.setMaxResults(count);
+		query.setParameter("scscf", scscf);
+		query.setFirstResult(first);
+		
+    	return query.list().iterator();	
 	}
 }

@@ -36,16 +36,28 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.Strings;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.ScscfDao;
+import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
+import org.cipango.ims.hss.web.scscf.ContextPanel;
 
 public class SubscriptionBrowserPage extends SubscriptionPage
 {
+	@SpringBean
+	private ScscfDao _scscfDao;
+	
+	private String _title;
 	
 	@SuppressWarnings("unchecked")
-	public SubscriptionBrowserPage()
+	public SubscriptionBrowserPage(PageParameters pageParameters)
 	{		
+		String scscf = pageParameters.getString("scscf");
 		add(new BookmarkablePageLink("createLink", AddSubscriptionPage.class));
 		
 		IColumn[] columns = new IColumn[5];
@@ -84,17 +96,28 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 			}
 
 		};
-
-		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"name"), 15);
+		DaoDataProvider daoDataProvider = new DaoDataProvider("name", scscf);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		table.setOutputMarkupId(true);
 		add(table);
+		
+		scscf = daoDataProvider.getScscf();
+		if (!Strings.isEmpty(scscf))
+		{
+			setContextMenu(new ContextPanel(_scscfDao.findById(scscf)));
+			_title = MapVariableInterpolator.interpolate(getString( "scscf.subscriptions.browser.title"),
+						new MicroMap("name", scscf));
+		}
+		else
+			_title = getString(getPrefix() + ".browser.title");
+		
+		add(new Label("title", _title));
 	}
 
 	@Override
 	public String getTitle()
 	{
-		return getString(getPrefix() + ".browser.title");
+		return _title;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -161,25 +184,57 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 
 	class DaoDataProvider extends SortableDataProvider<Subscription>
 	{
-		public DaoDataProvider(String sortProperty)
+		private String _scscf;
+		
+		public DaoDataProvider(String sortProperty, String scscf)
 		{
 			setSort(sortProperty, true);
+			setScscf(scscf);
 		}
 
 		public Iterator<Subscription> iterator(int first, int count)
 		{
-			return _dao.iterator(first, count, getSort().getProperty(), getSort()
+			if (Strings.isEmpty(_scscf))
+				return _dao.iterator(first, count, getSort().getProperty(), getSort()
 					.isAscending());
+			return _dao.iterator(first, count, getSort().getProperty(), getSort()
+					.isAscending(), _scscfDao.findById(_scscf));
 		}
 
 		public int size()
 		{
-			return _dao.count();
+			if (Strings.isEmpty(_scscf))
+				return _dao.count();		
+			return _scscfDao.findById(_scscf).getSubscriptions().size();
 		}
 
 		public IModel<Subscription> model(Subscription o)
 		{
 			return new CompoundPropertyModel<Subscription>(new DaoDetachableModel(o));
+		}
+		
+		public void setScscf(String name)
+		{
+			_scscf = name;
+			if (Strings.isEmpty(_scscf))
+			{
+				_scscf = "";
+			}
+			else
+			{
+				Scscf scscf = _scscfDao.findById(_scscf);
+				if (scscf == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("scscf.error.notFound"),
+							new MicroMap("id", _scscf)));
+					_scscf = "";
+				}
+			}
+		}
+		
+		public String getScscf()
+		{
+			return _scscf;
 		}
 	}
 

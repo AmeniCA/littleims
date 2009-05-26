@@ -36,8 +36,12 @@ import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.ApplicationServerDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.web.as.ContextPanel;
+import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
+import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 
 public class IfcBrowserPage extends IfcPage
 {
@@ -52,14 +56,21 @@ public class IfcBrowserPage extends IfcPage
 		String asName = pageParameters.getString("applicationServer");
 		add(new BookmarkablePageLink("createLink", EditIfcPage.class));
 		
-		IColumn[] columns = new IColumn[4];
+		IColumn[] columns = new IColumn[5];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".priority", this, null),
 				"priority", "priority");
 		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".applicationServer", this, null),
 				"application_server", "applicationServerName");
-		columns[3] = new AbstractColumn(new Model("Actions"))
+		columns[3] = new AbstractColumn(new Model(getString("contextPanel.serviceProfiles")))
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				cellItem.add(new NbElemsPanel(componentId, (InitialFilterCriteria) model.getObject()));
+			}
+		};
+		columns[4] = new AbstractColumn(new Model(getString("actions")))
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
@@ -114,6 +125,20 @@ public class IfcBrowserPage extends IfcPage
 		}
 
 	}
+	
+	private static class NbElemsPanel extends Panel
+	{
+
+		@SuppressWarnings("unchecked")
+		public NbElemsPanel(String id, InitialFilterCriteria ifc)
+		{
+			super(id);
+			add(new Label("nb", String.valueOf(ifc.getServiceProfiles().size() + ifc.getSharedServiceProfiles().size())));
+			add(new BookmarkablePageLink("link", ServiceProfileBrowserPage.class,
+					new PageParameters("ifc=" + ifc.getName())));
+		}
+	}
+
 
 	@SuppressWarnings("unchecked")
 	class DaoDataProvider extends SortableDataProvider
