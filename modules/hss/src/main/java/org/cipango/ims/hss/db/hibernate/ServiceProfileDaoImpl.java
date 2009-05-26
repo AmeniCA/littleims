@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.cipango.ims.hss.db.ServiceProfileDao;
@@ -34,9 +35,12 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 			"AND i.id NOT IN (" +
 			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._sharedServiceProfiles AS s WITH s.id = :profileId) ORDER BY i._name";
 	
+	private static final String GET_ALL = "FROM ServiceProfile ORDER BY _name";
 	
-	private static final String GET_ALL =
-		"FROM ServiceProfile ORDER BY _name";
+	private static final String COUNT_BY_IFC =
+		"SELECT count(s) FROM ServiceProfile AS s JOIN s._ifcs AS i WITH i.id = :id";
+	private static final String COUNT_BY_SHARED_IFC =
+		"SELECT count(s) FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :id";
 	
 	public ServiceProfileDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -68,6 +72,37 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 	public List<ServiceProfile> getAllServiceProfile()
 	{
 		return currentSession().createQuery(GET_ALL).list();
+	}
+
+	public int count(Integer ifcId)
+	{
+		if (ifcId == null)
+			return count();
+		Object o1 = query(COUNT_BY_IFC).setLong("id", ifcId).uniqueResult();
+		Object o2 = query(COUNT_BY_SHARED_IFC).setLong("id", ifcId).uniqueResult();	
+		return ((Long) o1).intValue() + ((Long) o2).intValue();
+	}
+
+	public Iterator<ServiceProfile> iterator(int first, int count, String sort,
+			boolean sortAsc, Integer ifcId)
+	{
+		if (ifcId == null)
+			return iterator(first, count, sort, sortAsc);
+		
+		StringBuilder hql = new StringBuilder();
+    	hql.append("SELECT s FROM ServiceProfile AS s WHERE s.id IN " +
+    			"(SELECT s.id FROM ServiceProfile AS s JOIN s._ifcs AS i WITH i.id = :id) OR  s.id IN " +
+    			"(SELECT s.id FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :id)");
+		if (sort != null && !sort.trim().equals("")) 
+			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		
+		Query query = query(hql.toString());
+		if (count > 0)
+			query.setMaxResults(count);
+		query.setParameter("id", ifcId);
+		query.setFirstResult(first);
+		
+    	return query.list().iterator();	
 	}
 
 }

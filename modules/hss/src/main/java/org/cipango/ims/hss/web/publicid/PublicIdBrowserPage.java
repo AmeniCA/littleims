@@ -27,6 +27,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -36,17 +37,27 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.Strings;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
+import org.cipango.ims.hss.model.ServiceProfile;
+import org.cipango.ims.hss.web.serviceprofile.ContextPanel;
 
 public class PublicIdBrowserPage extends PublicIdentityPage
 {
+	@SpringBean
+	private ServiceProfileDao _serviceProfileDao;
+	
+	private String _title;
 
 	@SuppressWarnings("unchecked")
-	public PublicIdBrowserPage()
+	public PublicIdBrowserPage(PageParameters pageParameters)
 	{
-		
+		String serviceProfile = pageParameters.getString("serviceProfile");
 		addSearchField();
 		add(new BookmarkablePageLink("createLink", EditPublicUserIdPage.class));
 		add(new BookmarkablePageLink("createPsiLink", EditPsiPage.class));
@@ -76,10 +87,23 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			}
 
 		};
+		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile);
 
-		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"identity"), 15);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		add(table);
+		
+		serviceProfile = daoDataProvider.getServiceProfile();
+		
+		if (!Strings.isEmpty(serviceProfile))
+		{
+			setContextMenu(new ContextPanel(_serviceProfileDao.findById(serviceProfile)));
+			_title = MapVariableInterpolator.interpolate(getString( "serviceProfile.publicIds.browser.title"),
+						new MicroMap("name", serviceProfile));
+		}
+		else
+			_title = getString(getPrefix() + ".browser.title");
+		
+		add(new Label("title", _title));
 	}
 	
 	private void addSearchField()
@@ -136,7 +160,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	@Override
 	public String getTitle()
 	{
-		return getString(getPrefix() + ".browser.title");
+		return _title;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -165,20 +189,52 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 
 	class DaoDataProvider extends SortableDataProvider<PublicIdentity>
 	{
-		public DaoDataProvider(String sortProperty)
+		private String _serviceProfile;
+		private Long _key;
+		
+		public DaoDataProvider(String sortProperty, String serviceProfile)
 		{
 			setSort(sortProperty, true);
+			setServiceProfile(serviceProfile);
 		}
 
 		public Iterator<PublicIdentity> iterator(int first, int count)
 		{
 			return _dao.iterator(first, count, getSort().getProperty(), getSort()
-					.isAscending());
+					.isAscending(), _key);
 		}
 
 		public int size()
 		{
-			return _dao.count();
+			return _dao.count(_key);
+		}
+		
+		public void setServiceProfile(String name)
+		{
+			_serviceProfile = name;
+			if (Strings.isEmpty(_serviceProfile))
+			{
+				_serviceProfile = "";
+				_key = null;
+			}
+			else
+			{
+				ServiceProfile serviceProfile = _serviceProfileDao.findById(_serviceProfile);
+				if (serviceProfile == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("serviceProfile.error.notFound"),
+							new MicroMap("id", _serviceProfile)));
+					_serviceProfile = "";
+					_key = null;
+				}
+				else
+					_key = serviceProfile.getId();
+			}
+		}
+		
+		public String getServiceProfile()
+		{
+			return _serviceProfile;
 		}
 
 		public IModel<PublicIdentity> model(PublicIdentity o)

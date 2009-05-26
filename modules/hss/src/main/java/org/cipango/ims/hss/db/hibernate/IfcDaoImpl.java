@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.cipango.ims.hss.db.IfcDao;
@@ -30,6 +31,11 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 	
 	private static final String GET_ALL_SHARED =
 		"FROM InitialFilterCriteria  AS ifc WHERE ifc._sharedServiceProfiles IS NOT EMPTY";
+	
+
+	private static final String COUNT_BY_AS =
+		"SELECT count(*) FROM InitialFilterCriteria AS i WHERE i._applicationServer.id = :as";
+
 	
 	public IfcDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -58,6 +64,37 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 	public List<InitialFilterCriteria> getAllSharedIfcs()
 	{
 		return currentSession().createQuery(GET_ALL_SHARED).list();
+	}
+
+	public int count(Long asId)
+	{
+		if (asId == null)
+			return count();
+		Query query = currentSession().createQuery(COUNT_BY_AS);
+		query.setParameter("as", asId);
+		return ((Long) query.uniqueResult()).intValue();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Iterator<InitialFilterCriteria> iterator(int first, int count,
+			String sort, boolean sortAsc, Long asId)
+	{
+		if (asId == null)
+			return iterator(first, count, sort, sortAsc);
+		
+		StringBuilder hql = new StringBuilder();
+    	hql.append("FROM InitialFilterCriteria AS i");
+		hql.append(" WHERE i._applicationServer.id = :asId ");
+		if (sort != null && !sort.trim().equals("")) 
+			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		
+		Query query = query(hql.toString());
+		if (count > 0)
+			query.setMaxResults(count);
+		query.setParameter("asId", asId);
+		query.setFirstResult(first);
+		
+    	return query.list().iterator();	
 	}
 
 }

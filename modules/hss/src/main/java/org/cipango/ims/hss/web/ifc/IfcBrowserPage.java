@@ -21,6 +21,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataT
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -28,15 +29,27 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.Strings;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.ApplicationServerDao;
+import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.web.as.ContextPanel;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 public class IfcBrowserPage extends IfcPage
 {
+	@SpringBean
+	private ApplicationServerDao _applicationServerDao;
+	
+	private String _title;
 	
 	@SuppressWarnings("unchecked")
-	public IfcBrowserPage()
+	public IfcBrowserPage(PageParameters pageParameters)
 	{		
+		String asName = pageParameters.getString("applicationServer");
 		add(new BookmarkablePageLink("createLink", EditIfcPage.class));
 		
 		IColumn[] columns = new IColumn[4];
@@ -54,16 +67,28 @@ public class IfcBrowserPage extends IfcPage
 			}
 		};
 
-		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"name"), 15);
+		DaoDataProvider daoDataProvider = new DaoDataProvider("name", asName);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		table.setOutputMarkupId(true);
 		add(table);
+		
+		asName = daoDataProvider.getAsName();
+		if (!Strings.isEmpty(asName))
+		{
+			setContextMenu(new ContextPanel(_applicationServerDao.findById(asName)));
+			_title = MapVariableInterpolator.interpolate(getString( "as.ifcs.browser.title"),
+						new MicroMap("id", asName));
+		}
+		else
+			_title = getString(getPrefix() + ".browser.title");
+		
+		add(new Label("title", _title));
 	}
 
 	@Override
 	public String getTitle()
 	{
-		return getString(getPrefix() + ".browser.title");
+		return _title;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,22 +118,54 @@ public class IfcBrowserPage extends IfcPage
 	@SuppressWarnings("unchecked")
 	class DaoDataProvider extends SortableDataProvider
 	{
-		public DaoDataProvider(String sortProperty)
+		private Long _asKey;
+		private String _asName;
+		
+		public DaoDataProvider(String sortProperty, String asName)
 		{
 			setSort(sortProperty, true);
+			setAS(asName);
 		}
 
 		public Iterator iterator(int first, int count)
 		{
 			return _dao.iterator(first, count, getSort().getProperty(), getSort()
-					.isAscending());
+					.isAscending(), _asKey);
 		}
 
 		public int size()
 		{
-			return _dao.count();
+			return _dao.count(_asKey);
+		}
+		
+		public void setAS(String name)
+		{
+			_asName = name;
+			if (Strings.isEmpty(_asName))
+			{
+				_asName = "";
+				_asKey = null;
+			}
+			else
+			{
+				ApplicationServer as = _applicationServerDao.findById(_asName);
+				if (as == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("as.error.notFound"),
+							new MicroMap("id", _asName)));
+					_asName = "";
+					_asKey = null;
+				}
+				else
+					_asKey = as.getId();
+			}
 		}
 
+		public String getAsName()
+		{
+			return _asName;
+		}
+		
 		public IModel model(Object o)
 		{
 			return new CompoundPropertyModel(new DaoDetachableModel((InitialFilterCriteria) o));

@@ -28,9 +28,6 @@ public class ApplicationServerDaoImpl extends AbstractHibernateDao<ApplicationSe
 	private static final String GET_BY_NAME =
 		"FROM ApplicationServer WHERE _name = :key";
 	
-	private static final String NB_IFCS =
-		"SELECT count(*) FROM InitialFilterCriteria AS ifc WHERE ifc._applicationServer.id = :as";
-	
 	private static final String GET_ALL =
 		"FROM ApplicationServer ORDER BY _name";
 	
@@ -50,13 +47,6 @@ public class ApplicationServerDaoImpl extends AbstractHibernateDao<ApplicationSe
 		Query query = currentSession().createQuery(GET_BY_NAME);
 		query.setParameter("key", id);
 		return (ApplicationServer) query.uniqueResult();
-	}
-	
-	public long getNbIfcs(ApplicationServer applicationServer)
-	{
-		Query query = currentSession().createQuery(NB_IFCS);
-		query.setParameter("as", applicationServer.getId());
-		return (Long) query.uniqueResult();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -63,6 +63,8 @@ table.filteredTable tr th a { padding-right: 15px; background-position: right; b
 table.filteredTable tr th.wicket_orderDown a { background-image: url(arrow_down.png); }
 table.filteredTable tr th.wicket_orderUp a { background-image: url(arrow_up.png); }
 table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.png); }
+table.filteredTable tr td { padding:4px;}
+table.filteredTable tr td span li  {list-style: none;}
 
 .filter { background-color:#fffff0; border:1px solid #BBBBBB; padding:5px 30px;}
 .filter li {list-style: none; display: inline; padding: 30px;}

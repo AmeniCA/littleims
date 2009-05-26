@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -24,6 +25,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -31,21 +33,43 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.Strings;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.db.IfcDao;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
+import org.cipango.ims.hss.web.ifc.ContextPanel;
+import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 
 public class ServiceProfileBrowserPage extends ServiceProfilePage
 {
-
+	@SpringBean
+	private IfcDao _ifcDao;
+	
+	private String _title;
+	
 	@SuppressWarnings("unchecked")
-	public ServiceProfileBrowserPage()
+	public ServiceProfileBrowserPage(PageParameters pageParameters)
 	{
+		String ifcName = pageParameters.getString("ifc");
+		
 		add(new BookmarkablePageLink("createLink", EditServiceProfilePage.class));
 
-		IColumn[] columns = new IColumn[2];
+		IColumn[] columns = new IColumn[3];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
-		columns[1] = new FilteredAbstractColumn(new Model("Actions"))
+		columns[1] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPublicIds", this, null)) 
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				cellItem.add(new NbPublicIdsPanel(componentId, (ServiceProfile) model.getObject()));
+			}
+			
+		};
+		columns[2] = new FilteredAbstractColumn(new Model("Actions"))
 		{
 
 			public void populateItem(Item cellItem, String componentId, IModel model)
@@ -60,17 +84,30 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 			}
 
 		};
+		
+		DaoDataProvider daoDataProvider = new DaoDataProvider("name", ifcName);
 
-		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"name"), 15);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		add(table);
+		
+		ifcName = daoDataProvider.getIfc();
+		if (!Strings.isEmpty(ifcName))
+		{
+			setContextMenu(new ContextPanel(_ifcDao.findById(ifcName)));
+			_title = MapVariableInterpolator.interpolate(getString( "ifc.serviceProfile.browser.title"),
+						new MicroMap("name", ifcName));
+		}
+		else
+			_title = getString(getPrefix() + ".browser.title");
+		
+		add(new Label("title", _title));
 	}
 	
 
 	@Override
 	public String getTitle()
 	{
-		return getString(getPrefix() + ".browser.title");
+		return _title;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,26 +130,70 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 			add(new BookmarkablePageLink("deleteLink", DeleteServiceProfilePage.class,
 					new PageParameters("id=" + key)));
 		}
+	}
+	
+	private static class NbPublicIdsPanel extends Panel
+	{
 
+		@SuppressWarnings("unchecked")
+		public NbPublicIdsPanel(String id, ServiceProfile serviceProfile)
+		{
+			super(id);
+			add(new Label("nb", String.valueOf(serviceProfile.getPublicIdentites().size())));
+			add(new BookmarkablePageLink("link", PublicIdBrowserPage.class, 
+					new PageParameters("serviceProfile=" + serviceProfile.getName())));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	class DaoDataProvider extends SortableDataProvider
 	{
-		public DaoDataProvider(String sortProperty)
+		private String _ifcName;
+		private Integer _key;
+		
+		public DaoDataProvider(String sortProperty, String ifcName)
 		{
 			setSort(sortProperty, true);
+			setIfc(ifcName);
 		}
 
 		public Iterator iterator(int first, int count)
 		{
 			return _dao.iterator(first, count, getSort().getProperty(), getSort()
-					.isAscending());
+					.isAscending(), _key);
 		}
 
 		public int size()
 		{
-			return _dao.count();
+			return _dao.count(_key);
+		}
+		
+		public void setIfc(String name)
+		{
+			_ifcName = name;
+			if (Strings.isEmpty(_ifcName))
+			{
+				_ifcName = "";
+				_key = null;
+			}
+			else
+			{
+				InitialFilterCriteria ifc = _ifcDao.findById(_ifcName);
+				if (ifc == null)
+				{
+					error(MapVariableInterpolator.interpolate(getString("as.error.notFound"),
+							new MicroMap("id", _ifcName)));
+					_ifcName = "";
+					_key = null;
+				}
+				else
+					_key = ifc.getId();
+			}
+		}
+		
+		public String getIfc()
+		{
+			return _ifcName;
 		}
 
 		public IModel model(Object o)

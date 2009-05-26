@@ -14,8 +14,10 @@
 package org.cipango.ims.hss.web.subscription;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -24,15 +26,19 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.RefreshingView;
+import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 
 public class SubscriptionBrowserPage extends SubscriptionPage
 {
@@ -42,12 +48,28 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 	{		
 		add(new BookmarkablePageLink("createLink", AddSubscriptionPage.class));
 		
-		IColumn[] columns = new IColumn[3];
+		IColumn[] columns = new IColumn[5];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
 		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".scscf", this, null),
 				"scscf", "scscf");
-		columns[2] = new FilteredAbstractColumn(new Model("Actions"))
+		columns[2] = new PropertyColumn(new Model(getString("contextPanel.privateIdentities")), null)
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				final Subscription id = (Subscription) model.getObject();
+				cellItem.add(new IdentityPanel(componentId, id.getPrivateIds(), false));
+			}
+		};
+		columns[3] = new PropertyColumn(new Model(getString("contextPanel.publicIdentities")), null)
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				final Subscription id = (Subscription) model.getObject();
+				cellItem.add(new IdentityPanel(componentId, id.getPublicIds(), true));
+			}
+		};
+		columns[4] = new FilteredAbstractColumn(new Model(getString("actions")))
 		{
 
 			public void populateItem(Item cellItem, String componentId, IModel model)
@@ -56,7 +78,6 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 				cellItem.add(new ActionsPanel(componentId, id));
 			}
 
-			// return the go-and-clear filter for the filter toolbar
 			public Component getFilter(String componentId, FilterForm form)
 			{
 				return new GoAndClearFilter(componentId, form);
@@ -98,6 +119,44 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 					new PageParameters("id=" + key)));
 		}
 
+	}
+	
+
+	private static class IdentityPanel extends Panel
+	{
+		@SuppressWarnings("unchecked")
+		public IdentityPanel(String id, final Set<String> identities, final boolean publicId)
+		{
+			super(id);
+			add(new RefreshingView("identity")
+			{
+
+				@Override
+				protected Iterator getItemModels()
+				{
+					return new ModelIteratorAdapter<String>(identities.iterator()) {
+
+						@Override
+						protected IModel<String> model(String id)
+						{
+							return new Model<String>(id);
+						}
+						
+					};
+				}
+
+				@Override
+				protected void populateItem(Item item)
+				{
+					MarkupContainer link = new BookmarkablePageLink("link", 
+							publicId ? EditPublicUserIdPage.class : EditPrivateIdPage.class, 
+							new PageParameters("id=" + item.getModelObject()));
+					item.add(link);
+					link.add(new Label("identity", item.getModel()));
+				}
+				
+			});
+		}
 	}
 
 	class DaoDataProvider extends SortableDataProvider<Subscription>

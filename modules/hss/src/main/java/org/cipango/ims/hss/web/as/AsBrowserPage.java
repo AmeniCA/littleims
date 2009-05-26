@@ -30,6 +30,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.ApplicationServer;
+import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
 
 public class AsBrowserPage extends AsPage
 {
@@ -48,7 +49,7 @@ public class AsBrowserPage extends AsPage
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
-				cellItem.add(new Label(componentId, new Model(_dao.getNbIfcs((ApplicationServer) model.getObject()))));
+				cellItem.add(new NbIfcsPanel(componentId, (ApplicationServer) model.getObject()));
 			}
 			
 		};
@@ -90,6 +91,19 @@ public class AsBrowserPage extends AsPage
 					new PageParameters("id=" + key)));
 		}
 
+	}
+	
+	private static class NbIfcsPanel extends Panel
+	{
+
+		@SuppressWarnings("unchecked")
+		public NbIfcsPanel(String id, ApplicationServer as)
+		{
+			super(id);
+			add(new Label("nb", String.valueOf(as.getIcfc().size())));
+			add(new BookmarkablePageLink("link", IfcBrowserPage.class,
+					new PageParameters("applicationServer=" + as.getName())));
+		}
 	}
 
 	@SuppressWarnings("unchecked")

@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.cipango.ims.hss.model.ServiceProfile;
@@ -24,4 +25,7 @@ public interface ServiceProfileDao extends Dao, ImsDao<ServiceProfile>
 	ServiceProfile findById(String id);
 	List<String> getAvailableIfc(ServiceProfile serviceProfile);
 	List<ServiceProfile> getAllServiceProfile();
+	int count(Integer ifcId);
+	public Iterator<ServiceProfile> iterator(int first, int count,
+			String sort, boolean sortAsc, Integer ifcId);
 }

@@ -22,6 +22,5 @@ public interface ApplicationServerDao extends Dao, ImsDao<ApplicationServer>
 {
 	void save(ApplicationServer as);
 	ApplicationServer findById(String id);
-	long getNbIfcs(ApplicationServer applicationServer);
 	List<ApplicationServer> getAll();
 }

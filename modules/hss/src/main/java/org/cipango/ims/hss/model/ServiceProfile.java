@@ -13,6 +13,8 @@
 // ========================================================================
 package org.cipango.ims.hss.model;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,6 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
@@ -39,6 +42,9 @@ public class ServiceProfile
 	
 	@Column (unique = true)
 	private String _name;
+	
+	@OneToMany (mappedBy = "_serviceProfile")
+	private Set<PublicIdentity> _publicIdentites = new HashSet<PublicIdentity>();
 	
 	@ManyToMany
 	@JoinTable (
@@ -180,6 +186,16 @@ public class ServiceProfile
 	public void setSharedIfcs(SortedSet<InitialFilterCriteria> sharedIfcs)
 	{
 		_sharedIfcs = sharedIfcs;
+	}
+
+	public Set<PublicIdentity> getPublicIdentites()
+	{
+		return _publicIdentites;
+	}
+
+	public void setPublicIdentites(Set<PublicIdentity> publicIdentites)
+	{
+		_publicIdentites = publicIdentites;
 	}
 
 }

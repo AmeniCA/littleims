@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.cipango.ims.hss.model.PublicIdentity;
@@ -25,4 +26,7 @@ public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 	List<String> findLike(String id, int maxResults);
 	List<PublicIdentity> findAll();
 	PublicIdentity findWilcard(String id);
+	int count(Long serviceProfileId);
+	public Iterator<PublicIdentity> iterator(int first, int count,
+			String sort, boolean sortAsc, Long serviceProfileId);
 }

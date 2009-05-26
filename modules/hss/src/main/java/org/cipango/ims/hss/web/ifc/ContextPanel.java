@@ -18,6 +18,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
+import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 @SuppressWarnings("unchecked")
@@ -30,6 +31,7 @@ public class ContextPanel extends Panel {
 		add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters("id=" + ifc.getName())));
 		add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class, new PageParameters("id=" + ifc.getName())));
 		add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, new PageParameters("id=" + ifc.getName())));
+		add(new BookmarkablePageLink("serviceProfileLink", ServiceProfileBrowserPage.class, new PageParameters("ifc=" + ifc.getName())));
 	}
 
 

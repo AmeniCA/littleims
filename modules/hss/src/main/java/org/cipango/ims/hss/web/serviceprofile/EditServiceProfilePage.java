@@ -111,6 +111,8 @@ public class EditServiceProfilePage extends ServiceProfilePage
 				ServiceProfile original = _dao.findById(_key);
 				for (InitialFilterCriteria ifc : original.getIfcs())
 					serviceProfile.addIfc(ifc);
+				for (InitialFilterCriteria ifc : original.getSharedIfcs())
+					serviceProfile.addSharedIfc(ifc);
 			}
 			
 			_dao.save(serviceProfile);
