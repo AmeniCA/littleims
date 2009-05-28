@@ -107,7 +107,7 @@ public abstract class SPT implements XML.Convertible, Comparable<SPT>, Cloneable
 	
 	public static boolean isRegex(String expression)
 	{
-		return expression.indexOf('!') != -1;
+		return expression != null && expression.indexOf('!') != -1;
 	}
 	
 	@Override

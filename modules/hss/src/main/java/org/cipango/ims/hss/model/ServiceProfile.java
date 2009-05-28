@@ -14,6 +14,7 @@
 package org.cipango.ims.hss.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -27,6 +28,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.cipango.ims.hss.HssException;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.model.spt.SessionCaseSpt;
@@ -88,21 +90,49 @@ public class ServiceProfile
 		_ifcs = ifcs;
 	}
 	
-	public void addIfc(InitialFilterCriteria ifc)
+	public void addIfc(InitialFilterCriteria ifc) throws HssException
 	{
 		if (ifc != null)
 		{
+			checkPriority(ifc);
 			_ifcs.add(ifc);
 			ifc.getServiceProfiles().add(this);
 		}
 	}
 	
-	public void addSharedIfc(InitialFilterCriteria ifc)
+	public void addSharedIfc(InitialFilterCriteria ifc) throws HssException
 	{
 		if (ifc != null)
 		{
+			checkPriority(ifc);
 			_sharedIfcs.add(ifc);
 			ifc.getSharedServiceProfiles().add(this);
+		}
+	}
+	
+	private void checkPriority(InitialFilterCriteria ifc) throws HssException
+	{
+		Iterator<InitialFilterCriteria> it = getIfcs().iterator();
+		while (it.hasNext())
+		{
+			InitialFilterCriteria ifc2 = it.next();
+			if (ifc2.getPriority() == ifc.getPriority())
+			{
+				throw new HssException("Could not add the IFC " 
+						+ ifc.getName() + " as the IFC " + ifc2.getName() 
+						+ " as the same priority (" + ifc.getPriority() + ")");
+			}	
+		}
+		it = getSharedIfcs().iterator();
+		while (it.hasNext())
+		{
+			InitialFilterCriteria ifc2 = it.next();
+			if (ifc2.getPriority() == ifc.getPriority())
+			{
+				throw new HssException("Could not add the IFC " 
+						+ ifc.getName() + " as the IFC " + ifc2.getName() 
+						+ " as the same priority (" + ifc.getPriority() + ")");
+			}		
 		}
 	}
 	

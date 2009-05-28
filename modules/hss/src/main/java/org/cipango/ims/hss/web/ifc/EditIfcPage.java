@@ -14,6 +14,8 @@
 package org.cipango.ims.hss.web.ifc;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
@@ -30,6 +32,10 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.validator.MinimumValidator;
+import org.cipango.ims.hss.HssException;
 import org.cipango.ims.hss.db.ApplicationServerDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ApplicationServer;
@@ -89,7 +95,10 @@ public class EditIfcPage extends IfcPage
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 		form.add(new RequiredTextField<String>("name", String.class));
-		form.add(new RequiredTextField<Integer>("priority", Integer.class));
+		form.add(new RequiredTextField<Integer>("priority", Integer.class)
+				.add(new MinimumValidator<Integer>(0))
+				//.add(new PriorityValidator())
+				.setRequired(true));
 		form.add(new RadioChoice("profilePartIndicator",
 				Arrays.asList(new Short[]{0,1, null}),
 				new ChoiceRenderer<Short>()
@@ -117,7 +126,7 @@ public class EditIfcPage extends IfcPage
 					return getString("ifc.conditionTypeDnf");
 			}
 			
-		}));
+		}).setRequired(true));
 	
 		form.add(new DropDownChoice("applicationServer",
 				new LoadableDetachableModel()
@@ -129,7 +138,7 @@ public class EditIfcPage extends IfcPage
 					}
 					
 				},
-				new ChoiceRenderer<ApplicationServer>("name", "id")));
+				new ChoiceRenderer<ApplicationServer>("name", "id")).setRequired(true));
 		
 
 		form.add(new AjaxFallbackButton("ok", form)
@@ -138,7 +147,45 @@ public class EditIfcPage extends IfcPage
 			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				boolean adding = isAdding();
-				apply(form1);
+				try
+				{	
+					InitialFilterCriteria ifc = (InitialFilterCriteria) getForm().getModelObject();
+					ApplicationServer as = (ApplicationServer) getForm().get("applicationServer").getDefaultModelObject();
+					ifc.setApplicationServer(as);
+					
+					if (_serviceProfileKey != null)
+					{
+						ServiceProfile profile = _serviceProfileDao.findById(_serviceProfileKey);
+						if (profile != null)
+						{
+							try 
+							{
+								profile.addIfc(ifc);
+							}
+							catch (HssException e) {
+								error(e.getMessage());
+								return;
+							}
+						}
+					}
+					if (_copy)
+					{
+						InitialFilterCriteria template = _dao.findById(_key);
+						for (SPT spt: template.getSpts())
+						{
+							ifc.addSpt(spt.clone());
+						}
+					}
+					_key = ifc.getName();
+					_dao.save(ifc);
+					
+					getSession().info(getString("modification.success"));
+				}
+				catch (Exception e)
+				{
+					__log.debug(e.getMessage(), e);
+					getSession().error(getString(getPrefix() + ".error.duplicate", getForm().getModel()));
+				}
 				if (adding)
 					setResponsePage(EditSptsPage.class, new PageParameters("id=" + _key));
 				else
@@ -157,44 +204,8 @@ public class EditIfcPage extends IfcPage
 		if (ifc != null)
 			setContextMenu(new ContextPanel(ifc));
 	}
+	
 
-	@SuppressWarnings("unchecked")
-	protected void apply(Form form)
-	{
-		try
-		{	
-			InitialFilterCriteria ifc = (InitialFilterCriteria) form.getModelObject();
-			ApplicationServer as = (ApplicationServer) form.get("applicationServer").getDefaultModelObject();
-			ifc.setApplicationServer(as);
-			
-			if (_serviceProfileKey != null)
-			{
-				ServiceProfile profile = _serviceProfileDao.findById(_serviceProfileKey);
-				if (profile != null)
-				{
-					profile.addIfc(ifc);
-				}
-			}
-			if (_copy)
-			{
-				InitialFilterCriteria template = _dao.findById(_key);
-				for (SPT spt: template.getSpts())
-				{
-					ifc.addSpt(spt.clone());
-				}
-			}
-			_key = ifc.getName();
-			_dao.save(ifc);
-			
-			getSession().info(getString("modification.success"));
-		}
-		catch (Exception e)
-		{
-			__log.debug(e.getMessage(), e);
-			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
-		}
-
-	}
 
 	private boolean isAdding()
 	{
@@ -205,6 +216,25 @@ public class EditIfcPage extends IfcPage
 	public String getTitle()
 	{
 		return _title;
+	}
+	
+	class PriorityValidator extends AbstractValidator<Integer>
+	{
+
+		@Override
+		protected void onValidate(IValidatable<Integer> validatable)
+		{
+			if (_key == null)
+				return;
+			
+			Iterator<InitialFilterCriteria> it = 
+				_dao.getIfcsWithSamePriority(_dao.findById(_key), validatable.getValue()).iterator();
+			if (it.hasNext())
+			{
+				error(validatable);
+			}
+		}
+		
 	}
 }
 

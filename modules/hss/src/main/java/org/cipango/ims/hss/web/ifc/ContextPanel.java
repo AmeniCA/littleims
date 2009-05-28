@@ -28,10 +28,20 @@ public class ContextPanel extends Panel {
 	public ContextPanel(InitialFilterCriteria ifc) {
 		super("contextMenu");
 		setOutputMarkupId(true);
-		add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters("id=" + ifc.getName())));
-		add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class, new PageParameters("id=" + ifc.getName())));
-		add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, new PageParameters("id=" + ifc.getName())));
-		add(new BookmarkablePageLink("serviceProfileLink", ServiceProfileBrowserPage.class, new PageParameters("ifc=" + ifc.getName())));
+		add(new BookmarkablePageLink("editLink", EditIfcPage.class, 
+				new PageParameters("id=" + ifc.getName())));
+		
+		add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class, 
+				new PageParameters("id=" + ifc.getName())));
+		
+		add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, 
+				new PageParameters("id=" + ifc.getName())));
+		
+		add(new BookmarkablePageLink("viewLink", ViewIfcPage.class, 
+				new PageParameters("id=" + ifc.getName())));
+		
+		add(new BookmarkablePageLink("serviceProfileLink", ServiceProfileBrowserPage.class, 
+				new PageParameters("ifc=" + ifc.getName())));
 	}
 
 

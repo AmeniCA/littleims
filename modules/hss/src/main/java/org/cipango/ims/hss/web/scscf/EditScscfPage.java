@@ -24,6 +24,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.Scscf;
+import org.cipango.ims.hss.web.util.UriValidator;
 
 public class EditScscfPage extends ScscfPage
 {
@@ -59,7 +60,7 @@ public class EditScscfPage extends ScscfPage
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 		form.add(new RequiredTextField<String>("name", String.class));
-		form.add(new RequiredTextField<String>("uri", String.class));
+		form.add(new RequiredTextField<String>("uri", String.class).add(new UriValidator(true)));
 		form.add(new Label("nbSubscriptions", new Model(_dao.getNbSubscriptions(scscf))));
 		
 		form.add(new Button("submit")

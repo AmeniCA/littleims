@@ -41,6 +41,7 @@ import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
+import org.cipango.ims.hss.web.util.UriValidator;
 
 public class EditPublicUserIdPage extends PublicIdentityPage
 {
@@ -88,7 +89,7 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 		add(new Label("title", getTitle()));
 		Form form = new Form("form", new CompoundPropertyModel(_model));
 		add(form);
-		form.add(new RequiredTextField<String>("identity", String.class));
+		form.add(new RequiredTextField<String>("identity", String.class).add(new UriValidator()));
 		form.add(new CheckBox("barred"));
 
 		form.add(new DropDownChoice("identityType",
@@ -125,25 +126,44 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 					
 				}));
 		
-		form.add(new CheckBox("anotherUser", new Model<Boolean>()).setVisible(isAdding()));
-
 		form.add(new Button("submit")
 		{
 			@Override
 			public void onSubmit()
 			{
-				apply(getForm());
+				try
+				{
+					PublicUserIdentity publicIdentity = (PublicUserIdentity) getForm().getModelObject();
+
+					if (publicIdentity.getImplicitRegistrationSet() == null)
+					{
+						ImplicitRegistrationSet implicitRegistrationSet = new ImplicitRegistrationSet();
+						_implicitRegistrationSetDao.save(implicitRegistrationSet);
+						publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
+					}
+					
+					if (_privateIdKey != null)
+					{
+						PrivateIdentity privateIdentity = _privateIdentityDao.findById(_privateIdKey);
+						if (privateIdentity != null)
+						{
+							privateIdentity.addPublicId(publicIdentity);
+						}
+					}
+
+					_dao.save(publicIdentity);
+					getSession().info(getString("modification.success"));
+					if (!publicIdentity.getIdentity().equals(_key))
+						setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + publicIdentity.getIdentity()));
+				}
+				catch (Exception e)
+				{
+					__log.debug("Failed to apply edit", e);
+					getSession().error(getString(getPrefix() + ".error.duplicate", getForm().getModel()));
+				}
 			}
 		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(PublicIdBrowserPage.class);
-			}
-		});
+
 		form.add(new Button("cancel")
 		{
 			@Override
@@ -156,40 +176,6 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 
 		if (publicIdentity != null)
 			setContextMenu(new ContextPanel((PublicUserIdentity) publicIdentity));
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void apply(Form form)
-	{
-		try
-		{
-			PublicUserIdentity publicIdentity = (PublicUserIdentity) form.getModelObject();
-
-			if (publicIdentity.getImplicitRegistrationSet() == null)
-			{
-				ImplicitRegistrationSet implicitRegistrationSet = new ImplicitRegistrationSet();
-				_implicitRegistrationSetDao.save(implicitRegistrationSet);
-				publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
-			}
-			
-			if (_privateIdKey != null)
-			{
-				PrivateIdentity privateIdentity = _privateIdentityDao.findById(_privateIdKey);
-				if (privateIdentity != null)
-				{
-					privateIdentity.addPublicId(publicIdentity);
-				}
-			}
-
-			_dao.save(publicIdentity);
-			getSession().info(getString("modification.success"));
-		}
-		catch (Exception e)
-		{
-			__log.debug("Failed to apply edit", e);
-			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
-		}
-
 	}
 
 	private boolean isAdding()

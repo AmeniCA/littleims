@@ -43,6 +43,7 @@ import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.web.util.AjaxFallbackButton;
+import org.cipango.ims.hss.web.util.UriValidator;
 
 public class EditPsiPage extends PublicIdentityPage
 {
@@ -91,10 +92,10 @@ public class EditPsiPage extends PublicIdentityPage
 		}
 
 		
-		add(new Label("title", _title));
+		add(new Label("title", _title).setOutputMarkupId(true));
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new RequiredTextField<String>("identity", String.class));
+		form.add(new RequiredTextField<String>("identity", String.class).add(new UriValidator()));
 		form.add(new RequiredTextField("privateServiceIdentity", String.class));
 		form.add(new CheckBox("psiActivation"));
 
@@ -167,16 +168,20 @@ public class EditPsiPage extends PublicIdentityPage
 				try
 				{
 					PSI psi = (PSI) form.getModelObject();
-			
 					_dao.save(psi);
 
 					getSession().info(getString("modification.success"));
 					
-					if (target != null)
+					if (!psi.getIdentity().equals(_key))
+					{
+						setResponsePage(EditPsiPage.class, new PageParameters("id=" + psi.getIdentity()));
+					} 
+					else if (target != null)
 					{
 						Component contextMenu = new PsiContextPanel(psi);
 						getPage().get("contextMenu").replaceWith(contextMenu);
 						target.addComponent(contextMenu);
+						target.addComponent(getPage().get("title"));
 					}
 				}
 				catch (Exception e)

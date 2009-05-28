@@ -15,6 +15,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
+import org.cipango.ims.hss.web.ifc.ViewIfcPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 
 @SuppressWarnings("unchecked")
@@ -55,7 +56,7 @@ public class ContextPanel extends Panel {
 			protected void populateItem(ListItem item)
 			{
 				MarkupContainer link = new BookmarkablePageLink("identity", 
-						EditIfcPage.class, 
+						ViewIfcPage.class, 
 						new PageParameters("id=" + item.getModelObject()));
 				item.add(link);
 				link.add(new Label("name", item.getModel()));

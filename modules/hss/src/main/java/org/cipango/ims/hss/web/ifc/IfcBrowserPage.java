@@ -36,12 +36,9 @@ import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.ApplicationServerDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
-import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.web.as.ContextPanel;
-import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
-import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 
 public class IfcBrowserPage extends IfcPage
 {
@@ -114,6 +111,8 @@ public class IfcBrowserPage extends IfcPage
 			{
 				key = ifc.getName();
 			}
+			add(new BookmarkablePageLink("viewLink", ViewIfcPage.class, new PageParameters(
+					"id=" + key)));
 			add(new BookmarkablePageLink("editLink", EditIfcPage.class, new PageParameters(
 					"id=" + key)));
 			add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, new PageParameters(

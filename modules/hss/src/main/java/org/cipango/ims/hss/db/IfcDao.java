@@ -27,4 +27,5 @@ public interface IfcDao extends Dao, ImsDao<InitialFilterCriteria>
 	public List<InitialFilterCriteria> getAllSharedIfcs();
 	public int count(Long asId);
 	public Iterator<InitialFilterCriteria> iterator(int first, int count, String sort, boolean sortAsc, Long asId);
+	public List<InitialFilterCriteria> getIfcsWithSamePriority(InitialFilterCriteria ifc, int priority);
 }

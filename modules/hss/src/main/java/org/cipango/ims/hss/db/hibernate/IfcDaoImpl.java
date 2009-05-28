@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,10 +33,13 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 	private static final String GET_ALL_SHARED =
 		"FROM InitialFilterCriteria  AS ifc WHERE ifc._sharedServiceProfiles IS NOT EMPTY";
 	
-
 	private static final String COUNT_BY_AS =
 		"SELECT count(*) FROM InitialFilterCriteria AS i WHERE i._applicationServer.id = :as";
 
+	private static final String IFC_SAME_PRIORITY =
+		"FROM InitialFilterCriteria  AS ifc WHERE ifc._priority = :priority AND ifc.id != :ifcId " +
+		"AND ifc._sharedServiceProfiles IN" +
+		"(SELECT s.id FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :ifcId)";// TODO
 	
 	public IfcDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -95,6 +99,17 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 		query.setFirstResult(first);
 		
     	return query.list().iterator();	
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<InitialFilterCriteria> getIfcsWithSamePriority(InitialFilterCriteria ifc, int priority)
+	{
+		if (ifc == null)
+			return Collections.EMPTY_LIST;
+		Query query = query(IFC_SAME_PRIORITY);
+		query.setParameter("priority", priority);
+		query.setParameter("ifcId", ifc.getId());
+		return query.list();
 	}
 
 }

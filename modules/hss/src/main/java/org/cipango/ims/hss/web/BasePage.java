@@ -13,6 +13,8 @@
 // ========================================================================
 package org.cipango.ims.hss.web;
 
+import javax.servlet.sip.SipFactory;
+
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -27,17 +29,17 @@ public abstract class BasePage extends WebPage {
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
 		add(new WebMarkupContainer("contextMenu"));
 	}
-	
+		
 	public void setContextMenu(Component panel) {
 		panel.setOutputMarkupId(true);
 		addOrReplace(panel);
 	}
 	
-	public ImsApplication getKaleoApp() {
+	public ImsApplication getImsApp() {
 		return (ImsApplication) getApplication();
 	}
 	
-	public ImsSession getKaleoSession() {
+	public ImsSession getImsSession() {
 		return (ImsSession) getSession();
 	}
 	
@@ -53,7 +55,7 @@ public abstract class BasePage extends WebPage {
 	}
 	
 	protected void goToBackPage(Class defaultPage) {
-		Page backPage = getKaleoSession().getBackPage(getClass());			
+		Page backPage = getImsSession().getBackPage(getClass());			
 
 		if (backPage == null) {
 			setResponsePage(defaultPage);
@@ -73,7 +75,7 @@ public abstract class BasePage extends WebPage {
 			String end = name.substring(index);
 			try 
 			{
-				return name + ' ' + Integer.parseInt(end);
+				return name + ' ' + (Integer.parseInt(end) + 1);
 			}
 			catch (Exception e) 
 			{

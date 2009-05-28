@@ -45,6 +45,8 @@ public abstract class AjaxFallbackButton extends org.apache.wicket.ajax.markup.h
 	@Override
 	protected void onSubmit(AjaxRequestTarget target, Form<?> form)
 	{
+		if (target != null)
+			target.addComponent(getPage().get("feedback"));
 		try
 		{
 			doSubmit(target, form);			
@@ -55,8 +57,6 @@ public abstract class AjaxFallbackButton extends org.apache.wicket.ajax.markup.h
 			getSession().warn(getString("modification.failure") + e.getLocalizedMessage());
 		}
 		
-		if (target != null)
-			target.addComponent(getPage().get("feedback"));
 	}	
 	
 	protected abstract void doSubmit(AjaxRequestTarget target, Form<?> form) throws Exception;

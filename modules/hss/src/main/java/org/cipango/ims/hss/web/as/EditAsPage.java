@@ -30,6 +30,7 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.ApplicationServer.DefaultHandling;
+import org.cipango.ims.hss.web.util.UriValidator;
 
 public class EditAsPage extends AsPage
 {
@@ -65,7 +66,7 @@ public class EditAsPage extends AsPage
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 		form.add(new RequiredTextField<String>("name", String.class));
-		form.add(new RequiredTextField<String>("serverName", String.class));
+		form.add(new RequiredTextField<String>("serverName", String.class).add(new UriValidator(true)));
 		form.add(new DropDownChoice("defaultHandling",
 				Arrays.asList(new Short[]{0,1}),
 				new ChoiceRenderer<Short>()

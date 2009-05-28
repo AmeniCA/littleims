@@ -15,6 +15,8 @@ package org.cipango.ims.hss.web;
 
 import java.util.Locale;
 
+import javax.servlet.sip.SipFactory;
+
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.Request;
@@ -25,7 +27,6 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.convert.IConverter;
-import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.util.HexString;
 import org.cipango.ims.hss.web.as.AsBrowserPage;
 import org.cipango.ims.hss.web.as.DeleteAsPage;
@@ -33,6 +34,7 @@ import org.cipango.ims.hss.web.as.EditAsPage;
 import org.cipango.ims.hss.web.ifc.DeleteIfcPage;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
 import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
+import org.cipango.ims.hss.web.ifc.ViewIfcPage;
 import org.cipango.ims.hss.web.privateid.DeletePrivateIdPage;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.privateid.EditPublicIdsPage;
@@ -58,15 +60,18 @@ import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 import org.cipango.ims.hss.web.util.ClassResolver;
+import org.cipango.ims.hss.web.util.UriValidator;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 public class ImsApplication extends WebApplication {
 
 	private static ImsApplication __instance;
-	private PrivateIdentityDao _privateIdentityDao;
 	private SpringComponentInjector _injector;
 
 	private boolean _wicketStarted = false;
+	private SipFactory _sipFactory;
 	
 	private ImsApplication() {	
 	}
@@ -86,7 +91,7 @@ public class ImsApplication extends WebApplication {
 	
 	@Override
 	protected void init() {
-		super.init();		
+		super.init();
 		
 		// Need to change class resolver due a weird ClassNotFound (on Java 6 only) thrown on
 		// Classes.resolveClass("[B]")		
@@ -121,6 +126,7 @@ public class ImsApplication extends WebApplication {
 		
 		mount(new MixedParamUrlCodingStrategy("/ifc/edit", EditIfcPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/ifc/delete", DeleteIfcPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/ifc/view", ViewIfcPage.class, id));
 		mountBookmarkablePage("/icfs/browser", IfcBrowserPage.class);
 		
 		mount(new MixedParamUrlCodingStrategy("/service-profile", ViewServiceProfilePage.class, id));
@@ -147,20 +153,20 @@ public class ImsApplication extends WebApplication {
 	public Class<? extends Page> getHomePage() {
 		return Index.class;
 	}
+	
+	public SipFactory getSipFactory()
+	{
+		if (_sipFactory == null)
+		{
+			ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+			_sipFactory = (SipFactory) context.getBean("sipFactory");
+		}
+		return _sipFactory;
+	}
 		
 	@Override
 	public org.apache.wicket.Session newSession(Request request, Response response) {
 		return new ImsSession(request);
-	}
-
-	public PrivateIdentityDao getPrivateIdentityDao()
-	{
-		return _privateIdentityDao;
-	}
-
-	public void setPrivateIdentityDao(PrivateIdentityDao privateIdentityDao)
-	{
-		_privateIdentityDao = privateIdentityDao;
 	}
 	
 	/**

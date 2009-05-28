@@ -29,6 +29,10 @@
 		<property name="password" value="" />
 	</bean>
 	
+	<bean id="sipFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
+	</bean>
+	
 	<bean id="namingStrategy" class="org.cipango.ims.hss.util.CustomNamingStrategy"/>
 	
 	<bean id="sessionFactory"

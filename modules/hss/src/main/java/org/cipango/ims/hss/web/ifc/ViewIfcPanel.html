@@ -1,5 +1,5 @@
 <wicket:panel>
-<div class="elementPanel" wicket:id="ifc">
+<div class="elementPanel">
 	<div class="title">
 		<a href="#" wicket:id="hideLink" class="hideLink"><wicket:message key="elementPanel.hide"/></a>
 		<a wicket:id="elementLink">
@@ -14,6 +14,7 @@
 			<li><wicket:message key="ifc.priority"/>: <span wicket:id="priority"></span></li>
 			<li><wicket:message key="ifc.profilePartIndicator"/>: <span wicket:id="profilePartIndicatorAsString"></span></li>
 			<li><wicket:message key="ifc.applicationServer"/>: <a wicket:id="asLink"><span wicket:id="applicationServer"></span></a></li>
+			<li><wicket:message key="ifc.serviceProfiles"/>: <a wicket:id="serviceProfilesLink"><span wicket:id="serviceProfiles"></span></a></li>
 			<li>
 				<wicket:message key="ifc.expression"/>: 
 				<span wicket:id="expression"></span>&nbsp;&nbsp; 
@@ -21,7 +22,7 @@
 			</li>
 			<li>
 				<wicket:message key="ifc.xml"/>: 
-				<pre wicket:id="xml"></pre>&nbsp;&nbsp; 
+				<pre wicket:id="xml"></pre> 
 			</li>
 		</ul>
 	</div>

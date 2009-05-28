@@ -13,15 +13,23 @@
 // ========================================================================
 package org.cipango.ims.hss.web.serviceprofile;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.RefreshingView;
+import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.ServiceProfile;
+import org.cipango.ims.hss.web.ifc.ViewIfcPanel;
 
 public class ViewServiceProfilePage extends ServiceProfilePage
 {
@@ -56,7 +64,20 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 			}
 			
 		};
-		add(new IfcViewPanel("ifcs", ifcsModel, false));
+		add(new RefreshingView("ifcs", ifcsModel)
+		{
+			@Override
+			protected Iterator getItemModels()
+			{
+				return new CompoundModelIterator((Collection) getDefaultModelObject());
+			}
+
+			@Override
+			protected void populateItem(Item item)
+			{
+				item.add(new ViewIfcPanel("ifc", item.getModel(), false));
+			}
+		});
 		
 		IModel sharedIfcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getSharedIfcs()) {
 			@Override
@@ -66,7 +87,21 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 			}
 			
 		};
-		add(new IfcViewPanel("sharedIfcs", sharedIfcsModel, true));
+
+		add(new RefreshingView("sharedIfcs", sharedIfcsModel)
+		{
+			@Override
+			protected Iterator getItemModels()
+			{
+				return new CompoundModelIterator((Collection) getDefaultModelObject());
+			}
+
+			@Override
+			protected void populateItem(Item item)
+			{
+				item.add(new ViewIfcPanel("ifc", item.getModel(), true));
+			}
+		});
 		
 		if (serviceProfile != null)
 			setContextMenu(new ContextPanel(serviceProfile));
@@ -76,6 +111,27 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 	public String getTitle()
 	{
 		return _title;
+	}
+		
+	class CompoundModelIterator extends ModelIteratorAdapter implements Serializable {
+		public CompoundModelIterator(Collection modelObject) {
+			super(modelObject.iterator());
+		}
+		
+		@Override
+		protected IModel model(Object id)
+		{
+			return new CompoundPropertyModel(new LoadableDetachableModel(id) {
+
+				@Override
+				protected Object load()
+				{
+					// TODO implements
+					return null;
+				}
+				
+			});
+		}
 	}
 
 }

@@ -31,6 +31,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.HssException;
 import org.cipango.ims.hss.db.IfcDao;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
@@ -206,42 +207,49 @@ public class EditIfcsPage extends ServiceProfilePage
 		while (it.hasNext()) {
 			String ifcName = (String) it.next();
 			InitialFilterCriteria ifc = _ifcDao.findById(ifcName);
-			switch (action)
+			try
 			{
-			case ADD_TO_IFC:
-				profile.addIfc(ifc);
-				used.getChoices().add(ifcName);
-				contextModel.add(ifcName);
-				break;
-			case ADD_TO_SHARED:
-				profile.addSharedIfc(ifc);
-				shared.getChoices().add(ifcName);
-				contextModel.add(ifcName);
-				break;
-			case MOVE_TO_IFC:
-				profile.removeSharedIfc(ifc);
-				profile.addIfc(ifc);
-				used.getChoices().add(ifcName);
-				break;
-			case MOVE_TO_SHARED:
-				profile.removeIfc(ifc);
-				profile.addSharedIfc(ifc);
-				shared.getChoices().add(ifcName);
-				break;
-			case REMOVE_FROM_IFC:
-				profile.removeIfc(ifc);
-				contextModel.remove(ifcName);
-				available.getChoices().add(ifcName);
-				break;
-			case REMOVE_FROM_SHARED:
-				profile.removeSharedIfc(ifc);
-				contextModel.remove(ifcName);
-				available.getChoices().add(ifcName);
-				break;
-			default:
-				break;
+				switch (action)
+				{
+				case ADD_TO_IFC:
+					profile.addIfc(ifc);
+					used.getChoices().add(ifcName);
+					contextModel.add(ifcName);
+					break;
+				case ADD_TO_SHARED:
+					profile.addSharedIfc(ifc);
+					shared.getChoices().add(ifcName);
+					contextModel.add(ifcName);
+					break;
+				case MOVE_TO_IFC:
+					profile.removeSharedIfc(ifc);
+					profile.addIfc(ifc);
+					used.getChoices().add(ifcName);
+					break;
+				case MOVE_TO_SHARED:
+					profile.removeIfc(ifc);
+					profile.addSharedIfc(ifc);
+					shared.getChoices().add(ifcName);
+					break;
+				case REMOVE_FROM_IFC:
+					profile.removeIfc(ifc);
+					contextModel.remove(ifcName);
+					available.getChoices().add(ifcName);
+					break;
+				case REMOVE_FROM_SHARED:
+					profile.removeSharedIfc(ifc);
+					contextModel.remove(ifcName);
+					available.getChoices().add(ifcName);
+					break;
+				default:
+					break;
+				}
+				choosen.remove(ifcName);
 			}
-			choosen.remove(ifcName);
+			catch (HssException e) 
+			{
+				error(e.getMessage());
+			}
 			it.remove();
 		}
 		_dao.save(profile);
@@ -249,6 +257,7 @@ public class EditIfcsPage extends ServiceProfilePage
 		if (target != null)
 		{
 			target.addComponent(form1);
+			target.addComponent(getPage().get("feedback"));
 			target.addComponent(getPage().get("contextMenu"));
 		}
 	}

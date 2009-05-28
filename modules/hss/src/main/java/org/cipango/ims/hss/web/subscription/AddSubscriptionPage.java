@@ -40,6 +40,7 @@ import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
+import org.cipango.ims.hss.web.util.UriValidator;
 
 public class AddSubscriptionPage extends SubscriptionPage
 {
@@ -91,7 +92,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 			
 		}));
 		form.add(publicId);
-		publicId.add(new RequiredTextField<String>("identity"));
+		publicId.add(new RequiredTextField<String>("identity").add(new UriValidator()));
 		publicId.add(new CheckBox("barred"));
 
 		publicId.add(new DropDownChoice("identityType",
