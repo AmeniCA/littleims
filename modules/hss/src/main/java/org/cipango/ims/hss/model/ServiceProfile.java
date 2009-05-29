@@ -19,13 +19,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.cipango.ims.hss.HssException;
@@ -33,8 +31,6 @@ import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.model.spt.SessionCaseSpt;
 import org.cipango.ims.hss.model.spt.SessionCaseSpt.SessionCase;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 
 @Entity
 public class ServiceProfile
@@ -45,29 +41,22 @@ public class ServiceProfile
 	@Column (unique = true)
 	private String _name;
 	
-	@OneToMany (mappedBy = "_serviceProfile")
+	@OneToMany (mappedBy = "_serviceProfile", cascade = {CascadeType.ALL})
 	private Set<PublicIdentity> _publicIdentites = new HashSet<PublicIdentity>();
 	
-	@ManyToMany
-	@JoinTable (
-			name = "SP_IFC",
-			joinColumns = {@JoinColumn(name = "serviceProfile")},
-			inverseJoinColumns = {@JoinColumn(name = "ifc")})
-	@Sort (type = SortType.NATURAL)
-	private SortedSet<InitialFilterCriteria> _ifcs = new TreeSet<InitialFilterCriteria>();
-	
-	@ManyToMany
-	@JoinTable (
-			name = "SP_SHARED_IFC",
-			joinColumns = {@JoinColumn(name = "serviceProfile")},
-			inverseJoinColumns = {@JoinColumn(name = "ifc")})
-	@Sort (type = SortType.NATURAL)
-	private SortedSet<InitialFilterCriteria> _sharedIfcs = new TreeSet<InitialFilterCriteria>();
-
+	@OneToMany (mappedBy = "_serviceProfile")
+	private Set<SpIfc> _allIfcs = new HashSet<SpIfc>();
 
 	public boolean hasSharedIfcs()
 	{
-		return _sharedIfcs != null && !_sharedIfcs.isEmpty();
+		Iterator<SpIfc> it = getAllIfcs().iterator();
+		while (it.hasNext())
+		{
+			SpIfc spIfc = (SpIfc) it.next();
+			if (spIfc.isShared())
+				return true;
+		}
+		return false;
 	}
 
 	public Long getId()
@@ -80,42 +69,61 @@ public class ServiceProfile
 		_id = id;
 	}
 
-	public SortedSet<InitialFilterCriteria> getIfcs()
+	public SortedSet<InitialFilterCriteria> getIfcs(boolean shared)
 	{
-		return _ifcs;
-	}
-
-	public void setIfcs(SortedSet<InitialFilterCriteria> ifcs)
-	{
-		_ifcs = ifcs;
-	}
-	
-	public void addIfc(InitialFilterCriteria ifc) throws HssException
-	{
-		if (ifc != null)
-		{
-			checkPriority(ifc);
-			_ifcs.add(ifc);
-			ifc.getServiceProfiles().add(this);
-		}
-	}
-	
-	public void addSharedIfc(InitialFilterCriteria ifc) throws HssException
-	{
-		if (ifc != null)
-		{
-			checkPriority(ifc);
-			_sharedIfcs.add(ifc);
-			ifc.getSharedServiceProfiles().add(this);
-		}
-	}
-	
-	private void checkPriority(InitialFilterCriteria ifc) throws HssException
-	{
-		Iterator<InitialFilterCriteria> it = getIfcs().iterator();
+		SortedSet<InitialFilterCriteria> ifcs = new TreeSet<InitialFilterCriteria>();
+		Iterator<SpIfc> it = getAllIfcs().iterator();
 		while (it.hasNext())
 		{
-			InitialFilterCriteria ifc2 = it.next();
+			SpIfc spIfc = (SpIfc) it.next();
+			if (!(shared ^ spIfc.isShared()))
+				ifcs.add(spIfc.getIfc());
+		}
+		return ifcs;
+	}
+
+	public void addIfc(InitialFilterCriteria ifc, boolean shared) throws HssException
+	{
+		if (ifc != null)
+		{
+			checkPriority(ifc);
+			new SpIfc(ifc, this, shared);
+		}
+	}
+	
+	public void moveIfc(InitialFilterCriteria ifc, boolean shared) throws HssException
+	{
+		SpIfc spIfc = getSpIfc(ifc);
+		if (spIfc != null)
+		{
+			spIfc.setShared(shared);
+		}
+	}
+	
+	private SpIfc getSpIfc(InitialFilterCriteria ifc)
+	{
+		if (ifc != null)
+		{
+			Iterator<SpIfc> it = getAllIfcs().iterator();
+			while (it.hasNext())
+			{
+				SpIfc spIfc = (SpIfc) it.next();
+				if (spIfc.getIfc().getId().equals(ifc.getId()))
+				{
+					return spIfc;
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	private void checkPriority(InitialFilterCriteria ifc) throws HssException
+	{
+		Iterator<SpIfc> it = getAllIfcs().iterator();
+		while (it.hasNext())
+		{
+			InitialFilterCriteria ifc2 = it.next().getIfc();
 			if (ifc2.getPriority() == ifc.getPriority())
 			{
 				throw new HssException("Could not add the IFC " 
@@ -123,23 +131,13 @@ public class ServiceProfile
 						+ " as the same priority (" + ifc.getPriority() + ")");
 			}	
 		}
-		it = getSharedIfcs().iterator();
-		while (it.hasNext())
-		{
-			InitialFilterCriteria ifc2 = it.next();
-			if (ifc2.getPriority() == ifc.getPriority())
-			{
-				throw new HssException("Could not add the IFC " 
-						+ ifc.getName() + " as the IFC " + ifc2.getName() 
-						+ " as the same priority (" + ifc.getPriority() + ")");
-			}		
-		}
 	}
 	
 	public boolean hasUnregisteredServices()
 	{
-		for (InitialFilterCriteria ifc : getIfcs())
+		for (SpIfc spIfc : getAllIfcs())
 		{
+			InitialFilterCriteria ifc = spIfc.getIfc();
 			Short profilePartIndicator = ifc.getProfilePartIndicator();
 			if (profilePartIndicator == null)
 			{
@@ -175,24 +173,6 @@ public class ServiceProfile
 		}
 		return false;
 	}
-	
-	public void removeIfc(InitialFilterCriteria ifc)
-	{
-		if (ifc != null)
-		{
-			_ifcs.remove(ifc);
-			ifc.getServiceProfiles().remove(this);
-		}
-	}
-	
-	public void removeSharedIfc(InitialFilterCriteria ifc)
-	{
-		if (ifc != null)
-		{
-			_sharedIfcs.remove(ifc);
-			ifc.getSharedServiceProfiles().remove(this);
-		}
-	}
 
 	public String getName()
 	{
@@ -204,20 +184,6 @@ public class ServiceProfile
 		_name = name;
 	}
 
-
-
-	public SortedSet<InitialFilterCriteria> getSharedIfcs()
-	{
-		return _sharedIfcs;
-	}
-
-
-
-	public void setSharedIfcs(SortedSet<InitialFilterCriteria> sharedIfcs)
-	{
-		_sharedIfcs = sharedIfcs;
-	}
-
 	public Set<PublicIdentity> getPublicIdentites()
 	{
 		return _publicIdentites;
@@ -226,6 +192,16 @@ public class ServiceProfile
 	public void setPublicIdentites(Set<PublicIdentity> publicIdentites)
 	{
 		_publicIdentites = publicIdentites;
+	}
+
+	public Set<SpIfc> getAllIfcs()
+	{
+		return _allIfcs;
+	}
+
+	public void setAllIfcs(Set<SpIfc> allIfcs)
+	{
+		_allIfcs = allIfcs;
 	}
 
 }

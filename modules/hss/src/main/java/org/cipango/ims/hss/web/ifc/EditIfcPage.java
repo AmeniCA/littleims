@@ -16,6 +16,7 @@ package org.cipango.ims.hss.web.ifc;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
@@ -97,7 +98,7 @@ public class EditIfcPage extends IfcPage
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<Integer>("priority", Integer.class)
 				.add(new MinimumValidator<Integer>(0))
-				//.add(new PriorityValidator())
+				.add(new PriorityValidator())
 				.setRequired(true));
 		form.add(new RadioChoice("profilePartIndicator",
 				Arrays.asList(new Short[]{0,1, null}),
@@ -153,21 +154,6 @@ public class EditIfcPage extends IfcPage
 					ApplicationServer as = (ApplicationServer) getForm().get("applicationServer").getDefaultModelObject();
 					ifc.setApplicationServer(as);
 					
-					if (_serviceProfileKey != null)
-					{
-						ServiceProfile profile = _serviceProfileDao.findById(_serviceProfileKey);
-						if (profile != null)
-						{
-							try 
-							{
-								profile.addIfc(ifc);
-							}
-							catch (HssException e) {
-								error(e.getMessage());
-								return;
-							}
-						}
-					}
 					if (_copy)
 					{
 						InitialFilterCriteria template = _dao.findById(_key);
@@ -178,6 +164,22 @@ public class EditIfcPage extends IfcPage
 					}
 					_key = ifc.getName();
 					_dao.save(ifc);
+					
+					if (_serviceProfileKey != null)
+					{
+						ServiceProfile profile = _serviceProfileDao.findById(_serviceProfileKey);
+						if (profile != null)
+						{
+							try 
+							{
+								profile.addIfc(ifc, false);
+							}
+							catch (HssException e) {
+								error(e.getMessage());
+								return;
+							}
+						}
+					}
 					
 					getSession().info(getString("modification.success"));
 				}
@@ -221,20 +223,49 @@ public class EditIfcPage extends IfcPage
 	class PriorityValidator extends AbstractValidator<Integer>
 	{
 
+		private String _ifcs;
 		@Override
 		protected void onValidate(IValidatable<Integer> validatable)
 		{
 			if (_key == null)
 				return;
 			
-			Iterator<InitialFilterCriteria> it = 
-				_dao.getIfcsWithSamePriority(_dao.findById(_key), validatable.getValue()).iterator();
-			if (it.hasNext())
+			List<InitialFilterCriteria> list = 
+				_dao.getIfcsWithSamePriority(_dao.findById(_key), validatable.getValue());
+			if (!list.isEmpty())
 			{
+				if (list.size() == 1)
+					_ifcs = list.get(0).getName();
+				else
+				{
+					StringBuilder sb = new StringBuilder();
+					Iterator<InitialFilterCriteria> it = list.iterator();
+					while (it.hasNext())
+					{
+						InitialFilterCriteria ifc = it.next();
+						sb.append(ifc.getName());
+						if (it.hasNext())
+							sb.append(", ");
+					}
+					_ifcs = sb.toString();
+				}
 				error(validatable);
 			}
 		}
 		
+		@Override
+		protected String resourceKey()
+		{
+			return "validator.ifc.priority";
+		}
+		
+		@Override
+		protected Map<String, Object> variablesMap(IValidatable<Integer> validatable)
+		{
+			Map<String, Object> map =  super.variablesMap(validatable);
+			map.put("ifc", _ifcs);
+			return map;
+		}
 	}
 }
 

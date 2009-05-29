@@ -56,11 +56,11 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 		_title = getString("view.serviceProfile.title", new DaoDetachableModel(serviceProfile));
 		add(new Label("title", _title));
 		
-		IModel ifcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getIfcs()) {
+		IModel ifcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getIfcs(false)) {
 			@Override
 			protected Object load()
 			{
-				return _dao.findById(_key).getIfcs();
+				return _dao.findById(_key).getIfcs(false);
 			}
 			
 		};
@@ -79,11 +79,11 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 			}
 		});
 		
-		IModel sharedIfcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getSharedIfcs()) {
+		IModel sharedIfcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getIfcs(true)) {
 			@Override
 			protected Object load()
 			{
-				return _dao.findById(_key).getSharedIfcs();
+				return _dao.findById(_key).getIfcs(true);
 			}
 			
 		};

@@ -158,12 +158,12 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.close("Extension");
 
 		out.close("PublicIdentity");
-		out.add("InitialFilterCriteria", _serviceProfile.getIfcs());
+		out.add("InitialFilterCriteria", _serviceProfile.getIfcs(false));
 		
 		if (_serviceProfile.hasSharedIfcs())
 		{
 			out.open("Extension");
-			Iterator<InitialFilterCriteria> it = _serviceProfile.getSharedIfcs().iterator();
+			Iterator<InitialFilterCriteria> it = _serviceProfile.getIfcs(true).iterator();
 			while (it.hasNext())
 				out.add("SharedIFCSetID", it.next().getId());
 			out.close("Extension");

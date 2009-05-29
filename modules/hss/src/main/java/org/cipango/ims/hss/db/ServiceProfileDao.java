@@ -17,6 +17,7 @@ package org.cipango.ims.hss.db;
 import java.util.Iterator;
 import java.util.List;
 
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 
 public interface ServiceProfileDao extends Dao, ImsDao<ServiceProfile>
@@ -28,4 +29,5 @@ public interface ServiceProfileDao extends Dao, ImsDao<ServiceProfile>
 	int count(Integer ifcId);
 	public Iterator<ServiceProfile> iterator(int first, int count,
 			String sort, boolean sortAsc, Integer ifcId);
+	void unlink(ServiceProfile serviceProfile, InitialFilterCriteria ifc);
 }

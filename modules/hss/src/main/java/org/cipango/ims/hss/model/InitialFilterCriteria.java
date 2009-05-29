@@ -25,7 +25,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -57,17 +56,14 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	@Sort (type = SortType.NATURAL)
 	private SortedSet<SPT> _spts = new TreeSet<SPT>();
 	
-	@ManyToMany (mappedBy = "_ifcs")
-	private Set<ServiceProfile> _serviceProfiles = new HashSet<ServiceProfile>();
-	
-	@ManyToMany (mappedBy = "_sharedIfcs")
-	private Set<ServiceProfile> _sharedServiceProfiles = new HashSet<ServiceProfile>();
-	
-	public Set<ServiceProfile> getServiceProfiles()
+	@OneToMany (mappedBy = "_ifc", cascade = { CascadeType.ALL })
+	private Set<SpIfc> _serviceProfiles = new HashSet<SpIfc>();
+		
+	public Set<SpIfc> getServiceProfiles()
 	{
 		return _serviceProfiles;
 	}
-	public void setServiceProfiles(Set<ServiceProfile> serviceProfiles)
+	public void setServiceProfiles(Set<SpIfc> serviceProfiles)
 	{
 		_serviceProfiles = serviceProfiles;
 	}
@@ -207,14 +203,6 @@ public class InitialFilterCriteria implements Comparable<InitialFilterCriteria>,
 	public void setName(String name)
 	{
 		_name = name;
-	}
-	public Set<ServiceProfile> getSharedServiceProfiles()
-	{
-		return _sharedServiceProfiles;
-	}
-	public void setSharedServiceProfiles(Set<ServiceProfile> sharedServiceProfiles)
-	{
-		_sharedServiceProfiles = sharedServiceProfiles;
 	}
 	
 	public static class ProfilePartIndicator

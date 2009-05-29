@@ -132,7 +132,7 @@ public class IfcBrowserPage extends IfcPage
 		public NbElemsPanel(String id, InitialFilterCriteria ifc)
 		{
 			super(id);
-			add(new Label("nb", String.valueOf(ifc.getServiceProfiles().size() + ifc.getSharedServiceProfiles().size())));
+			add(new Label("nb", String.valueOf(ifc.getServiceProfiles().size())));
 			add(new BookmarkablePageLink("link", ServiceProfileBrowserPage.class,
 					new PageParameters("ifc=" + ifc.getName())));
 		}

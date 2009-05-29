@@ -53,7 +53,7 @@ public class ViewIfcPanel extends Panel
 				new PageParameters("ifc=" + ifc.getName()));
 		add(serviceProfilesLink);
 		serviceProfilesLink.add(new Label("serviceProfiles", 
-				String.valueOf(ifc.getServiceProfiles().size() + ifc.getSharedServiceProfiles().size())));
+				String.valueOf(ifc.getServiceProfiles().size())));
 		
 		Output out = XML.getPretty().newOutput();
 		ifc.print(out);

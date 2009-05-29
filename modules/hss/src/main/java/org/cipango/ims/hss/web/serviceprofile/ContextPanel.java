@@ -14,6 +14,7 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
+import org.cipango.ims.hss.model.SpIfc;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
 import org.cipango.ims.hss.web.ifc.ViewIfcPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
@@ -42,14 +43,10 @@ public class ContextPanel extends Panel {
 				new PageParameters("serviceProfile=" + serviceProfile.getName())));
 
 		final List<String> ifcs = new ArrayList<String>();
-		Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs().iterator();
+		Iterator<SpIfc> it = serviceProfile.getAllIfcs().iterator();
 		while (it.hasNext())
-			ifcs.add(it.next().getName());
-		
-		it = serviceProfile.getSharedIfcs().iterator();
-		while (it.hasNext())
-			ifcs.add(it.next().getName());
-		
+			ifcs.add(it.next().getIfc().getName());
+				
 		add(new ListView("ifcs", ifcs){
 
 			@Override

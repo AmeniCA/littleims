@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cipango.ims.hss.db.ServiceProfileDao;
+import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -31,16 +32,15 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 	
 	private static final String GET_AVAILABLE_IFCS =
 		"SELECT i._name FROM InitialFilterCriteria AS i WHERE i.id NOT IN (" +
-			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._serviceProfiles AS s WITH s.id = :profileId)" +
-			"AND i.id NOT IN (" +
-			"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._sharedServiceProfiles AS s WITH s.id = :profileId) ORDER BY i._name";
-	
+		"SELECT i.id FROM InitialFilterCriteria AS i JOIN i._serviceProfiles AS s WITH s._serviceProfile.id = :profileId)";
+
 	private static final String GET_ALL = "FROM ServiceProfile ORDER BY _name";
 	
 	private static final String COUNT_BY_IFC =
-		"SELECT count(s) FROM ServiceProfile AS s JOIN s._ifcs AS i WITH i.id = :id";
-	private static final String COUNT_BY_SHARED_IFC =
-		"SELECT count(s) FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :id";
+		"SELECT count(s) FROM ServiceProfile AS s JOIN s._allIfcs AS i WITH i._ifc.id = :id";
+	
+	private static final String UNLINK =
+		"FROM SpIfc AS s WHERE s._ifc = :ifc AND s._serviceProfile = :serviceProfile";
 	
 	public ServiceProfileDaoImpl(SessionFactory sessionFactory) 
 	{
@@ -78,11 +78,11 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 	{
 		if (ifcId == null)
 			return count();
-		Object o1 = query(COUNT_BY_IFC).setLong("id", ifcId).uniqueResult();
-		Object o2 = query(COUNT_BY_SHARED_IFC).setLong("id", ifcId).uniqueResult();	
-		return ((Long) o1).intValue() + ((Long) o2).intValue();
+		Query query = query(COUNT_BY_IFC).setLong("id", ifcId);
+		return ((Long) query.uniqueResult()).intValue();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Iterator<ServiceProfile> iterator(int first, int count, String sort,
 			boolean sortAsc, Integer ifcId)
 	{
@@ -90,9 +90,7 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 			return iterator(first, count, sort, sortAsc);
 		
 		StringBuilder hql = new StringBuilder();
-    	hql.append("SELECT s FROM ServiceProfile AS s WHERE s.id IN " +
-    			"(SELECT s.id FROM ServiceProfile AS s JOIN s._ifcs AS i WITH i.id = :id) OR  s.id IN " +
-    			"(SELECT s.id FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :id)");
+    	hql.append("SELECT s FROM ServiceProfile AS s JOIN s._allIfcs AS i WITH i._ifc.id = :id");
 		if (sort != null && !sort.trim().equals("")) 
 			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
 		
@@ -103,6 +101,15 @@ public class ServiceProfileDaoImpl extends AbstractHibernateDao<ServiceProfile> 
 		query.setFirstResult(first);
 		
     	return query.list().iterator();	
+	}
+
+
+	public void unlink(ServiceProfile serviceProfile, InitialFilterCriteria ifc)
+	{
+		Query query = query(UNLINK);
+		query.setParameter("ifc", ifc);
+		query.setParameter("serviceProfile", serviceProfile);
+		currentSession().delete(query.uniqueResult());
 	}
 
 }

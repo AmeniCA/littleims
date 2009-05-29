@@ -31,15 +31,15 @@ public class IfcDaoImpl extends AbstractHibernateDao<InitialFilterCriteria> impl
 		"FROM InitialFilterCriteria WHERE _name = :key";
 	
 	private static final String GET_ALL_SHARED =
-		"FROM InitialFilterCriteria  AS ifc WHERE ifc._sharedServiceProfiles IS NOT EMPTY";
+		"SELECT ifc FROM InitialFilterCriteria  AS ifc JOIN ifc._serviceProfiles AS spIfc WITH spIfc._shared = true";
 	
 	private static final String COUNT_BY_AS =
 		"SELECT count(*) FROM InitialFilterCriteria AS i WHERE i._applicationServer.id = :as";
 
 	private static final String IFC_SAME_PRIORITY =
-		"FROM InitialFilterCriteria  AS ifc WHERE ifc._priority = :priority AND ifc.id != :ifcId " +
-		"AND ifc._sharedServiceProfiles IN" +
-		"(SELECT s.id FROM ServiceProfile AS s JOIN s._sharedIfcs AS i WITH i.id = :ifcId)";// TODO
+		"SELECT ifc FROM InitialFilterCriteria  AS ifc JOIN ifc._serviceProfiles AS spIfc WHERE ifc._priority = :priority AND ifc.id != :ifcId " +
+		"AND spIfc._serviceProfile.id IN" +
+		"(SELECT i._serviceProfile.id FROM SpIfc AS i WHERE i._ifc.id = :ifcId)";
 	
 	public IfcDaoImpl(SessionFactory sessionFactory) 
 	{

@@ -126,7 +126,7 @@ public class EditIfcsPage extends ServiceProfilePage
 		List used = new ArrayList();
 		if (serviceProfile != null)
 		{
-			Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs().iterator();
+			Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs(false).iterator();
 			while (it.hasNext()) {
 				used.add(it.next().getName());
 			}	
@@ -143,7 +143,7 @@ public class EditIfcsPage extends ServiceProfilePage
 		List shared = new ArrayList();
 		if (serviceProfile != null)
 		{
-			Iterator<InitialFilterCriteria> it = serviceProfile.getSharedIfcs().iterator();
+			Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs(true).iterator();
 			while (it.hasNext()) {
 				shared.add(it.next().getName());
 			}	
@@ -212,32 +212,26 @@ public class EditIfcsPage extends ServiceProfilePage
 				switch (action)
 				{
 				case ADD_TO_IFC:
-					profile.addIfc(ifc);
+					profile.addIfc(ifc, false);
 					used.getChoices().add(ifcName);
 					contextModel.add(ifcName);
 					break;
 				case ADD_TO_SHARED:
-					profile.addSharedIfc(ifc);
+					profile.addIfc(ifc, true);
 					shared.getChoices().add(ifcName);
 					contextModel.add(ifcName);
 					break;
 				case MOVE_TO_IFC:
-					profile.removeSharedIfc(ifc);
-					profile.addIfc(ifc);
+					profile.moveIfc(ifc, false);
 					used.getChoices().add(ifcName);
 					break;
 				case MOVE_TO_SHARED:
-					profile.removeIfc(ifc);
-					profile.addSharedIfc(ifc);
+					profile.moveIfc(ifc, true);
 					shared.getChoices().add(ifcName);
 					break;
 				case REMOVE_FROM_IFC:
-					profile.removeIfc(ifc);
-					contextModel.remove(ifcName);
-					available.getChoices().add(ifcName);
-					break;
 				case REMOVE_FROM_SHARED:
-					profile.removeSharedIfc(ifc);
+					_dao.unlink(profile, ifc);
 					contextModel.remove(ifcName);
 					available.getChoices().add(ifcName);
 					break;
