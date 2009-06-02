@@ -5,8 +5,8 @@
 	<form wicket:id="form">
 		<table class="dataDetails">
 			<tr>
-				<th><wicket:message key="publicId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="identity" type="text" /></td>
+				<th><wicket:message key="publicId.name"/></th>
+				<td><input wicket:id="identity" type="text" class="longText"/></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.privateServiceId"/></th>
@@ -22,15 +22,15 @@
 				</td>
 			</tr>
 			<tr>
-          <th><wicket:message key="publicId.identityType">identityType</wicket:message></th>
-          <td>
-          	<select wicket:id="identityType">
-          	</select>
-          </td>
-      </tr>
+              <th><wicket:message key="publicId.identityType">identityType</wicket:message></th>
+              <td>
+              	<select wicket:id="identityType">
+              	</select>
+              </td>
+            </tr>
 			<tr>
 				<th><wicket:message key="publicId.displayName"></wicket:message></th>
-				<td><input wicket:id="displayName" type="text" /></td>
+				<td><input wicket:id="displayName" type="text" class="longText"/></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="publicId.state"/></th>

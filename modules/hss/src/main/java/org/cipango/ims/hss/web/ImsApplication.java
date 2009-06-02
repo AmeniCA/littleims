@@ -163,6 +163,11 @@ public class ImsApplication extends WebApplication {
 		}
 		return _sipFactory;
 	}
+	
+	public String getContextPath()
+	{
+		return getServletContext().getContextPath();
+	}
 		
 	@Override
 	public org.apache.wicket.Session newSession(Request request, Response response) {

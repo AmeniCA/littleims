@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -51,7 +50,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 	public ViewSubscriptionPage(PageParameters pageParameters)
 	{
 		Subscription subscription = getSubscription(pageParameters);
-		_key = subscription == null ? null : subscription.getName();
+		_key = (subscription == null) ? null : subscription.getName();
 		
 		_title = getString("view.subscription.title", new DaoDetachableModel(subscription));
 		add(new Label("title", _title));
@@ -65,13 +64,8 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			
 		};
 		
-		WebMarkupContainer svg = new WebMarkupContainer("svg");
-		add(svg);
-		String encodedName = subscription.getName().replaceAll("\\:", "%3A");
-		svg.add(new AttributeModifier("src", true, new Model("../../svg/subscription.svg?key=" + encodedName)));
-		int maxElem = Math.max(subscription.getPrivateIdentities().size(), subscription.getPublicIdentities().size());
-		svg.add(new AttributeModifier("height", new Model(maxElem * 100 + 10)));
-		
+		add(new SvgMarkupContainer("svg", subscription));
+			
 		add(new RefreshingView("privateIds", privateIdsModel) {
 
 			@Override

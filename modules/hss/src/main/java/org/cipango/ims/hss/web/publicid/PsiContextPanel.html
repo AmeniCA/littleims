@@ -13,9 +13,11 @@
 		<li>
 			<a href="#" wicket:id="deleteLink"><wicket:message key="contextPanel.delete">Delete</wicket:message></a>
 		</li>
-		<li>
-			<a href="#" wicket:id="xmlSubscriptionLink"><wicket:message key="contextPanel.xmlSubscription"/></a>
-		</li>
+		<wicket:enclosure>
+    		<li>
+    			<a href="#" wicket:id="xmlSubscriptionLink"><wicket:message key="contextPanel.xmlSubscription"/></a>
+    		</li>
+		</wicket:enclosure>
 		<wicket:enclosure>
 			<li>
 				<a href="#" wicket:id="scscfLink"><wicket:message key="contextPanel.scscf">S-CSCF</wicket:message></a>

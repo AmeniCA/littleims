@@ -16,8 +16,11 @@ package org.cipango.ims.hss.web.subscription;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
@@ -40,6 +43,7 @@ import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.ImplicitRegistrationSetDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
+import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
@@ -69,10 +73,11 @@ public class EditImplicitSetPage extends SubscriptionPage
 		if (subscription == null)
 		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
-					new MicroMap("name", _key)));
+					new MicroMap("id", key)));
 			_key = null;
 		}
 					
+		add(new SvgMarkupContainer("svg", subscription));
 		
 		final Form form = new Form("form");
 		form.setOutputMarkupId(true);
@@ -195,22 +200,43 @@ public class EditImplicitSetPage extends SubscriptionPage
 		return _title;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void apply(AjaxRequestTarget target,Form form, ImplicitRegistrationSet implicitRegistrationSet)
 	{
+		Set<PublicUserIdentity> publics = implicitRegistrationSet.getPublicIdentities();
+		Set<PrivateIdentity> privates = null;
+		if (!publics.isEmpty())
+			privates = publics.iterator().next().getPrivateIdentities();
+		
 		Iterator it = ((List) form.get("publicIds").getDefaultModelObject()).iterator();
 		while (it.hasNext()) {
 			PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById((String) it.next());
-			ImplicitRegistrationSet previous = publicIdentity.getImplicitRegistrationSet();
-			publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
-			if (previous != null && previous.getPublicIdentities().isEmpty())
-				_implicitRegistrationSetDao.delete(previous);
-			_publicIdentityDao.save(publicIdentity);
+			
+			if (privates != null && !privates.equals(publicIdentity.getPrivateIdentities()))
+			{
+				Map map = new HashMap();
+				map.put("identity", publicIdentity.getIdentity());
+				map.put("implicitRegistrationSet", implicitRegistrationSet.getId());
+				error(MapVariableInterpolator.interpolate(
+						getString("subscription.error.implicitSet.privates"), map));
+			}
+			else
+			{
+				ImplicitRegistrationSet previous = publicIdentity.getImplicitRegistrationSet();
+				publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
+				if (previous != null && previous.getPublicIdentities().isEmpty())
+					_implicitRegistrationSetDao.delete(previous);
+				_publicIdentityDao.save(publicIdentity);
+			}
 		}	
 		if (target != null)
 		{
 			target.addComponent(form);
+			target.addComponent(getPage().get("svg"));
 		}
 	}
+	
+	
 	
 	class CompoundModelIterator extends ModelIteratorAdapter<ImplicitRegistrationSet> implements Serializable {
 		public CompoundModelIterator(Collection<ImplicitRegistrationSet> modelObject) {

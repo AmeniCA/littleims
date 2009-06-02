@@ -61,7 +61,10 @@ public class EditScscfPage extends ScscfPage
 		add(form);
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<String>("uri", String.class).add(new UriValidator(true)));
-		form.add(new Label("nbSubscriptions", new Model(_dao.getNbSubscriptions(scscf))));
+		if (isAdding())
+			form.add(new Label("nbSubscriptions", new Model()).setVisible(false));
+		else
+			form.add(new Label("nbSubscriptions", new Model(_dao.getNbSubscriptions(scscf))));
 		
 		form.add(new Button("submit")
 		{

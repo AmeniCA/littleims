@@ -184,7 +184,7 @@ public class PrivateIdentity
 	public void removePublicId(PublicUserIdentity publicIdentity)
 	{
 		getPublicIdentities().remove(publicIdentity);
-		publicIdentity.getPrivateIdentities().add(this);
+		publicIdentity.getPrivateIdentities().remove(this);
 	}
 	
 }

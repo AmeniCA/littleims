@@ -46,7 +46,7 @@ a {color:#003399;}
 .dataDetails .defaultValue { font-style:italic; margin:0px 30px; }
 .dataDetails ul {padding:0pt; margin: 0px;}
 .dataDetails li {list-style: none; padding: 2px;}
-.dataDetails .longText { width: 200px; }
+.dataDetails .longText { width: 300px; }
 .actions { color: black; background:white; width:400px; margin:10px 0px 0pt 0pt; }
 .actions th { text-align:left; vertical-align:top; color: black; background:white; font-weight:normal; white-space:nowrap; padding:3px; }
 

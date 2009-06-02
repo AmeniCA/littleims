@@ -16,13 +16,14 @@ package org.cipango.ims.hss.web.privateid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.AbstractChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -34,8 +35,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.db.PublicIdentityDao;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
+import org.cipango.ims.hss.web.util.AjaxFallbackButton;
 
 
 public class EditPublicIdsPage extends PrivateIdentityPage
@@ -69,7 +72,7 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		
 		form.add(new AjaxFallbackButton("join.noSub", form) {
 			@Override
-			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, form1.get("publics.available.noSub"), false);
 			}
@@ -86,7 +89,7 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		
 		form.add(new AjaxFallbackButton("join", form) {
 			@Override
-			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, form1.get("publics.available.sub"), false);
 			}
@@ -104,7 +107,7 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 		
 		form.add(new AjaxFallbackButton("leave", form) {
 			@Override
-			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, form1.get("publics"), true);			
 			}
@@ -150,8 +153,52 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 				((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
 			}
 			choosen.remove(publicId);
-			it.remove();
 		}
+		
+		// Check for consistency
+		boolean revertDone = false;
+		it = ((List) component.getDefaultModelObject()).iterator();
+		while (it.hasNext()) {
+			String publicId = (String) it.next();
+			PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById(publicId);
+			ImplicitRegistrationSet set = publicIdentity.getImplicitRegistrationSet();
+			Iterator<PublicUserIdentity> it2 = set.getPublicIdentities().iterator();
+			while (it2.hasNext())
+			{
+				PublicUserIdentity publicUserIdentity = it2.next();
+				if (!publicIdentity.getPrivateIdentities().equals(publicUserIdentity.getPrivateIdentities()))
+				{
+					Map map = new HashMap();
+					map.put("identity", publicIdentity.getIdentity());
+					map.put("implicitRegistrationSet", set.getId());
+					error(MapVariableInterpolator.interpolate(
+							getString("subscription.error.implicitSet.privates"), map));
+					
+					// Revert 
+					if (!revertDone)
+					{
+						Iterator it3 = ((List) component.getDefaultModelObject()).iterator();
+						while (it3.hasNext()) {
+							publicId = (String) it3.next();
+							PublicUserIdentity pubId = (PublicUserIdentity) _publicIdentityDao.findById(publicId);
+							if (!remove)
+							{
+								privateIdentity.removePublicId(pubId);
+								publicsModel.remove(publicId);
+							}
+							else
+							{
+								privateIdentity.addPublicId(pubId);
+								publicsModel.add(publicId);
+								((AbstractChoice) form1.get("publics")).getChoices().add(publicId);
+							}
+						}
+						revertDone = true;
+					}
+				}
+			}
+		}
+		
 		_dao.save(privateIdentity);		
 		if (target != null)
 		{
@@ -159,7 +206,7 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 			target.addComponent(getPage().get("contextMenu"));
 		}
 	}
-	
+		
 	@Override
 	public String getTitle() {
 		return getString("privateId.publicIds.title", new DaoDetachableModel(_key));

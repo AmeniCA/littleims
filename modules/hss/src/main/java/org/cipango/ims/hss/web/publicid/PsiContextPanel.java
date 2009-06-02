@@ -21,9 +21,7 @@ public class PsiContextPanel extends Panel
 				new PageParameters("id=" + psi.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePublicIdPage.class, 
 				new PageParameters("id=" + psi.getIdentity())));
-		add(new BookmarkablePageLink("xmlSubscriptionLink", XmlSubscriptionPage.class, 
-				new PageParameters("id=" + psi.getIdentity())));
-		
+			
 		if (psi.getScscf() != null)
 			add(new BookmarkablePageLink("scscfLink", EditScscfPage.class, 
 					new PageParameters("id=" + psi.getScscf().getName())));
@@ -37,10 +35,17 @@ public class PsiContextPanel extends Panel
 			add(new WebMarkupContainer("asLink").setVisible(false));
 		
 		if (psi.getServiceProfile()!= null)
+		{
 			add(new BookmarkablePageLink("serviceProfileLink", EditServiceProfilePage.class, 
 					new PageParameters("id=" + psi.getServiceProfile().getName())));
+			add(new BookmarkablePageLink("xmlSubscriptionLink", XmlSubscriptionPage.class, 
+					new PageParameters("id=" + psi.getIdentity())));
+		}
 		else
-			add(new WebMarkupContainer("serviceProfileLink").setVisible(false));	
+		{
+			add(new WebMarkupContainer("serviceProfileLink").setVisible(false));
+			add(new WebMarkupContainer("xmlSubscriptionLink").setVisible(false));	
+		}
 	}
 
 	

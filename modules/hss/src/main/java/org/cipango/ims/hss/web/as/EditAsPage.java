@@ -77,7 +77,7 @@ public class EditAsPage extends AsPage
 				return DefaultHandling.toString(id);
 			}
 			
-		}));
+		}).setRequired(true));
 
 		form.add(new CheckBox("includeRegisterRequest"));
 		form.add(new CheckBox("includeRegisterResponse"));
