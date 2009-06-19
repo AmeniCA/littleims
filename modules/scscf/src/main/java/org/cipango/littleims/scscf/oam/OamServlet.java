@@ -145,6 +145,12 @@ public class OamServlet extends HttpServlet
 	private void printSharedIfc(PrintWriter out)
 	{
 		Map<Integer, InitialFilterCriteria> sharedIfc = _sessionManager.getUserProfileCache().getSharedIFCs();
+		if (sharedIfc == null)
+		{
+			out.println("<b>Shared IFCs have not been loaded</b>");
+			return;
+		}
+		
 		Iterator<Integer> it = sharedIfc.keySet().iterator();
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>ID</th><th>Priority</th><th>Trigger point</th><th>AS</th>");

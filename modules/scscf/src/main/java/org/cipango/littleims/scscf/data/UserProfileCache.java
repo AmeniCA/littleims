@@ -43,7 +43,7 @@ public class UserProfileCache
 	private Map<String, UserProfile> _wildcardServiceProfiles = new ConcurrentHashMap<String, UserProfile>();
 	
 	private TriggerPointCompiler _tpCompiler = new TriggerPointCompiler();
-	private Map<Integer, InitialFilterCriteria> _sharedIFCs = new ConcurrentHashMap<Integer, InitialFilterCriteria>();
+	private Map<Integer, InitialFilterCriteria> _sharedIFCs;
 
 	private static final Logger __log = Logger.getLogger(UserProfileCache.class);
 
@@ -96,9 +96,19 @@ public class UserProfileCache
 				if (profile.getExtension() != null)
 				{
 					int[] sIFCs = profile.getExtension().getSharedIFCSetIDArray();
+
+					if (_sharedIFCs == null)
+						refreshSharedIFCs();
+					
 					for (int j = 0; j < sIFCs.length; j++)
 					{
 						Integer ifcID = new Integer(sIFCs[j]);
+						
+						if (_sharedIFCs == null)
+						{
+							__log.warn("Could not found shared IFC with ID: " + ifcID);
+							continue;
+						}
 						InitialFilterCriteria ifc = (InitialFilterCriteria) _sharedIFCs.get(ifcID);
 						if (ifc != null)
 						{
@@ -111,6 +121,8 @@ public class UserProfileCache
 								__log.error("Cannot add IFC: " + ifc + " because " + e.getMessage());
 							}
 						}
+						else
+							__log.warn("Could not found shared IFC with ID: " + ifcID);
 					}
 				}
 
@@ -221,16 +233,26 @@ public class UserProfileCache
 	{
 		if (_sharedIfcsUrl != null)
 		{
-			SharedIFCsDocument sharedIFCs = SharedIFCsDocument.Factory.parse(_sharedIfcsUrl);
-			TSharedIFC[] sifcs = sharedIFCs.getSharedIFCs().getSharedIFCArray();
-			for (int i = 0; i < sifcs.length; i++)
+			try
 			{
-				TSharedIFC sifc = sifcs[i];
-				int id = sifc.getID();
-				TInitialFilterCriteria tifc = sifc.getInitialFilterCriteria();
-				InitialFilterCriteria ifc = createIFC(tifc);
-				__log.info("Added Shared IFC: " + ifc);
-				_sharedIFCs.put(new Integer(id), ifc);
+				SharedIFCsDocument sharedIFCs = SharedIFCsDocument.Factory.parse(_sharedIfcsUrl);
+				_sharedIFCs = new ConcurrentHashMap<Integer, InitialFilterCriteria>();
+				TSharedIFC[] sifcs = sharedIFCs.getSharedIFCs().getSharedIFCArray();
+				for (int i = 0; i < sifcs.length; i++)
+				{
+					TSharedIFC sifc = sifcs[i];
+					int id = sifc.getID();
+					TInitialFilterCriteria tifc = sifc.getInitialFilterCriteria();
+					InitialFilterCriteria ifc = createIFC(tifc);
+					__log.info("Added Shared IFC: " + ifc);
+					_sharedIFCs.put(new Integer(id), ifc);
+				}
+			}
+			catch (IOException e)
+			{
+				__log.warn("Failed to get shared IFCs from URL: " 
+						+ _sharedIfcsUrl + ": " + e);
+				__log.debug("Failed to get shared IFCs from URL: " + _sharedIfcsUrl, e);
 			}
 		}
 	}
