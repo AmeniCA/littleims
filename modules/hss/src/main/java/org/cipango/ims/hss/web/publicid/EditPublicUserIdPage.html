@@ -1,9 +1,14 @@
 <html>
 <body>        
 <wicket:extend>
-	<h2 wicket:id="title">User Account configuration</h2>
 	<form wicket:id="form">
 		<table class="dataDetails">
+			<tr class="title">
+				<th colspan="2">
+					<wicket:message key="view.publicId.title"></wicket:message>
+					<b wicket:id="title"></b>
+				</th>
+			</tr>
 			<tr>
 				<th><wicket:message key="publicId.name"/></th>
 				<td><input wicket:id="identity" type="text" class="longText"/></td>

@@ -56,9 +56,10 @@ public class EditScscfPage extends ScscfPage
 			_title = getString(getPrefix() + ".edit.title", model);
 		}
 		
-		add(new Label("title", getTitle()));
+		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		form.add(new Label("title", scscf.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<String>("uri", String.class).add(new UriValidator(true)));
 		if (isAdding())
@@ -72,15 +73,6 @@ public class EditScscfPage extends ScscfPage
 			public void onSubmit()
 			{
 				apply(getForm());
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(ScscfBrowserPage.class);
 			}
 		});
 		form.add(new Button("cancel")

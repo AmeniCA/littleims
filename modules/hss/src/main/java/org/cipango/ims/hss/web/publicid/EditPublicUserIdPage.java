@@ -27,7 +27,6 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
@@ -46,11 +45,11 @@ import org.cipango.ims.hss.web.util.UriValidator;
 public class EditPublicUserIdPage extends PublicIdentityPage
 {
 
-	private String _key;
-	private DaoDetachableModel _model;
-	private String _privateIdKey;
-	
 	private static final Logger __log = Logger.getLogger(EditPublicUserIdPage.class);
+	
+	private String _key;
+	private String _title;
+	private String _privateIdKey;
 	
 	@SpringBean
 	private PrivateIdentityDao _privateIdentityDao;
@@ -84,11 +83,18 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 			return;
 		}
 		
-		_model = new DaoDetachableModel(publicIdentity);
+
+		DaoDetachableModel model = new DaoDetachableModel(publicIdentity);
 		
-		add(new Label("title", getTitle()));
-		Form form = new Form("form", new CompoundPropertyModel(_model));
+		if (isAdding()) {
+			_title = getString(getPrefix() + ".add.title");
+		} else {
+			_title = getString(getPrefix() + ".edit.title", model);
+		}
+		
+		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		form.add(new Label("title", publicIdentity.getIdentity()));
 		form.add(new RequiredTextField<String>("identity", String.class).add(new UriValidator()));
 		form.add(new CheckBox("barred"));
 
@@ -186,11 +192,7 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 	@Override
 	public String getTitle()
 	{
-		if (isAdding()) {
-			return getString(getPrefix() + ".add.title");
-		} else {
-			return getString(getPrefix() + ".edit.title", _model);
-		}
+		return _title;
 	}
 }
 

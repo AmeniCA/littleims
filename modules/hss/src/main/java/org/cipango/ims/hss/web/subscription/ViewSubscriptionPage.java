@@ -52,7 +52,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 		Subscription subscription = getSubscription(pageParameters);
 		_key = (subscription == null) ? null : subscription.getName();
 		
-		_title = getString("view.subscription.title", new DaoDetachableModel(subscription));
+		_title = getString(getPrefix() + ".edit.title", new DaoDetachableModel(subscription));
 		add(new Label("title", _title));
 		
 		IModel privateIdsModel = new LoadableDetachableModel(subscription == null ? Collections.EMPTY_SET : subscription.getPrivateIdentities()) {

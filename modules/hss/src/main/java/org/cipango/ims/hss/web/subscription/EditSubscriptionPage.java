@@ -60,16 +60,19 @@ public class EditSubscriptionPage extends SubscriptionPage
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> f)
 			{
-				apply(f);
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(SubscriptionBrowserPage.class);
+				try
+				{	
+					Subscription s = (Subscription) f.getModelObject();
+					_dao.save(s);
+
+					getSession().info(getString("modification.success"));
+
+					setResponsePage(ViewSubscriptionPage.class, new PageParameters("id=" + s.getName()));
+				}
+				catch (Exception e)
+				{
+					getSession().error(getString(getPrefix() + ".error.duplicate", f.getModel()));
+				}
 			}
 		});
 		form.add(new Button("cancel")
@@ -84,22 +87,6 @@ public class EditSubscriptionPage extends SubscriptionPage
 
 		if (subscription != null)
 			setContextMenu(new ContextPanel(subscription));
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void apply(Form form)
-	{
-		try
-		{	
-			_dao.save((Subscription) form.getModelObject());
-
-			getSession().info(getString("modification.success"));
-		}
-		catch (Exception e)
-		{
-			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
-		}
-
 	}
 
 	private boolean isAdding()

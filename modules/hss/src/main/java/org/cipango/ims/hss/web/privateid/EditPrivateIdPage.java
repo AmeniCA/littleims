@@ -36,7 +36,7 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 
 	private String _key;
 	private String _subscriptionId;
-	private DaoDetachableModel _model;
+	private String _title;
 	
 	@SpringBean
 	private SubscriptionDao _subscriptionDao;
@@ -57,11 +57,18 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 				_key = null;
 			}
 		}
-		_model = new DaoDetachableModel(privateIdentity);
+		DaoDetachableModel model = new DaoDetachableModel(privateIdentity);
+		
+		if (isAdding()) {
+			_title = getString(getPrefix() + ".add.title");
+		} else {
+			_title = getString(getPrefix() + ".edit.title", model);
+		}
 
-		add(new Label("title", getTitle()));
-		Form form = new Form("form", new CompoundPropertyModel(_model));
+		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+
+		form.add(new Label("title", privateIdentity.getIdentity()));
 		form.add(new RequiredTextField<String>("identity", String.class));
 		form.add(new TextField("passwordAsString", String.class));
 		form.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
@@ -82,15 +89,6 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 			public void onSubmit()
 			{
 				apply(getForm());
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(PrivateIdBrowserPage.class);
 			}
 		});
 		form.add(new Button("cancel")
@@ -140,10 +138,6 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 	@Override
 	public String getTitle()
 	{
-		if (isAdding()) {
-			return getString(getPrefix() + ".add.title");
-		} else {
-			return getString(getPrefix() + ".edit.title", _model);
-		}
+		return _title;
 	}
 }

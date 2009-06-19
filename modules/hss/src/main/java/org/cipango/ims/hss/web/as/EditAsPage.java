@@ -61,10 +61,10 @@ public class EditAsPage extends AsPage
 		} else {
 			_title = getString(getPrefix() + ".edit.title", model);
 		}
-		
-		add(new Label("title", getTitle()));
+
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		form.add(new Label("title", applicationServer.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<String>("serverName", String.class).add(new UriValidator(true)));
 		form.add(new DropDownChoice("defaultHandling",
@@ -89,15 +89,6 @@ public class EditAsPage extends AsPage
 			public void onSubmit()
 			{
 				apply(getForm());
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(AsBrowserPage.class);
 			}
 		});
 		form.add(new Button("cancel")

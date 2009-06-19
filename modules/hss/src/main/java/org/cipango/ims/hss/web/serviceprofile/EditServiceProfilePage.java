@@ -61,9 +61,10 @@ public class EditServiceProfilePage extends ServiceProfilePage
 			_title = getString(getPrefix() + ".edit.title", model);
 		}
 		
-		add(new Label("title", _title));
+		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		form.add(new Label("title", serviceProfile.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		
 		form.add(new CheckBox("anotherUser", new Model()).setVisible(isAdding()));
@@ -73,16 +74,28 @@ public class EditServiceProfilePage extends ServiceProfilePage
 			@Override
 			public void onSubmit()
 			{
-				apply(getForm());
-			}
-		});
-		form.add(new Button("ok")
-		{
-			@Override
-			public void onSubmit()
-			{
-				apply(getForm());
-				goToBackPage(ServiceProfileBrowserPage.class);
+				try
+				{
+					ServiceProfile serviceProfile = (ServiceProfile) getForm().getModelObject();
+
+					if (_copy)
+					{
+						ServiceProfile original = _dao.findById(_key);
+						for (InitialFilterCriteria ifc : original.getIfcs(false))
+							serviceProfile.addIfc(ifc, false);
+						for (InitialFilterCriteria ifc : original.getIfcs(true))
+							serviceProfile.addIfc(ifc, true);
+					}
+					
+					_dao.save(serviceProfile);
+				
+					getSession().info(getString("modification.success"));
+					setResponsePage(ViewServiceProfilePage.class, new PageParameters("id=" + serviceProfile.getName()));
+				}
+				catch (Exception e)
+				{
+					getSession().error(getString(getPrefix() + ".error.duplicate", getForm().getModel()));
+				}
 			}
 		});
 		form.add(new Button("cancel")
@@ -97,33 +110,6 @@ public class EditServiceProfilePage extends ServiceProfilePage
 
 		if (serviceProfile != null)
 			setContextMenu(new ContextPanel(serviceProfile));
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void apply(Form form)
-	{
-		try
-		{
-			ServiceProfile serviceProfile = (ServiceProfile) form.getModelObject();
-
-			if (_copy)
-			{
-				ServiceProfile original = _dao.findById(_key);
-				for (InitialFilterCriteria ifc : original.getIfcs(false))
-					serviceProfile.addIfc(ifc, false);
-				for (InitialFilterCriteria ifc : original.getIfcs(true))
-					serviceProfile.addIfc(ifc, true);
-			}
-			
-			_dao.save(serviceProfile);
-		
-			getSession().info(getString("modification.success"));
-		}
-		catch (Exception e)
-		{
-			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
-		}
-
 	}
 
 	private boolean isAdding()

@@ -92,9 +92,9 @@ public class EditIfcPage extends IfcPage
 			_title = getString(getPrefix() + ".edit.title", model);
 		}
 		
-		add(new Label("title", getTitle()));
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
+		form.add(new Label("title", ifc.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<Integer>("priority", Integer.class)
 				.add(new MinimumValidator<Integer>(0))

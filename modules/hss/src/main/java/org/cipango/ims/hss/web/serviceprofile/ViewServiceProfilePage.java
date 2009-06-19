@@ -53,7 +53,7 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 			}
 		}
 		
-		_title = getString("view.serviceProfile.title", new DaoDetachableModel(serviceProfile));
+		_title = getString("serviceProfile.edit.title", new DaoDetachableModel(serviceProfile));
 		add(new Label("title", _title));
 		
 		IModel ifcsModel = new LoadableDetachableModel(serviceProfile == null ? Collections.EMPTY_SET : serviceProfile.getIfcs(false)) {

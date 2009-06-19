@@ -1,9 +1,14 @@
 <html>
 <body>        
 <wicket:extend>
-	<h2 wicket:id="title">User Account configuration</h2>
 	<form wicket:id="form">
 		<table class="dataDetails">
+			<tr class="title">
+		        <th colspan="2">
+		            <wicket:message key="view.serviceProfile.title"></wicket:message>
+		            <b wicket:id="title"></b>
+		        </th>
+		    </tr>
 			<tr>
 				<th><wicket:message key="serviceProfile.name"/></th>
 				<td><input wicket:id="name" type="text" /></td>
@@ -19,7 +24,6 @@
 			<tr>
 				<th>&nbsp;</th>
 				<td>
-					<input type="submit" wicket:id="ok" wicket:message="value:button.ok" />
 					<input type="submit" wicket:id="submit" wicket:message="value:button.apply" />
 					<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
 				</td>
