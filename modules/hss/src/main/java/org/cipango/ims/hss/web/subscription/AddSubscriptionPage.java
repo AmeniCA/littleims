@@ -71,8 +71,8 @@ public class AddSubscriptionPage extends SubscriptionPage
 		form.add(privateId);
 		
 		privateId.add(new RequiredTextField<String>("identity"));
-		privateId.add(new TextField("passwordAsString", String.class));
-		privateId.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
+		privateId.add(new RequiredTextField("passwordAsString", String.class));
+		privateId.add(new RequiredTextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
 		{
 			@Override
 			protected void onValidate(IValidatable<byte[]> validatable)
@@ -125,7 +125,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 						return profile.getName();
 					}
 					
-				}));
+				}).setRequired(true));
 		
 		WebMarkupContainer subscriptionMarkup = new WebMarkupContainer("subscription", new CompoundPropertyModel( new LoadableDetachableModel() {
 			@Override

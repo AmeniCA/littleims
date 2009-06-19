@@ -124,7 +124,7 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 						return profile.getName();
 					}
 					
-				}));
+				}).setRequired(true));
 		
 		form.add(new Button("submit")
 		{
