@@ -29,4 +29,9 @@ public interface PublicIdentityDao extends Dao, ImsDao<PublicIdentity>
 	public Iterator<PublicIdentity> iterator(int first, int count,
 			String sort, boolean sortAsc, String foreignKeyName, Long foreignKeyId);
 	
+	public Iterator<PublicIdentity> likeIterator(int first, int count, String sort,
+			boolean sortAsc, String likeIdentity);
+	
+	public int countLike(String likeIdentity);
+	
 }

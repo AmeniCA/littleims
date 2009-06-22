@@ -45,6 +45,7 @@ import org.cipango.ims.hss.db.ApplicationServerDao;
 import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ApplicationServer;
+import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Scscf;
@@ -70,8 +71,9 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		String serviceProfile = pageParameters.getString("serviceProfile");
 		String applicationServer = pageParameters.getString("applicationServer");
 		String scscf = pageParameters.getString("scscf");
+		String search = pageParameters.getString("search");
 		
-		addSearchField();
+		addSearchField(search);
 		add(new BookmarkablePageLink("createLink", EditPublicUserIdPage.class));
 		add(new BookmarkablePageLink("createPsiLink", EditPsiPage.class));
 
@@ -100,7 +102,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			}
 
 		};
-		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile, applicationServer, scscf);
+		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile, applicationServer, scscf, search);
 
 		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
 		add(table);
@@ -134,13 +136,13 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void addSearchField()
+	private void addSearchField(String search)
 	{
 		Form form = new Form("form");
         add(form);
 
         AutoCompleteTextField<String> field = new AutoCompleteTextField<String>("searchInput",
-            new Model<String>(""))
+            new Model<String>(search))
         {
             @Override
             protected Iterator<String> getChoices(String input)
@@ -164,24 +166,16 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			{
 				String id = (String) getForm().get("searchInput").getDefaultModelObject();
 				if (!Strings.isEmpty(id))
-					setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + id));
+				{
+					PublicIdentity publicIdentity = _dao.findById(id);
+					if (publicIdentity == null)
+						setResponsePage(PublicIdBrowserPage.class, new PageParameters("search=" + id));
+					else if (publicIdentity instanceof PSI)
+						setResponsePage(EditPsiPage.class, new PageParameters("id=" + id));
+					else
+						setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + id));
+				}
 			}
-		});
-        
-        form.add(new Button("match")
-		{
-			@Override
-			public void onSubmit()
-			{
-				String id = (String) getForm().get("searchInput").getDefaultModelObject();
-				PublicIdentity publicIdentity = _dao.findById(id);
-				if (publicIdentity == null)
-					publicIdentity = _dao.findWilcard(id);
-				if (publicIdentity != null)
-					setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + publicIdentity.getIdentity()));
-				else
-					warn("Could not found identity with IMPU: " + id);
-			} 
 		});
 	}
 
@@ -220,13 +214,14 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		private String _serviceProfile;
 		private String _applicationServer;	
 		private String _scscf;
-
+		private String _likeIdentity;
 		private Long _key;
 		
 		public DaoDataProvider(String sortProperty, 
 				String serviceProfile, 
 				String applicationServer,
-				String scscf)
+				String scscf,
+				String likeIdentity)
 		{
 			setSort(sortProperty, true);
 			setServiceProfile(serviceProfile);
@@ -236,7 +231,9 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 				if (Strings.isEmpty(_applicationServer))
 					setScscf(scscf);
 			}
-		}
+			if (!Strings.isEmpty(likeIdentity))
+				_likeIdentity = likeIdentity;
+		}	
 
 		public Iterator<PublicIdentity> iterator(int first, int count)
 		{		
@@ -249,6 +246,9 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			if (!Strings.isEmpty(_scscf))
 				return _dao.iterator(first, count, getSort().getProperty(), getSort()
 						.isAscending(), "_applicationServer", _key);
+			if (!Strings.isEmpty(_likeIdentity))
+				return _dao.likeIterator(first, count, getSort().getProperty(), getSort()
+						.isAscending(), _likeIdentity);
 			return _dao.iterator(first, count, getSort().getProperty(), getSort()
 					.isAscending());	
 		}
@@ -261,6 +261,8 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 				return _applicationServerDao.findById(_applicationServer).getPsis().size();
 			if (!Strings.isEmpty(_scscf))
 				return _scscfDao.findById(_scscf).getPsis().size();
+			if (!Strings.isEmpty(_likeIdentity))
+				return _dao.countLike(_likeIdentity);
 			return _dao.count();
 		}
 		

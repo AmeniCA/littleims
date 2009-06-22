@@ -14,6 +14,7 @@
 
 package org.cipango.ims.hss.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,10 +35,10 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		"FROM PublicIdentity WHERE _identity = :key";
 	
 	private static final String FIND_WILCARD = 
-		"FROM PublicIdentity WHERE :id like _regex";
+		"FROM PublicIdentity AS p WHERE :id like _regex";
 	
 	private static final String GET_ALL_WILCARDS = 
-		"FROM PublicIdentity WHERE _regex != null";
+		"SELECT p._identity FROM PublicIdentity AS p WHERE _regex != null";
 			
 	public PublicIdentityDaoImpl(SessionFactory sessionFactory)
 	{
@@ -84,17 +85,31 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 	@SuppressWarnings("unchecked")
 	public PublicIdentity findWilcard(String id)
 	{
-		List<PublicIdentity> wilcards = currentSession().createQuery(GET_ALL_WILCARDS).list();
-		Iterator<PublicIdentity> it = wilcards.iterator();
+		Iterator<String> it = currentSession().createQuery(GET_ALL_WILCARDS).list().iterator();
 		while (it.hasNext())
 		{
-			PublicIdentity publicIdentity = it.next();
-			if (id.matches(RegexUtil.extendedRegexToJavaRegex(publicIdentity.getIdentity())))
-				return publicIdentity;	
+			String identity = it.next();
+			if (id.matches(RegexUtil.extendedRegexToJavaRegex(identity)))
+				return findById(identity);	
 		}
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<String> findWilcards(String id)
+	{
+		Iterator<String> it = currentSession().createQuery(GET_ALL_WILCARDS).list().iterator();
+		List<String> list = new ArrayList<String>();
+		while (it.hasNext())
+		{
+			String identity = it.next();
+			if (id.matches(RegexUtil.extendedRegexToJavaRegex(identity)))
+				list.add(identity);	
+		}
+		return list;
+	}
 
+	@SuppressWarnings("unchecked")
 	public Iterator<PublicIdentity> iterator(int first, int count, String sort,
 			boolean sortAsc, String foreignKeyName, Long foreignKeyId)
 	{
@@ -114,6 +129,40 @@ public class PublicIdentityDaoImpl extends AbstractHibernateDao<PublicIdentity> 
 		query.setFirstResult(first);
 		
     	return query.list().iterator();	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Iterator<PublicIdentity> likeIterator(int first, int count, String sort,
+			boolean sortAsc, String likeIdentity)
+	{
+		if (likeIdentity == null)
+			return iterator(first, count, sort, sortAsc);
+				
+		StringBuilder hql = new StringBuilder();
+    	hql.append("FROM PublicIdentity AS p WHERE LOWER(p._identity) LIKE :id");
+
+		Iterator<String> it  = findWilcards(likeIdentity).iterator();
+		while (it.hasNext())
+    		hql.append(" OR p._identity = \'").append(it.next()).append('\'');
+			
+		if (sort != null && !sort.trim().equals("")) 
+			hql.append(" order by ").append(sort).append((sortAsc) ? " asc" : " desc");
+		
+		Query query = query(hql.toString());
+		if (count > 0)
+			query.setMaxResults(count);
+		query.setParameter("id", "%" + likeIdentity + "%");
+		query.setFirstResult(first);
+    	return query.list().iterator();	
+	}
+	
+	public int countLike(String likeIdentity)
+	{
+		if (likeIdentity == null)
+			return count();
+		Query query = query("SELECT count(*) FROM PublicIdentity AS p WHERE LOWER(p._identity) LIKE :id");
+		query.setParameter("id", "%" + likeIdentity + "%");
+		return ((Long) query.uniqueResult()).intValue() + findWilcards(likeIdentity).size();
 	}
 
 	private boolean isPsiField(String name)
