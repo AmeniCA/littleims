@@ -21,6 +21,7 @@ import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
 import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
+import org.cipango.ims.hss.web.subscription.DeregistrationPage;
 import org.cipango.ims.hss.web.subscription.EditImplicitSetPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 
@@ -48,6 +49,8 @@ public class ContextPanel extends Panel {
 						new PageParameters("id=" + subscription.getName())));
 				add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
 						new PageParameters("id=" + subscription.getName())));
+				add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
+						new PageParameters("id=" + subscription.getName())));
 				foundSub = true;
 			}
 		}
@@ -56,6 +59,7 @@ public class ContextPanel extends Panel {
 		{
 			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class).setVisible(false));
 			add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class)).setVisible(false);
+			add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class)).setVisible(false);
 		}
 		
 		

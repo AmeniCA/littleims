@@ -96,6 +96,11 @@ public class ImplicitRegistrationSet
 		return State.toString(getState());
 	}
 	
+	public void deregister()
+	{
+		getStates().clear();
+	}
+	
 	public void updateState(String privateIdentity, Short state)
 	{
 		for (RegistrationState registrationState : _states)

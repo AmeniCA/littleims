@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -24,6 +25,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.Filte
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.FilteredAbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.filter.GoAndClearFilter;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
@@ -32,6 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.ServiceProfile;
 
 public class PrivateIdBrowserPage extends PrivateIdentityPage
 {
@@ -41,10 +44,19 @@ public class PrivateIdBrowserPage extends PrivateIdentityPage
 	{
 		add(new BookmarkablePageLink("createLink", EditPrivateIdPage.class));
 
-		IColumn[] columns = new IColumn[2];
+		IColumn[] columns = new IColumn[3];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"identity");
-		columns[1] = new FilteredAbstractColumn(new Model("Actions"))
+		columns[1] = new AbstractColumn(new StringResourceModel(getPrefix() + ".publicIds", this, null)) 
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				PrivateIdentity identity = (PrivateIdentity) model.getObject();
+				cellItem.add(new Label(componentId, String.valueOf(identity.getPublicIdentities().size())));
+			}
+			
+		};
+		columns[2] = new FilteredAbstractColumn(new Model("Actions"))
 		{
 
 			public void populateItem(Item cellItem, String componentId, IModel model)

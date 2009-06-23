@@ -55,6 +55,7 @@ import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.hss.web.subscription.AddSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.DeleteSubscriptionPage;
+import org.cipango.ims.hss.web.subscription.DeregistrationPage;
 import org.cipango.ims.hss.web.subscription.EditImplicitSetPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
@@ -104,6 +105,7 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/subscription/edit", EditSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription/delete", DeleteSubscriptionPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/subscription", ViewSubscriptionPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/network-deregistration", DeregistrationPage.class, id));
 		
 		mount(new MixedParamUrlCodingStrategy("/private-identity/edit", EditPrivateIdPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/private-identity/delete", DeletePrivateIdPage.class, id));

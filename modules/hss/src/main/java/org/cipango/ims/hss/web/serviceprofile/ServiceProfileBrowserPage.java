@@ -58,7 +58,7 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 		
 		add(new BookmarkablePageLink("createLink", EditServiceProfilePage.class));
 
-		IColumn[] columns = new IColumn[3];
+		IColumn[] columns = new IColumn[4];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
 		columns[1] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPublicIds", this, null)) 
@@ -69,7 +69,16 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 			}
 			
 		};
-		columns[2] = new FilteredAbstractColumn(new Model("Actions"))
+		columns[2] = new AbstractColumn(new StringResourceModel(getPrefix() + ".ifcs", this, null)) 
+		{
+			public void populateItem(Item cellItem, String componentId, IModel model)
+			{
+				ServiceProfile sp = (ServiceProfile) model.getObject();
+				cellItem.add(new Label(componentId, String.valueOf(sp.getAllIfcs().size())));
+			}
+			
+		};
+		columns[3] = new FilteredAbstractColumn(new Model("Actions"))
 		{
 
 			public void populateItem(Item cellItem, String componentId, IModel model)

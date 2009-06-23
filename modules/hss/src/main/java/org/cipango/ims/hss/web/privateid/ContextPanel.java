@@ -30,6 +30,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
+import org.cipango.ims.hss.web.subscription.DeregistrationPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 
 @SuppressWarnings("unchecked")
@@ -40,9 +41,16 @@ public class ContextPanel extends Panel {
 		super("contextMenu");
 		setOutputMarkupId(true);
 		if (privateIdentity.getSubscription() != null)
+		{
 			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getName())));
+			add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
+					new PageParameters("id=" + privateIdentity.getSubscription().getName())));
+		}
 		else
+		{
 			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class).setVisible(false));
+			add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class)).setVisible(false);
+		}
 		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
 				

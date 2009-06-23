@@ -547,9 +547,9 @@ public class Hss
 	
 	private void checkClearScscf(PublicIdentity publicIdentity)
 	{
-		boolean activePublic = false;
 		if (publicIdentity instanceof PublicUserIdentity)
 		{
+			boolean activePublic = false;
 			Subscription subscription = 
 				((PublicUserIdentity) publicIdentity).getPrivateIdentities().iterator().next().getSubscription();
 			for (PublicIdentity publicId : subscription.getPublicIdentities())
