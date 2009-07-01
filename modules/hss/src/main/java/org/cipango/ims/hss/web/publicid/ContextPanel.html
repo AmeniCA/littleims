@@ -34,7 +34,24 @@
 				<li wicket:id="privateIds">
 					<a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
 				</li>
-				<li><a href="#" wicket:id="newPrivateIdLink"><wicket:message key="contextPanel.newPrivateId"></wicket:message></a></li>
+				<li>
+					<a href="#" wicket:id="newPrivateIdLink">
+						<wicket:message key="contextPanel.newPrivateId"/>
+					</a>
+				</li>
+			</ul>
+		</li>
+		<li>
+			<wicket:message key="contextPanel.debugSessions"/>
+			<ul>
+				<li wicket:id="debugSessions">
+					<a href="#" wicket:id="session"><span wicket:id="id"></span></a>
+				</li>
+				<li>
+					<a href="#" wicket:id="newDebugSessionLink">
+						<wicket:message key="contextPanel.newDebugSessionLink"/>
+					</a>
+				</li>
 			</ul>
 		</li>
 	</ul>

@@ -9,4 +9,5 @@
   <artifactId>littleims-common</artifactId>
   <packaging>jar</packaging>
   <name>littleIMS :: Common</name>
+  
 </project>

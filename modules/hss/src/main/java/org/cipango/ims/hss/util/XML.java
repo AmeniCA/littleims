@@ -13,7 +13,9 @@
 // ========================================================================
 package org.cipango.ims.hss.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -88,9 +90,12 @@ public class XML
 
     public interface Output
     {
+    	public void openCdata();
+    	public void closeCdata();
     	public void open(String name);
     	public void close(String name);
         public void add(String name, Object value);
+        public void add(String name, Object value, Map<String, String> attributes);
         
         public Object getParameter(String name);
         public void setParameter(String name, Object value);
@@ -122,9 +127,7 @@ public class XML
     		}
     		_sb.append('<').append(name).append(">");
     		if (_prettyPrint)
-    		{
     			_sb.append('\n');
-    		}
     	}
     	    	
     	public void close(String name)
@@ -140,7 +143,12 @@ public class XML
     			_sb.append('\n');
     	}
     	
-		public void add(String name, Object value)
+    	public void add(String name, Object value)
+    	{
+    		add(name, value, null);
+    	}
+    	
+		public void add(String name, Object value, Map<String, String> attributes)
 		{
 			if (value == null)
 			{
@@ -149,7 +157,15 @@ public class XML
 	    			for (int i = 0; i < _indexTab; i++)
 	    				_sb.append('\t');
 	    		}
-				_sb.append('<').append(name).append("/>");
+				_sb.append('<').append(name);
+				if (attributes != null && !attributes.isEmpty())
+				{
+					for (String key : attributes.keySet())
+					{
+						_sb.append(' ').append(key).append("=\"").append(attributes.get(key)).append('"');
+					}
+				}
+				_sb.append("/>");
 				if (_prettyPrint)
 	    		{
 	    			_sb.append('\n');
@@ -174,15 +190,23 @@ public class XML
 		    				_sb.append('\t');
 		    			_indexTab++;
 		    		}
-					_sb.append('<').append(name).append('>');
+					
+					_sb.append('<').append(name);
+					if (attributes != null && !attributes.isEmpty())
+					{
+						for (String key : attributes.keySet())
+						{
+							_sb.append(' ').append(key).append("=\"").append(attributes.get(key)).append('"');
+						}
+					}
+					_sb.append('>');
+					
 					if (value instanceof Boolean)
-					{
 						_sb.append(((Boolean) value) ? 1 : 0);
-					}
 					else if (value instanceof String || value.getClass().isPrimitive())
-					{
 						_sb.append(value);
-					}
+					else if (value instanceof Date)
+						_sb.append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format((Date) value));
 					else if (value instanceof Convertible)
 					{
 						if (isPrettyPrint())
@@ -239,6 +263,32 @@ public class XML
 			if (_parameters == null)
 				_parameters = new HashMap<String, Object>();
 			_parameters.put(name, value);
+		}
+
+		public void closeCdata()
+		{
+			if (_prettyPrint)
+    		{
+    			_indexTab--;
+    			for (int i = 0; i < _indexTab; i++)
+    				_sb.append('\t');
+    		}
+			_sb.append("]]>");
+			if (_prettyPrint)
+    			_sb.append('\n');
+		}
+
+		public void openCdata()
+		{
+			if (_prettyPrint)
+    		{
+    			for (int i = 0; i < _indexTab; i++)
+    				_sb.append('\t');
+    			_indexTab++;
+    		}
+			_sb.append("<![CDATA[");
+			if (_prettyPrint)
+    			_sb.append('\n');
 		}
 
     	

@@ -30,10 +30,27 @@
               <name>jetty.port</name>
               <value>8070</value>
             </systemProperty>
+            <systemProperty>
+              <name>log4j.configuration</name>
+              <value>file:resources/log4j.xml</value>
+            </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9996</stopPort>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xmlbeans-maven-plugin</artifactId>
+        <executions>
+           <execution>
+              <goals>
+                 <goal>xmlbeans</goal>
+              </goals>
+           </execution>
+        </executions>
+        <inherited>true</inherited>
       </plugin>
       
     </plugins>
@@ -48,7 +65,11 @@
     <dependency>
        <groupId>org.springframework</groupId>
        <artifactId>spring</artifactId>
-     </dependency>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlbeans</groupId>
+      <artifactId>xmlbeans</artifactId>
+    </dependency>
   </dependencies>
   
   <profiles>

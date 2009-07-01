@@ -15,9 +15,12 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.cipango.ims.hss.model.DebugSession;
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
+import org.cipango.ims.hss.web.debugsession.EditDebugSessionPage;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.serviceprofile.EditServiceProfilePage;
 import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
@@ -69,6 +72,12 @@ public class ContextPanel extends Panel {
 			add(new BookmarkablePageLink("serviceProfileLink", ViewServiceProfilePage.class, 
 				new PageParameters("id=" + publicIdentity.getServiceProfile().getName())));
 
+		addPrivateIds(publicIdentity);
+		addDebugSessions(publicIdentity);
+	}
+	
+	private void addPrivateIds(PublicUserIdentity publicIdentity)
+	{
 		final List<String> privateIds = new ArrayList<String>();
 		Iterator<PrivateIdentity> it = publicIdentity.getPrivateIdentities().iterator();
 		while (it.hasNext())
@@ -100,7 +109,46 @@ public class ContextPanel extends Panel {
 				link.add(new Label("name", item.getModel()));
 			}
 		});
-		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, new PageParameters("publicId=" + publicIdentity.getIdentity())));
+		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, 
+				new PageParameters("publicId=" + publicIdentity.getIdentity())));
+		
+	}
+	
+	private void addDebugSessions(PublicIdentity publicIdentity)
+	{
+		final List<Long> sessions = new ArrayList<Long>();
+		Iterator<DebugSession> it = publicIdentity.getDebugSessions().iterator();
+		while (it.hasNext())
+			sessions.add(it.next().getId());
+		
+		add(new RefreshingView("debugSessions"){
+
+			@Override
+			protected Iterator getItemModels()
+			{
+				return new ModelIteratorAdapter<Long>(sessions.iterator()) {
+
+					@Override
+					protected IModel<Long> model(Long id)
+					{
+						return new Model<Long>(id);
+					}
+					
+				};
+			}
+
+			@Override
+			protected void populateItem(Item item)
+			{
+				MarkupContainer link = new BookmarkablePageLink("session", 
+						EditDebugSessionPage.class, 
+						new PageParameters("id=" + item.getModelObject()));
+				item.add(link);
+				link.add(new Label("id", item.getModel()));
+			}
+		});
+		add(new BookmarkablePageLink("newDebugSessionLink", EditDebugSessionPage.class, 
+				new PageParameters("publicId=" + publicIdentity.getIdentity())));
 	}
 
 

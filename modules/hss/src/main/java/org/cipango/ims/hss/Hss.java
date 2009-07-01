@@ -340,7 +340,8 @@ public class Hss
 				return id;
 		}
 		
-		throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITIES_DONT_MATCH);
+		throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITIES_DONT_MATCH,
+				"Private identity : " + privateIdentity.getIdentity() + " does not have associated IMPU: " + impu);
 	}
 	
 	@Transactional

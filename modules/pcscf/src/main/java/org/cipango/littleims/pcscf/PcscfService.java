@@ -32,7 +32,7 @@ import org.cipango.littleims.util.Headers;
 public class PcscfService
 {
 
-	private final static Logger __log = Logger.getLogger(PcscfServlet.class);
+	private final Logger _log = Logger.getLogger(PcscfServlet.class);
 	
 	private SipFactory _sipFactory;
 	private SipURI _pcscfUri;
@@ -49,8 +49,8 @@ public class PcscfService
 		processHeaders(request, _registerHeadersToRemove, _registerHeadersToAdd);
 		Proxy proxy = request.getProxy();
 		proxy.setRecordRoute(true);
+		proxy.setSupervised(true);
 		proxy.proxyTo(request.getRequestURI());
-		request.getApplicationSession().invalidate();
 	}
 	
 	public void doNonRegisterRequest(SipServletRequest request) throws IOException, ServletException
@@ -73,6 +73,7 @@ public class PcscfService
 		}
 		Proxy proxy = request.getProxy();
 		proxy.setRecordRoute(true);
+		proxy.setSupervised(true);
 		proxy.proxyTo(request.getRequestURI());
 	}
 	
@@ -99,7 +100,7 @@ public class PcscfService
 	{
 		_icscfUri = icscfUri;
 		_icscfUri.setLrParam(true);
-		__log.info("I-CSCF URI: " + _icscfUri);
+		_log.info("I-CSCF URI: " + _icscfUri);
 	}
 	public Map<String, String> getRegisterHeadersToAdd()
 	{
@@ -120,7 +121,7 @@ public class PcscfService
 	{
 		_pcscfUri = pcscfUri;
 		_pcscfUri.setLrParam(true);
-		__log.info("P-CSCF URI: " + _pcscfUri);
+		_log.info("P-CSCF URI: " + _pcscfUri);
 	}
 
 	public SipFactory getSipFactory()

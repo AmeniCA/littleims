@@ -1,0 +1,100 @@
+package org.cipango.littleims.pcscf.oam;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.cipango.littleims.pcscf.debug.DebugConf;
+import org.cipango.littleims.pcscf.debug.DebugIdService;
+import org.cipango.littleims.pcscf.debug.DebugSession;
+import org.springframework.beans.BeansException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+public class OamServlet extends HttpServlet
+{
+
+	private DebugIdService _debugIdService;
+	private static final Logger __log = Logger.getLogger(OamServlet.class);
+	
+	public void init() throws ServletException
+	{
+		WebApplicationContext context = WebApplicationContextUtils
+		.getWebApplicationContext(getServletContext());
+
+		try 
+		{
+			_debugIdService = (DebugIdService) context.getBean("debugIdService");
+		} 
+		catch (BeansException e) 
+		{
+			throw new UnavailableException("no debug service " + e);
+		}
+	}
+	
+	private void printSubscriptions(PrintWriter out)
+	{
+
+		out.println("<h2>Debug subscriptions</h2>");
+		out.println("<table border=\"1\" cellspacing=\"0\">" +
+		"<th>AOR</th><th>Session ID</th><th>Start trigger</th><th>Stop trigger</th><th>Debug ID</th>");
+
+		Iterator<DebugConf> it = _debugIdService.getDebugConfs();
+		synchronized (it)
+		{
+			while (it.hasNext())
+			{
+				DebugConf debugConf = it.next();				
+				out.println("<tr>");
+				
+				List<DebugSession> sessions = debugConf.getSessions();
+				String tdRowspan = "<td rowspan=\"" + sessions.size() + "\">" ;
+				out.println(tdRowspan + debugConf.getAor() + "</td>");
+				Iterator<DebugSession> it2 = sessions.iterator();
+				boolean first = true;
+				while (it2.hasNext())
+				{
+					DebugSession session = it2.next();
+					if (!first)
+						out.println("<tr>");
+					out.println("<td>" + session.getId() + "</td>");
+					out.println("<td>" + session.getStartTriggerAsString()  +  "</td>");
+					out.println("<td>" + session.getStoptTriggerAsString() +  "</td>");
+					out.println("<td>" + session.getDebugId()  +  "</td>");
+					if (first)
+					{
+						first = false;
+					}
+					out.println("</tr>");
+				}
+				out.println("</tr>");
+			}
+		}
+		out.println("</table>");
+	}
+	
+	
+
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+			IOException
+	{
+		
+		PrintWriter out = resp.getWriter();
+		out.println("<html><head><title>OAM</title></head><body>");
+		printSubscriptions(out);		
+		out.println("</body></html>");
+	}
+	
+
+	
+}

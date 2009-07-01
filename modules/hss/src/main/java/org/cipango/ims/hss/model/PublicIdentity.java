@@ -17,8 +17,13 @@
  */
 package org.cipango.ims.hss.model;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -28,7 +33,9 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.ims.hss.util.XML.Convertible;
 import org.cipango.ims.hss.util.XML.Output;
@@ -54,6 +61,9 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	private String _displayName;
 		
 	private String _regex;
+	
+	@OneToMany (mappedBy = "_publicIdentity", cascade = {CascadeType.ALL})
+	private Set<DebugSession> _debugSessions = new HashSet<DebugSession>();
 		
 	@ManyToOne
 	private ServiceProfile _serviceProfile;
@@ -149,10 +159,37 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.add("IdentityType", getIdentityType());
 		if (_regex != null)
 			out.add("WildcardedPSI", _identity);
-		if (_displayName != null && !_displayName.trim().equals(""))
+		if (!Strings.isEmpty(_displayName) || !_debugSessions.isEmpty())
 		{
 			out.open("Extension");
-			out.add("DisplayName", _displayName);
+			
+			if (!Strings.isEmpty(_displayName))
+				out.add("DisplayName", _displayName);
+			
+			if (!_debugSessions.isEmpty())
+			{
+				out.open("Extension");
+				out.open("ServiceLevelTraceInfo");
+				out.openCdata();
+				
+				out.open(/*"?xml version=\"1.0\"?>\n\t\t\t\t\t\t\t<"
+						+ */"debuginfo xmlns=\"urn:ietf:params:xml:ns:debuginfo\" "
+						+ "version=\"0\" state=\"full\"");
+				//FIXME manage version			
+				out.open("debugconfig aor=\"" + (realImpu != null ? realImpu : _identity) + '"');
+				Map<String, String> attributes = new HashMap<String, String>();
+				for (DebugSession debugSession : _debugSessions)
+				{
+					attributes.put("id", String.valueOf(debugSession.getId()));
+					out.add("session", debugSession, attributes);
+				}
+				out.close("debugconfig");
+				out.close("debuginfo");
+				out.closeCdata();
+				out.close("ServiceLevelTraceInfo");
+				out.close("Extension");
+			}
+			
 			out.close("Extension");
 		}
 		out.close("Extension");
@@ -225,6 +262,16 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		return _regex != null;
 	}
 	
+	public Set<DebugSession> getDebugSessions()
+	{
+		return _debugSessions;
+	}
+
+	public void setDebugSessions(Set<DebugSession> debugSessions)
+	{
+		_debugSessions = debugSessions;
+	}
+	
 	public static class IdentityType
 	{
 		public static final short PUBLIC_USER_IDENTITY = 0;
@@ -252,6 +299,4 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 			}
 		}
 	}
-
-
 }

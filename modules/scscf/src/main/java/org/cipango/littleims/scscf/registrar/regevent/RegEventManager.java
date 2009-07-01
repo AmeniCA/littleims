@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo.ContactInfo;
 import org.cipango.littleims.util.Headers;
+import org.cipango.littleims.util.Methods;
 
 
 public class RegEventManager implements Runnable, RegEventListener
@@ -38,6 +39,8 @@ public class RegEventManager implements Runnable, RegEventListener
 	private static final Logger __log = Logger.getLogger(RegEventManager.class);
 	private static final String ABSOLUTE_EXPIRES = "absoluteExpires";
 	private static final String NOTIFY_VERSION = "notifyVersion";
+	private static final String REG_INFO_CONTENT_TYPE = "application/reginfo+xml";
+	public static final String REG_EVENT = "reg";
 	
 
 	private Timer _timer = new Timer("RegEventTimer");
@@ -206,9 +209,9 @@ public class RegEventManager implements Runnable, RegEventListener
 		try
 		{
 			session.setAttribute(ExpiryTask.LAST_EVENT, e);
-			final SipServletRequest notify = session.createRequest("NOTIFY");
-			notify.setHeader("Event", "reg");
-			notify.setHeader("Subscription-State", getSubscriptionState(session));
+			final SipServletRequest notify = session.createRequest(Methods.NOTIFY);
+			notify.setHeader(Headers.EVENT_HEADER, REG_EVENT);
+			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session));
 			Integer version = (Integer) session.getAttribute(NOTIFY_VERSION);
 			if (version == null)
 			{
@@ -222,7 +225,7 @@ public class RegEventManager implements Runnable, RegEventListener
 
 			String body = generateRegInfo(e, state, version.intValue());
 			byte[] content = body.getBytes();
-			notify.setContent(content, "application/reginfo+xml");
+			notify.setContent(content, REG_INFO_CONTENT_TYPE);
 			notify.send();			
 		}
 		catch (Exception ex)

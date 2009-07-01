@@ -14,13 +14,18 @@
 package org.cipango.littleims.pcscf;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.pcscf.debug.DebugIdService;
+import org.cipango.littleims.util.Headers;
+import org.cipango.littleims.util.Methods;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -28,7 +33,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class PcscfServlet extends SipServlet
 {
 	private PcscfService _pcscfService;
-	private final static Logger __log = Logger.getLogger(PcscfServlet.class);
+	private DebugIdService _debugIdService;
+	private final Logger _log = Logger.getLogger(PcscfServlet.class);
 	
 	@Override
 	public void init() throws ServletException
@@ -38,6 +44,7 @@ public class PcscfServlet extends SipServlet
 
 		try {
 			_pcscfService = (PcscfService) context.getBean("pcscfService");
+			_debugIdService = (DebugIdService) context.getBean("debugIdService");
 		} catch (BeansException e) {
 			throw new UnavailableException("no I-CSCF service " + e);
 		}
@@ -46,11 +53,46 @@ public class PcscfServlet extends SipServlet
 	@Override
 	protected void doRequest(SipServletRequest request) throws ServletException, IOException
 	{		
-		if (request.getMethod().equals("REGISTER"))
-			_pcscfService.doRegister(request);
-		else
-			_pcscfService.doNonRegisterRequest(request);
-		
+		try
+		{
+			if (request.getMethod().equals(Methods.REGISTER))
+				_pcscfService.doRegister(request);
+			else
+			{	
+				_debugIdService.handleDebug(request);
+				_pcscfService.doNonRegisterRequest(request);
+			}
+		}
+		catch (Throwable e) 
+		{
+			_log.warn("Failed to handle request:\n" + request, e);
+		}
+	}
+
+	@Override
+	protected void doResponse(SipServletResponse response) throws ServletException,
+			IOException
+	{
+		try
+		{
+			if (response.getMethod().equals(Methods.REGISTER))
+			{
+				Iterator<String> it = response.getHeaderNames();
+				while (it.hasNext())
+				{
+					String name = (String) it.next();
+					if (name.equalsIgnoreCase(Headers.P_DEBUG_ID))
+						_debugIdService.subscribe(response.getFrom().getURI(), response.getExpires());
+				}
+				response.getApplicationSession().invalidate();
+			}
+			else
+				_debugIdService.handleDebug(response);
+		}
+		catch (Throwable e) 
+		{
+			_log.warn("Failed to handle response:\n" + response, e);
+		}
 	}
 
 }

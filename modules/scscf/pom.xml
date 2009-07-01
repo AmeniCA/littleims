@@ -147,7 +147,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/webapps-diameter" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
+                      <fileset dir="${jetty.home}/sipapps" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
                       <fileset dir="${jetty.home}/etc" includes="s-cscf.xml,littleims.properties"/>
                       <fileset dir="${jetty.home}/resources" includes="log4j.xml"/>
                     </delete>
@@ -158,7 +158,7 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/webapps-diameter"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/sipapps"/>
                     <copy todir="${jetty.home}/resources">
                       <fileset dir="resources"/>
                     </copy>

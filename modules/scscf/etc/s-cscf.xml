@@ -122,6 +122,20 @@
 		-->
 		<property name="maxExpires" value="600000" />
 	</bean>
+	
+	<bean id="debugIdService" 
+			class="org.cipango.littleims.scscf.debug.DebugIdService">
+		<property name="userProfileCache" ref="userProfileCache" />
+		<!-- 
+		S-CSCF policy for minimun debug event subscription time in seconds
+		-->
+		<property name="minExpires" value="60" />
+		<!-- 
+		S-CSCF policy for maximum debug event subscription time in seconds
+		-->
+		<property name="maxExpires" value="600000" />
+	</bean>
+		
 		
 	
 	<bean id="enumClient" 

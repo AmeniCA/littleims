@@ -25,6 +25,12 @@
 		<servlet-class>org.cipango.littleims.pcscf.PcscfServlet</servlet-class>
 		<load-on-startup/>
 	</servlet>
+	
+		<servlet>
+		<servlet-name>DebugIdServlet</servlet-name>
+		<servlet-class>org.cipango.littleims.pcscf.debug.DebugIdServlet</servlet-class>
+		<load-on-startup/>
+	</servlet>
 
 	<session-config>
 		<session-timeout>30</session-timeout>

@@ -198,6 +198,8 @@
 	<xs:complexType name="tPublicIdentityExtension3">
 		<xs:sequence>
 			<xs:element name="WildcardedIMPU" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="ServiceLevelTraceInfo" type="tServiceLevelTraceInfo" minOccurs="0"/>
+			<xs:element name="SIPURIParameters" type="tString" minOccurs="0"/>
 			<xs:element name="Extension" type="tExtension" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -207,6 +209,11 @@
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="tAliasIdentityGroupID" final="list restriction">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tServiceLevelTraceInfo" final="list restriction">
 		<xs:restriction base="xs:string">
 			<xs:minLength value="0"/>
 		</xs:restriction>

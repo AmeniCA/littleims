@@ -26,7 +26,9 @@ import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterMessage;
 import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.ims.IMS;
+import org.cipango.littleims.scscf.debug.DebugIdService;
 import org.cipango.littleims.scscf.registrar.Authenticator;
+import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 import org.springframework.beans.BeansException;
@@ -44,7 +46,8 @@ public class SessionServlet extends SipServlet implements DiameterListener
 	private SessionManager _sessionManager;
 	
 	private Authenticator _authenticator;
-
+	
+	private DebugIdService _debugIdService;
 
 	private static final Logger __log = Logger.getLogger(SessionServlet.class);
 
@@ -57,6 +60,7 @@ public class SessionServlet extends SipServlet implements DiameterListener
 		{
 			_sessionManager = (SessionManager) context.getBean("sessionManager");
 			_authenticator = (Authenticator) context.getBean("authenticator");
+			_debugIdService = (DebugIdService) context.getBean("debugIdService");
 		} 
 		catch (BeansException e) 
 		{
@@ -66,36 +70,55 @@ public class SessionServlet extends SipServlet implements DiameterListener
 
 	protected void doRequest(SipServletRequest request) throws ServletException, IOException
 	{
-		String method = request.getMethod();
-		if (Methods.REGISTER.equals(method))
+		try
 		{
-			getServletContext().getNamedDispatcher(REGISTRAR_SERVLET_NAME).forward(request, null);
-			return;
-		}
-		else if (Methods.SUBSCRIBE.equals(method))
-		{
-			String event = request.getHeader(Headers.EVENT_HEADER);
-			if ("reg".equalsIgnoreCase(event))
+			String method = request.getMethod();
+			if (Methods.REGISTER.equals(method))
 			{
-				request.getSession().setHandler(REGISTRAR_SERVLET_NAME);
 				getServletContext().getNamedDispatcher(REGISTRAR_SERVLET_NAME).forward(request, null);
 				return;
 			}
+			else if (Methods.SUBSCRIBE.equals(method))
+			{
+				String event = request.getHeader(Headers.EVENT_HEADER);
+				if (RegEventManager.REG_EVENT.equalsIgnoreCase(event))
+				{
+					request.getSession().setHandler(REGISTRAR_SERVLET_NAME);
+					getServletContext().getNamedDispatcher(REGISTRAR_SERVLET_NAME).forward(request, null);
+					return;
+				}
+				if (DebugIdService.DEBUG_EVENT.equalsIgnoreCase(event))
+				{
+					_debugIdService.doSubscribe(request);
+					return;
+				}
+			}
+			
+			if (request.isInitial())
+			{
+				_sessionManager.doInitialRequest(request);
+			}
+			else
+			{
+				_sessionManager.doSubsequentRequest(request);
+			}
 		}
-		
-		if (request.isInitial())
+		catch (Throwable e) 
 		{
-			_sessionManager.doInitialRequest(request);
-		}
-		else
-		{
-			_sessionManager.doSubsequentRequest(request);
+			__log.warn("Failed to handle request:\n" + request, e);
 		}
 	}
 
 	protected void doResponse(SipServletResponse response) throws ServletException, IOException
 	{
-		_sessionManager.doResponse(response);
+		try
+		{
+			_sessionManager.doResponse(response);
+		}
+		catch (Throwable e) 
+		{
+			__log.warn("Failed to handle response:\n" + response, e);
+		}
 	}
 
 	public void handle(DiameterMessage message) throws IOException

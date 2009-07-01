@@ -13,8 +13,12 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data;
 
+import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.xmlbeans.XmlException;
+import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
+import org.cipango.littleims.cx.data.userprofile.TPublicIdentityExtension3;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.ServiceProfile;
 
@@ -38,6 +42,16 @@ public class ServiceProfileTest extends TestCase
 		assertEquals(1, p1);
 		assertEquals(4, p2);
 		assertEquals(8, p3);
+	}
+	
+	public void testDebugId() throws XmlException, IOException
+	{
+		IMSSubscriptionDocument subscription = 
+			IMSSubscriptionDocument.Factory.parse(getClass().getResourceAsStream("pDebugId.xml"));
+		TPublicIdentityExtension3 ext =  subscription.getIMSSubscription().getServiceProfileArray(0).getPublicIdentityArray(0)
+		.getExtension().getExtension().getExtension();
+		String level = ext.getServiceLevelTraceInfo();
+		assertNotNull(level);
 	}
 
 }

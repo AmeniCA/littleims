@@ -325,6 +325,12 @@ public class Registrar
 			}
 	
 			response.addAddressHeader(Headers.SERVICE_ROUTE_HEADER, _serviceRoute, true);
+			
+			UserProfile profile = _userProfileCache.getProfile(aor.toString(), null);
+			if (profile != null && profile.getServiceLevelTraceInfo() != null)
+				response.setHeader(Headers.P_DEBUG_ID, "");
+			//TODO check also associated URI for serviceLevelTraceInfo
+			
 			response.send();
 	
 			if (_cdf.isEnabled())
@@ -563,6 +569,7 @@ public class Registrar
 		{
 			String sURI = it.next();
 			UserProfile profile = _userProfileCache.getProfile(sURI, null);
+
 			Iterator<InitialFilterCriteria> ifcs = profile.getServiceProfile().getIFCsIterator();
 
 			while (ifcs.hasNext())

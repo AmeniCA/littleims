@@ -89,10 +89,16 @@
 		</property>
 		<property name="requestHeadersToRemove">
 			<list>
-				<value>P-Debug-ID</value>
 				<value>P-Preferred-Identity</value>
 			</list>
 		</property>
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+	
+	<bean id="debugIdService" 
+			class="org.cipango.littleims.pcscf.debug.DebugIdService">
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.port}" />
+		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.port};lr" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
 

@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.sip.URI;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidatorAddListener;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -33,6 +34,9 @@ public class UriValidator extends AbstractValidator<String> implements IValidato
 	{
 		try
 		{
+			if (Strings.isEmpty(validatable.getValue()))
+				return;
+			
 			BasePage basePage = (BasePage) _component.getPage();
 			URI uri = basePage.getImsApp().getSipFactory().createURI(validatable.getValue());
 			if (!uri.isSipURI() && _requiresSipUri)

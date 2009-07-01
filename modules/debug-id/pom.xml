@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.cipango.littleims</groupId>
+    <artifactId>littleims-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <artifactId>littleims-p-debug-id</artifactId>
+  <packaging>jar</packaging>
+  <name>littleIMS :: P-Debug-ID</name>
+  
+  <dependencies>
+  	<dependency>
+			<groupId>org.cipango</groupId>
+			<artifactId>cipango</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<profiles>
+    <profile>
+      <id>copy-jetty</id>
+      <activation>
+        <property>
+          <name>jetty</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete includeemptydirs="true">
+                      <fileset dir="${jetty.home}/lib/ext" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
+                    </delete>
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <phase>install</phase>
+                <configuration>
+                  <tasks>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/lib/ext"/>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles> 
+</project>

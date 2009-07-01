@@ -131,12 +131,17 @@ public class UserProfileCache
 				for (int j = 0; j < publicIDs.length; j++)
 				{
 					TPublicIdentity publicID = publicIDs[j];
-					boolean wildcard =publicID.getExtension() != null && publicID.getExtension().getWildcardedPSI() != null; 
+					boolean wildcard = publicID.getExtension() != null && publicID.getExtension().getWildcardedPSI() != null; 
 					String identity = wildcard ? publicID.getExtension().getWildcardedPSI() : publicID.getIdentity();
 					UserProfile userProfile = new UserProfile(identity);
 					userProfile.setBarred(publicID.getBarringIndication());
 					userProfile.setServiceProfile(serviceProfile);
+					if (publicID.getExtension() != null
+							&& publicID.getExtension().getExtension() != null
+							&& publicID.getExtension().getExtension().getExtension() != null)
+						userProfile.setServiceLevelTraceInfo(publicID.getExtension().getExtension().getExtension().getServiceLevelTraceInfo());
 					__log.debug("Cache user profile for identity " + identity);
+					
 					
 					if (wildcard)
 						_wildcardServiceProfiles.put(RegexUtil.extendedRegexToJavaRegex(identity), userProfile);	
@@ -150,7 +155,7 @@ public class UserProfileCache
 			__log.warn("Failed to cache profile for user: " + imsSub.getIMSSubscription().getPrivateID(), e);
 		}
 	}
-
+	
 	public void clearUserProfile(String publicID)
 	{
 		if (_serviceProfiles.remove(publicID) == null)

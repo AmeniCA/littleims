@@ -18,37 +18,49 @@ package org.cipango.littleims.scscf.data;
 public class UserProfile
 {
 
+	private String _uri;
+	private boolean _barred;
+	private ServiceProfile _serviceProfile;
+	private String _serviceLevelTraceInfo;
+	
 	public UserProfile(String uri)
 	{
-		this.uri = uri;
+		_uri = uri;
 	}
 
 	public boolean isBarred()
 	{
-		return barred;
+		return _barred;
 	}
 
 	public void setBarred(boolean b)
 	{
-		barred = b;
+		_barred = b;
 	}
 
 	public void setServiceProfile(ServiceProfile profile)
 	{
-		serviceProfile = profile;
+		_serviceProfile = profile;
 	}
 
 	public ServiceProfile getServiceProfile()
 	{
-		return serviceProfile;
+		return _serviceProfile;
 	}
 
 	public String getURI()
 	{
-		return uri;
+		return _uri;
 	}
 
-	private String uri;
-	private boolean barred;
-	private ServiceProfile serviceProfile;
+	public String getServiceLevelTraceInfo()
+	{
+		return _serviceLevelTraceInfo;
+	}
+
+	public void setServiceLevelTraceInfo(String serviceLevelTraceInfo)
+	{
+		_serviceLevelTraceInfo = serviceLevelTraceInfo;
+	}
+
 }

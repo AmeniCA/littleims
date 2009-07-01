@@ -21,7 +21,10 @@ public abstract class Methods
 	public static final String INFO = "INFO";
 	public static final String INVITE = "INVITE";
 	public static final String MESSAGE = "MESSAGE";
+	public static final String NOTIFY = "NOTIFY";
 	public static final String OPTIONS = "OPTIONS";
+	public static final String PRACK = "PRACK";
 	public static final String REGISTER = "REGISTER";
 	public static final String SUBSCRIBE = "SUBSCRIBE";
+	public static final String UPDATE = "UPDATE";
 }
