@@ -68,7 +68,6 @@ public class RegistrarServlet extends SipServlet
 	{
 		try
 		{
-			__log.debug("Received REGISTER request: \r\n" + request);
 			String privateUserIdentity = _authenticator.authenticate(false, request);	
 			if (privateUserIdentity != null)
 				_registrar.doRegister(request, privateUserIdentity);

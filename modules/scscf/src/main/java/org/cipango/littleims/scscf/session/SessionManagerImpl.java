@@ -94,7 +94,7 @@ public class SessionManagerImpl implements SessionManager
 	public void doInitialRequest(SipServletRequest request, boolean sarAnswer) throws ServletException, IOException
 	{
 		if (!sarAnswer && __log.isDebugEnabled())
-			__log.debug("Received initial request: \n" + request);
+			__log.debug("Received initial request: " + request.getMethod() + " " + request.getRequestURI());
 		
 		if (!isComeFromTrustedDomain(request))
 			request.removeHeader(Headers.P_SERVED_USER);
@@ -370,7 +370,6 @@ public class SessionManagerImpl implements SessionManager
 	{
 		String orig = request.getParameter(ORIG_PARAM);
 		String term = request.getParameter(TERM_PARAM);
-		__log.debug("Orig param is: *" + orig + "*. Term param is: *" + term + "*");
 		if (_terminatingDefault) // default standard mode
 			return orig != null;
 		else

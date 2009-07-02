@@ -1,3 +1,16 @@
+// ========================================================================
+// Copyright 2009 NEXCOM Systems
+// ------------------------------------------------------------------------
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at 
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ========================================================================
 package org.cipango.ims;
 
 import java.io.File;
@@ -34,8 +47,6 @@ public class DebugIdMessageLog extends AbstractMessageLog
 			SipServletRequest request = ((SipServletResponse) message).getRequest();
 			if (request != null)
 				debugId = request.getHeader(P_DEBUG_ID);
-			else
-				System.out.println(">>>>>>>No request for:\n" + message);
 		}
 		if (debugId == null || debugId.trim().equals(""))
 			return;

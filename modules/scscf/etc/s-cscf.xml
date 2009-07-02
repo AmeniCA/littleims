@@ -22,6 +22,10 @@
 		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
 	</bean>
 	
+	<bean id="timerService" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="javax.servlet.sip.TimerService" />
+	</bean>
+	
 	<bean id="diameterFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
 		<property name="attributeName" value="org.cipango.diameter.DiameterFactory" />
 	</bean>
@@ -126,6 +130,7 @@
 	<bean id="debugIdService" 
 			class="org.cipango.littleims.scscf.debug.DebugIdService">
 		<property name="userProfileCache" ref="userProfileCache" />
+		<property name="timerService" ref="timerService" />
 		<!-- 
 		S-CSCF policy for minimun debug event subscription time in seconds
 		-->

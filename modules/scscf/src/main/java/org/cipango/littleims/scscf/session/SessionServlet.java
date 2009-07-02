@@ -17,9 +17,11 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterAnswer;
@@ -36,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
-public class SessionServlet extends SipServlet implements DiameterListener
+public class SessionServlet extends SipServlet implements DiameterListener, TimerListener
 {
 
 	private static final long serialVersionUID = -4447425709778698992L;
@@ -155,6 +157,11 @@ public class SessionServlet extends SipServlet implements DiameterListener
 			__log.warn("Received unexpected exception when handing Diameter " + 
 					(message.isRequest() ? "request" : "answer") + ": " + message.getCommand(), e);
 		}
+	}
+
+	public void timeout(ServletTimer timer)
+	{
+		((Runnable) timer.getInfo()).run();
 	}
 
 		

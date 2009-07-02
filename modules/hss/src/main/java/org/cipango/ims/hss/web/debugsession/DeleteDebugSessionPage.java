@@ -14,14 +14,6 @@
 package org.cipango.ims.hss.web.debugsession;
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.util.collections.MicroMap;
-import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
-import org.cipango.ims.hss.model.PSI;
-import org.cipango.ims.hss.model.PublicIdentity;
-import org.cipango.ims.hss.model.PublicUserIdentity;
 
 
 public class DeleteDebugSessionPage extends DebugSessionPage {

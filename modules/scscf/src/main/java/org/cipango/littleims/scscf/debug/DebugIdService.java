@@ -1,33 +1,49 @@
+// ========================================================================
+// Copyright 2009 NEXCOM Systems
+// ------------------------------------------------------------------------
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at 
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ========================================================================
 package org.cipango.littleims.scscf.debug;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
 import org.cipango.littleims.util.Headers;
-import org.cipango.littleims.util.Methods;
 
 public class DebugIdService
 {
 	private static final int DEFAULT_EXPIRES = 43200;
-	private static final String DEBUG_INFO_CONTENT_TYPE = "application/debuginfo+xml";
 	public static final String DEBUG_EVENT = "debug";
 	private final Logger _log = Logger.getLogger(RegEventManager.class);
 	
 	private int _minExpires;
 	private int _maxExpires;
 	private UserProfileCache _userProfileCache;
-
+	private TimerService _timerService;
 	
 
 	public void doSubscribe(SipServletRequest subscribe) throws ServletException, IOException
 	{
+		DebugSession session = (DebugSession) subscribe.getSession().getAttribute(DebugSession.class.getName());
+		
 		// TODO check if user if authorized
 		int expires = subscribe.getExpires();
 		if (expires == -1)
@@ -60,17 +76,23 @@ public class DebugIdService
 		SipServletResponse response = subscribe.createResponse(SipServletResponse.SC_OK);
 		response.setExpires(expires);
 		response.send();
+		
 		// Wait a little to ensure 200/SUBSCRIBE is received before NOTIFY
 		try { Thread.sleep(100); } catch (Exception e) {}
 		
-		SipServletRequest notify = response.getSession().createRequest(Methods.NOTIFY);
-		notify.setExpires(expires);
-		UserProfile profile = _userProfileCache.getProfile(subscribe.getRequestURI().toString(), null);
-		notify.setContent(profile.getServiceLevelTraceInfo().getBytes(), DEBUG_INFO_CONTENT_TYPE);
-		notify.setHeader(Headers.EVENT_HEADER, DEBUG_EVENT);
-		notify.setHeader(Headers.SUBSCRIPTION_STATE, "active;expires=" + expires);
-		notify.send();
+		if (session == null)
+		{	
+			session = new DebugSession(subscribe.getSession(), expires);
+			_timerService.createTimer(subscribe.getApplicationSession(), 
+					expires, false, new ExpirationTask(session, _timerService));
+		}
+		else
+		{
+			session.setExpires(expires);
+		}
 		
+		UserProfile profile = _userProfileCache.getProfile(subscribe.getRequestURI().toString(), null);
+		session.sendNotify(profile == null ? null : profile.getServiceLevelTraceInfo());
 	}
 
 
@@ -113,6 +135,39 @@ public class DebugIdService
 	public void setUserProfileCache(UserProfileCache userProfileCache)
 	{
 		_userProfileCache = userProfileCache;
+	}
+	public TimerService getTimerService()
+	{
+		return _timerService;
+	}
+
+
+
+	public void setTimerService(TimerService timerService)
+	{
+		_timerService = timerService;
+	}
+
+	static class ExpirationTask implements Runnable, Serializable
+	{
+		private DebugSession _session;
+		private TimerService _timerService;
+		
+		public ExpirationTask(DebugSession session, TimerService timerService)
+		{	
+			_session = session;
+			_timerService = timerService;
+		}
+		public void run()
+		{
+			int expires = _session.getExpires();
+			if (expires == 0)
+				_session.sendNotify(null);
+			else
+				_timerService.createTimer(_session.getSipSession().getApplicationSession(), 
+						expires, false, this);
+		}
+		
 	}
 
 }

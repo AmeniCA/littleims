@@ -1,3 +1,16 @@
+// ========================================================================
+// Copyright 2009 NEXCOM Systems
+// ------------------------------------------------------------------------
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at 
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// ========================================================================
 package org.cipango.littleims.pcscf.debug;
 
 import java.util.HashMap;
@@ -40,23 +53,36 @@ public class DebugIdService
 		try
 		{
 			// TODO check if subscription exists
-			SipServletRequest request = _sipFactory.createRequest(
-					_sipFactory.createApplicationSession(),
-					Methods.SUBSCRIBE,
-					_pcscfUri,
-					aor);
-			request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
-			request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
-			request.setExpires(expires);
-			request.pushRoute(_icscfUri);
-
-			DebugSubscription subscription = new DebugSubscription(this);
-			_subscriptions.put(aor.toString(), subscription);
-			request.getApplicationSession().setAttribute(DebugSubscription.class.getName(), 
-					subscription);
-			request.getSession().setHandler("DebugIdServlet");
-			request.send();
-			_log.debug("Start debug subscription of user " + aor);
+			DebugSubscription subscription = _subscriptions.get(aor.toString());
+			
+			if (subscription == null || !subscription.getSession().isValid())
+			{
+				SipServletRequest request = _sipFactory.createRequest(
+						_sipFactory.createApplicationSession(),
+						Methods.SUBSCRIBE,
+						_pcscfUri,
+						aor);
+				request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
+				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
+				request.setExpires(expires);
+				request.pushRoute(_icscfUri);
+	
+				subscription = new DebugSubscription(this, request.getSession(), aor.toString());
+				_subscriptions.put(aor.toString(), subscription);
+				request.getApplicationSession().setAttribute(DebugSubscription.class.getName(), 
+						subscription);
+				request.getSession().setHandler("DebugIdServlet");
+				request.send();
+				_log.debug("Start debug subscription of user " + aor);
+			}
+			else
+			{
+				SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
+				request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
+				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
+				request.setExpires(expires);
+				request.send();
+			}
 		}
 		catch (Exception e)
 		{
@@ -145,6 +171,16 @@ public class DebugIdService
 	public void addDebugConf(DebugConf conf)
 	{
 		_confs.put(conf.getAor(), conf);
+	}
+	
+	public void removeDebugConf(DebugConf conf)
+	{
+		_confs.remove(conf.getAor());
+	}
+	
+	public void removeSubscriptions(DebugSubscription subscription)
+	{
+		_subscriptions.remove(subscription.getAor());
 	}
 	
 	public Iterator<DebugConf> getDebugConfs()

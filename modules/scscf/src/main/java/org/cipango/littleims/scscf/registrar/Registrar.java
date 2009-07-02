@@ -122,13 +122,12 @@ public class Registrar
 	
 	public void doRegister(SipServletRequest request, String privateUserIdentity) throws ServletException, IOException
 	{
-		__log.debug("Received REGISTER request: \r\n" + request);
-		
 		// 24.229 1. Identify the user
 		// Since the Private User Identity may not be present,
 		// we use the Public User Identity
-
 		SipURI aor = getAor(request);
+
+		__log.debug("Received REGISTER request for " + aor);
 
 		// check that we are configured to handle the user's domain
 		String realm = aor.getHost();
@@ -338,16 +337,21 @@ public class Registrar
 	
 			sendThirdPartyRegister(request, response, expires, regInfo);
 			
+			if (expires == 0 && !_permanentAssignation 
+					&& regInfo.getContacts() != null && regInfo.getContacts().isEmpty())
+				_userProfileCache.clearUserProfile(aor.toString());
 			
 		}
 		catch (LittleimsException e) {
 			__log.warn(e.getMessage(), e);
-			try { request.createResponse(e.getStatusCode()).send(); } catch (IOException e2) { }
+			if (!request.isCommitted())
+				try { request.createResponse(e.getStatusCode()).send(); } catch (IOException e2) { }
 		}
 		catch (Exception e)
 		{
 			__log.warn(e.getMessage(), e);
-			try { request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();} catch (IOException e2) { }
+			if (!request.isCommitted())
+				try { request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();} catch (IOException e2) { }
 		}
 		finally
 		{
@@ -495,9 +499,7 @@ public class Registrar
 
 			RegistrationInfo info = new RegistrationInfo();
 			info.setAssociatedURIs(associatedURIs);
-			
-			if (!_permanentAssignation && regContext.getBindings().isEmpty())
-				_userProfileCache.clearUserProfile(to.toString());
+			info.setContacts(regContext.getContacts());
 			
 			return info;
 		}
