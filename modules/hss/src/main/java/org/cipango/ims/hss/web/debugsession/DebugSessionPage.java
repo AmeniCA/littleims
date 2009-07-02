@@ -42,6 +42,7 @@ public abstract class DebugSessionPage extends BasePage
 
 		public DaoDetachableModel(DebugSession debugSession)
 		{
+			super(debugSession);
 			if (debugSession != null)
 				_key = debugSession.getId();
 		}

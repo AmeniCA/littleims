@@ -34,8 +34,9 @@ import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.web.publicid.ContextPanel;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.publicid.PsiContextPanel;
-import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.util.ID;
 import org.cipango.ims.hss.web.util.MethodField;
 import org.cipango.ims.hss.web.util.UriValidator;
 
@@ -76,6 +77,12 @@ public class EditDebugSessionPage extends DebugSessionPage
 			}
 			else
 				publicIdentity = debugSession.getPublicIdentity();
+		}
+		
+		if (debugSession == null)
+		{
+			debugSession = new DebugSession();
+			debugSession.setDebugId(ID.newDebugId());
 		}
 		
 		DaoDetachableModel model = new DaoDetachableModel(debugSession);
@@ -159,9 +166,29 @@ public class EditDebugSessionPage extends DebugSessionPage
 			public void onSubmit()
 			{
 				getSession().info(getString("modification.cancel"));
-				goToBackPage(PublicIdBrowserPage.class);
+				String id;
+				if (isAdding())
+					id = _publicIdentityDao.findById(_publicIdKey).getIdentity();
+				else
+					id = _dao.findById(_key).getPublicIdentity().getIdentity();
+				setResponsePage(EditPublicUserIdPage.class, 
+						new PageParameters("id=" + id));
 			}
 		}.setDefaultFormProcessing(false));
+		
+		form.add(new Button("delete")
+		{
+			@Override
+			public void onSubmit()
+			{
+				DebugSession session = _dao.findById(_key);
+				setResponsePage(EditPublicUserIdPage.class, 
+						new PageParameters("id=" + session.getPublicIdentity().getIdentity()));
+				_dao.delete(session);
+				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(session)));
+				
+			}
+		}.setDefaultFormProcessing(false).setVisible(!isAdding()));
 
 		if (publicIdentity != null)
 		{

@@ -31,7 +31,6 @@ import org.cipango.ims.hss.util.HexString;
 import org.cipango.ims.hss.web.as.AsBrowserPage;
 import org.cipango.ims.hss.web.as.DeleteAsPage;
 import org.cipango.ims.hss.web.as.EditAsPage;
-import org.cipango.ims.hss.web.debugsession.DeleteDebugSessionPage;
 import org.cipango.ims.hss.web.debugsession.EditDebugSessionPage;
 import org.cipango.ims.hss.web.ifc.DeleteIfcPage;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
@@ -142,7 +141,6 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/implicit-registration-state/edit", EditImplicitSetPage.class, id));
 			
 		mount(new MixedParamUrlCodingStrategy("/debug-session/edit", EditDebugSessionPage.class, id));
-		mount(new MixedParamUrlCodingStrategy("/debug-session/delete", DeleteDebugSessionPage.class, id));
 		
 		_wicketStarted = true;
 		springStart();
