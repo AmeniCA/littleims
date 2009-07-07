@@ -77,7 +77,7 @@ public class PublicUserIdentity extends PublicIdentity
 	}
 	
 	@Override
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu, boolean prettyPrint)
+	public String getImsSubscriptionAsXml(String privateIdentity, String realImpu, boolean prettyPrint)
 	{
 		Output out;
 		if (prettyPrint)
@@ -90,7 +90,7 @@ public class PublicUserIdentity extends PublicIdentity
 			// If no private identity is registered, use the first private identity.
 			out.add("PrivateID", getPrivateIdentities().iterator().next().getIdentity());
 		else
-			out.add("PrivateID", privateIdentity.getIdentity());
+			out.add("PrivateID", privateIdentity);
 		out.add("ServiceProfile", _implicitRegistrationSet.getPublicIdentities());
 		out.close("IMSSubscription");
 		return out.toString();

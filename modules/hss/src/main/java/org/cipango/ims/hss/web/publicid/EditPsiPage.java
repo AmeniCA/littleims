@@ -93,7 +93,7 @@ public class EditPsiPage extends PublicIdentityPage
 		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", publicIdentity.getIdentity()).setOutputMarkupId(true));
+		form.add(new Label("title", publicIdentity == null ? "" : publicIdentity.getIdentity()).setOutputMarkupId(true));
 		form.add(new RequiredTextField<String>("identity", String.class).add(new UriValidator()));
 		form.add(new RequiredTextField("privateServiceIdentity", String.class));
 		form.add(new CheckBox("psiActivation"));
@@ -171,15 +171,17 @@ public class EditPsiPage extends PublicIdentityPage
 
 					getSession().info(getString("modification.success"));
 					
+					getCxManager().identityUpdated(psi);
+					
 					if (!psi.getIdentity().equals(_key))
-					{
 						setResponsePage(EditPsiPage.class, new PageParameters("id=" + psi.getIdentity()));
-					} 
 					else if (target != null)
 					{
 						Component contextMenu = new PsiContextPanel(psi);
 						getPage().get("contextMenu").replaceWith(contextMenu);
-						target.addComponent(contextMenu);
+						
+						target.addComponent(getPage().get("contextMenu"));
+						target.addComponent(getPage().get("pprPanel").setVisible(true));
 					}
 				}
 				catch (Exception e)

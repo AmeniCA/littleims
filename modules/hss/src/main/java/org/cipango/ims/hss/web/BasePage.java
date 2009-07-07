@@ -13,71 +13,91 @@
 // ========================================================================
 package org.cipango.ims.hss.web;
 
-import javax.servlet.sip.SipFactory;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.ims.hss.CxManager;
 
-public abstract class BasePage extends WebPage {
+public abstract class BasePage extends WebPage
+{
 
-	public BasePage() {
+	@SpringBean
+	private CxManager _cxManager;
+
+	public BasePage()
+	{
 		add(new HeaderPanel().setRenderBodyOnly(true));
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
 		add(new WebMarkupContainer("contextMenu"));
 	}
-		
-	public void setContextMenu(Component panel) {
+
+	public void setContextMenu(Component panel)
+	{
 		panel.setOutputMarkupId(true);
 		addOrReplace(panel);
 	}
-	
-	public ImsApplication getImsApp() {
+
+	public ImsApplication getImsApp()
+	{
 		return (ImsApplication) getApplication();
 	}
-	
-	public ImsSession getImsSession() {
+
+	public ImsSession getImsSession()
+	{
 		return (ImsSession) getSession();
 	}
-	
+
+	protected CxManager getCxManager()
+	{
+		return _cxManager;
+	}
+
 	public abstract String getTitle();
 
 	@Override
-	protected void onBeforeRender() {
+	protected void onBeforeRender()
+	{
+		addOrReplace(new PprPanel("pprPanel", _cxManager));
 		super.onBeforeRender();
 		// The title can need subclass construction done
-		if (get("page.title") == null) {
+		if (get("page.title") == null)
+		{
 			add(new Label("page.title", getTitle()));
 		}
 	}
-	
-	protected void goToBackPage(Class defaultPage) {
-		Page backPage = getImsSession().getBackPage(getClass());			
 
-		if (backPage == null) {
+	protected void goToBackPage(Class<? extends Page> defaultPage)
+	{
+		Page backPage = getImsSession().getBackPage(getClass());
+
+		if (backPage == null)
+		{
 			setResponsePage(defaultPage);
-		} else {					
+		}
+		else
+		{
 			setResponsePage(backPage);
 		}
 	}
-	
+
 	protected String getCopyName(String name)
 	{
-		String copy  = getString("copyOf");
+		String copy = getString("copyOf");
 		if (name.startsWith(copy))
 		{
 			int index = name.lastIndexOf(' ');
 			if (index == -1)
 				return name + " 2";
 			String end = name.substring(index);
-			try 
+			try
 			{
 				return name + ' ' + (Integer.parseInt(end) + 1);
 			}
-			catch (Exception e) 
+			catch (Exception e)
 			{
 				return name + " 2";
 			}

@@ -64,7 +64,7 @@ public class EditServiceProfilePage extends ServiceProfilePage
 		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", serviceProfile.getName()));
+		form.add(new Label("title", isAdding() ? "" : serviceProfile.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		
 		form.add(new CheckBox("anotherUser", new Model()).setVisible(isAdding()));
@@ -89,6 +89,9 @@ public class EditServiceProfilePage extends ServiceProfilePage
 					
 					_dao.save(serviceProfile);
 				
+					// As only profile name is modified no need to send PPR
+					//getCxManager().profileUpdated(serviceProfile);
+					
 					getSession().info(getString("modification.success"));
 					setResponsePage(ViewServiceProfilePage.class, new PageParameters("id=" + serviceProfile.getName()));
 				}

@@ -5,14 +5,18 @@
 		<table class="dataDetails">
 		  <tr class="title">
                 <th colspan="2">
-                    <wicket:message key="view.scscf.title"></wicket:message>
+                    <wicket:message key="view.scscf.title"/>
                     <b wicket:id="title"></b>
                 </th>
             </tr>
-			<tr>
-				<th><wicket:message key="scscf.name"></wicket:message></th>
-				<td><input wicket:id="name" type="text"/></td>
-			</tr>
+            <tr>
+                <th><wicket:message key="scscf.name"/></th>
+                <td><input wicket:id="name" type="text"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="scscf.diameterHost"/></th>
+                <td><input wicket:id="diameterHost" type="text" class="longText"/></td>
+            </tr>
 			<tr>
 				<th><wicket:message key="scscf.uri"/></th>
 				<td><input class="longText" wicket:id="uri" type="text"/></td>

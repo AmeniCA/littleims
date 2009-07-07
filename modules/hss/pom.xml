@@ -57,6 +57,10 @@
               <name>sip.port</name>
               <value>5050</value>
             </systemProperty>
+            <systemProperty>
+              <name>scscfRealm</name>
+              <value>cipango.org</value>
+            </systemProperty>
           </systemProperties>
           <diameterNode implementation="org.cipango.diameter.Node">
             <connectors>

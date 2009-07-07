@@ -247,12 +247,15 @@ public class EditIfcsPage extends ServiceProfilePage
 			it.remove();
 		}
 		_dao.save(profile);
+		
+		getCxManager().profileUpdated(profile);
 				
 		if (target != null)
 		{
 			target.addComponent(form1);
 			target.addComponent(getPage().get("feedback"));
 			target.addComponent(getPage().get("contextMenu"));
+			target.addComponent(getPage().get("pprPanel").setVisible(true));
 		}
 	}
 	

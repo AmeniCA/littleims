@@ -147,6 +147,9 @@ public class EditDebugSessionPage extends DebugSessionPage
 					}
 
 					_dao.save(debugSession);
+					
+					getCxManager().identityUpdated(debugSession.getPublicIdentity());
+					
 					getSession().info(getString("modification.success"));
 					if (!debugSession.getId().equals(_key))
 						setResponsePage(EditDebugSessionPage.class, 

@@ -94,7 +94,7 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", publicIdentity.getIdentity()));
+		form.add(new Label("title", publicIdentity == null ? "" : publicIdentity.getIdentity()));
 		form.add(new RequiredTextField<String>("identity", String.class).add(new UriValidator()));
 		form.add(new CheckBox("barred"));
 
@@ -159,8 +159,12 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 
 					_dao.save(publicIdentity);
 					getSession().info(getString("modification.success"));
+					
+					getCxManager().identityUpdated(publicIdentity);
+					
 					if (!publicIdentity.getIdentity().equals(_key))
 						setResponsePage(EditPublicUserIdPage.class, new PageParameters("id=" + publicIdentity.getIdentity()));
+					
 				}
 				catch (Exception e)
 				{

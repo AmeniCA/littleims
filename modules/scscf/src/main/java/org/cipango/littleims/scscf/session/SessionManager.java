@@ -23,6 +23,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterRequest;
 import org.cipango.littleims.scscf.charging.CDF;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.Registrar;
@@ -56,5 +57,7 @@ public interface SessionManager
 	public Iterator<Session> getSessions();
 	
 	public void handleSaa(DiameterAnswer saa);
+	
+	public void handlePpr(DiameterRequest ppr);
 
 }

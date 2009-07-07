@@ -443,7 +443,7 @@ public class Hss
 			answer.getAVPs().addString(Base.USER_NAME, impi);
 			if (!userDataAlreadyAvailable)
 			{
-				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu, false);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(impi, impu, false);
 				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
 			AVPList associatedIds = getAssociatedIdentities(privateIdentity);
@@ -505,7 +505,7 @@ public class Hss
 				
 			if (!userDataAlreadyAvailable)
 			{
-				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, impu, false);
+				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(impi, impu, false);
 				answer.getAVPs().addString(IMS.IMS_VENDOR_ID, IMS.USER_DATA, serviceProfile);
 			}
 			associatedIds = getAssociatedIdentities(privateIdentity);
@@ -679,6 +679,16 @@ public class Hss
 		catch (Exception e)
 		{
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public void doPpa(DiameterAnswer ppa)
+	{
+		int resultCode = ppa.getResultCode();
+		if (resultCode >= 3000)
+		{
+			__log.warn("Received negative response code to DPR: " + resultCode);
+			// TODO deregister.
 		}
 	}
 	

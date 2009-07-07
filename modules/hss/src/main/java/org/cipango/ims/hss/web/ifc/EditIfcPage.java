@@ -94,7 +94,7 @@ public class EditIfcPage extends IfcPage
 		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", ifc.getName()));
+		form.add(new Label("title", isAdding() ? "" : ifc.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<Integer>("priority", Integer.class)
 				.add(new MinimumValidator<Integer>(0))
@@ -179,6 +179,13 @@ public class EditIfcPage extends IfcPage
 								return;
 							}
 						}
+					}
+					
+					getCxManager().ifcUpdated(ifc);
+					
+					if (target != null)
+					{
+						target.addComponent(getPage().get("pprPanel").setVisible(true));
 					}
 					
 					getSession().info(getString("modification.success"));

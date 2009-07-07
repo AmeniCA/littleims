@@ -26,6 +26,7 @@ import javax.servlet.sip.TimerListener;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterMessage;
+import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.littleims.scscf.debug.DebugIdService;
@@ -125,16 +126,21 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 
 	public void handle(DiameterMessage message) throws IOException
 	{
+
+		int command = message.getCommand();
 		try
 		{
 			if (message.isRequest())
 			{
-				__log.warn("No handler for diameter request with command " + message.getCommand());
+				DiameterRequest request = (DiameterRequest) message;
+				if (command == IMS.PPR)
+					_sessionManager.handlePpr(request);
+				else
+					__log.warn("No handler for diameter request with command " + message.getCommand());
 			}
 			else
 			{
 				DiameterAnswer answer = (DiameterAnswer) message;
-				int command = message.getCommand();
 				if ( command == IMS.MAA)
 					_authenticator.handleMaa(answer);
 				else if (command == IMS.SAA)
@@ -155,7 +161,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 		catch (Throwable e) 
 		{
 			__log.warn("Received unexpected exception when handing Diameter " + 
-					(message.isRequest() ? "request" : "answer") + ": " + message.getCommand(), e);
+					(message.isRequest() ? "request" : "answer") + ": " + command, e);
 		}
 	}
 

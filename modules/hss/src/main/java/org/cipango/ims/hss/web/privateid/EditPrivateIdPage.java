@@ -68,7 +68,7 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
 
-		form.add(new Label("title", privateIdentity.getIdentity()));
+		form.add(new Label("title", privateIdentity == null ? "" : privateIdentity.getIdentity()));
 		form.add(new RequiredTextField<String>("identity", String.class));
 		form.add(new TextField("passwordAsString", String.class));
 		form.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()

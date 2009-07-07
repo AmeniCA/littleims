@@ -131,6 +131,23 @@ public class HssServlet extends SipServlet implements DiameterListener
 	
 	protected void doAnswer(DiameterAnswer answer)
 	{
-		
+		int command = answer.getCommand();
+		try
+		{
+			switch (command) 
+			{
+			case IMS.PPA:
+				_hss.doPpa(answer);
+				break;
+			default:
+				__log.warn("Received unknown answer: " + command);
+				break;
+			}
+		}
+		catch (Throwable e)
+		{
+			if (__log.isDebugEnabled())
+				__log.debug("Unable to process request: " + command, e);
+		}
 	}
 }

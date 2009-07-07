@@ -41,12 +41,14 @@ public class ScscfBrowserPage extends ScscfPage
 	{		
 		add(new BookmarkablePageLink("createLink", EditScscfPage.class));
 		
-		IColumn[] columns = new IColumn[5];
+		IColumn[] columns = new IColumn[6];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"name", "name");
-		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".uri", this, null),
+		columns[1] = new PropertyColumn(new StringResourceModel(getPrefix() + ".diameterHost", this, null),
+				"diameterHost", "diameterHost");
+		columns[2] = new PropertyColumn(new StringResourceModel(getPrefix() + ".uri", this, null),
 				"uri", "uri");
-		columns[2] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbSubscriptions", this, null)) 
+		columns[3] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbSubscriptions", this, null)) 
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
@@ -54,7 +56,7 @@ public class ScscfBrowserPage extends ScscfPage
 			}
 			
 		};
-		columns[3] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPsi", this, null)) 
+		columns[4] = new AbstractColumn(new StringResourceModel(getPrefix() + ".nbPsi", this, null)) 
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{
@@ -62,7 +64,7 @@ public class ScscfBrowserPage extends ScscfPage
 			}
 			
 		};
-		columns[4] = new AbstractColumn(new Model("Actions"))
+		columns[5] = new AbstractColumn(new Model("Actions"))
 		{
 			public void populateItem(Item cellItem, String componentId, IModel model)
 			{

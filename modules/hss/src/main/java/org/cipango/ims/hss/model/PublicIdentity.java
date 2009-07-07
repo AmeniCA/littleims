@@ -218,7 +218,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	 * @param realImpu In case of wildcard, the IMPU is not the identity.
 	 * @return
 	 */
-	public abstract String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu, boolean prettyPrint);
+	public abstract String getImsSubscriptionAsXml(String privateIdentity, String realImpu, boolean prettyPrint);
 	
 	public abstract Short getState();
 	

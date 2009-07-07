@@ -140,7 +140,7 @@ public class EditSptsPage extends BasePage
 						spt.setGroupId(groupId);
 						spt.setInitialFilterCriteria(_ifcDao.findByRealKey(_ifcId));
 						_dao.save(spt);
-						
+												
 						if (target != null)
 						{
 							target.addComponent(form);
@@ -160,6 +160,9 @@ public class EditSptsPage extends BasePage
 			protected void doSubmit(AjaxRequestTarget target, Form<?> form)
 			{
 				saveSpts(form);
+
+				getCxManager().ifcUpdated(_ifcDao.findByRealKey(_ifcId));
+				
 				getSession().info(getString("modification.success"));
 				if (target != null)
 				{

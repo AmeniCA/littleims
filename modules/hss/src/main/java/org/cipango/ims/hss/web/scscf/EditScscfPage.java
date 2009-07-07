@@ -59,7 +59,8 @@ public class EditScscfPage extends ScscfPage
 		
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", scscf.getName()));
+		form.add(new Label("title", scscf == null ? "" : scscf.getName()));
+		form.add(new RequiredTextField<String>("diameterHost", String.class));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<String>("uri", String.class).add(new UriValidator(true)));
 		if (isAdding())

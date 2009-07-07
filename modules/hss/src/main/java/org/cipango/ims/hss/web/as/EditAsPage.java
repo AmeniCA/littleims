@@ -64,7 +64,7 @@ public class EditAsPage extends AsPage
 
 		Form form = new Form("form", new CompoundPropertyModel(model));
 		add(form);
-		form.add(new Label("title", applicationServer.getName()));
+		form.add(new Label("title", applicationServer == null ? "" : applicationServer.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		form.add(new RequiredTextField<String>("serverName", String.class).add(new UriValidator(true)));
 		form.add(new DropDownChoice("defaultHandling",
@@ -88,7 +88,19 @@ public class EditAsPage extends AsPage
 			@Override
 			public void onSubmit()
 			{
-				apply(getForm());
+				try
+				{	
+					ApplicationServer as = (ApplicationServer) getForm().getModelObject();
+					_dao.save(as);
+
+					getCxManager().applicationServerUpdated(as);
+					
+					getSession().info(getString("modification.success"));
+				}
+				catch (Exception e)
+				{
+					getSession().error(getString(getPrefix() + ".error.duplicate", getForm().getModel()));
+				}
 			}
 		});
 		form.add(new Button("cancel")
@@ -103,22 +115,6 @@ public class EditAsPage extends AsPage
 
 		if (applicationServer != null)
 			setContextMenu(new ContextPanel(applicationServer));
-	}
-
-	@SuppressWarnings("unchecked")
-	protected void apply(Form form)
-	{
-		try
-		{	
-			_dao.save((ApplicationServer) form.getModelObject());
-
-			getSession().info(getString("modification.success"));
-		}
-		catch (Exception e)
-		{
-			getSession().error(getString(getPrefix() + ".error.duplicate", form.getModel()));
-		}
-
 	}
 
 	private boolean isAdding()

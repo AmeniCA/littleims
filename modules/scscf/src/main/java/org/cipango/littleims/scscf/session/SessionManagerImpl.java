@@ -29,6 +29,7 @@ import javax.servlet.sip.URI;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.littleims.cx.ServerAssignmentType;
@@ -283,6 +284,30 @@ public class SessionManagerImpl implements SessionManager
 			__log.warn("Unable to process SAA answer", e);
 		}
 
+	}
+	
+	public void handlePpr(DiameterRequest ppr)
+	{
+		try
+		{
+			AVP userData = ppr.getAVP(IMS.IMS_VENDOR_ID, IMS.USER_DATA);
+			IMSSubscriptionDocument subscription = null;
+			if (userData != null)
+			{
+				subscription = IMSSubscriptionDocument.Factory.parse(userData.getString());
+				_userProfileCache.cacheUserProfile(subscription);
+				__log.info("Update user profile of " 
+						+ subscription.getIMSSubscription().getPrivateID()
+						+ " after PPR request");
+			}
+
+			ppr.createAnswer(Base.DIAMETER_SUCCESS).send();
+		}
+		catch (Exception e) 
+		{
+			__log.warn("Unable to process PPR request", e);
+			try { ppr.createAnswer(Base.DIAMETER_UNABLE_TO_COMPLY).send(); } catch (Exception e1) { }
+		}
 	}
 
 	private boolean isCSUser(URI uri)
@@ -568,4 +593,6 @@ public class SessionManagerImpl implements SessionManager
 	{
 		return _sessionMap.getSessions();
 	}
+
+
 }

@@ -72,7 +72,7 @@ public class PSI extends PublicIdentity
 	}
 	
 	@Override
-	public String getImsSubscriptionAsXml(PrivateIdentity privateIdentity, String realImpu, boolean prettyPrint)
+	public String getImsSubscriptionAsXml(String privateIdentity, String realImpu, boolean prettyPrint)
 	{
 		Output out;
 		if (prettyPrint)

@@ -34,6 +34,9 @@ public class Scscf
 	@Column (unique=true)
 	private String _uri;
 	
+	@Column (unique=true)
+	private String _diameterHost;
+	
 	@OneToMany(mappedBy = "_scscf")
 	private Set<Subscription> _subscriptions = new HashSet<Subscription>();
 	
@@ -93,5 +96,15 @@ public class Scscf
 	public void setSubscriptions(Set<Subscription> subscriptions)
 	{
 		_subscriptions = subscriptions;
+	}
+
+	public String getDiameterHost()
+	{
+		return _diameterHost;
+	}
+
+	public void setDiameterHost(String diameterHost)
+	{
+		_diameterHost = diameterHost;
 	}
 }

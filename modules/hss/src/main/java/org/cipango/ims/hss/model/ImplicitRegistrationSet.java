@@ -60,6 +60,16 @@ public class ImplicitRegistrationSet
 	{
 		return _states;
 	}
+	
+	public String getRegisteredPrivateIdentity()
+	{
+		for (RegistrationState state : _states)
+		{
+			if (state.getState() == State.REGISTERED)
+				return state.getPrivateIdentity();
+		}
+		return null;
+	}
 
 	public void setStates(Set<RegistrationState> states)
 	{
