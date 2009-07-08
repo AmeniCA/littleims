@@ -13,11 +13,17 @@
 // ========================================================================
 package org.cipango.ims.hss.web.privateid;
 
+import java.util.Arrays;
+
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.RadioChoice;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -40,6 +46,8 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 	
 	@SpringBean
 	private SubscriptionDao _subscriptionDao;
+	
+	private boolean _pwdDisplayable;
 
 	@SuppressWarnings("unchecked")
 	public EditPrivateIdPage(PageParameters pageParameters)
@@ -70,7 +78,51 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 
 		form.add(new Label("title", privateIdentity == null ? "" : privateIdentity.getIdentity()));
 		form.add(new RequiredTextField<String>("identity", String.class));
-		form.add(new TextField("passwordAsString", String.class));
+		
+		_pwdDisplayable = isPwdDisplayableAsString(privateIdentity);
+		RadioChoice passwordEdit = new RadioChoice("passwordEdit",
+				new Model(_pwdDisplayable),
+				Arrays.asList(new Boolean[] {true, false}),
+				new ChoiceRenderer<Boolean>()
+		{
+			@Override
+			public Object getDisplayValue(Boolean id)
+			{
+				if (id)
+					return getString("privateId.passwordEdit.string");
+				else
+					return getString("privateId.passwordEdit.hexadecimal");
+			}
+		});
+		form.add(passwordEdit);
+		passwordEdit.add(new AjaxFormComponentUpdatingBehavior("onChange")
+		{
+			@Override
+			protected void onUpdate(AjaxRequestTarget target)
+			{
+				Component passwordAsString = getPage().get("form:passwordAsString");
+				Component password = getPage().get("form:password");
+				if (!passwordAsString.isVisible() && !_pwdDisplayable)
+				{
+					getSession().warn(getString("privateId.error.passwordNotDisplayableAsString"));
+					Component passwordEdit = getPage().get("form:passwordEdit");
+					passwordEdit.setDefaultModelObject(false);
+					target.addComponent(passwordEdit);
+					target.addComponent(getPage().get("feedback"));
+				}
+				else
+				{
+					passwordAsString.setVisible(!passwordAsString.isVisible());
+					password.setVisible(!password.isVisible());
+					target.addComponent(passwordAsString);
+					target.addComponent(password);
+				}
+			}
+		});
+		
+		form.add(new TextField("passwordAsString", String.class).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(_pwdDisplayable));
+		form.add(new TextField("password", byte[].class).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(!_pwdDisplayable));
+		
 		form.add(new TextField("operatorId", byte[].class).add(new AbstractValidator<byte[]>()
 		{
 			@Override
@@ -80,8 +132,6 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 					error(validatable, "validator.byteArray.length");
 			}
 		}));
-
-		form.add(new CheckBox("anotherUser", new Model<Boolean>()).setVisible(isAdding()));
 
 		form.add(new Button("submit")
 		{
@@ -104,6 +154,20 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 		if (privateIdentity != null)
 			setContextMenu(new ContextPanel(privateIdentity));
 	}
+	
+	private boolean isPwdDisplayableAsString(PrivateIdentity privateIdentity)
+	{
+		if (privateIdentity == null)
+			return true;
+		
+		byte[] data = privateIdentity.getPassword();
+		for (int i = 0; i < data.length; i++)
+		{
+			if (data[i] < 0x20 || data[i] > 0x7E)
+				return false;
+		}
+		return true;
+	}
 
 	@SuppressWarnings("unchecked")
 	protected void apply(Form form)
@@ -121,6 +185,7 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 						new MicroMap("name", _subscriptionId)));
 			}
 			_dao.save(privateIdentity);
+			_pwdDisplayable = isPwdDisplayableAsString(privateIdentity);
 			getSession().info(getString("modification.success"));
 		}
 		catch (Exception e)

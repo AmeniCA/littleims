@@ -21,7 +21,6 @@ import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.ims.Cx;
-import org.cipango.littleims.util.Base64;
 import org.cipango.littleims.util.HexString;
 
 

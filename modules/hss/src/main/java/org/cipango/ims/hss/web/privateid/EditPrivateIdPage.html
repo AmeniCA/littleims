@@ -14,9 +14,18 @@
 				<td><input wicket:id="identity" type="text" /></td>
 			</tr>
 			<tr>
+                <th><wicket:message key="privateId.passwordEdit"/></th>
+                <td>
+                    <span wicket:id="passwordEdit">
+                        <input type="radio"/>
+                    </span>
+                </td>
+            </tr>
+			<tr>
 				<th><wicket:message key="privateId.password">Password</wicket:message></th>
 				<td>
 					<input wicket:id="passwordAsString" type="text"/>
+					<input wicket:id="password" type="text" size="42" maxlength="32"/>
 				</td>
 			</tr>
 			<tr>
@@ -26,14 +35,6 @@
                     <div class="description"><wicket:message key="privateId.operatorId.descr"/></div>
                 </td>
             </tr>
-			<wicket:enclosure>
-				<tr>
-					<th><wicket:message key="user.new.another">New user</wicket:message></th>
-					<td>
-						<input wicket:id="anotherUser" type="checkbox" />
-					</td>
-				</tr>
-			</wicket:enclosure>
 			<tr>
 				<th>&nbsp;</th>
 				<td>
