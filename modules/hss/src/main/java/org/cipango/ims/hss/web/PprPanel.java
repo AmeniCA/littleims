@@ -14,17 +14,29 @@
 package org.cipango.ims.hss.web;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.RefreshingView;
+import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.CxManager;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 
 public class PprPanel extends Panel
 {
@@ -95,7 +107,7 @@ public class PprPanel extends Panel
 		if (nbPublicsToUpdate != _nbPublicsToUpdate)
 		{
 			setVisible(nbPublicsToUpdate != 0);
-			if (get("form") == null)
+			if (nbPublicsToUpdate != 0 && get("form") == null)
 				createForm(page.getCxManager());
 			_nbPublicsToUpdate = nbPublicsToUpdate;
 		}
@@ -104,7 +116,38 @@ public class PprPanel extends Panel
 		{
 			String title = MapVariableInterpolator.interpolate(getString("pprPanel.title"),
 					new MicroMap("nb", _nbPublicsToUpdate));
-			((WebMarkupContainer) get("form")).addOrReplace(new Label("title", title));
+			WebMarkupContainer form = ((WebMarkupContainer) get("form"));
+			form.addOrReplace(new Label("title", title));
+			
+			WebMarkupContainer details = new WebMarkupContainer("details");
+			form.add(details);
+			
+			details.add(new RefreshingView("publicIdentities", new Model((Serializable) page.getCxManager().getPublicIdsToUpdateAsString())){
+
+				@Override
+				protected Iterator getItemModels()
+				{
+					return new ModelIteratorAdapter<String>(((Collection)getDefaultModelObject()).iterator()) {
+
+						@Override
+						protected IModel<String> model(String id)
+						{
+							return new Model<String>(id);
+						}
+						
+					};
+				}
+
+				@Override
+				protected void populateItem(Item item)
+				{
+					MarkupContainer link = new BookmarkablePageLink("identity", 
+							EditPublicUserIdPage.class, 
+							new PageParameters("id=" + item.getModelObject()));
+					item.add(link);
+					link.add(new Label("name", item.getModel()));
+				}
+			});
 		}
 	}
 	

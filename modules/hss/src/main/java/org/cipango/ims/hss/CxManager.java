@@ -147,6 +147,11 @@ public class CxManager
 		return set;
 	}
 	
+	public Set<String> getPublicIdsToUpdateAsString()
+	{
+		return _publicIdsToUpdate;
+	}
+	
 	public int getNbPublicIdsToUpdate()
 	{
 		return _publicIdsToUpdate.size();

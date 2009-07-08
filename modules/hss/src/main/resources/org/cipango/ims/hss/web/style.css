@@ -110,6 +110,10 @@ div.wicket-aa { font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,Verdan
 div.wicket-aa ul { list-style:none; padding: 2px; margin:0; }
 div.wicket-aa ul li.selected { background-color: #FFFF00; padding: 2px; margin:0; }
 
+.pprPanel .details { background:#FFFFFF; position: absolute; left: -999em; padding: 5px;}
+.pprPanel:hover .details{ left: auto; }
+.pprPanel:sfhover .details{ left: auto; }
+
 /* ------------------------------------------------------------------------- */
 /*                                Menu                                       */
 /* ------------------------------------------------------------------------- */
