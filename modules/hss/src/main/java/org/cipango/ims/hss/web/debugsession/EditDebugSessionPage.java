@@ -187,6 +187,7 @@ public class EditDebugSessionPage extends DebugSessionPage
 				DebugSession session = _dao.findById(_key);
 				setResponsePage(EditPublicUserIdPage.class, 
 						new PageParameters("id=" + session.getPublicIdentity().getIdentity()));
+				getCxManager().identityUpdated(session.getPublicIdentity());
 				_dao.delete(session);
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(session)));
 				

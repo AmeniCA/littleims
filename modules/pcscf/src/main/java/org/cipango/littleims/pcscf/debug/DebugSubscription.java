@@ -65,6 +65,8 @@ public class DebugSubscription
 			Debuginfo debuginfo = doc.getDebuginfo();
 			
 			int version = debuginfo.getVersion().intValue();
+
+			__log.debug("Received NOTIFY No " + version + " for debug event for user " + _aor);
 			if (version <= _version)
 			{
 				__log.warn("Discard notify request to " + notify.getFrom().getURI() + ": invalid version number: " + 
@@ -77,20 +79,32 @@ public class DebugSubscription
 			}
 			_version = version;
 			
-			if (debuginfo.getState() == Debuginfo.State.FULL)
-				_configs.clear();
 			
-			for (Debugconfig debugConfig :debuginfo.getDebugconfigArray())
+			List<DebugConf> toRemove = new ArrayList<DebugConf>(_configs);
+			
+			for (Debugconfig debugConfig : debuginfo.getDebugconfigArray())
 			{
 				String aor = debugConfig.getAor();
 				DebugConf debugConf = getDebugconfig(aor);
 				if (debugConf != null)
+				{
 					debugConf.updateConfig(debugConfig);
+					toRemove.remove(debugConf);
+				}
 				else
 				{
 					debugConf = new DebugConf(debugConfig);
 					_configs.add(debugConf);
 					_debugIdService.addDebugConf(debugConf);
+				}
+			}
+			
+			if (debuginfo.getState() == Debuginfo.State.FULL)
+			{
+				for (DebugConf debugConf : toRemove)
+				{
+					_debugIdService.removeDebugConf(debugConf);
+					_configs.remove(debugConf);
 				}
 			}
 						
@@ -110,7 +124,7 @@ public class DebugSubscription
 		_session.invalidate();
 		for (DebugConf debugConf : _configs)
 			_debugIdService.removeDebugConf(debugConf);
-		_debugIdService.removeSubscriptions(this);
+		_debugIdService.removeSubscription(this);
 	}
 	
 	public SipSession getSession()
@@ -133,5 +147,15 @@ public class DebugSubscription
 	public String getAor()
 	{
 		return _aor;
+	}
+
+	public int getVersion()
+	{
+		return _version;
+	}
+
+	public List<DebugConf> getConfigs()
+	{
+		return _configs;
 	}
 }

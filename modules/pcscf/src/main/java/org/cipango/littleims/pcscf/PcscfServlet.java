@@ -18,6 +18,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -82,7 +83,15 @@ public class PcscfServlet extends SipServlet
 				{
 					String name = (String) it.next();
 					if (name.equalsIgnoreCase(Headers.P_DEBUG_ID))
-						_debugIdService.subscribe(response.getFrom().getURI(), response.getExpires());
+					{
+						Address contact = response.getAddressHeader(Headers.CONTACT_HEADER);
+						int expires = -1;
+						if (contact != null)
+							expires = contact.getExpires();
+						if (expires == -1)
+							expires = response.getExpires();
+						_debugIdService.subscribe(response.getFrom().getURI(), expires);
+					}
 				}
 				response.getApplicationSession().invalidate();
 			}

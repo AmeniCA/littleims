@@ -13,19 +13,15 @@
 // ========================================================================
 package org.cipango.littleims.scscf.debug;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
-import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
+import org.cipango.littleims.scscf.data.UserProfileListener;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 
-public class DebugSession
+public class DebugSession implements UserProfileListener
 {
 
 	private static final String DEBUG_INFO_CONTENT_TYPE = "application/debuginfo+xml";
@@ -36,7 +32,7 @@ public class DebugSession
 	private int _version;
 	private SipSession _session;
 	private long _absoluteExpires;
-	private TimerService _timerService;
+	private String _aor;
 	
 	public DebugSession(SipSession session, int expires)
 	{
@@ -68,10 +64,13 @@ public class DebugSession
 			notify.send();
 			if (expires == 0)
 				_session.getApplicationSession().invalidate();
+			
+			__log.debug("Send NOTIFY N° " + (_version - 1) + " to " 
+					+ _aor + " for debug event");
 		}
 		catch (Exception e)
 		{
-			__log.warn("Failed to send NOTIFY for user " + _session.getRemoteParty().getURI(), e);
+			__log.warn("Failed to send NOTIFY for user " + _aor, e);
 		}
 	}
 
@@ -93,6 +92,21 @@ public class DebugSession
 	{
 		_absoluteExpires = System.currentTimeMillis() + expires * 1000;
 		_session.getApplicationSession().setExpires(expires / 60 + 30);
+	}
+
+	public void serviceLevelTraceInfoChanged(String newValue)
+	{
+		sendNotify(newValue);
+	}
+
+	public String getAor()
+	{
+		return _aor;
+	}
+
+	public void setAor(String aor)
+	{
+		_aor = aor;
 	}
 	
 }

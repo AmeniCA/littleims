@@ -39,8 +39,8 @@ public class UserProfileCache
 {
 
 	private URL _sharedIfcsUrl;
-	private Map<String, UserProfile> _serviceProfiles = new ConcurrentHashMap<String, UserProfile>();
-	private Map<String, UserProfile> _wildcardServiceProfiles = new ConcurrentHashMap<String, UserProfile>();
+	private ConcurrentHashMap<String, UserProfile> _serviceProfiles = new ConcurrentHashMap<String, UserProfile>();
+	private ConcurrentHashMap<String, UserProfile> _wildcardServiceProfiles = new ConcurrentHashMap<String, UserProfile>();
 	
 	private TriggerPointCompiler _tpCompiler = new TriggerPointCompiler();
 	private Map<Integer, InitialFilterCriteria> _sharedIFCs;
@@ -133,20 +133,30 @@ public class UserProfileCache
 					TPublicIdentity publicID = publicIDs[j];
 					boolean wildcard = publicID.getExtension() != null && publicID.getExtension().getWildcardedPSI() != null; 
 					String identity = wildcard ? publicID.getExtension().getWildcardedPSI() : publicID.getIdentity();
-					UserProfile userProfile = new UserProfile(identity);
+					
+					UserProfile newProfile = new UserProfile(identity);
+					UserProfile userProfile;
+					if (wildcard)
+					{
+						String regex = RegexUtil.extendedRegexToJavaRegex(identity);
+						userProfile = _wildcardServiceProfiles.putIfAbsent(regex, newProfile);
+					}
+					else
+						userProfile = _serviceProfiles.putIfAbsent(identity, newProfile);
+	
+					if (userProfile == null)
+						userProfile = newProfile;
+					
 					userProfile.setBarred(publicID.getBarringIndication());
 					userProfile.setServiceProfile(serviceProfile);
 					if (publicID.getExtension() != null
 							&& publicID.getExtension().getExtension() != null
 							&& publicID.getExtension().getExtension().getExtension() != null)
 						userProfile.setServiceLevelTraceInfo(publicID.getExtension().getExtension().getExtension().getServiceLevelTraceInfo());
-					__log.debug("Cache user profile for identity " + identity);
-					
-					
-					if (wildcard)
-						_wildcardServiceProfiles.put(RegexUtil.extendedRegexToJavaRegex(identity), userProfile);	
 					else
-						_serviceProfiles.put(identity, userProfile);
+						userProfile.setServiceLevelTraceInfo(null);
+					__log.debug("Cache user profile for identity " + identity);
+					// TODO add UserProfileListener to unregister user if no debug subscription is set. 
 				}
 			}
 		}

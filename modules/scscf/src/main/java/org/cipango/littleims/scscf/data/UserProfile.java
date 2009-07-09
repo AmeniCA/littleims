@@ -13,6 +13,9 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 
 public class UserProfile
@@ -22,6 +25,7 @@ public class UserProfile
 	private boolean _barred;
 	private ServiceProfile _serviceProfile;
 	private String _serviceLevelTraceInfo;
+	private Set<UserProfileListener> _listeners;
 	
 	public UserProfile(String uri)
 	{
@@ -60,7 +64,27 @@ public class UserProfile
 
 	public void setServiceLevelTraceInfo(String serviceLevelTraceInfo)
 	{
+		if (_listeners != null && 
+				(((serviceLevelTraceInfo != null && !serviceLevelTraceInfo.equals(_serviceLevelTraceInfo)))
+				|| (serviceLevelTraceInfo == null &&  _serviceLevelTraceInfo != null)))
+		{
+			for (UserProfileListener l : _listeners)
+				l.serviceLevelTraceInfoChanged(serviceLevelTraceInfo);
+		}
 		_serviceLevelTraceInfo = serviceLevelTraceInfo;
+	}
+	
+	public void addListener(UserProfileListener l)
+	{
+		if (_listeners == null)
+			_listeners = new HashSet<UserProfileListener>();
+		_listeners.add(l);
+	}
+	
+	public void removeListener(UserProfileListener l)
+	{
+		if (_listeners != null)
+			_listeners.remove(l);
 	}
 
 }

@@ -40,7 +40,7 @@ import org.cipango.littleims.util.URIHelper;
 public class IcscfService
 {
 
-	private static final Logger __log = Logger.getLogger(IcscfService.class);
+	private final Logger _log = Logger.getLogger(IcscfService.class);
 
 	private static final String ORIG_PARAM = "orig";
 	private static final String TERM_PARAM = "term";	
@@ -79,7 +79,7 @@ public class IcscfService
 		{
 			if ( uaa.getResultCode() >= 3000)
 			{
-				__log.debug("Diameter UAA answer is not valid: " + uaa.getResultCode() + ". Sending 403 response");
+				_log.debug("Diameter UAA answer is not valid: " + uaa.getResultCode() + ". Sending 403 response");
 	
 				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
 				return;
@@ -96,7 +96,7 @@ public class IcscfService
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
+			_log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
 			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
 		}
 		finally
@@ -111,19 +111,12 @@ public class IcscfService
 		SipServletRequest request = (SipServletRequest) lia.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
 		{
-			if ( lia.getResultCode() >= 3000)
-			{
-				__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 403 response");
-	
-				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-				return;
-			}
-			
 			if (isOriginating(request))
 			{
 				if (lia.getResultCode() >= 3000)
 				{
-					__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 404 response");	
+					_log.debug("Diameter LIA answer from " + request.getFrom().getURI() + " is not valid: " + lia.getResultCode() 
+							+ ". Sending 404 response");	
 					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
 					return;
 				}
@@ -149,17 +142,24 @@ public class IcscfService
 						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
 					}
 					else
+					{
+						_log.debug("User " + requestUri + " is unknown. Sending '404 Not found' response for "
+								+ request.getMethod());
 						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					}
 					return;
 				}
 				else if (lia.getResultCode() == IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED)
 				{
+					_log.debug("User " + requestUri + " is not registered. Sending '480 Temporarly unvailable' response for " 
+							+ request.getMethod());
 					request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
 					return;
 				}
 				else if (lia.getResultCode() >= 3000)
 				{
-					__log.debug("Diameter LIA answer is not valid: " + lia.getResultCode() + ". Sending 404 response");
+					_log.debug("Diameter LIA answer to " + requestUri + " is not valid: " + lia.getResultCode() 
+							+ ". Sending 404 response");
 					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
 					return;
 				}
@@ -183,7 +183,7 @@ public class IcscfService
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
+			_log.warn("Cannot handle LIA answer, send 480/" + request.getMethod(), e);
 			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
 		}
 		finally
@@ -315,7 +315,6 @@ public class IcscfService
 	{
 		String orig = request.getParameter(ORIG_PARAM);
 		String term = request.getParameter(TERM_PARAM);
-		__log.debug("Orig param is: *" + orig + "*. Term param is: *" + term + "*");
 		if (isTerminatingDefault()) // default standard mode
 			return orig != null;
 		else

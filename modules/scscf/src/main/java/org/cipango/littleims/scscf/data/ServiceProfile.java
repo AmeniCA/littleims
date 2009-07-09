@@ -27,40 +27,20 @@ import org.cipango.littleims.util.LittleimsException;
 public class ServiceProfile
 {
 
-	private static Comparator<InitialFilterCriteria> ifcComparator = new Comparator<InitialFilterCriteria>()
-	{
-
-		public int compare(InitialFilterCriteria o1, InitialFilterCriteria o2)
-		{
-			int p1 = o1.getPriority();
-			int p2 = o2.getPriority();
-
-			if (p1 < p2)
-			{
-				return -1;
-			}
-			else if (p1 == p2)
-			{
-				return 0;
-			}
-			else
-			{
-				return 1;
-			}
-		}
-
-	};
-
 	public static final int DEFAULT_MEDIA_PROFILE = -1;
+
+	private List<InitialFilterCriteria> _ifcs = new ArrayList<InitialFilterCriteria>();
+	private int _mediaProfile = DEFAULT_MEDIA_PROFILE;
+	
 
 	public void setMediaProfile(int mediaProfile)
 	{
-		this.mediaProfile = mediaProfile;
+		this._mediaProfile = mediaProfile;
 	}
 
 	public void addIFC(InitialFilterCriteria ifc) throws LittleimsException
 	{
-		Iterator<InitialFilterCriteria> it = ifcs.iterator();
+		Iterator<InitialFilterCriteria> it = _ifcs.iterator();
 		while (it.hasNext())
 		{
 			InitialFilterCriteria otherIFC = it.next();
@@ -70,20 +50,36 @@ public class ServiceProfile
 						+ ifc.getPriority(), SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 			}
 		}
-		ifcs.add(ifc);
-		Collections.sort(ifcs, ifcComparator);
+		_ifcs.add(ifc);
+		Collections.sort(_ifcs, ifcComparator);
 	}
 
 	public Iterator<InitialFilterCriteria> getIFCsIterator()
 	{
-		return ifcs.iterator();
+		return _ifcs.iterator();
 	}
 
 	public String toString()
 	{
-		return ifcs.toString();
+		return _ifcs.toString();
 	}
+	
+	private static Comparator<InitialFilterCriteria> ifcComparator = new Comparator<InitialFilterCriteria>()
+	{
 
-	private List<InitialFilterCriteria> ifcs = new ArrayList<InitialFilterCriteria>();
-	private int mediaProfile = DEFAULT_MEDIA_PROFILE;
+		public int compare(InitialFilterCriteria o1, InitialFilterCriteria o2)
+		{
+			int p1 = o1.getPriority();
+			int p2 = o2.getPriority();
+
+			if (p1 < p2)
+				return -1;
+			else if (p1 == p2)
+				return 0;
+			else
+				return 1;
+		}
+
+	};
+
 }

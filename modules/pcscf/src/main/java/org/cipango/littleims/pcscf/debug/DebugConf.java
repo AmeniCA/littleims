@@ -36,14 +36,22 @@ public class DebugConf
 	
 	public void updateConfig(org.cipango.ims.pcscf.debug.data.DebugconfigDocument.Debugconfig debugConfig)
 	{
+		List<DebugSession> toRemove = new ArrayList<DebugSession>(_sessions);
+		
 		for (Session session : debugConfig.getSessionArray())
 		{
 			DebugSession debugSession = getSession(session.getId());
 			if (debugSession == null)
 				_sessions.add(new DebugSession(_aor, session));
 			else
+			{
 				debugSession.update(session);
+				toRemove.remove(debugSession);
+			}
 		}
+		
+		for (DebugSession session : toRemove)
+			_sessions.remove(session);
 	}
 	
 	public List<DebugSession> getSessions()

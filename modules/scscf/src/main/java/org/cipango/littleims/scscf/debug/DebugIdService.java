@@ -19,7 +19,6 @@ import java.io.Serializable;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
@@ -83,6 +82,7 @@ public class DebugIdService
 		if (session == null)
 		{	
 			session = new DebugSession(subscribe.getSession(), expires);
+			session.setAor(subscribe.getRequestURI().toString());
 			_timerService.createTimer(subscribe.getApplicationSession(), 
 					expires, false, new ExpirationTask(session, _timerService));
 		}
@@ -91,8 +91,14 @@ public class DebugIdService
 			session.setExpires(expires);
 		}
 		
-		UserProfile profile = _userProfileCache.getProfile(subscribe.getRequestURI().toString(), null);
-		session.sendNotify(profile == null ? null : profile.getServiceLevelTraceInfo());
+		UserProfile profile = _userProfileCache.getProfile(session.getAor(), null);
+		if (profile != null)
+		{
+			profile.addListener(session);
+			session.sendNotify(profile.getServiceLevelTraceInfo());
+		}
+		else
+			session.sendNotify(null);
 	}
 
 

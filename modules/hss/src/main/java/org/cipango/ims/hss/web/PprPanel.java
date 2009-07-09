@@ -104,16 +104,15 @@ public class PprPanel extends Panel
 		super.onBeforeRender();
 		BasePage page = (BasePage) getPage();
 		int nbPublicsToUpdate = page.getCxManager().getNbPublicIdsToUpdate();
-		if (nbPublicsToUpdate != _nbPublicsToUpdate)
-		{
-			setVisible(nbPublicsToUpdate != 0);
-			if (nbPublicsToUpdate != 0 && get("form") == null)
-				createForm(page.getCxManager());
-			_nbPublicsToUpdate = nbPublicsToUpdate;
-		}
+
+		_nbPublicsToUpdate = nbPublicsToUpdate;
 		
 		if (nbPublicsToUpdate > 0)
 		{
+			setVisible(true);
+			if (get("form") == null)
+				createForm(page.getCxManager());
+			
 			String title = MapVariableInterpolator.interpolate(getString("pprPanel.title"),
 					new MicroMap("nb", _nbPublicsToUpdate));
 			WebMarkupContainer form = ((WebMarkupContainer) get("form"));
@@ -149,6 +148,8 @@ public class PprPanel extends Panel
 				}
 			});
 		}
+		else
+			setVisible(false);
 	}
 	
 	

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.cipango.littleims.pcscf.debug.DebugConf;
 import org.cipango.littleims.pcscf.debug.DebugIdService;
 import org.cipango.littleims.pcscf.debug.DebugSession;
+import org.cipango.littleims.pcscf.debug.DebugSubscription;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -53,10 +54,48 @@ public class OamServlet extends HttpServlet
 		}
 	}
 	
-	private void printSubscriptions(PrintWriter out)
+	private void printDebugSubscriptions(PrintWriter out)
 	{
 
 		out.println("<h2>Debug subscriptions</h2>");
+		out.println("<table border=\"1\" cellspacing=\"0\">" +
+		"<th>Subscription AOR</th><th>Version</th><th>Conf AOR</th><th>Nb sessions</th>");
+
+		Iterator<DebugSubscription> it = _debugIdService.getDebugSubscriptions();
+		synchronized (it)
+		{
+			while (it.hasNext())
+			{
+				DebugSubscription debugSubscription = it.next();				
+				out.println("<tr>");
+				
+				List<DebugConf> confs = debugSubscription.getConfigs();
+				String tdRowspan = "<td rowspan=\"" + confs.size() + "\">" ;
+				out.println(tdRowspan + debugSubscription.getAor() + "</td>");
+				out.println(tdRowspan + debugSubscription.getVersion() + "</td>");
+				Iterator<DebugConf> it2 = confs.iterator();
+				boolean first = true;
+				while (it2.hasNext())
+				{
+					DebugConf conf = it2.next();
+					if (!first)
+						out.println("<tr>");
+					out.println("<td>" + conf.getAor() + "</td>");
+					out.println("<td>" + conf.getSessions().size()  +  "</td>");
+					if (first)
+						first = false;
+					out.println("</tr>");
+				}
+				out.println("</tr>");
+			}
+		}
+		out.println("</table>");
+	}
+	
+	private void printDebugSessions(PrintWriter out)
+	{
+
+		out.println("<h2>Debug sessions</h2>");
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>AOR</th><th>Session ID</th><th>Start trigger</th><th>Stop trigger</th><th>Debug ID</th>");
 
@@ -103,8 +142,9 @@ public class OamServlet extends HttpServlet
 	{
 		
 		PrintWriter out = resp.getWriter();
-		out.println("<html><head><title>OAM</title></head><body>");
-		printSubscriptions(out);		
+		out.println("<html><head><title>P-SCSCF: OAM</title></head><body>");
+		printDebugSubscriptions(out);		
+		printDebugSessions(out);
 		out.println("</body></html>");
 	}
 	

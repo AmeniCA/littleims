@@ -315,6 +315,8 @@ public class Registrar
 							(Address) contacts.get(i), false);
 				}
 			}
+			else
+				response.setExpires(0);
 	
 			Iterator<String> it = regInfo.getAssociatedURIs().iterator();
 			while (it.hasNext())

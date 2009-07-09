@@ -178,7 +178,7 @@ public class DebugIdService
 		_confs.remove(conf.getAor());
 	}
 	
-	public void removeSubscriptions(DebugSubscription subscription)
+	public void removeSubscription(DebugSubscription subscription)
 	{
 		_subscriptions.remove(subscription.getAor());
 	}
@@ -186,6 +186,11 @@ public class DebugIdService
 	public Iterator<DebugConf> getDebugConfs()
 	{
 		return _confs.values().iterator();
+	}
+	
+	public Iterator<DebugSubscription> getDebugSubscriptions()
+	{
+		return _subscriptions.values().iterator();
 	}
 
 	public SipFactory getSipFactory()
