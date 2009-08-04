@@ -568,17 +568,18 @@ public class Hss
 	
 	private static AVP getMandatoryAVP(AVPList avps, int code) throws DiameterException
 	{
-		AVP avp = avps.getAVP(code);
-		if (avp == null)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP); // TODO add failed-avps
-		return avp;
+		return getMandatoryAVP(avps, Base.IETF_VENDOR_ID, code);
 	}
 	
 	private static AVP getMandatoryAVP(AVPList avps, int vendorId, int code) throws DiameterException
 	{
 		AVP avp = avps.getAVP(vendorId, code);
 		if (avp == null)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
+		{
+			AVP failedAvp = AVP.ofAVPs(Base.FAILED_AVP, 
+					AVP.ofBytes(vendorId, code, new byte[10]));
+			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP).addAvp(failedAvp);
+		}
 		return avp;
 	}
 	

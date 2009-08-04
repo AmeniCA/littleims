@@ -53,7 +53,7 @@ public class ContextPanel extends Panel {
 				add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
 						new PageParameters("id=" + subscription.getName())));
 				add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
-						new PageParameters("id=" + subscription.getName())));
+						new PageParameters("id=" + subscription.getName())).setVisible(subscription.getScscf() != null));
 				foundSub = true;
 			}
 		}

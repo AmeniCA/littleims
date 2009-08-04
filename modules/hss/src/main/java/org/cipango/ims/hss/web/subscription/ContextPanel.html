@@ -10,10 +10,12 @@
 		<li><a href="#" wicket:id="viewLink"><wicket:message key="contextPanel.view"/></a></li>
 		<li><a href="#" wicket:id="editLink"><wicket:message key="contextPanel.edit"/></a></li>
 		<li><a href="#" wicket:id="deleteLink"><wicket:message key="contextPanel.delete"/></a></li>
-		<li><a href="#" wicket:id="deregistrationLink"><wicket:message key="contextPanel.deregistration"/></a></li>
+		<wicket:enclosure>
+		  <li><a href="#" wicket:id="deregistrationLink"><wicket:message key="contextPanel.deregistration"/></a></li>
+		</wicket:enclosure>
 		<li><a href="#" wicket:id="implicitSetLink"><wicket:message key="contextPanel.implicitSets"/></a></li>
 		<wicket:enclosure>
-			<li><a href="#" wicket:id="scscfLink"><wicket:message key="contextPanel.scscf"/></a></li>
+		  <li><a href="#" wicket:id="scscfLink"><wicket:message key="contextPanel.scscf"/></a></li>
 		</wicket:enclosure>
 		<li>
 			<wicket:message key="contextPanel.privateIdentities"/>

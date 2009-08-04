@@ -15,6 +15,7 @@ package org.cipango.ims.hss.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class ImplicitRegistrationSet
 	@OneToMany (mappedBy="_implicitRegistrationSet")
 	private Set<PublicUserIdentity> _publicIdentities = new HashSet<PublicUserIdentity>();
 	
-	@OneToMany (mappedBy="_implicitRegistrationSet", cascade = { CascadeType.ALL })
+	@OneToMany (mappedBy="_implicitRegistrationSet", cascade = { CascadeType.ALL, CascadeType.REMOVE })
 	private Set<RegistrationState> _states = new HashSet<RegistrationState>();
 	
 	public Long getId()
@@ -108,7 +109,9 @@ public class ImplicitRegistrationSet
 	
 	public void deregister()
 	{
-		getStates().clear();
+		Iterator<RegistrationState> it = getStates().iterator();
+		while (it.hasNext())
+			it.next().setState(State.NOT_REGISTERED);
 	}
 	
 	public void updateState(String privateIdentity, Short state)

@@ -13,18 +13,24 @@
 		<li>
 			<a href="#" wicket:id="deleteLink"><wicket:message key="contextPanel.delete">Delete</wicket:message></a>
 		</li>
-		<li>
-			<a href="#" wicket:id="deregistrationLink"><wicket:message key="contextPanel.deregistration"/></a>
-		</li>
-		<li>
-			<a href="#" wicket:id="subscriptionLink"><wicket:message key="contextPanel.subscription">Subscription</wicket:message></a>
-		</li>		
+		<wicket:enclosure>
+    		<li>
+    			<a href="#" wicket:id="deregistrationLink"><wicket:message key="contextPanel.deregistration"/></a>
+    		</li>
+		</wicket:enclosure>
+		<wicket:enclosure>
+    		<li>
+    			<a href="#" wicket:id="subscriptionLink"><wicket:message key="contextPanel.subscription">Subscription</wicket:message></a>
+    		</li>
+    	</wicket:enclosure>		
 		<li>
 			<a href="#" wicket:id="xmlSubscriptionLink"><wicket:message key="contextPanel.xmlSubscription"/></a>
 		</li>
-		<li>
-			<a href="#" wicket:id="implicitSetLink"><wicket:message key="contextPanel.implicitSets"/></a>
-		</li>
+		<wicket:enclosure>
+    		<li>
+    			<a href="#" wicket:id="implicitSetLink"><wicket:message key="contextPanel.implicitSets"/></a>
+    		</li>
+    	</wicket:enclosure>
 		<li>
 			<a href="#" wicket:id="serviceProfileLink"><wicket:message key="contextPanel.serviceProfile"/></a>
 		</li>

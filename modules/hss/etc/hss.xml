@@ -104,7 +104,8 @@
 	<bean id="cxManager" class="org.cipango.ims.hss.CxManager">
 		<property name="diameterFactory" ref="diameterFactory" />
 		<property name="publicIdentityDao" ref="publicIdentityDao" />
-		<property name="scscfRealm" value="${hss.realm}" />
+		<property name="subscriptionDao" ref="subscriptionDao" />
+		<property name="scscfRealm" value="cipango.org" />
 	</bean>
 	
 	<bean id="hss" class="org.cipango.ims.hss.Hss" autowire="byName" >

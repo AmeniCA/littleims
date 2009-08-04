@@ -1,9 +1,7 @@
 package org.cipango.ims.hss.web.subscription;
 
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.wicket.MarkupContainer;
@@ -17,7 +15,6 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
@@ -28,6 +25,7 @@ public class ContextPanel extends Panel {
 	
 	public ContextPanel(Subscription subscription) {
 		super("contextMenu");
+		setOutputMarkupId(true);
 		add(new BookmarkablePageLink("viewLink", ViewSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
 		add(new BookmarkablePageLink("editLink", EditSubscriptionPage.class, 
@@ -35,7 +33,7 @@ public class ContextPanel extends Panel {
 		add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
 		add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
-				new PageParameters("id=" + subscription.getName())));
+				new PageParameters("id=" + subscription.getName())).setVisible(subscription.getScscf() != null));
 		add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
 				new PageParameters("id=" + subscription.getName())));
 		

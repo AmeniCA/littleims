@@ -60,4 +60,27 @@ public class Cx
 			return _algorithm;
 		}
 	}
+	
+	public static class ReasonCode
+	{
+		public static final int PERMANENT_TERMINATION = 0,
+				NEW_SERVER_ASSIGNED = 1, SERVER_CHANGE = 2, REMOVE_SCSCF = 3;
+
+		public static String toString(int reasonCode)
+		{
+			switch (reasonCode)
+			{
+			case PERMANENT_TERMINATION:
+				return "PERMANENT_TERMINATION";
+			case NEW_SERVER_ASSIGNED:
+				return "NEW_SERVER_ASSIGNED";
+			case SERVER_CHANGE:
+				return "SERVER_CHANGE";
+			case REMOVE_SCSCF:
+				return "REMOVE_SCSCF";
+			default:
+				return "Unknown reason: " + reasonCode;
+			}
+		}
+	}
 }

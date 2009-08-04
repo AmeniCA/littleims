@@ -16,9 +16,12 @@ package org.cipango.ims.hss.web.subscription;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -34,22 +37,27 @@ import org.apache.wicket.markup.html.form.RadioChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.Cx;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
+import org.cipango.ims.hss.web.util.AjaxFallbackButton;
 
 public class DeregistrationPage extends SubscriptionPage
 {
-	@SpringBean
-	PrivateIdentityDao _privateIdentityDao;
+	private static final Logger __log = Logger.getLogger(DeregistrationPage.class);
 	
 	@SpringBean
-	PublicIdentityDao _publicIdentityDao;
+	private PrivateIdentityDao _privateIdentityDao;
 	
+	@SpringBean
+	private PublicIdentityDao _publicIdentityDao;
+		
 	private String _key;
 
 	@SuppressWarnings("unchecked")
@@ -95,7 +103,9 @@ public class DeregistrationPage extends SubscriptionPage
 		WebMarkupContainer privateIdTr = new WebMarkupContainer("privateIdTr");
 		privateIdTr.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false);
 		form.add(privateIdTr);
-		privateIdTr.add(new DropDownChoice("privateId", new Model(), privateIds));
+		privateIdTr.add(new ListMultipleChoice("privateIds", 
+				new Model(new ArrayList()), 
+				privateIds));
 		
 		List<String> publicIds = subscription == null ? Collections.EMPTY_LIST
 				: new ArrayList(subscription.getPublicIds());
@@ -114,41 +124,74 @@ public class DeregistrationPage extends SubscriptionPage
 			@Override
 			public Object getDisplayValue(Integer id)
 			{
-				return ReasonCode.toString(id);
+				return Cx.ReasonCode.toString(id);
 			}
 
 		}).setRequired(true));
 
 		form.add(new TextField<String>("reasonPhrase", new Model<String>()));
 
-		form.add(new Button("submit")
+		form.add(new AjaxFallbackButton("submit", form)
 		{
-			public void onSubmit()
+			@Override
+			protected void doSubmit(AjaxRequestTarget target, Form<?> form)
+					throws Exception
 			{
-				// TODO send RTR
 				boolean deregisterPublic = (Boolean) getForm().get("deregistrationType").getDefaultModelObject();
+				String reasonPhrase = (String) getForm().get("reasonPhrase").getDefaultModelObject();
+				Integer reasonCode = (Integer) getForm().get("reasonCode").getDefaultModelObject();
+
 				if (deregisterPublic)
 				{
 					List<String> publicIds = (List<String>) getForm().get("publicIdsTr:publicIds").getDefaultModelObject();
+					Set<PublicIdentity> publicIdentities = new HashSet<PublicIdentity>(publicIds.size());
 					Iterator<String> it = publicIds.iterator();
 					while (it.hasNext())
 					{
-						PublicUserIdentity id = (PublicUserIdentity) _publicIdentityDao.findById(it.next());
-						id.getImplicitRegistrationSet().deregister();
+						PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById(it.next());
+						publicIdentities.addAll(publicIdentity.getImplicitRegistrationSet().getPublicIdentities());
+						System.out.println("publicIdentity:" + publicIdentity.getIdentity() + "/" + publicIdentity);
+					}
+					try
+					{
+						getCxManager().sendRtr(publicIdentities, reasonCode, reasonPhrase);
+						getSession().info(getString("subscription.deregistration.done"));
+					}
+					catch (Exception e)
+					{
+						__log.warn("Failed to send RTR", e);
+						error(MapVariableInterpolator.interpolate(getString("subscription.error.deregistration"),
+								new MicroMap("reason", e.getMessage())));
 					}
 				}
 				else
 				{
-					String privateId = (String) getForm().get("privateIdTr:privateId").getDefaultModelObject();
-					PrivateIdentity privateIdentity = _privateIdentityDao.findById(privateId);
-					Iterator<PublicUserIdentity> it = privateIdentity.getPublicIdentities().iterator();
-										
+					List<String> privateIds = (List<String>) getForm().get("privateIdTr:privateIds").getDefaultModelObject();
+					Set<PrivateIdentity> privateIdentities = new HashSet<PrivateIdentity>(privateIds.size());
+					Iterator<String> it = privateIds.iterator();
 					while (it.hasNext())
-						it.next().updateState(privateId, State.NOT_REGISTERED);
+						privateIdentities.add(_privateIdentityDao.findById(it.next()));
+					try
+					{
+						getCxManager().sendRtrPrivate(privateIdentities, reasonCode, reasonPhrase);
+						getSession().info(getString("subscription.deregistration.done"));
+					}
+					catch (Exception e)
+					{
+						__log.warn("Failed to send RTR", e);
+						error(MapVariableInterpolator.interpolate(getString("subscription.error.deregistration"),
+								new MicroMap("reason", e.getMessage())));
+					}
+					
 				}
-				
-				checkClearScscf();
+				if (target != null)
+				{
+					Component contextMenu = new ContextPanel(_dao.findById(_key));
+					getPage().get("contextMenu").replaceWith(contextMenu);				
+					target.addComponent(getPage().get("contextMenu"));
+				}
 			}
+
 		});
 
 		form.add(new Button("cancel")
@@ -167,46 +210,10 @@ public class DeregistrationPage extends SubscriptionPage
 			setContextMenu(new ContextPanel(subscription));
 	}
 	
-	private void checkClearScscf()
-	{
-		boolean activePublic = false;
-		Subscription subscription = _dao.findById(_key);
-		for (PublicIdentity publicId : subscription.getPublicIdentities())
-		{
-			Short state = publicId.getState();
-			if (State.NOT_REGISTERED != state)
-				activePublic = true;
-		}
-		if (!activePublic)
-			subscription.setScscf(null);
-	}
-
 	@Override
 	public String getTitle()
 	{
 		return getString("subscription.deregistration.title");
 	}
 
-	static class ReasonCode
-	{
-		public static final int PERMANENT_TERMINATION = 0,
-				NEW_SERVER_ASSIGNED = 1, SERVER_CHANGE = 2, REMOVE_SCSCF = 3;
-
-		public static String toString(int reasonCode)
-		{
-			switch (reasonCode)
-			{
-			case PERMANENT_TERMINATION:
-				return "PERMANENT_TERMINATION";
-			case NEW_SERVER_ASSIGNED:
-				return "NEW_SERVER_ASSIGNED";
-			case SERVER_CHANGE:
-				return "SERVER_CHANGE";
-			case REMOVE_SCSCF:
-				return "REMOVE_SCSCF";
-			default:
-				return "Unknown reason: " + reasonCode;
-			}
-		}
-	}
 }

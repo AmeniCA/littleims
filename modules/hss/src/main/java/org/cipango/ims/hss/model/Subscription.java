@@ -119,9 +119,9 @@ public class Subscription
 
 	public void setScscf(Scscf scscf)
 	{
-		_scscf = scscf;
 		if (_scscf != null)
 			_scscf.getSubscriptions().remove(this);
+		_scscf = scscf;
 		if (scscf != null)
 			scscf.getSubscriptions().add(this);
 	}

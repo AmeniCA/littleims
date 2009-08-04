@@ -14,27 +14,36 @@
 package org.cipango.ims.hss;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.util.string.Strings;
 import org.cipango.diameter.AVP;
+import org.cipango.diameter.AVPList;
 import org.cipango.diameter.ApplicationId;
 import org.cipango.diameter.DiameterFactory;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.ims.hss.db.PublicIdentityDao;
+import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.PSI;
+import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.SpIfc;
+import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public class CxManager
 {
@@ -43,6 +52,7 @@ public class CxManager
 	private String _scscfRealm;
 	private Set<String> _publicIdsToUpdate = new HashSet<String>();
 	private PublicIdentityDao _publicIdentityDao;
+	private SubscriptionDao _subscriptionDao;
 	
 	/**
 	 * <pre>
@@ -99,6 +109,123 @@ public class CxManager
 		else
 			_publicIdsToUpdate.remove(publicIdentity.getIdentity());
 	}
+	
+	/**
+	 * 
+	 * <pre>
+	 *  <Registration-Termination-Request> ::= < Diameter Header: 304, REQ, PXY, 16777216 >
+	 *   < Session-Id >
+	 *   { Vendor-Specific-Application-Id }
+	 *   { Auth-Session-State }
+	 *   { Origin-Host }
+	 *   { Origin-Realm }
+	 *   { Destination-Host }
+	 *   { Destination-Realm }
+	 *   { User-Name }
+	 *   [ Associated-Identities ]
+	 *  *[ Supported-Features ]
+	 *  *[ Public-Identity ]
+	 *   { Deregistration-Reason }
+	 *  *[ AVP ]
+	 *  *[ Proxy-Info ]
+	 *  *[ Route-Record ]
+	 * </pre>
+	 * @param publicIdentity
+	 * @return
+	 * @throws IOException 
+	 */
+	@Transactional (readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void sendRtr(Collection<PublicIdentity> publicIdentities, Integer reasonCode, String reasonPhrase) throws IOException
+	{
+		
+		Scscf scscf = publicIdentities.iterator().next().getScscf();
+		Subscription subscription = null;
+		if (scscf == null)
+			throw new IOException("No S-CSCF assigned to " + publicIdentities);
+		
+		DiameterRequest request = newRequest(IMS.RTR, scscf);
+		for (PublicIdentity publicIdentity : publicIdentities)
+			request.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY, publicIdentity.getIdentity()));
+		
+		String privateIdentity = getPrivateIdentity(publicIdentities.iterator().next());		
+		request.add(AVP.ofString(Base.USER_NAME, privateIdentity));
+		request.add(getDeregistrationReason(reasonCode, reasonPhrase));
+		
+		request.send();
+		
+		Iterator<PublicIdentity> it2 = publicIdentities.iterator();
+		while (it2.hasNext())
+		{
+			PublicIdentity publicIdentity = it2.next();
+			if (publicIdentity instanceof PublicUserIdentity)
+			{
+				PublicUserIdentity publicUserIdentity = (PublicUserIdentity) publicIdentity;
+				subscription = publicUserIdentity.getPrivateIdentities().iterator().next().getSubscription();
+				publicUserIdentity.getImplicitRegistrationSet().deregister();
+			}
+		}
+		checkClearScscf(subscription);
+	}
+	
+	private AVP getDeregistrationReason(Integer reasonCode, String reasonPhrase)
+	{
+		AVPList avpList = new AVPList();
+		avpList.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.REASON_CODE, reasonCode));
+		if (!Strings.isEmpty(reasonPhrase))
+			avpList.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.REASON_INFO, reasonPhrase));
+		
+		return AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.DERISTRATION_REASON, avpList);
+	}
+	
+	@Transactional (readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void sendRtrPrivate(Collection<PrivateIdentity> privateIdentities, Integer reasonCode, String reasonPhrase) throws IOException
+	{
+		Iterator<PrivateIdentity> it = privateIdentities.iterator();
+		PrivateIdentity privateIdentity = it.next();
+		Scscf scscf = privateIdentity.getSubscription().getScscf();
+		
+		if (scscf == null)
+			throw new IOException("No S-CSCF assigned to the subscription " + privateIdentity.getSubscription().getName());
+		
+		DiameterRequest request = newRequest(IMS.RTR, scscf);
+			
+		
+		request.add(AVP.ofString(Base.USER_NAME, privateIdentity.getIdentity()));
+		request.add(getDeregistrationReason(reasonCode, reasonPhrase));
+		
+		if (it.hasNext())
+		{
+			AVPList l = new AVPList();
+			while (it.hasNext())
+				l.addString(Base.USER_NAME, it.next().getIdentity());
+			request.add(AVP.ofAVPs(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES, l));
+		}
+		
+		request.send();
+		
+		for (PrivateIdentity privateId : privateIdentities)
+		{
+			Iterator<PublicUserIdentity> it2 = privateId.getPublicIdentities().iterator();
+			while (it2.hasNext())
+				it2.next().updateState(privateId.getIdentity(), State.NOT_REGISTERED);
+		}
+		checkClearScscf(privateIdentity.getSubscription());
+	}
+	
+	private void checkClearScscf(Subscription subscription)
+	{
+		boolean activePublic = false;
+		for (PublicIdentity publicId : subscription.getPublicIdentities())
+		{
+			Short state = publicId.getState();
+			if (State.NOT_REGISTERED != state)
+				activePublic = true;
+		}
+		if (!activePublic)
+			subscription.setScscf(null);
+		_subscriptionDao.save(subscription);
+	}
+
 	
 	private String getPrivateIdentity(PublicIdentity publicIdentity)
 	{
@@ -201,6 +328,16 @@ public class CxManager
 	public void setPublicIdentityDao(PublicIdentityDao publicIdentityDao)
 	{
 		_publicIdentityDao = publicIdentityDao;
+	}
+
+	public SubscriptionDao getSubscriptionDao()
+	{
+		return _subscriptionDao;
+	}
+
+	public void setSubscriptionDao(SubscriptionDao subscriptionDao)
+	{
+		_subscriptionDao = subscriptionDao;
 	}
 	
 }
