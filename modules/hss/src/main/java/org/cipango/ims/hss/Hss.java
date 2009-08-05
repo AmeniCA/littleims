@@ -693,6 +693,15 @@ public class Hss
 		}
 	}
 	
+	public void doRta(DiameterAnswer rta)
+	{
+		int resultCode = rta.getResultCode();
+		if (resultCode >= 3000)
+		{
+			__log.warn("Received negative response code to RTR: " + resultCode);
+		}
+	}
+	
 	/**
 	 * Based on C.3.1	Profile 1: management of sequence numbers which are partly time-based
 	 */

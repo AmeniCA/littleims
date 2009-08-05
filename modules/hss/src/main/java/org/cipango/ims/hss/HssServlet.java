@@ -139,6 +139,9 @@ public class HssServlet extends SipServlet implements DiameterListener
 			case IMS.PPA:
 				_hss.doPpa(answer);
 				break;
+			case IMS.RTA:
+				_hss.doRta(answer);
+				break;
 			default:
 				__log.warn("Received unknown answer: " + command);
 				break;

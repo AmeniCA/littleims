@@ -150,7 +150,8 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.open("PublicIdentity");
 		out.add("BarringIndication", _barred);
 		String realImpu = (String) out.getParameter("realImpu");
-		if (realImpu != null)
+		if (realImpu != null && _regex != null 
+				&& realImpu.matches(RegexUtil.extendedRegexToJavaRegex(_identity)))
 			out.add("Identity", realImpu);
 		else
 			out.add("Identity", _identity);
