@@ -147,11 +147,8 @@ public class DeregistrationPage extends SubscriptionPage
 					Set<PublicIdentity> publicIdentities = new HashSet<PublicIdentity>(publicIds.size());
 					Iterator<String> it = publicIds.iterator();
 					while (it.hasNext())
-					{
-						PublicUserIdentity publicIdentity = (PublicUserIdentity) _publicIdentityDao.findById(it.next());
-						publicIdentities.addAll(publicIdentity.getImplicitRegistrationSet().getPublicIdentities());
-						System.out.println("publicIdentity:" + publicIdentity.getIdentity() + "/" + publicIdentity);
-					}
+						publicIdentities.add((PublicUserIdentity) _publicIdentityDao.findById(it.next()));
+					
 					try
 					{
 						getCxManager().sendRtr(publicIdentities, reasonCode, reasonPhrase);
