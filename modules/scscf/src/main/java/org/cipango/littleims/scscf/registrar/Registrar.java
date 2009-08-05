@@ -16,9 +16,11 @@ package org.cipango.littleims.scscf.registrar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,8 +36,10 @@ import javax.servlet.sip.URI;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
+import org.cipango.ims.Cx;
 import org.cipango.littleims.cx.ServerAssignmentType;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.cx.data.userprofile.TPublicIdentity;
@@ -619,6 +623,71 @@ public class Registrar
 		}
 	}
 	
+	private void sendThirdPartyRegister(String aor,RegistrationInfo regInfo)
+	{
+		try
+		{
+			// send third-party registration to relevant application servers
+			// @see 24.229 5.4.1.7
+			SipServletRequest request = _sipFactory.createRequest(
+					_sipFactory.createApplicationSession(),
+					Methods.REGISTER,
+					aor,
+					aor);
+			request.setExpires(0);
+			
+			Iterator<String> it = regInfo.getAssociatedURIs().iterator();
+			while (it.hasNext())
+			{
+				String sURI = it.next();
+				UserProfile profile = _userProfileCache.getProfile(sURI, null);
+
+				Iterator<InitialFilterCriteria> ifcs = profile.getServiceProfile().getIFCsIterator();
+
+				while (ifcs.hasNext())
+				{
+					URI toUri = _sipFactory.createURI(sURI);
+					URI fromUri = _scscfUri;
+					InitialFilterCriteria ifc = (InitialFilterCriteria) ifcs.next();
+					__log.debug("Evaluating ifc: " + ifc);
+					if (ifc.matches(request,
+							InitialFilterCriteria.SessionCase.ORIGINATING_SESSION))
+					{
+						__log.debug("IFC matches for URI: " + sURI + ". Sending Third-Party REGISTER");
+						SipServletRequest register = _sipFactory.createRequest(request
+								.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
+						register.setExpires(0);
+						register.setRequestURI(_sipFactory.createURI(ifc.getAS().getURI()));
+						
+						String pAccessNetworkInfo = request.getHeader(Headers.P_ACCESS_NETWORK_INFO);
+						if (pAccessNetworkInfo != null)
+							register.setHeader(Headers.P_ACCESS_NETWORK_INFO, pAccessNetworkInfo);
+						
+						String pChargingVector = request.getHeader(Headers.P_CHARCHING_VECTOR);
+						if (pChargingVector != null)
+							register.setHeader(Headers.P_CHARCHING_VECTOR, pChargingVector);
+						
+						String serviceInfo = ifc.getAS().getServiceInfo();
+						if (serviceInfo != null && !serviceInfo.trim().equals(""))
+						{
+							register.setContent(
+									generateXML(serviceInfo).getBytes(),
+									SERVICE_INFO_TYPE);
+						}
+
+						// TODO support multipart
+						register.setAddressHeader(Headers.CONTACT_HEADER, _sipFactory.createAddress(_scscfUri));
+						register.send();
+					}
+				}
+			}
+		}
+		catch (Throwable e)
+		{
+			__log.warn("Failed to send third party REGISTER", e);
+		}
+	}
+	
 	private String generateXML(String serviceInfo)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -627,6 +696,162 @@ public class Registrar
 		sb.append("<service-info>").append(serviceInfo).append("</service-info>\n");
 		sb.append("</ims-3gpp>\n");
 		return sb.toString();
+	}
+	
+	
+	public void handleRtr(DiameterRequest rtr) throws IOException, ServletException
+	{
+		// Deregister + send NOTIFY + send third party register
+		Iterator<AVP> it = rtr.getAVPs(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY);
+		
+		ContactEvent contactEvent;
+		int deregistrationReason = getDeregistrationReason(rtr);
+		switch (deregistrationReason)
+		{
+		case Cx.ReasonCode.NEW_SERVER_ASSIGNED:
+		case Cx.ReasonCode.REMOVE_SCSCF:
+		case Cx.ReasonCode.SERVER_CHANGE:
+			contactEvent = ContactEvent.DEACTIVATED;
+			break;
+		case Cx.ReasonCode.PERMANENT_TERMINATION:
+			contactEvent = ContactEvent.REJECTED;
+			break;
+		default:
+			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
+			answer.add(AVP.ofAVPs(Base.FAILED_AVP, 
+					AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.DERISTRATION_REASON, new byte[10])));
+			answer.send();
+			return;
+		}
+		
+		if (it.hasNext())
+		{
+			while (it.hasNext())
+			{
+				String publicId = it.next().getString();
+				Context regContext = _regContexts.get(publicId); // FIXME case wilcard 
+				
+				if (regContext == null)
+					continue;
+				
+				RegistrationInfo info = new RegistrationInfo();
+				info.setAssociatedURIs(regContext.getAssociatedURIs());
+				sendThirdPartyRegister(publicId, info);
+				
+				RegEvent regEvent = new RegEvent();
+				Iterator<String> it2 = regContext.getAssociatedURIs().iterator();
+				while (it2.hasNext())
+				{
+					String associatedIdentity = it2.next();
+					Context context = _regContexts.get(associatedIdentity);
+
+					if (context != null)
+					{
+						// Remove all bindings
+						RegInfo regInfo = context.removeAllBindings(contactEvent);
+						regEvent.addRegInfo(regInfo);
+						__log.info("User " + associatedIdentity + " has been network deregistered");
+						_regContexts.remove(associatedIdentity);
+						_userProfileCache.clearUserProfile(associatedIdentity);
+					}
+				}
+				notifyListeners(regEvent);
+			}
+		}
+		else
+		{
+			List<String> privateIds = getPrivateIdentities(rtr);
+			if (privateIds == null)
+				return;
+			
+			Set<String> contextsToRemove = new HashSet<String>();
+			Iterator<Context> it2 = _regContexts.values().iterator();
+			while (it2.hasNext())
+			{
+				Context context = it2.next();
+				if (context.hasPrivateIdentityRegistered(privateIds))
+				{
+					String publicId = context.getPublicIdentity();
+					RegEvent regEvent = new RegEvent();
+						
+					List<String> associatedURIs = context.getAssociatedURIs();
+					Iterator<String> it3 = associatedURIs.iterator();
+					while (it3.hasNext())
+					{
+						String publicID = it3.next();
+						context = (Context) _regContexts.get(publicID);
+						if (context != null)
+						{
+							// should never be null unlike wrong HSS configuration
+							for (String privateId : privateIds)
+							{
+								RegInfo regInfo = context.removeBinding(privateId, contactEvent);
+								if (regInfo != null)
+									regEvent.addRegInfo(regInfo);
+							}
+							
+							if (context.getState() == RegState.TERMINATED)
+								contextsToRemove.add(publicID);
+						}
+					}
+					notifyListeners(regEvent);
+
+					RegistrationInfo info = new RegistrationInfo();
+					info.setAssociatedURIs(associatedURIs);
+					info.setContacts(context.getContacts());
+											
+					sendThirdPartyRegister(publicId, info);
+					
+					if (info.getContacts().isEmpty())
+					{
+						
+					}
+				}
+			}
+			for (String publicId : contextsToRemove)
+			{
+				__log.info("User " + publicId + " has been network deregistered");
+				_userProfileCache.clearUserProfile(publicId);
+				_regContexts.remove(publicId);
+			}
+		}
+		DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_SUCCESS);
+		answer.send();
+	}
+	
+	private List<String> getPrivateIdentities(DiameterRequest rtr) throws IOException
+	{
+		String privateIdentity = rtr.getAVPs().getString(Base.USER_NAME);
+		if (privateIdentity == null)
+		{
+			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
+			answer.add(AVP.ofAVPs(Base.FAILED_AVP, 
+					AVP.ofBytes(Base.USER_NAME, new byte[0])));
+			answer.send();
+			return null;
+		}
+
+		List<String> privateIds = new ArrayList<String>();
+		privateIds.add(privateIdentity);
+		AVP associatedIdentites = rtr.getAVP(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES);
+		if (associatedIdentites != null)
+		{
+			Iterator<AVP> it = associatedIdentites.getGrouped().getAVPs(Base.USER_NAME);
+			while (it.hasNext())
+				privateIds.add(it.next().toString());
+		}
+		return privateIds;
+	}
+	
+	private int getDeregistrationReason(DiameterRequest rtr)
+	{
+		AVP avp = rtr.getAVP(IMS.IMS_VENDOR_ID, IMS.DERISTRATION_REASON);
+		if (avp == null)
+		{
+			__log.warn("Missing required AVP: Deregistration reason " + IMS.DERISTRATION_REASON);
+			return -1;
+		}	
+		return avp.getGrouped().getInt(IMS.IMS_VENDOR_ID, IMS.REASON_CODE);
 	}
 	
 	public UserProfileCache getUserProfileCache()

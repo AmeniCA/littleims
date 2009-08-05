@@ -59,28 +59,22 @@ public class UserProfileCache
 		{
 			// check all Service Profiles
 			TServiceProfile[] profiles = imsSub.getIMSSubscription().getServiceProfileArray();
-			for (int i = 0; i < profiles.length; i++)
+			for (TServiceProfile profile :profiles)
 			{
 				// Build a single ServiceProfile
 				// May contain several IFCs and be associated to several Public
 				// Identities
 				ServiceProfile serviceProfile = new ServiceProfile();
 
-				TServiceProfile profile = (TServiceProfile) profiles[i];
-
 				// Core Network Service Authorization
 				TCoreNetworkServicesAuthorization cnsa = profile
 						.getCoreNetworkServicesAuthorization();
 				if (cnsa != null)
-				{
 					serviceProfile.setMediaProfile(cnsa.getSubscribedMediaProfileId());
-				}
 
 				// Initial Filter Criterias
-				TInitialFilterCriteria[] iFCs = profile.getInitialFilterCriteriaArray();
-				for (int k = 0; k < iFCs.length; k++)
+				for (TInitialFilterCriteria tIFC : profile.getInitialFilterCriteriaArray())
 				{
-					TInitialFilterCriteria tIFC = (TInitialFilterCriteria) iFCs[k];
 					InitialFilterCriteria ifc = createIFC(tIFC);
 					try
 					{
@@ -128,9 +122,8 @@ public class UserProfileCache
 
 				// Public Identities that use this ServiceProfile
 				TPublicIdentity[] publicIDs = profile.getPublicIdentityArray();
-				for (int j = 0; j < publicIDs.length; j++)
+				for (TPublicIdentity publicID : publicIDs)
 				{
-					TPublicIdentity publicID = publicIDs[j];
 					boolean wildcard = publicID.getExtension() != null && publicID.getExtension().getWildcardedPSI() != null; 
 					String identity = wildcard ? publicID.getExtension().getWildcardedPSI() : publicID.getIdentity();
 					

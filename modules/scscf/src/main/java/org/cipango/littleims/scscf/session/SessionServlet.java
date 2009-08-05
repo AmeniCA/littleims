@@ -31,6 +31,7 @@ import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.littleims.scscf.debug.DebugIdService;
 import org.cipango.littleims.scscf.registrar.Authenticator;
+import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
@@ -51,6 +52,8 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 	private Authenticator _authenticator;
 	
 	private DebugIdService _debugIdService;
+	
+	private Registrar _registrar;
 
 	private static final Logger __log = Logger.getLogger(SessionServlet.class);
 
@@ -64,6 +67,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 			_sessionManager = (SessionManager) context.getBean("sessionManager");
 			_authenticator = (Authenticator) context.getBean("authenticator");
 			_debugIdService = (DebugIdService) context.getBean("debugIdService");
+			_registrar = (Registrar) context.getBean("registrar");
 		} 
 		catch (BeansException e) 
 		{
@@ -135,6 +139,8 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 				DiameterRequest request = (DiameterRequest) message;
 				if (command == IMS.PPR)
 					_sessionManager.handlePpr(request);
+				else if (command == IMS.RTR)
+					_registrar.handleRtr(request);
 				else
 					__log.warn("No handler for diameter request with command " + message.getCommand());
 			}

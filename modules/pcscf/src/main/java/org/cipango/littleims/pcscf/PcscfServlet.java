@@ -47,7 +47,7 @@ public class PcscfServlet extends SipServlet
 			_pcscfService = (PcscfService) context.getBean("pcscfService");
 			_debugIdService = (DebugIdService) context.getBean("debugIdService");
 		} catch (BeansException e) {
-			throw new UnavailableException("no I-CSCF service " + e);
+			throw new UnavailableException("no P-CSCF service " + e);
 		}
 	}
 
