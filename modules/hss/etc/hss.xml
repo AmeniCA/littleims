@@ -61,6 +61,19 @@
 		<property name="namingStrategy"><ref bean="namingStrategy"/></property>
 	</bean>
 	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	
+	<bean 
+			id="adminUserDao" class="org.cipango.ims.hss.db.hibernate.AdminUserDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
 	<bean id="subscriptionDao" class="org.cipango.ims.hss.db.hibernate.SubscriptionDaoImpl">
 		<constructor-arg ref="sessionFactory"/>
 	</bean>
@@ -110,21 +123,14 @@
 	
 	<bean id="hss" class="org.cipango.ims.hss.Hss" autowire="byName" >
 	</bean>
-	
-	<bean id="transactionManager"
-		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-
-	
+		
 	<bean id="webApplication" 
 			class="org.cipango.ims.hss.web.ImsApplication" 
 			autowire="byName" 
 			factory-method="getInstance"
 			init-method="springStart"
 			destroy-method="springStop">
+			<property name="webAuthentication" value="true" />
 	</bean>
 	
 </beans>

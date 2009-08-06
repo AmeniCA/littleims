@@ -23,11 +23,16 @@ import org.apache.wicket.Request;
 import org.apache.wicket.Response;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
+import org.apache.wicket.settings.ISecuritySettings;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.convert.IConverter;
 import org.cipango.ims.hss.util.HexString;
+import org.cipango.ims.hss.web.adminuser.AdminUserBrowserPage;
+import org.cipango.ims.hss.web.adminuser.DeleteAdminUserPage;
+import org.cipango.ims.hss.web.adminuser.EditAdminUserPage;
+import org.cipango.ims.hss.web.adminuser.SetPasswordPage;
 import org.cipango.ims.hss.web.as.AsBrowserPage;
 import org.cipango.ims.hss.web.as.DeleteAsPage;
 import org.cipango.ims.hss.web.as.EditAsPage;
@@ -62,8 +67,8 @@ import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 import org.cipango.ims.hss.web.util.ClassResolver;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.cipango.ims.hss.web.util.SignOutPage;
+import org.cipango.ims.hss.web.util.SigninPage;
 
 
 public class ImsApplication extends WebApplication {
@@ -73,6 +78,7 @@ public class ImsApplication extends WebApplication {
 
 	private boolean _wicketStarted = false;
 	private SipFactory _sipFactory;
+	private boolean _webAuthentication = true;
 	
 	private ImsApplication() {	
 	}
@@ -83,6 +89,14 @@ public class ImsApplication extends WebApplication {
 		if (_wicketStarted) {
 			_injector = new SpringComponentInjector(this);
 			addComponentInstantiationListener(_injector);	
+			
+			if (_webAuthentication)
+			{
+				AuthorizationStrategy authStrat = new AuthorizationStrategy();
+			    ISecuritySettings securitySettings = getSecuritySettings();
+			    securitySettings.setAuthorizationStrategy(authStrat);
+			    securitySettings.setUnauthorizedComponentInstantiationListener(authStrat);
+			}
 		}
 	}
 	
@@ -122,6 +136,11 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/s-cscf/delete", DeleteScscfPage.class, id));
 		mountBookmarkablePage("/s-cscf/browser", ScscfBrowserPage.class);
 		
+		mount(new MixedParamUrlCodingStrategy("/admin/user/edit", EditAdminUserPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/admin/user/set-password", SetPasswordPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/admin/user/delete", DeleteAdminUserPage.class, id));
+		mountBookmarkablePage("/admin/user/browser", AdminUserBrowserPage.class);
+		
 		mount(new MixedParamUrlCodingStrategy("/application-server/edit", EditAsPage.class, id));
 		mount(new MixedParamUrlCodingStrategy("/application-server/delete", DeleteAsPage.class, id));
 		mountBookmarkablePage("/application-server/browser", AsBrowserPage.class);
@@ -141,7 +160,9 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/implicit-registration-state/edit", EditImplicitSetPage.class, id));
 			
 		mount(new MixedParamUrlCodingStrategy("/debug-session/edit", EditDebugSessionPage.class, id));
-		
+		mountBookmarkablePage("/signin", SigninPage.class);
+		mountBookmarkablePage("/signout", SignOutPage.class);
+				
 		_wicketStarted = true;
 		springStart();
 	}
@@ -160,11 +181,6 @@ public class ImsApplication extends WebApplication {
 	
 	public SipFactory getSipFactory()
 	{
-		if (_sipFactory == null)
-		{
-			ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-			_sipFactory = (SipFactory) context.getBean("sipFactory");
-		}
 		return _sipFactory;
 	}
 	
@@ -202,5 +218,20 @@ public class ImsApplication extends WebApplication {
 			return HexString.toHexString((byte[]) value);
 		}
 		
+	}
+
+	public boolean isWebAuthentication()
+	{
+		return _webAuthentication;
+	}
+
+	public void setWebAuthentication(boolean webAuthentication)
+	{
+		_webAuthentication = webAuthentication;
+	}
+
+	public void setSipFactory(SipFactory sipFactory)
+	{
+		_sipFactory = sipFactory;
 	}
 }

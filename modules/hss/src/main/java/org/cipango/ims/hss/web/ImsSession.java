@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import org.apache.wicket.Page;
 import org.apache.wicket.Request;
 import org.apache.wicket.protocol.http.WebSession;
+import org.cipango.ims.hss.model.AdminUser;
 
 
 
@@ -25,11 +26,16 @@ public class ImsSession extends WebSession {
 
 	private Hashtable<Class<?>, Page> backPages = new Hashtable<Class<?>, Page>();
 
-
+	private AdminUser _adminUser;
+	
 	public ImsSession(Request request) {
 		super(request);
 	}
 
+	public static ImsSession get()
+	{
+		return (ImsSession) WebSession.get();
+	}
 
 	@Override
 	protected void detach() {
@@ -42,6 +48,22 @@ public class ImsSession extends WebSession {
 	
 	public Page getBackPage(Class<?> clazz) {
 		return backPages.get(clazz);
+	}
+
+	public boolean isAuthenticated()
+	{
+		return _adminUser != null;
+	}
+
+	public AdminUser getAdminUser()
+	{
+		return _adminUser;
+	}
+
+
+	public void setAdminUser(AdminUser adminUser)
+	{
+		_adminUser = adminUser;
 	}
 	
 }

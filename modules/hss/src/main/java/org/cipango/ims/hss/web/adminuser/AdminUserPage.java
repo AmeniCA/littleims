@@ -11,31 +11,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web;
+package org.cipango.ims.hss.web.adminuser;
 
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.ims.hss.db.AdminUserDao;
+import org.cipango.ims.hss.model.AdminUser;
+import org.cipango.ims.hss.web.BasePage;
 
-public class HeaderPanel extends Panel {
+public abstract class AdminUserPage extends BasePage
+{
 
-	public HeaderPanel() {
-		super("header");
-		ImsSession session = ((ImsSession) getSession());
-		if (session.isAuthenticated()) {
-			add(new Label("user.current", 
-					new StringResourceModel("headerPanel.user.current", new LoadableDetachableModel() {
-						@Override
-						protected Object load() {
-							return ((ImsSession) getSession()).getAdminUser();
-						}
-						
-					})));
-		} else {
-			add(new Label("user.current", "User: none").setVisible(false)); // FIXME visible
-		}
+	@SpringBean
+	protected AdminUserDao _dao;
 		
+	protected String getPrefix()
+	{
+		return "adminUser";
+	}
+
+	public class DaoDetachableModel extends LoadableDetachableModel<AdminUser>
+	{
+		private String key;
+
+		public DaoDetachableModel(String key)
+		{
+			this.key = key;
+		}
+
+		public DaoDetachableModel(AdminUser o)
+		{
+			super(o);
+			if (o != null)
+				this.key = o.getLogin();
+		}
+
+		@Override
+		protected AdminUser load()
+		{
+			if (key == null)
+				return new AdminUser();
+			else
+				return _dao.findById(key);
+		}
 	}
 
 }

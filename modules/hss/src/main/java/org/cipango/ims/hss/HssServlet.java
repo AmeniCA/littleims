@@ -26,6 +26,7 @@ import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
+import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.diameter.DiameterException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -46,6 +47,9 @@ public class HssServlet extends SipServlet implements DiameterListener
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		_hss = (Hss) context.getBean("hss");
 		_loader =  Thread.currentThread().getContextClassLoader();
+		
+		AdminUserDao dao = (AdminUserDao) context.getBean("adminUserDao");
+		dao.insertDefaultUserIfNone();
 	}
 	
 	public void handle(DiameterMessage message) throws IOException

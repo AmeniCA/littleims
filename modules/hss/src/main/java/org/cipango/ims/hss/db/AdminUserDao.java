@@ -11,31 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web;
 
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.StringResourceModel;
+package org.cipango.ims.hss.db;
 
-public class HeaderPanel extends Panel {
+import org.cipango.ims.hss.model.AdminUser;
 
-	public HeaderPanel() {
-		super("header");
-		ImsSession session = ((ImsSession) getSession());
-		if (session.isAuthenticated()) {
-			add(new Label("user.current", 
-					new StringResourceModel("headerPanel.user.current", new LoadableDetachableModel() {
-						@Override
-						protected Object load() {
-							return ((ImsSession) getSession()).getAdminUser();
-						}
-						
-					})));
-		} else {
-			add(new Label("user.current", "User: none").setVisible(false)); // FIXME visible
-		}
-		
-	}
-
+public interface AdminUserDao extends Dao, ImsDao<AdminUser>
+{
+	void save(AdminUser user);
+	AdminUser findById(String id);
+	
+	void insertDefaultUserIfNone();
 }

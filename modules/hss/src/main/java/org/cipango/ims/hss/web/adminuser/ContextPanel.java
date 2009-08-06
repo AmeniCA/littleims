@@ -11,31 +11,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web;
+package org.cipango.ims.hss.web.adminuser;
 
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.StringResourceModel;
+import org.cipango.ims.hss.model.AdminUser;
 
-public class HeaderPanel extends Panel {
+@SuppressWarnings("unchecked")
+public class ContextPanel extends Panel
+{
 
-	public HeaderPanel() {
-		super("header");
-		ImsSession session = ((ImsSession) getSession());
-		if (session.isAuthenticated()) {
-			add(new Label("user.current", 
-					new StringResourceModel("headerPanel.user.current", new LoadableDetachableModel() {
-						@Override
-						protected Object load() {
-							return ((ImsSession) getSession()).getAdminUser();
-						}
-						
-					})));
-		} else {
-			add(new Label("user.current", "User: none").setVisible(false)); // FIXME visible
-		}
-		
+	public ContextPanel(AdminUser adminUser)
+	{
+		super("contextMenu");
+		setOutputMarkupId(true);
+		add(new BookmarkablePageLink("editLink", EditAdminUserPage.class,
+				new PageParameters("id=" + adminUser.getLogin())));
+		add(new BookmarkablePageLink("deleteLink", DeleteAdminUserPage.class,
+				new PageParameters("id=" + adminUser.getLogin())));
+		add(new BookmarkablePageLink("setPwdLink", SetPasswordPage.class,
+				new PageParameters("id=" + adminUser.getLogin())));
 	}
 
 }

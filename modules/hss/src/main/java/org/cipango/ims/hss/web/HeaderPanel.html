@@ -9,14 +9,16 @@
 <wicket:panel>
     <div id="header">
     	<div id="logo">LittleIMS</div>
+        <wicket:link>
 		<div id="statusBar">
-			<span>User: none</span>
+			<span wicket:id="user.current">User: none</span>
 			<span class="link-delimiter">|</span>
-			LOGOUT
+			     <a href="/org/cipango/ims/hss/web/util/SignOutPage.html">
+                    <wicket:message key="headerPanel.signout">signout</wicket:message>
+                 </a>
 			<span class="link-delimiter">|</span>
 			HISTORY
 		</div>
-    	<wicket:link>
     	<div id="nav-container">
 	    	<ul>
     			<li>
@@ -52,6 +54,11 @@
 				<li>
                     <a href="/org/cipango/ims/hss/web/as/AsBrowserPage.html">
                         <wicket:message key="headerPanel.as">AS</wicket:message>
+                    </a>
+                </li>
+                <li>
+                    <a href="/org/cipango/ims/hss/web/adminuser/AdminUserBrowserPage.html">
+                        <wicket:message key="headerPanel.adminUsers">Admin users</wicket:message>
                     </a>
                 </li>
 			</ul>
