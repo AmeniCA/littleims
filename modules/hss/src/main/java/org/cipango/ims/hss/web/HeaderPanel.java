@@ -13,29 +13,56 @@
 // ========================================================================
 package org.cipango.ims.hss.web;
 
+import org.apache.wicket.Component;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
+import org.cipango.ims.hss.web.ImsSession.DaoDetachableModel;
+import org.cipango.ims.hss.web.adminuser.EditAdminUserPage;
+import org.cipango.ims.hss.web.util.SignOutPage;
 
-public class HeaderPanel extends Panel {
+public class HeaderPanel extends Panel
+{
 
-	public HeaderPanel() {
+	@SuppressWarnings("unchecked")
+	public HeaderPanel()
+	{
 		super("header");
 		ImsSession session = ((ImsSession) getSession());
-		if (session.isAuthenticated()) {
-			add(new Label("user.current", 
-					new StringResourceModel("headerPanel.user.current", new LoadableDetachableModel() {
-						@Override
-						protected Object load() {
-							return ((ImsSession) getSession()).getAdminUser();
-						}
-						
-					})));
-		} else {
-			add(new Label("user.current", "User: none").setVisible(false)); // FIXME visible
+		if (session.isAuthenticated())
+		{
+			DaoDetachableModel adminModel = ((ImsSession) getSession()).getAdminUserModel();
+			add(new Label("user.current", ""));
+			add(new BookmarkablePageLink("profileLink",
+					EditAdminUserPage.class, new PageParameters("id="
+							+ adminModel.getLogin())));
+			add(new BookmarkablePageLink("signout",
+					SignOutPage.class/*, new PageParameters(SignOutPage.REDIRECTPAGE_PARAM + "="
+							+ SigninPage.class.getName())*/));
 		}
-		
+		else
+		{
+			add(new Label("user.current", "User: none").setVisible(false));
+			add(new WebMarkupContainer("profileLink").setVisible(false));
+			add(new WebMarkupContainer("signout").setVisible(false));
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void onBeforeRender()
+	{
+		Component component = get("user.current");
+		if (component.isVisible())
+		{
+			component.setDefaultModelObject(MapVariableInterpolator.interpolate(getString("headerPanel.user.current"),
+				new MicroMap("login", ((ImsSession) getSession()).getLogin())));
+		}
+		super.onBeforeRender();
 	}
 
 }

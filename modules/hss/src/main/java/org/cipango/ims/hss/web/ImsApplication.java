@@ -28,6 +28,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.convert.IConverter;
+import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.util.HexString;
 import org.cipango.ims.hss.web.adminuser.AdminUserBrowserPage;
 import org.cipango.ims.hss.web.adminuser.DeleteAdminUserPage;
@@ -68,7 +69,6 @@ import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
 import org.cipango.ims.hss.web.util.ClassResolver;
 import org.cipango.ims.hss.web.util.SignOutPage;
-import org.cipango.ims.hss.web.util.SigninPage;
 
 
 public class ImsApplication extends WebApplication {
@@ -79,6 +79,8 @@ public class ImsApplication extends WebApplication {
 	private boolean _wicketStarted = false;
 	private SipFactory _sipFactory;
 	private boolean _webAuthentication = true;
+	
+	private AdminUserDao _adminUserDao;
 	
 	private ImsApplication() {	
 	}
@@ -233,5 +235,15 @@ public class ImsApplication extends WebApplication {
 	public void setSipFactory(SipFactory sipFactory)
 	{
 		_sipFactory = sipFactory;
+	}
+
+	public AdminUserDao getAdminUserDao()
+	{
+		return _adminUserDao;
+	}
+
+	public void setAdminUserDao(AdminUserDao adminUserDao)
+	{
+		_adminUserDao = adminUserDao;
 	}
 }

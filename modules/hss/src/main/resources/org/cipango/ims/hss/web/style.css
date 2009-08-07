@@ -25,6 +25,12 @@ body {
 	font-size: 80%;
 }
 
+#loginPanel { width:400px; font-size:16px; padding: 4px; background:#ECF2F6; margin:20px 0 0; text-align:left;}
+#loginPanel div {padding: 4px; }
+#loginPanel .label { width:150px; text-align:right; float:left; margin:0 4px 0 0;}
+#loginPanel .title { font-size:20px; text-align:center;}
+#loginPanel .button { text-align:center; padding: 10px; }
+
 h2 {margin: 5px 0px; }
 
 

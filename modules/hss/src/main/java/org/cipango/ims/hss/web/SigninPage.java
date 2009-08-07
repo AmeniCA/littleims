@@ -1,16 +1,17 @@
-package org.cipango.ims.hss.web.util;
+package org.cipango.ims.hss.web;
 
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.StatelessForm;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.model.AdminUser;
-import org.cipango.ims.hss.web.ImsSession;
 
+@SuppressWarnings("unused")
 public class SigninPage extends WebPage
 {
 	@SpringBean
@@ -18,23 +19,23 @@ public class SigninPage extends WebPage
 	
 	public SigninPage()
 	{
+		add(new Label("title", getString("signin.title")));
 		add(new SignInForm("signInForm"));
 		add(new FeedbackPanel("feedback"));
 	}
 	
+	@SuppressWarnings("unchecked")
 	private class SignInForm extends StatelessForm
 	{
 
 		private String _password;
-
 		private String _username;
 
-		@SuppressWarnings("unchecked")
 		public SignInForm(final String id)
 		{
 			super(id);
 			setModel(new CompoundPropertyModel(this));
-			add(new TextField("username"));
+			add(new RequiredTextField("username"));
 			add(new PasswordTextField("password"));
 		}
 
@@ -91,7 +92,5 @@ public class SigninPage extends WebPage
 			_username = username;
 		}
 	}
-
-
 
 }

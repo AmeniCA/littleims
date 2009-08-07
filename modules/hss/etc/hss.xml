@@ -126,11 +126,12 @@
 		
 	<bean id="webApplication" 
 			class="org.cipango.ims.hss.web.ImsApplication" 
-			autowire="byName" 
 			factory-method="getInstance"
 			init-method="springStart"
 			destroy-method="springStop">
-			<property name="webAuthentication" value="true" />
+		<property name="adminUserDao" ref="adminUserDao" />
+		<property name="sipFactory" ref="sipFactory" />
+		<property name="webAuthentication" value="true" />
 	</bean>
 	
 </beans>

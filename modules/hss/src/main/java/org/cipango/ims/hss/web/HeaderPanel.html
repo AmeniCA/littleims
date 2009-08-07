@@ -11,13 +11,15 @@
     	<div id="logo">LittleIMS</div>
         <wicket:link>
 		<div id="statusBar">
-			<span wicket:id="user.current">User: none</span>
+			<span wicket:id="user.current">User: none</span>	
+            <wicket:enclosure child="profileLink">
 			<span class="link-delimiter">|</span>
-			     <a href="/org/cipango/ims/hss/web/util/SignOutPage.html">
+			     <a wicket:id="signout">
                     <wicket:message key="headerPanel.signout">signout</wicket:message>
                  </a>
 			<span class="link-delimiter">|</span>
-			HISTORY
+			<a href="#" wicket:id="profileLink"><wicket:message key="headerPanel.profile"/></a>
+            </wicket:enclosure>
 		</div>
     	<div id="nav-container">
 	    	<ul>

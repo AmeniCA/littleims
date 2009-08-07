@@ -18,7 +18,6 @@ import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.authorization.Action;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
 import org.apache.wicket.authorization.IUnauthorizedComponentInstantiationListener;
-import org.cipango.ims.hss.web.util.SigninPage;
 
 public class AuthorizationStrategy implements IAuthorizationStrategy, IUnauthorizedComponentInstantiationListener
 {
@@ -31,11 +30,10 @@ public class AuthorizationStrategy implements IAuthorizationStrategy, IUnauthori
 	public <T extends Component> boolean isInstantiationAuthorized(
 			Class<T> componentClass)
 	{
+		if (Index.class.isAssignableFrom(componentClass))
+			return true;
 		if (BasePage.class.isAssignableFrom(componentClass))
-		{
 			return ImsSession.get().isAuthenticated();
-		}
-
 		return true;
 	}
 

@@ -40,6 +40,7 @@ public class SignOutPage extends WebPage {
       pageClass = getApplication().getHomePage();
     }
     getSession().invalidate();
+    info(getString("signout.done"));
     setResponsePage(pageClass);
   }
 }
