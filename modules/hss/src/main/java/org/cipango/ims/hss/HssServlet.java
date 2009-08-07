@@ -39,14 +39,11 @@ public class HssServlet extends SipServlet implements DiameterListener
 	private static final Logger __log = Logger.getLogger(HssServlet.class);
 	
 	private Hss _hss;
-	private ClassLoader _loader; //FIXME remove use of class loader: patch due to bug in cipango-diameter
-	
-	
+
 	public void init()
 	{
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		_hss = (Hss) context.getBean("hss");
-		_loader =  Thread.currentThread().getContextClassLoader();
 		
 		AdminUserDao dao = (AdminUserDao) context.getBean("adminUserDao");
 		dao.insertDefaultUserIfNone();
@@ -54,31 +51,10 @@ public class HssServlet extends SipServlet implements DiameterListener
 	
 	public void handle(DiameterMessage message) throws IOException
 	{
-		ClassLoader oldClassLoader = null;
-		Thread currentThread = null;
-		
-		if (_loader != null)
-		{
-			currentThread = Thread.currentThread();
-			oldClassLoader = currentThread.getContextClassLoader();
-			currentThread.setContextClassLoader(_loader);
-		}
-
-		try
-		{
-			if (message.isRequest())
-				doRequest((DiameterRequest) message);
-			else 
-				doAnswer((DiameterAnswer) message);
-		}
-		finally
-		{
-			if (_loader != null)
-			{
-				currentThread.setContextClassLoader(oldClassLoader);
-			}
-		}
-		
+		if (message.isRequest())
+			doRequest((DiameterRequest) message);
+		else 
+			doAnswer((DiameterAnswer) message);
 	}
 	
 	protected void doRequest(DiameterRequest request) throws IOException

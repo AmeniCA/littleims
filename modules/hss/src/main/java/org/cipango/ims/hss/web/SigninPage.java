@@ -1,5 +1,8 @@
 package org.cipango.ims.hss.web;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.PasswordTextField;
@@ -7,13 +10,17 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.model.AdminUser;
 
 @SuppressWarnings("unused")
 public class SigninPage extends WebPage
 {
+	private static final Logger __log = Logger.getLogger(SigninPage.class);
+	
 	@SpringBean
 	private AdminUserDao _dao;
 	
@@ -29,35 +36,31 @@ public class SigninPage extends WebPage
 	{
 
 		private String _password;
-		private String _username;
+		private String _login;
 
 		public SignInForm(final String id)
 		{
 			super(id);
 			setModel(new CompoundPropertyModel(this));
-			add(new RequiredTextField("username"));
+			add(new RequiredTextField("login"));
 			add(new PasswordTextField("password"));
 		}
 
 		@Override
 		public final void onSubmit()
 		{
-			if (signIn(_username, _password))
+			if (signIn(_login, _password))
 			{
 				if (!continueToOriginalDestination())
-				{
 					setResponsePage(getApplication().getHomePage());
-				}
 			}
 			else
-			{
-				error("Unknown username/ password");
-			}
+				error(getString("signin.error.invalidLoginPassword"));
 		}
 
 		private boolean signIn(String username, String password)
 		{
-			if (username != null && password != null)
+			if (!Strings.isEmpty(username) && !Strings.isEmpty(password))
 			{
 				AdminUser user = _dao.findById(username);
 				if (user != null)
@@ -68,6 +71,10 @@ public class SigninPage extends WebPage
 						return true;
 					}
 				}
+				HttpServletRequest request = ((WebRequest)getRequestCycle().getRequest()).getHttpServletRequest();
+				__log.warn("Invalid login / password from IP address " 
+						+ request.getRemoteAddr() +  " and host " + request.getRemoteHost()
+						+ " for login " + username);
 			}
 			return false;
 		}
@@ -82,15 +89,16 @@ public class SigninPage extends WebPage
 			_password = password;
 		}
 
-		public String getUsername()
+		public String getLogin()
 		{
-			return _username;
+			return _login;
 		}
 
-		public void setUsername(String username)
+		public void setLogin(String login)
 		{
-			_username = username;
+			_login = login;
 		}
+
 	}
 
 }
