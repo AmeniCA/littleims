@@ -165,7 +165,7 @@ public class TriggerPointCompiler
 		}
 		else if (spt.getSessionDescription() != null)
 		{
-			// TODO add SDP matching
+			c = new SdpCriteria(spt.getSessionDescription());
 		}
 		else
 		{

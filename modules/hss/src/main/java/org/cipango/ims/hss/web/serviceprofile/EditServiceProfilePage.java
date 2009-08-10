@@ -67,8 +67,6 @@ public class EditServiceProfilePage extends ServiceProfilePage
 		form.add(new Label("title", isAdding() ? "" : serviceProfile.getName()));
 		form.add(new RequiredTextField<String>("name", String.class));
 		
-		form.add(new CheckBox("anotherUser", new Model()).setVisible(isAdding()));
-
 		form.add(new Button("submit")
 		{
 			@Override
