@@ -65,7 +65,7 @@ public class DebugSession implements UserProfileListener
 			if (expires == 0)
 				_session.getApplicationSession().invalidate();
 			
-			__log.debug("Send NOTIFY N° " + (_version - 1) + " to " 
+			__log.debug("Send NOTIFY No " + (_version - 1) + " to " 
 					+ _aor + " for debug event");
 		}
 		catch (Exception e)

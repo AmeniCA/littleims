@@ -120,7 +120,7 @@ public class DebugIdService
 		
 		
 		DebugSession debugSession = (DebugSession) message.getApplicationSession().getAttribute(DebugSession.class.getName());
-		if (debugSession != null)
+		if (debugSession != null && !message.isCommitted())
 		{
 			message.setHeader(Headers.P_DEBUG_ID, debugSession.getDebugId());
 			debugSession.checkStopLogging(message);

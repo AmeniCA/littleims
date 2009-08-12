@@ -10,11 +10,6 @@
 			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>file:${jetty.home}/etc/littleims.properties</value>
-			</list>
-		</property>
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	</bean>
 
@@ -41,13 +36,13 @@
 		
 		Default: sip:pcscf@${pcscf.host}:${pcscf.port}
 		-->
-		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.port}" />
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
 		<!--
 		This URI is used by P-CSCF function for routing REGISTER request
 		
 		Default: sip:icscf@${icscf.host}:${icscf.port}
 		-->
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.port}" />
+		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port}" />
 		<!--
 		List of headers to process when receiving a REGISTER request.
 		Headers set in remove list are removed then headers in add list are added to the request.
@@ -96,8 +91,8 @@
 	
 	<bean id="debugIdService" 
 			class="org.cipango.littleims.pcscf.debug.DebugIdService">
-		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.port}" />
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.port};lr" />
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port};lr" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
 

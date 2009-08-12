@@ -11,6 +11,7 @@
   <name>littleIMS :: HSS</name>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
     <resources>
       <resource>
         <filtering>false</filtering>
@@ -44,6 +45,7 @@
         <groupId>org.cipango</groupId>
         <artifactId>maven-cipango-plugin</artifactId>
         <configuration>
+          <systemPropertiesFile>../../littleims.properties</systemPropertiesFile>
           <systemProperties>
             <systemProperty>
               <name>jetty.home</name>
@@ -64,6 +66,7 @@
                 <port>3868</port>
               </connector>
             </connectors>
+            <identity>hss.cipango.voip</identity>
           </diameterNode>
           <stopKey>foo</stopKey>
           <stopPort>9998</stopPort>
@@ -166,8 +169,8 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/webapps-diameter" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
-                      <fileset dir="${jetty.home}/etc" includes="hss.xml"/>
+                      <fileset dir="${hss.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${hss.home}/etc" includes="hss*.xml"/>
                     </delete>
                   </tasks>
                 </configuration>
@@ -176,8 +179,8 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/webapps-diameter"/>
-                    <copy todir="${jetty.home}/etc">
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${hss.home}/sipapps"/>
+                    <copy todir="${hss.home}/etc">
                       <fileset dir="etc"/>
                     </copy>
                   </tasks>
@@ -204,7 +207,7 @@
                       <artifactId>log4j</artifactId>
                     </artifactItem>
                   </artifactItems>
-                  <outputDirectory>${jetty.home}/lib/ext</outputDirectory>
+                  <outputDirectory>${hss.home}/lib/ext</outputDirectory>
                 </configuration>
               </execution>
             </executions>

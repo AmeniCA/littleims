@@ -11,6 +11,7 @@
   <name>littleIMS :: S-CSCF</name>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -29,6 +30,7 @@
         <groupId>org.cipango</groupId>
         <artifactId>maven-cipango-plugin</artifactId>
         <configuration>
+          <systemPropertiesFile>../../littleims.properties</systemPropertiesFile>
           <systemProperties>
             <systemProperty>
               <name>log4j.configuration</name>
@@ -40,7 +42,7 @@
             </systemProperty>
             <systemProperty>
               <name>sip.host</name>
-              <value>s-cscf.nexcom.voip</value>
+              <value>s-cscf.cipango.voip</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
@@ -59,13 +61,13 @@
             <connectors>
               <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
                 <port>3878</port>
-                <host>s-cscf.nexcom.voip</host>
+                <host>s-cscf.cipango.voip</host>
               </connector>
             </connectors>
-            <identity>s-cscf.nexcom.voip</identity>
+            <identity>s-cscf.cipango.voip</identity>
             <peers>
               <peer implementation="org.cipango.diameter.Peer">
-                <host>hss-nicolas.nexcom.voip</host>
+                <host>hss.cipango.voip</host>
               </peer>
             </peers>
           </diameterNode>
@@ -147,9 +149,9 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/sipapps" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
-                      <fileset dir="${jetty.home}/etc" includes="s-cscf.xml,littleims.properties"/>
-                      <fileset dir="${jetty.home}/resources" includes="log4j.xml"/>
+                      <fileset dir="${scscf.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${scscf.home}/etc" includes="s-cscf.xml,littleims.properties"/>
+                      <fileset dir="${scscf.home}/resources" includes="log4j.xml"/>
                     </delete>
                   </tasks>
                 </configuration>
@@ -158,11 +160,11 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/sipapps"/>
-                    <copy todir="${jetty.home}/resources">
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${scscf.home}/sipapps"/>
+                    <copy todir="${scscf.home}/resources">
                       <fileset dir="resources"/>
                     </copy>
-                    <copy todir="${jetty.home}/etc">
+                    <copy todir="${scscf.home}/etc">
                       <fileset dir="etc"/>
                     </copy>
                   </tasks>
@@ -189,7 +191,7 @@
                       <artifactId>log4j</artifactId>
                     </artifactItem>
                   </artifactItems>
-                  <outputDirectory>${jetty.home}/lib/ext</outputDirectory>
+                  <outputDirectory>${scscf.home}/lib/ext</outputDirectory>
                 </configuration>
               </execution>
             </executions>

@@ -38,8 +38,11 @@
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/lib/ext" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
+                    <delete>
+                      <fileset dir="${hss.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${scscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${pcscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${icscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
                     </delete>
                   </tasks>
                 </configuration>
@@ -48,7 +51,10 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/lib/ext"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${hss.home}/lib/ext"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${scscf.home}/lib/ext"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${pcscf.home}/lib/ext"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${icscf.home}/lib/ext"/>
                   </tasks>
                 </configuration>
                 <goals>

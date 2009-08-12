@@ -12,11 +12,13 @@
   <url>http://www.nexcom.fr</url>
   
   <build>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>org.cipango</groupId>
         <artifactId>maven-cipango-plugin</artifactId>
         <configuration>
+          <systemPropertiesFile>../../littleims.properties</systemPropertiesFile>
           <systemProperties>
             <systemProperty>
               <name>log4j.configuration</name>
@@ -32,7 +34,7 @@
             </systemProperty>
             <systemProperty>
               <name>sip.host</name>
-              <value>i-cscf.nexcom.voip</value>
+              <value>i-cscf.cipango.voip</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
@@ -47,10 +49,10 @@
                 <port>3888</port>
               </connector>
             </connectors>
-            <identity>i-cscf.nexcom.voip</identity>
+            <identity>i-cscf.cipango.voip</identity>
             <peers>
               <peer implementation="org.cipango.diameter.Peer">
-                <host>hss-nicolas.nexcom.voip</host>
+                <host>hss.cipango.voip</host>
               </peer>
             </peers>
           </diameterNode>
@@ -99,8 +101,8 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/sipapps" includes="${project.artifactId}-${project.version}.${project.packaging}"/>
-                      <fileset dir="${jetty.home}/etc" includes="i-cscf.xml"/>
+                      <fileset dir="${icscf.home}/sipapps" includes="${project.artifactId}.${project.packaging}"/>
+                      <fileset dir="${icscf.home}/etc" includes="i-cscf.xml"/>
                     </delete>
                   </tasks>
                 </configuration>
@@ -109,8 +111,8 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/sipapps"/>
-                    <copy todir="${jetty.home}/etc">
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${icscf.home}/sipapps"/>
+                    <copy todir="${icscf.home}/etc">
                       <fileset dir="etc"/>
                     </copy>
                   </tasks>

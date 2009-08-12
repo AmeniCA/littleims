@@ -10,11 +10,6 @@
 			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>file:${jetty.home}/etc/littleims.properties</value>
-			</list>
-		</property>
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	</bean>
 	
@@ -53,7 +48,7 @@
 		<property name="diameterFactory" ref="diameterFactory" />
 		<property name="hssRealm" value="${hss.realm}" />
 		<property name="hssHost" value="${hss.host}" />
-		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.port}" />
+		<property name="scscfName" value="sip:scscf@${scscf.host}:${scscf.sip.port}" />
 	</bean>
 
 	<bean id="userProfileCache" 
@@ -91,9 +86,9 @@
 		This URI is used for building service-route header of REGISTER 200 OK. 
 		Must match with IP address and port on which S-SCF is listening.
 		
-		Default: sip:scscf@${scscf.host}:${scscf.port}
+		Default: sip:scscf@${scscf.host}:${scscf.sip.port}
 		-->
-		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.port}" />
+		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.sip.port}" />
 		
 		<!--
 		Maximum number of users that can be registered at the same time.
@@ -173,18 +168,18 @@
 		This URI is used to push own route after AS processing
 		Must match with IP address and port on which S-SCF is listening.
 		
-		Default: sip:scscf@${scscf.host}:${scscf.port}
+		Default: sip:scscf@${scscf.host}:${scscf.sip.port}
 		-->
-		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.port}" />
+		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.sip.port}" />
 		<!--
 		This URI is used by S-CSCF function for routing outgoing request to terminating 
 		"network" (i.e. I-CSCF node)
 		If this parameter is not present, the Request-URI is used thanks DNS or etc/host
 		file for resolving domain name. 
 		
-		Default: sip:icscf@${icscf.host}:${icscf.port}
+		Default: sip:icscf@${icscf.host}:${icscf.sip.port}
 		-->
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.port}" />
+		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port}" />
 		
 		<!--
 		Requests are routed to the SIP element defined by this SIP URI:
@@ -193,7 +188,7 @@
 			- In terminating mode, when no profile is found and request-URI user part 
 		starts with a digit or a '+'.
 		-->
-		<property name="bgcfUri" value="sip:bgcf@${bgcf.host}:${bgcf.port}" />
+		<property name="bgcfUri" value="sip:bgcf@${bgcf.host}:${bgcf.sip.port}" />
 		<!-- 
 		If terminatingDefault set to false and "term" is present in the route, the request is treated as terminating.
 		If terminatingDefault set to false and "term" is not present in the route, the request is treated as originating.

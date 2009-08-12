@@ -6,9 +6,9 @@
     <version>1.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-  <artifactId>littleims-application-router</artifactId>
-  <packaging>jar</packaging>
-  <name>littleIMS :: Application router</name>
+  <artifactId>littleims-package</artifactId>
+  <packaging>pom</packaging>
+  <name>littleIMS :: Package</name>
 
   <profiles>
     <profile>
@@ -32,7 +32,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true">
-                      <fileset dir="${jetty.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${littleims.home}" includes="littleims.properties"/>
                     </delete>
                   </tasks>
                 </configuration>
@@ -41,7 +41,28 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${jetty.home}/lib/ext"/>
+                    <!--  S-CSCF -->
+                    <copy todir="${scscf.home}">
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                     </copy>
+                    
+                    <!--  P-CSCF -->
+                    <copy todir="${pcscf.home}">
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                     </copy>
+
+                    
+                    <!--  I-CSCF -->
+                    <copy todir="${icscf.home}">
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                     </copy>
+                    
+                    <!--  HSS -->
+                    <copy todir="${hss.home}">
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                     </copy>
+                     
+                     <copy file="../../littleims.properties" todir="${littleims.home}"/>
                   </tasks>
                 </configuration>
                 <goals>
@@ -54,4 +75,5 @@
       </build>
     </profile>
   </profiles> 
+
 </project>

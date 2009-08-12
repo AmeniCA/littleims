@@ -8,12 +8,14 @@
   <url>http://www.cipango.org</url>
 
   <modules>
+    <module>modules/package</module>
+    <module>modules/debug-id</module>
     <module>modules/util</module>
     <module>modules/hss</module>
     <module>modules/pcscf</module>
     <module>modules/scscf</module>
     <module>modules/icscf</module>
-    <module>modules/application-router</module>
+    <!-- module>modules/application-router</module -->
   </modules>
   
   <build>
@@ -131,6 +133,11 @@
     <cipango-version>1.0-SNAPSHOT</cipango-version>
     <wicket.version>1.4.0</wicket.version>
     <slf4j.version>1.4.0</slf4j.version>
+    <scscf.home>${littleims.home}/S-CSCF</scscf.home>
+    <pcscf.home>${littleims.home}/P-CSCF</pcscf.home>
+    <icscf.home>${littleims.home}/I-CSCF</icscf.home>
+    <hss.home>${littleims.home}/HSS</hss.home>
   </properties>
+
 
 </project>

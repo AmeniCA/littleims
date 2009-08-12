@@ -11,11 +11,6 @@
 
 
 	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>file:${jetty.home}/etc/littleims.properties</value>
-			</list>
-		</property>
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	</bean>
 
@@ -32,7 +27,7 @@
 		<property name="diameterFactory" ref="diameterFactory" />
 		<property name="hssRealm" value="${hss.realm}" />
 		<property name="hssHost" value="${hss.host}" />
-		<property name="icscfName" value="sip:icscf@${icscf.host}:${icscf.port}" />
+		<property name="icscfName" value="sip:icscf@${icscf.host}:${icscf.sip.port}" />
 	</bean>
 
 	<bean id="icscfService" class="org.cipango.littleims.icscf.IcscfService">
