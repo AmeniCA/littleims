@@ -15,13 +15,6 @@
 	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	</bean>
-
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-		<property name="url" value="jdbc:hsqldb:file:db/hss;shutdown=true"/>
-		<property name="username" value="sa" />
-		<property name="password" value="" />
-	</bean>
 	
 	<bean id="sipFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
 		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
@@ -36,21 +29,10 @@
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
-		<property name="dataSource" ref="dataSource" />
 		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt"/>
 	
 		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.dialect">
-					org.hibernate.dialect.HSQLDialect
-				</prop>
-	
-				<prop key="hibernate.show_sql">false</prop>
-				<prop key="hibernate.cache.provider_class">
-					org.hibernate.cache.NoCacheProvider
-				</prop>
-			</props>
+			<util:properties location="file:etc/hss-db.properties"/>
 		</property>
 		<property name="namingStrategy"><ref bean="namingStrategy"/></property>
 	</bean>

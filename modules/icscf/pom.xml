@@ -102,7 +102,7 @@
                   <tasks>
                     <delete includeemptydirs="true">
                       <fileset dir="${icscf.home}/sipapps" includes="${project.artifactId}.${project.packaging}"/>
-                      <fileset dir="${icscf.home}/etc" includes="i-cscf.xml"/>
+                      <fileset dir="${icscf.home}/etc" includes="i-cscf.xml,cipango-icscf.xml"/>
                     </delete>
                   </tasks>
                 </configuration>

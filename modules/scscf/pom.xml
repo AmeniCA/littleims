@@ -150,7 +150,7 @@
                   <tasks>
                     <delete includeemptydirs="true">
                       <fileset dir="${scscf.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
-                      <fileset dir="${scscf.home}/etc" includes="s-cscf.xml,littleims.properties"/>
+                      <fileset dir="${scscf.home}/etc" includes="s-cscf.xml,cipango-scscf.xml"/>
                       <fileset dir="${scscf.home}/resources" includes="log4j.xml"/>
                     </delete>
                   </tasks>

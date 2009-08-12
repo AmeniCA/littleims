@@ -33,6 +33,10 @@
                   <tasks>
                     <delete includeemptydirs="true">
                       <fileset dir="${littleims.home}" includes="littleims.properties"/>
+                      <fileset dir="${scscf.home}"/>
+                      <fileset dir="${pcscf.home}"/>
+                      <fileset dir="${icscf.home}"/>
+                      <fileset dir="${hss.home}" excludes="db/"/>
                     </delete>
                   </tasks>
                 </configuration>
