@@ -191,6 +191,9 @@
                     <copy todir="${hss.home}/etc">
                       <fileset dir="etc"/>
                     </copy>
+                    <copy todir="${hss.home}/db">
+                      <fileset dir="src/main/db-init"/>
+                    </copy>
                   </tasks>
                 </configuration>
                 <goals>
