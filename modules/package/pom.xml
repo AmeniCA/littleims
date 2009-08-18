@@ -47,7 +47,7 @@
                   <tasks>
                     <!--  S-CSCF -->
                     <copy todir="${scscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml,LICENSES/"/>
                      </copy>
                      <copy file="${jetty.home}/bin/cipango.sh" toFile="${scscf.home}/bin/scscf.sh"/>
                      <replace file="${scscf.home}/bin/scscf.sh" token="cipango.xml" value="cipango-scscf.xml"/>
@@ -57,7 +57,7 @@
                     
                     <!--  P-CSCF -->
                     <copy todir="${pcscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml,LICENSES/"/>
                      </copy>
                      <copy file="${jetty.home}/bin/cipango.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="cipango.xml" value="cipango-pcscf.xml"/>
@@ -67,7 +67,7 @@
                     
                     <!--  I-CSCF -->
                     <copy todir="${icscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml,LICENSES/"/>
                      </copy>
                      <copy file="${jetty.home}/bin/cipango.sh" toFile="${icscf.home}/bin/icscf.sh"/>
                      <replace file="${icscf.home}/bin/icscf.sh" token="cipango.xml" value="cipango-icscf.xml"/>
@@ -77,7 +77,7 @@
                     
                     <!--  HSS -->
                     <copy todir="${hss.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,sipapps,etc/sipdefault.xml,etc/webdefault.xml,LICENSES/"/>
                      </copy>
                      <copy file="${jetty.home}/bin/cipango.sh" toFile="${hss.home}/bin/hss.sh"/>
                      <replace file="${hss.home}/bin/hss.sh" token="cipango.xml" value="cipango-hss.xml"/>
@@ -95,6 +95,37 @@
             </executions>
           </plugin>
         </plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.0</version>
+          <executions>
+            <execution>
+              <id>copy log4j</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${jetty.home}/lib/ext</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </build>
     </profile>
   </profiles> 
