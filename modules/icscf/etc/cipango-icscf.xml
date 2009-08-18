@@ -7,7 +7,7 @@
         <Call name="load">
           <Arg>
             <New class="java.io.FileInputStream">
-              <Arg><SystemProperty default=".." name="littleims.home"/>/littleims.properties</Arg>
+              <Arg><SystemProperty default="." name="jetty.home"/>/../littleims.properties</Arg>
             </New>
           </Arg>
         </Call>

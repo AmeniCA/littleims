@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
 <Configure class="org.cipango.Server" id="Server">
+
+  <Call class="java.lang.System" name="setProperties">
+    <Arg>
+      <New class="java.util.Properties">
+        <Call name="load">
+          <Arg>
+            <New class="java.io.FileInputStream">
+              <Arg><SystemProperty default="." name="jetty.home"/>/../littleims.properties</Arg>
+            </New>
+          </Arg>
+        </Call>
+        <Call name="putAll">
+          <Arg><Call class="java.lang.System" name="getProperties"/></Arg>
+        </Call>
+      </New>
+    </Arg>
+  </Call>
+
   <!-- =========================================================== -->
   <!-- Server Thread Pool                                          -->
   <!-- =========================================================== -->

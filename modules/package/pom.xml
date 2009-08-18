@@ -47,24 +47,43 @@
                   <tasks>
                     <!--  S-CSCF -->
                     <copy todir="${scscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
                      </copy>
+                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${scscf.home}/bin/scscf.sh"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="cipango.xml" value="cipango-scscf.xml"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="cipango.pid" value="littleims-scscf.pid"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="CIPANGO_HOME" value="SCSCF_HOME"/>
+                     <chmod file="${scscf.home}/bin/scscf.sh" perm="ugo+rx"/>
                     
                     <!--  P-CSCF -->
                     <copy todir="${pcscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
                      </copy>
-
+                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="cipango.xml" value="cipango-pcscf.xml"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="cipango.pid" value="littleims-pcscf.pid"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="CIPANGO_HOME" value="PCSCF_HOME"/>
+                     <chmod file="${pcscf.home}/bin/pcscf.sh" perm="ugo+rx"/>
                     
                     <!--  I-CSCF -->
                     <copy todir="${icscf.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
                      </copy>
+                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${icscf.home}/bin/icscf.sh"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="cipango.xml" value="cipango-icscf.xml"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="cipango.pid" value="littleims-icscf.pid"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="CIPANGO_HOME" value="ICSCF_HOME"/>
+                     <chmod file="${icscf.home}/bin/icscf.sh" perm="ugo+rx"/>
                     
                     <!--  HSS -->
                     <copy todir="${hss.home}">
-                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,bin/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
+                       <fileset dir="${jetty.home}" includes="start.jar,lib/,resources/,sipapps,etc/sipdefault.xml,etc/webdefault.xml"/>
                      </copy>
+                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${hss.home}/bin/hss.sh"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="cipango.xml" value="cipango-hss.xml"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="cipango.pid" value="littleims-hss.pid"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="CIPANGO_HOME" value="HSS_HOME"/>
+                     <chmod file="${hss.home}/bin/hss.sh" perm="ugo+rx"/>
                      
                      <copy file="../../littleims.properties" todir="${littleims.home}"/>
                   </tasks>
