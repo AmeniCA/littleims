@@ -86,6 +86,9 @@
                      <chmod file="${hss.home}/bin/hss.sh" perm="ugo+rx"/>
                      
                      <copy file="../../littleims.properties" todir="${littleims.home}"/>
+                     <copy todir="${littleims.home}">
+                        <fileset dir="bin"/>
+                     </copy>
                   </tasks>
                 </configuration>
                 <goals>

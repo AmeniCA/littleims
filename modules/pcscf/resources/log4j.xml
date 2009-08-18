@@ -31,8 +31,16 @@
     <appender-ref ref="littleims"/>
   </category>
   
-  <root>
+  <category name="org.mortbay.log">
+    <param name="additivity" value="false"/>
     <priority value="info"/>
+    <appender-ref ref="console"/>
+    <appender-ref ref="littleims"/>
+  </category>
+  
+  
+  <root>
+    <priority value="warn"/>
     <appender-ref ref="console"/>
     <appender-ref ref="littleims"/>
   </root>
