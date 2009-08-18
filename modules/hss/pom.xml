@@ -188,8 +188,8 @@
                 <configuration>
                   <tasks>
                     <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${hss.home}/sipapps"/>
-                    <copy todir="${hss.home}/etc">
-                      <fileset dir="etc"/>
+                    <copy todir="${hss.home}">
+                      <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>
                     <copy todir="${hss.home}/db">
                       <fileset dir="src/main/db-init"/>

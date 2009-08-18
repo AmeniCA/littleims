@@ -161,11 +161,8 @@
                 <configuration>
                   <tasks>
                     <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${scscf.home}/sipapps"/>
-                    <copy todir="${scscf.home}/resources">
-                      <fileset dir="resources"/>
-                    </copy>
-                    <copy todir="${scscf.home}/etc">
-                      <fileset dir="etc"/>
+                    <copy todir="${hss.home}">
+                      <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>
                   </tasks>
                 </configuration>

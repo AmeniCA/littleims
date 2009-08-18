@@ -32,7 +32,7 @@
 		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt"/>
 	
 		<property name="hibernateProperties">
-			<util:properties location="file:etc/hss-db.properties"/>
+			<util:properties location="file:${jetty.home}/etc/hss-db.properties"/>
 		</property>
 		<property name="namingStrategy"><ref bean="namingStrategy"/></property>
 	</bean>
