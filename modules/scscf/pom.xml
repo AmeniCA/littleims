@@ -148,7 +148,7 @@
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete includeemptydirs="true">
+                    <delete includeemptydirs="true" failonerror="false">
                       <fileset dir="${scscf.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
                       <fileset dir="${scscf.home}/etc" includes="s-cscf.xml,cipango-scscf.xml"/>
                       <fileset dir="${scscf.home}/resources" includes="log4j.xml"/>
@@ -161,7 +161,7 @@
                 <configuration>
                   <tasks>
                     <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${scscf.home}/sipapps"/>
-                    <copy todir="${hss.home}">
+                    <copy todir="${scscf.home}">
                       <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>
                   </tasks>
