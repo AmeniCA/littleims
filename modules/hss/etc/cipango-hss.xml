@@ -78,26 +78,8 @@
   </Call>
 
   <Get name="transportManager">
-    <Call name="addConnector">
-      <Arg>
-        <New class="org.cipango.sip.UdpConnector">
-          <Set name="port"><SystemProperty default="5050" name="hss.sip.port"/></Set>
-          <Set name="host"><SystemProperty name="hss.host"/></Set>
-        </New>
-      </Arg>
-    </Call>
-    <Call name="addConnector">
-      <Arg>
-        <New class="org.cipango.sip.TcpConnector">
-          <Set name="port"><SystemProperty default="5050" name="hss.sip.port"/></Set>
-          <Set name="host"><SystemProperty name="hss.host"/></Set>
-        </New>
-      </Arg>
-    </Call>
-    <Set name="accessLog">
-     <New class="org.cipango.ims.DebugIdMessageLog">
-       <Set name="logDirectory"><SystemProperty default="." name="jetty.home"/>/logs</Set>
-     </New>
+    <Set name="connectors">
+      <Array type="org.cipango.sip.SipConnector"/>
     </Set>
   </Get>
 
