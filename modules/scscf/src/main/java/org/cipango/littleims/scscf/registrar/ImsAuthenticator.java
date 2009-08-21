@@ -22,7 +22,7 @@ import java.util.TimerTask;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
@@ -68,8 +68,7 @@ public class ImsAuthenticator implements Authenticator
 	{
 		try
 		{
-			SipURI from = (SipURI) request.getFrom().getURI();
-			SipURI aor = URIHelper.getCanonicalForm(_sipFactory, from);
+			URI aor = URIHelper.getCanonicalForm(_sipFactory,  request.getFrom().getURI());
 			String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
 			AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 						
@@ -77,7 +76,7 @@ public class ImsAuthenticator implements Authenticator
 			{
 				// No authorization, must be first REGISTER request
 				// Inform registrar module and challenge UE
-				_cxManager.sendMAR(aor.toString(), ah, request);
+				_cxManager.sendMAR(aor, ah, request);
 				
 				return null;
 			}
@@ -114,12 +113,12 @@ public class ImsAuthenticator implements Authenticator
 					case STALE:
 						__log.debug("Registration is stale. Sending 401 response");
 						request.setAttribute("stale", true);
-						_cxManager.sendMAR(aor.toString(), ah, request);
+						_cxManager.sendMAR(aor, ah, request);
 						break;
 					case RESYNCHRONIZATION:
 					case INITIAL:
 						__log.debug("Registration is initial. Sending 401 response");
-						_cxManager.sendMAR(aor.toString(), ah, request);
+						_cxManager.sendMAR(aor, ah, request);
 						break;
 					default:
 						__log.warn("Unknown reason " + e.getReason());
@@ -234,7 +233,7 @@ public class ImsAuthenticator implements Authenticator
 		}
 	}
 
-	public void checkRegistration(SipURI uri, AuthorizationHeader ah, String method)
+	public void checkRegistration(URI uri, AuthorizationHeader ah, String method)
 			throws AuthorizationException
 	{
 

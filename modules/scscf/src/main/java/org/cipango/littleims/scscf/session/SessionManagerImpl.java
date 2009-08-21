@@ -109,7 +109,7 @@ public class SessionManagerImpl implements SessionManager
 			// first time
 
 			odi = generateODI();
-			__log.debug("No original dialog identifier. Generating ODI: " + odi);
+			__log.trace("No original dialog identifier. Generating ODI: " + odi);
 
 			// new session, we need to determine session case
 			Session session = null;
@@ -369,13 +369,12 @@ public class SessionManagerImpl implements SessionManager
 		SipSession session = request.getSession();
 		String role = (String) session.getAttribute(SCSCF_ROLE);
 		String method = request.getMethod();
-		if (ROLE_ORIGINATING.equals(role))
+		if (__log.isTraceEnabled())
 		{
-			__log.info("Received " + method + " for originating session");
-		}
-		else if (ROLE_TERMINATING.equals(role))
-		{
-			__log.info("Received  " + method + " for terminating session");
+			if (ROLE_ORIGINATING.equals(role))
+				__log.trace("Received " + method + " for originating session: " + session);
+			else if (ROLE_TERMINATING.equals(role))
+				__log.trace("Received  " + method + " for terminating session: " + session);
 		}
 		
 		if (Methods.BYE.equals(method) && _cdf.isEnabled())
@@ -402,10 +401,8 @@ public class SessionManagerImpl implements SessionManager
 	}
 	
 	private URI getServerUser(SipServletRequest request, boolean originating) throws ServletParseException
-	{
-		
+	{	
 		Address served = request.getAddressHeader(Headers.P_SERVED_USER);
-		URI servedUri;
 		if (served == null)
 		{
 			if (originating)
@@ -427,20 +424,9 @@ public class SessionManagerImpl implements SessionManager
 				}
 			}
 			else
-			{
-				servedUri = request.getRequestURI();
-				if (servedUri.isSipURI())
-					servedUri = URIHelper.getCanonicalForm(sipFactory, (SipURI) servedUri);
-				
-				return servedUri;
-			}
+				return URIHelper.getCanonicalForm(sipFactory, request.getRequestURI());
 		}
-		servedUri = served.getURI();
-
-		if (servedUri.isSipURI())
-			servedUri = URIHelper.getCanonicalForm(sipFactory, (SipURI) servedUri);
-		
-		return servedUri;
+		return URIHelper.getCanonicalForm(sipFactory, served.getURI());
 	}
 	
 	private boolean isComeFromTrustedDomain(SipServletRequest request)

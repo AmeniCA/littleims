@@ -141,11 +141,12 @@ public class Hss
 		
 		String impu = getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
 
-		PrivateIdentity privateIdentity = 
-			_privateIdentityDao.findById(getMandatoryAVP(avps, Base.USER_NAME).getString());
+		String impi = getMandatoryAVP(avps, Base.USER_NAME).getString();
+		PrivateIdentity privateIdentity = _privateIdentityDao.findById(impi);
 		
 		if (privateIdentity == null)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN);
+			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN,
+					"Could not found private identity with IMPI: " + impi);
 		
 		PublicIdentity publicIdentity = getPublicIdentity(privateIdentity, impu);
 		
@@ -268,7 +269,8 @@ public class Hss
 		PrivateIdentity privateIdentity = _privateIdentityDao.findById(impi);
 		
 		if (privateIdentity == null)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN);
+			throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_USER_UNKNOWN, 
+					"Could not found private identity with IMPI: " + impi);
 		
 		PublicIdentity publicIdentity = getPublicIdentity(privateIdentity, impu);
 		
@@ -390,7 +392,7 @@ public class Hss
 			}
 		}
 		else
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
+			throw DiameterException.newMissingDiameterAvp(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY);
 		
 		if (publicIdentity == null)
 		{
@@ -400,7 +402,7 @@ public class Hss
 				impu = publicIdentity.getIdentity();
 			}
 			else
-				throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
+				throw DiameterException.newMissingDiameterAvp(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY);
 		}
 		
 		if (impu == null 
@@ -410,10 +412,10 @@ public class Hss
 				&& serverAssignmentType != ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME
 				&& serverAssignmentType != ServerAssignmentType.USER_DEREGISTRATION_STORE_SERVER_NAME 
 				&& serverAssignmentType != ServerAssignmentType.ADMINISTRATIVE_DEREGISTRATION)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
+			throw DiameterException.newMissingDiameterAvp(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY);
 		
 		if (impi == null && serverAssignmentType != ServerAssignmentType.UNREGISTERED_USER)
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP);
+			throw DiameterException.newMissingDiameterAvp(Base.IETF_VENDOR_ID, Base.USER_NAME);
 		
 			
 		String serverName = getMandatoryAVP(avps, IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString();
@@ -575,13 +577,11 @@ public class Hss
 	{
 		AVP avp = avps.getAVP(vendorId, code);
 		if (avp == null)
-		{
-			AVP failedAvp = AVP.ofAVPs(Base.FAILED_AVP, 
-					AVP.ofBytes(vendorId, code, new byte[10]));
-			throw new DiameterException(IMS.IMS_VENDOR_ID, Base.DIAMETER_MISSING_AVP).addAvp(failedAvp);
-		}
+			throw DiameterException.newMissingDiameterAvp(vendorId, code);
 		return avp;
 	}
+	
+	
 	
 	protected AuthenticationVector[] getDigestAuthVectors(int nb, String realm, PrivateIdentity identity)
 	{

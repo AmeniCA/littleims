@@ -62,7 +62,7 @@ public class TerminatingSession extends Session
 		// 1. Check that user is not barred
 		if (getProfile() == null || getProfile().isBarred())
 		{
-			__log.debug("Barred user: " + requestURI + ". Sending 404 response");
+			__log.info("Barred user: " + requestURI + ". Sending 404 response");
 			request.createResponse(SipServletResponse.SC_NOT_FOUND, "Barred identity").send();
 			return true;
 		}
@@ -96,7 +96,6 @@ public class TerminatingSession extends Session
 		else
 		{
 			// Evaluate filter criteria
-			__log.debug("Checking for next filter criteria");
 			InitialFilterCriteria ifc = null;
 			boolean ifcMatched = false;
 
@@ -114,7 +113,9 @@ public class TerminatingSession extends Session
 				{
 					SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAS().getURI());
 
-					__log.debug("IFC matched. Forwarding request to: " + asURI);
+					if (__log.isDebugEnabled())
+						__log.debug("IFC " + ifc + " matched for user " + getProfile().getURI() 
+								+ ". Forwarding request to: " + asURI);
 					if (asURI.getLrParam() == true)
 					{
 						request.pushRoute(getOwnURI());
@@ -135,7 +136,7 @@ public class TerminatingSession extends Session
 			if (_context == null)
 			{
 				// No AS or only proxy AS, send 480 (Temporarily unavailable)
-				__log.debug("User is not registered. Sending 480 response");
+				__log.info("User is not registered. Sending 480 response");
 				request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
 			}
 			else

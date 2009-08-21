@@ -28,7 +28,6 @@ import org.xbill.DNS.Record;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 
-
 public class EnumClient
 {
 
@@ -37,14 +36,13 @@ public class EnumClient
 
 	private static final Logger __log = Logger.getLogger(EnumClient.class);
 
-
 	public SipURI translate(TelURL telURL) throws LittleimsException
 	{
 		if (!telURL.isGlobal())
 		{
-			throw new LittleimsException("Global Tel URL only", SipServletResponse.SC_BAD_REQUEST);
+			throw new LittleimsException("Global Tel URL only",
+					SipServletResponse.SC_BAD_REQUEST);
 		}
-		__log.debug("Trying to translate tel: " + telURL);
 		String number = telURL.getPhoneNumber();
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < number.length(); i++)
@@ -62,18 +60,17 @@ public class EnumClient
 		}
 		catch (TextParseException e)
 		{
-			throw new LittleimsException("Cannot build ENUM request", e, SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			throw new LittleimsException("Cannot build ENUM request", e,
+					SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 		}
 		Record[] records = l.run();
 
-		__log.debug("Enum result: " + l.getResult());
+		__log.debug("Enum result for tel URL: " + telURL + " is "
+				+ l.getResult() + " and got "
+				+ (records == null ? 0 : records.length) + " records.");
 
 		if (records == null)
-		{
 			return null;
-		}
-
-		__log.debug("Got " + records.length + " records.");
 
 		for (int i = 0; i < records.length; i++)
 		{
@@ -99,39 +96,84 @@ public class EnumClient
 
 				try
 				{
-					return (SipURI) _sipFactory.createURI(sipURI);
+					SipURI uri = (SipURI) _sipFactory.createURI(sipURI);
+					__log.info("Enum resolution successful: able to transform " + telURL + " to " + uri);
+					return uri;
 				}
 				catch (Exception e)
 				{
-					throw new LittleimsException("Invalid ENUM SIP URI", e, SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					throw new LittleimsException("Invalid ENUM SIP URI: "
+							+ sipURI, e,
+							SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 				}
 			}
 		}
 		return null;
 	}
 
-
 	public String getDomain()
 	{
 		return _domain;
 	}
-
 
 	public void setDomain(String domain)
 	{
 		_domain = domain;
 	}
 
-
 	public SipFactory getSipFactory()
 	{
 		return _sipFactory;
 	}
-
 
 	public void setSipFactory(SipFactory sipFactory)
 	{
 		_sipFactory = sipFactory;
 	}
 
+	public static void main(String[] args) throws LittleimsException
+	{
+		/*
+		String number = "882990086330";
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < number.length(); i++)
+		{
+			sb.append(number.charAt(number.length() - 1 - i));
+			sb.append('.');
+		}
+		sb.append("e164.org");
+		String dnsNumber = sb.toString();
+
+		Lookup l = null;
+		try
+		{
+			l = new Lookup(dnsNumber, Type.NAPTR);
+		}
+		catch (TextParseException e)
+		{
+			throw new LittleimsException("Cannot build ENUM request", e,
+					SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+		}
+		Record[] records = l.run();
+
+		__log.debug("Enum result for tel URL: " + number + " is "
+				+ l.getResult() + " and got "
+				+ (records == null ? 0 : records.length) + " records.");
+*/
+		String number = "+1002";
+		String naptr = "!^\\+1002$sip:carol@cipango.org!";
+		char sep = naptr.charAt(0);
+
+		StringTokenizer st = new StringTokenizer(naptr, "" + sep);
+
+		String ere = st.nextToken();
+		String repl = st.nextToken();
+		System.out.println("ere: " + ere + " / repl " + repl);
+
+		ere = ere.replaceAll("\\\\\\\\", "\\\\");
+
+		String sipURI = number.replaceFirst(ere, repl);
+		System.out.println(sipURI);
+		
+	}
 }

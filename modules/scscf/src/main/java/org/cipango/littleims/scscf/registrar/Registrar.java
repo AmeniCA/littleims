@@ -73,7 +73,6 @@ public class Registrar
 
 	private UserProfileCache _userProfileCache;
 	private CDF _cdf;
-	private List<String> _realms;
 	private int _maxUsers;
 	private SipFactory _sipFactory;
 
@@ -118,10 +117,9 @@ public class Registrar
 		}
 	}
 
-	private SipURI getAor(SipServletRequest request)
+	private URI getAor(SipServletRequest request)
 	{
-		SipURI to = (SipURI) request.getTo().getURI();
-		return URIHelper.getCanonicalForm(_sipFactory, to);
+		return URIHelper.getCanonicalForm(_sipFactory, request.getTo().getURI());
 	}
 	
 	public void doRegister(SipServletRequest request, String privateUserIdentity) throws ServletException, IOException
@@ -129,19 +127,9 @@ public class Registrar
 		// 24.229 1. Identify the user
 		// Since the Private User Identity may not be present,
 		// we use the Public User Identity
-		SipURI aor = getAor(request);
+		URI aor = getAor(request);
 
 		__log.debug("Received REGISTER request for " + aor);
-
-		// check that we are configured to handle the user's domain
-		String realm = aor.getHost();
-		if (!_realms.contains(realm))
-		{
-			__log.warn("Realm " + realm + " is not authorized to register");
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-			request.getApplicationSession().invalidate();
-			return;
-		}
 
 		// check that max registered users is not reached
 		if (_maxUsers > 0 && (getNbContexts() >= _maxUsers))
@@ -274,7 +262,7 @@ public class Registrar
 			
 			String privateUserIdentity = saa.getRequest().getAVP(Base.USER_NAME).getString();
 
-			SipURI aor = getAor(request);
+			URI aor = getAor(request);
 			RegistrationInfo regInfo;	
 	
 			Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
@@ -366,7 +354,7 @@ public class Registrar
 		}
 	}
 
-	public RegistrationInfo register(SipURI to, Address contact,
+	public RegistrationInfo register(URI to, Address contact,
 			String privateUserIdentity, int expires, SipURI path, IMSSubscriptionDocument subscription)
 	{
 		List<String> associatedURIs = null;
@@ -872,16 +860,6 @@ public class Registrar
 	public void setCdf(CDF cdf)
 	{
 		_cdf = cdf;
-	}
-
-	public List<String> getRealms()
-	{
-		return _realms;
-	}
-
-	public void setRealms(List<String> realms)
-	{
-		_realms = realms;
 	}
 
 	public int getMaxUsers()

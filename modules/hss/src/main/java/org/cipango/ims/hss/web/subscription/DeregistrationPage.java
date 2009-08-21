@@ -91,8 +91,11 @@ public class DeregistrationPage extends SubscriptionPage
 			{
 				Component privateId = getPage().get("form:privateIdTr");
 				Component publicIds = getPage().get("form:publicIdsTr");
-				privateId.setVisible(!privateId.isVisible());
-				publicIds.setVisible(!publicIds.isVisible());
+				boolean privateVisible = !privateId.isVisible();
+				privateId.setVisible(privateVisible);
+				((ListMultipleChoice) getPage().get("form:privateIdTr:privateIds")).setRequired(privateVisible);
+				((ListMultipleChoice) getPage().get("form:publicIdsTr:publicIds")).setRequired(!privateVisible);
+				publicIds.setVisible(!privateVisible);
 				target.addComponent(privateId);
 				target.addComponent(publicIds);
 			}
@@ -114,7 +117,7 @@ public class DeregistrationPage extends SubscriptionPage
 		form.add(publicIdsTr);
 		publicIdsTr.add(new ListMultipleChoice("publicIds", 
 				new Model(new ArrayList()), 
-				publicIds));
+				publicIds).setRequired(true));
 		
 		form.add(new DropDownChoice("reasonCode", 
 				new Model<Integer>(),
@@ -148,7 +151,7 @@ public class DeregistrationPage extends SubscriptionPage
 					Iterator<String> it = publicIds.iterator();
 					while (it.hasNext())
 						publicIdentities.add((PublicUserIdentity) _publicIdentityDao.findById(it.next()));
-					
+										
 					try
 					{
 						getCxManager().sendRtr(publicIdentities, reasonCode, reasonPhrase);
@@ -158,16 +161,17 @@ public class DeregistrationPage extends SubscriptionPage
 					{
 						__log.warn("Failed to send RTR", e);
 						error(MapVariableInterpolator.interpolate(getString("subscription.error.deregistration"),
-								new MicroMap("reason", e.getMessage())));
+								new MicroMap("reason", e.toString())));
 					}
 				}
 				else
-				{
+				{					
 					List<String> privateIds = (List<String>) getForm().get("privateIdTr:privateIds").getDefaultModelObject();
 					Set<PrivateIdentity> privateIdentities = new HashSet<PrivateIdentity>(privateIds.size());
 					Iterator<String> it = privateIds.iterator();
 					while (it.hasNext())
 						privateIdentities.add(_privateIdentityDao.findById(it.next()));
+										
 					try
 					{
 						getCxManager().sendRtrPrivate(privateIdentities, reasonCode, reasonPhrase);

@@ -34,7 +34,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.PrivateIdentity;
-import org.cipango.ims.hss.model.ServiceProfile;
 
 public class PrivateIdBrowserPage extends PrivateIdentityPage
 {
@@ -42,8 +41,6 @@ public class PrivateIdBrowserPage extends PrivateIdentityPage
 	@SuppressWarnings("unchecked")
 	public PrivateIdBrowserPage()
 	{
-		add(new BookmarkablePageLink("createLink", EditPrivateIdPage.class));
-
 		IColumn[] columns = new IColumn[3];
 		columns[0] = new PropertyColumn(new StringResourceModel(getPrefix() + ".name", this, null),
 				"identity");

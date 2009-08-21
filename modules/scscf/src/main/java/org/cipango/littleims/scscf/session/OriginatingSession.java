@@ -45,39 +45,33 @@ public class OriginatingSession extends Session
 	public boolean handleInitialRequest(SipServletRequest request) throws IOException,
 			ServletException
 	{
-
-		URI requestURI = request.getRequestURI();
-
 		// 1. Check that user is not barred
 		if (getProfile() == null || getProfile().isBarred())
 		{
-			__log.debug("Barred user: " + getProfile().getURI() + ". Sending 403 response");
+			__log.info("Barred user: " + getProfile().getURI() + ". Sending 403 response");
 			request.createResponse(SipServletResponse.SC_NOT_FOUND, "Barred identity").send();
 			return true;
 		}
 
-		// 2. Remove its own SIP URI from topmost Route => already done by SIP
-		// AS
+		// 2. Remove its own SIP URI from topmost Route => already done by SIP AS
 
 		// 3. Check if original dialog identifier is present
 		String odi = request.getParameter(ORIGINAL_DIALOG_IDENTIFIER_PARAM);
 
 		// 4. Check whether the initial request matches the next unexecuted
 		// initial filter criteria
-		__log.debug("Checking for next filter criteria");
 		InitialFilterCriteria ifc = null;
 		boolean ifcMatched = false;
 
 		while ((ifc = nextIFC()) != null)
 		{
-
-			__log.debug("Evaluating filter criteria with priority: " + ifc.getPriority());
+			__log.trace("Evaluating filter criteria with priority: " + ifc.getPriority());
 			ifcMatched = ifc.matches(request, _sessionCase);
 			if (ifcMatched)
 			{
 				SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAS().getURI());
 
-				__log.debug("IFC matched. Forwarding request to: " + asURI);
+				__log.debug("IFC " +  ifc + " matched for user " + getProfile().getURI() + ". Forwarding request to: " + asURI);
 				request.pushRoute(getOwnURI());
 				request.pushRoute(asURI);
 				request.getProxy().setRecordRoute(false);

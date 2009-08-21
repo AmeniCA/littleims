@@ -16,6 +16,7 @@ package org.cipango.littleims.scscf.cx;
 import java.io.IOException;
 
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
@@ -28,6 +29,7 @@ import org.cipango.ims.Cx.AuthenticationScheme;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Base642;
 import org.cipango.littleims.util.Digest;
+import org.cipango.littleims.util.URIHelper;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
@@ -113,9 +115,14 @@ public class CxManager
 	 * </pre>
 	 * @throws IOException 
 	 */
-	public void sendMAR(String publicUserIdentity, AuthorizationHeader authorization, SipServletRequest request) throws IOException
+	public void sendMAR(URI publicUserIdentity, AuthorizationHeader authorization, SipServletRequest request) throws IOException
 	{
-		DiameterRequest mar = newRequest(IMS.MAR, publicUserIdentity,  authorization.getParameter(Digest.USERNAME_PARAM));
+		String privateId;
+		if (authorization != null)
+			privateId = authorization.getParameter(Digest.USERNAME_PARAM);
+		else
+			privateId = URIHelper.extractPrivateIdentity(publicUserIdentity);
+		DiameterRequest mar = newRequest(IMS.MAR, publicUserIdentity.toString(), privateId);
 		mar.add(getSipAuthDataItem(authorization));
 		mar.add(AVP.ofInt(IMS.IMS_VENDOR_ID,IMS.SIP_NUMBER_AUTH_ITEMS, 1));
 		mar.setAttribute(SipServletRequest.class.getName(), request);
@@ -187,8 +194,10 @@ public class CxManager
 	private AVP getSipAuthDataItem(AuthorizationHeader authorizationHeader)
 	{
 		String scheme = null;
-		String algorithm = authorizationHeader.getParameter(Digest.ALGORITHM_PARAM);
-		if (algorithm == null)
+		String algorithm = authorizationHeader == null ? null : authorizationHeader.getParameter(Digest.ALGORITHM_PARAM);
+		if (authorizationHeader == null)
+			scheme = AuthenticationScheme.SIP_DIGEST.getName();
+		else if (algorithm == null)
 			scheme = AuthenticationScheme.DIGEST_AKA_MD5.getName();
 		else
 		{
@@ -202,7 +211,7 @@ public class CxManager
 				scheme = authScheme.getName();
 		}
 		
-		String auts = authorizationHeader.getParameter(Digest.AUTS);
+		String auts = authorizationHeader == null ? null : authorizationHeader.getParameter(Digest.AUTS);
 		if (auts != null)
 		{
 			byte[] rand = getRand(authorizationHeader.getParameter(Digest.NONCE_PARAM));

@@ -59,13 +59,14 @@ public class IcscfService
 			return;
 		}
 		
-		SipURI to = (SipURI) request.getTo().getURI();
-		SipURI aor = URIHelper.getCanonicalForm(_sipFactory, to);
+		URI aor = URIHelper.getCanonicalForm(_sipFactory, request.getTo().getURI());
 		String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
 		AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 		String  privateUserId = null;
 		if (ah != null)
 			privateUserId = ah.getParameter(Digest.USERNAME_PARAM);
+		else
+			privateUserId = URIHelper.extractPrivateIdentity(aor);
 		
 		_cxManager.sendUAR(aor.toString(), privateUserId,
 				request.getHeader(Headers.P_VISITED_NETWORK_ID), 

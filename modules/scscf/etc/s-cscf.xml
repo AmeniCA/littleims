@@ -73,16 +73,6 @@
 		-->
 		<property name="maxExpires" value="600000" />
 		<!--
-		List of realms managed by this server.
-		If a REGISTER is received with a domain not present in this list, it is refused
-		with code "403 Forbidden".
-		-->
-		<property name="realms">
-			<list>
-				<value>cipango.org</value>
-			</list>
-		</property>
-		<!--
 		This URI is used for building service-route header of REGISTER 200 OK. 
 		Must match with IP address and port on which S-SCF is listening.
 		
@@ -140,7 +130,7 @@
 	
 	<bean id="enumClient" 
 			class="org.cipango.littleims.scscf.session.EnumClient">
-		<property name="domain" value="e164.org" />
+		<property name="domain" value="${scscf.enum.domain}" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
 	
@@ -203,6 +193,7 @@
 		<property name="sipFactory" ref="sipFactory" />
 		<property name="userProfileCache" ref="userProfileCache" />
 		<property name="cxManager" ref="cxManager" />
+		<property name="enumClient" ref="enumClient" />
 	</bean>
 	
 	

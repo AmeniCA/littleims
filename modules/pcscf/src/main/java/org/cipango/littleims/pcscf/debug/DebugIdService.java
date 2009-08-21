@@ -132,7 +132,6 @@ public class DebugIdService
 		try
 		{
 			Address served = request.getAddressHeader(Headers.P_SERVED_USER);
-			URI servedUri;
 			if (served == null)
 			{
 				if (originating)
@@ -143,20 +142,9 @@ public class DebugIdService
 						served = request.getFrom();
 				}
 				else
-				{
-					servedUri = request.getRequestURI();
-					if (servedUri.isSipURI())
-						servedUri = URIHelper.getCanonicalForm(_sipFactory, (SipURI) servedUri);
-					
-					return servedUri;
-				}
+					return URIHelper.getCanonicalForm(_sipFactory, request.getRequestURI());
 			}
-			servedUri = served.getURI();
-
-			if (servedUri.isSipURI())
-				servedUri = URIHelper.getCanonicalForm(_sipFactory, (SipURI) servedUri);
-			
-			return servedUri;
+			return URIHelper.getCanonicalForm(_sipFactory, served.getURI());
 		}
 		catch (ServletParseException e)
 		{

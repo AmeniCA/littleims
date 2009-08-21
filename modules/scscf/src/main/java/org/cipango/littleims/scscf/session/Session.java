@@ -91,9 +91,9 @@ public abstract class Session
 	{
 		URI requestURI = request.getRequestURI();
 
-		if (requestURI.getScheme().equals("tel"))
+		if (requestURI instanceof TelURL)
 		{
-			__log.debug("Called Party is a tel URL. Trying ENUM translation");
+			__log.debug("Called Party: " + requestURI + " is a tel URL. Trying ENUM translation");
 			SipURI translatedRURI = null;
 			try
 			{
@@ -144,27 +144,20 @@ public abstract class Session
 			}
 			else
 			{
-				SipURI termURI = (SipURI) requestURI;
-				String domain = termURI.getHost();
 				if (__log.isDebugEnabled())
-				{
-					__log.debug("Forwarding to terminating network: " + domain);
-				}
+					__log.debug("Forwarding to terminating network: " + ((SipURI) requestURI).getHost());
 
 				if (_sessionManager.getIcscfUri() != null)
 				{
-					__log.info("Forwarding request to ICSCF");
+					__log.trace("Forwarding request to ICSCF");
 					request.pushRoute(_sessionManager.getIcscfUri());
 				}
 				else
-				{
 					__log.debug("Forwarding request for " + request.getRequestURI()
 							+ " using request URI");
-				}
 
 			}
 		}
-		__log.info("Proxying request to: " + request.getAddressHeader(Headers.ROUTE));
 		request.removeHeader(Headers.P_SERVED_USER);
 		request.getProxy().proxyTo(request.getRequestURI());
 	}

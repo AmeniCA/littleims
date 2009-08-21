@@ -107,7 +107,7 @@
 			destroy-method="springStop">
 		<property name="adminUserDao" ref="adminUserDao" />
 		<property name="sipFactory" ref="sipFactory" />
-		<property name="webAuthentication" value="true" />
+		<property name="webAuthentication" value="${hss.webAuthentication.enabled}" />
 	</bean>
 	
 </beans>

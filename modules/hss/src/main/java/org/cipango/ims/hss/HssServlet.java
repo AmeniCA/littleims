@@ -86,11 +86,13 @@ public class HssServlet extends SipServlet implements DiameterListener
 		{
 			if (__log.isDebugEnabled())
 			{
-				if (e.getResultCode() == IMS.DIAMETER_ERROR_USER_UNKNOWN)
-					__log.debug("Unable to process request: " + command + " Result code: " + e.getResultCode() 
+				int vendorId = e.getVendorId();
+				int resultCode = e.getResultCode();
+				if ((vendorId == IMS.IMS_VENDOR_ID && resultCode == IMS.DIAMETER_ERROR_USER_UNKNOWN))
+					__log.debug("Unable to process request: " + command + ", Result code: " + e.getResultCode() 
 							+ " Reason: " + e.getMessage());
 				else
-					__log.debug("Unable to process request: " + command + " Result code: " + e.getResultCode(), e);
+					__log.debug("Unable to process request: " + command + ", Result code: " + e.getResultCode(), e);
 			}
 			DiameterAnswer answer = request.createAnswer(e.getVendorId(), e.getResultCode());
 			if (e.getAvps() != null)
@@ -102,8 +104,7 @@ public class HssServlet extends SipServlet implements DiameterListener
 		}
 		catch (Throwable e)
 		{
-			if (__log.isDebugEnabled())
-				__log.debug("Unable to process request: " + command, e);
+			__log.warn("Unable to process request: " + command, e);
 			DiameterAnswer answer = request.createAnswer(Base.DIAMETER_UNABLE_TO_COMPLY);
 			answer.send();
 		}
