@@ -70,6 +70,9 @@
           </diameterNode>
           <stopKey>foo</stopKey>
           <stopPort>9998</stopPort>
+          <webAppConfig>
+            <contextPath>/</contextPath>
+          </webAppConfig>
         </configuration>
       </plugin>
     </plugins>
@@ -175,7 +178,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${hss.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${hss.home}/sipapps" includes="ROOT.war"/>
                       <fileset dir="${hss.home}/etc" includes="hss.xml,cipango-hss.xml,hss-db.properties"/>
                       <fileset dir="${hss.home}/resources" includes="log4j.xml"/>
                     </delete>
@@ -186,7 +189,7 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${hss.home}/sipapps"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" toFile="${hss.home}/sipapps/ROOT.war"/>
                     <copy todir="${hss.home}">
                       <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>

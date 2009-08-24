@@ -260,7 +260,7 @@ public class UserProfileCache
 			{
 				__log.warn("Failed to get shared IFCs from URL: " 
 						+ _sharedIfcsUrl + ": " + e);
-				__log.debug("Failed to get shared IFCs from URL: " + _sharedIfcsUrl, e);
+				__log.trace("Failed to get shared IFCs from URL: " + _sharedIfcsUrl, e);
 			}
 		}
 	}

@@ -167,8 +167,8 @@ public class CxManager
 			sar.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.WILCARDED_PSI, wilcardPublicId));
 		sar.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.SERVER_ASSIGNMENT_TYPE, serverAssignmentType));
 		sar.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.USER_DATA_ALREADY_AVAILABLE, userDataAlreadyAvailable ? 1 : 0));
-		
-		sar.setAttribute(SipServletRequest.class.getName(), request);
+		if (request != null)
+			sar.setAttribute(SipServletRequest.class.getName(), request);
 		sar.send();
 		if (__log.isDebugEnabled())
 			__log.debug("Send SAR request for public identity " + publicUserIdentity 

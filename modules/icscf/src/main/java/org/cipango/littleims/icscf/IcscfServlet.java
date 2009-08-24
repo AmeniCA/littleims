@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterAnswer;
@@ -65,8 +66,18 @@ public class IcscfServlet extends SipServlet implements DiameterListener
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Received unexpected exception:" + e, e);
-			throw new RuntimeException(e);
+			__log.warn("Failed to handle request:\n" + request, e);
+			if (!request.isCommitted())
+			{
+				try
+				{
+					request.createResponse(SipServletResponse.SC_SERVICE_UNAVAILABLE).send();
+				}
+				catch (Throwable t) 
+				{
+					__log.debug("Failed to send 503 response after exception", t);
+				}
+			}
 		}
 	}
 

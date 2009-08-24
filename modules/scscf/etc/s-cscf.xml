@@ -57,7 +57,7 @@
 		<!--
 		Shared IFCs URL
 		-->
-		<property name="sharedIfcsUrl" value="http://${hss.host}:${hss.http.port}/littleims-hss/sharedIFCs.xml" />
+		<property name="sharedIfcsUrl" value="http://${hss.host}:${hss.http.port}/sharedIFCs.xml" />
 	</bean>
 	
 	

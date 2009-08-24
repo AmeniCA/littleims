@@ -39,6 +39,9 @@
           </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9996</stopPort>
+          <webAppConfig>
+            <contextPath>/</contextPath>
+          </webAppConfig>
         </configuration>
       </plugin>
       
@@ -96,7 +99,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${pcscf.home}/sipapps" includes="${project.build.finalName}.${project.packaging}"/>
+                      <fileset dir="${pcscf.home}/sipapps" includes="ROOT.war"/>
                       <fileset dir="${pcscf.home}/etc" includes="p-cscf.xml,cipango-pcscf.xml"/>
                       <fileset dir="${pcscf.home}/resources" includes="log4j.xml"/>
                     </delete>
@@ -107,7 +110,7 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${pcscf.home}/sipapps"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" tofile="${pcscf.home}/sipapps/ROOT.war"/>
                     <copy todir="${pcscf.home}">
                       <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>

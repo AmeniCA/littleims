@@ -243,7 +243,7 @@ public class OamServlet extends HttpServlet
 			resp.sendRedirect(req.getRequestURI());
 		}
 		PrintWriter out = resp.getWriter();
-		out.println("<html><head><title>OAM</title></head><body>");
+		out.println("<html><head><title>littleIMS :: S-CSCF: OAM</title></head><body>");
 		printSessions(out);
 		printUsers(out);
 		

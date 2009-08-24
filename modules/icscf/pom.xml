@@ -56,6 +56,9 @@
               </peer>
             </peers>
           </diameterNode>
+          <webAppConfig>
+            <contextPath>/</contextPath>
+          </webAppConfig>
         </configuration>
       </plugin>
       
@@ -101,7 +104,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${icscf.home}/sipapps" includes="${project.artifactId}.${project.packaging}"/>
+                      <fileset dir="${icscf.home}/sipapps" includes="ROOT.war"/>
                       <fileset dir="${icscf.home}/etc" includes="i-cscf.xml,cipango-icscf.xml"/>
                       <fileset dir="${icscf.home}/resources" includes="log4j.xml"/>
                     </delete>
@@ -112,7 +115,7 @@
                 <phase>install</phase>
                 <configuration>
                   <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${icscf.home}/sipapps"/>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" tofile="${icscf.home}/sipapps/ROOT.war"/>
                     <copy todir="${icscf.home}">
                       <fileset dir="${basedir}" includes="etc/,resources/"/>
                     </copy>

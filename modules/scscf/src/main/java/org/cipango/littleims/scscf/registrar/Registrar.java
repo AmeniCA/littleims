@@ -952,7 +952,14 @@ public class Registrar
 
 		public void run()
 		{
-			regTimerExpired(_uri, _privateID);
+			try
+			{
+				regTimerExpired(_uri, _privateID);
+			}
+			catch (Throwable e)
+			{
+				__log.warn("Unexpected exception in RegTimerTask", e);
+			}
 		}
 
 	}

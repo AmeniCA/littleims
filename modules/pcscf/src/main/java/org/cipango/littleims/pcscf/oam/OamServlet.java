@@ -142,7 +142,7 @@ public class OamServlet extends HttpServlet
 	{
 		
 		PrintWriter out = resp.getWriter();
-		out.println("<html><head><title>P-SCSCF: OAM</title></head><body>");
+		out.println("<html><head><title>littleIMS :: P-SCSCF: OAM</title></head><body>");
 		printDebugSubscriptions(out);		
 		printDebugSessions(out);
 		out.println("</body></html>");

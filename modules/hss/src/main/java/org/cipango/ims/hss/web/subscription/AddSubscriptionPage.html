@@ -3,13 +3,47 @@
 <wicket:extend>
 	<h2 wicket:id="title"></h2>
 	<form wicket:id="form">
+	   <table wicket:id="publicIdentity" class="dataDetails" >
+            <tr class="title">
+                <th colspan="2"><wicket:message key="contextPanel.publicIdentity"/></th>
+            </tr>
+            <tr>
+                <th><wicket:message key="publicId.name">Private URI</wicket:message></th>
+                <td><input wicket:id="identity" type="text" onChange="setSubscriptionName(this);setPrivateIdentity(this);"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="publicId.barred">Barred</wicket:message></th>
+                <td>
+                    <input wicket:id="barred" type="checkbox"/>
+                </td>
+            </tr>
+            <tr>
+                <th><wicket:message key="publicId.identityType">identityType</wicket:message></th>
+                <td>
+                    <select wicket:id="identityType">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th><wicket:message key="publicId.displayName"></wicket:message></th>
+                <td><input wicket:id="displayName" type="text" /></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="publicId.serviceProfile"/></th>
+                <td>
+                    <select wicket:id="serviceProfile">
+                    </select>
+                </td>
+            </tr>
+        </table>
+	
 		<table wicket:id="privateIdentity" class="dataDetails">
 			<tr class="title">
 				<th colspan="2"><wicket:message key="contextPanel.privateIdentity"/></th>
 			</tr>
 			<tr>
 				<th><wicket:message key="privateId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="identity" type="text" /></td>
+				<td><input id="privateIdentity" wicket:id="identity" type="text" /></td>
 			</tr>
 			<tr>
 				<th><wicket:message key="privateId.password">Password</wicket:message></th>
@@ -24,40 +58,6 @@
                     <div class="description"><wicket:message key="privateId.operatorId.descr"/></div>
                 </td>
             </tr>
-		</table>
-		
-		<table wicket:id="publicIdentity" class="dataDetails" >
-            <tr class="title">
-				<th colspan="2"><wicket:message key="contextPanel.publicIdentity"/></th>
-			</tr>
-			<tr>
-				<th><wicket:message key="publicId.name">Private URI</wicket:message></th>
-				<td><input wicket:id="identity" type="text" onChange="setSubscriptionName(this);"/></td>
-			</tr>
-			<tr>
-				<th><wicket:message key="publicId.barred">Barred</wicket:message></th>
-				<td>
-					<input wicket:id="barred" type="checkbox"/>
-				</td>
-			</tr>
-			<tr>
-	            <th><wicket:message key="publicId.identityType">identityType</wicket:message></th>
-	            <td>
-	            	<select wicket:id="identityType">
-	            	</select>
-	            </td>
-	        </tr>
-			<tr>
-				<th><wicket:message key="publicId.displayName"></wicket:message></th>
-				<td><input wicket:id="displayName" type="text" /></td>
-			</tr>
-			<tr>
-				<th><wicket:message key="publicId.serviceProfile"/></th>
-				<td>
-	            	<select wicket:id="serviceProfile">
-	            	</select>
-	            </td>
-			</tr>
 		</table>
 		
 		<table wicket:id="subscription" class="dataDetails" >

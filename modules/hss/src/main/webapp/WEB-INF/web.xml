@@ -8,59 +8,39 @@
   <display-name>Test WebApp</display-name>
   
   <context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			file:${jetty.home}/etc/hss.xml
-		</param-value>
-	</context-param>
-		
-	<filter>
-		<filter-name>osiv</filter-name> <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
-	</filter>
-	
-	<filter>
-		<filter-name>wicket</filter-name>
-		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
-		<init-param>
-			<param-name>applicationFactoryClassName</param-name>
-			<param-value>org.apache.wicket.spring.SpringWebApplicationFactory</param-value>
-		</init-param>
-	</filter>
-	
-	<filter-mapping>
-		<filter-name>osiv</filter-name>
-		<url-pattern>/wicket/*</url-pattern>
-	</filter-mapping>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+      file:${jetty.home}/etc/hss.xml
+    </param-value>
+  </context-param>
+    
+  <filter>
+    <filter-name>osiv</filter-name> <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+  </filter>
+  
+  <filter>
+    <filter-name>wicket</filter-name>
+    <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
+    <init-param>
+      <param-name>applicationFactoryClassName</param-name>
+      <param-value>org.apache.wicket.spring.SpringWebApplicationFactory</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>osiv</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
-	<filter-mapping>
-		<filter-name>wicket</filter-name>
-	<url-pattern>/wicket/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>osiv</filter-name>
-		<url-pattern>/api/*</url-pattern>
-	</filter-mapping>
-	
-	<filter-mapping>
-		<filter-name>osiv</filter-name>
-		<url-pattern>/svg/subscription.svg</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>osiv</filter-name>
-		<url-pattern>/sharedIFCs.xml</url-pattern>
-	</filter-mapping>
-	
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	
-  <servlet>
-    <servlet-name>api</servlet-name>
-    <servlet-class>org.cipango.ims.hss.web.ApiServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+  <filter-mapping>
+    <filter-name>wicket</filter-name>
+  <url-pattern>/*</url-pattern>
+  </filter-mapping>
+    
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
 
    <servlet>
     <servlet-name>SvgServlet</servlet-name>
@@ -74,11 +54,7 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   
-  <servlet-mapping>
-    <servlet-name>api</servlet-name>
-    <url-pattern>/api/*</url-pattern>
-  </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>SvgServlet</servlet-name>
     <url-pattern>/svg/subscription.svg</url-pattern>
@@ -88,5 +64,5 @@
     <servlet-name>SharedIfcServlet</servlet-name>
     <url-pattern>/sharedIFCs.xml</url-pattern>
   </servlet-mapping>
-	
+  
 </web-app>
