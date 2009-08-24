@@ -32,7 +32,7 @@
                 <configuration>
                   <tasks>
                     <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${littleims.home}" includes="littleims.properties"/>
+                      <fileset dir="${littleims.home}" includes="littleims.properties, README.txt"/>
                       <fileset dir="${scscf.home}"/>
                       <fileset dir="${pcscf.home}"/>
                       <fileset dir="${icscf.home}"/>
@@ -101,9 +101,9 @@
                      <replace file="${hss.home}/bin/hss.sh" token="cipango.pid" value="littleims-hss.pid"/>
                      <replace file="${hss.home}/bin/hss.sh" token="CIPANGO_HOME" value="HSS_HOME"/>
                      
-                     <copy file="../../littleims.properties" todir="${littleims.home}"/>
                      <copy todir="${littleims.home}">
-                        <fileset dir="bin"/>
+                        <fileset dir="${basedir}/bin"/>
+                        <fileset dir="${basedir}/../.." includes="littleims.properties, README.txt"/>
                      </copy>
                      <chmod dir="${littleims.home}" perm="ugo+rx" includes="*.sh,**/*.sh"/>
                      <fixcrlf srcdir="${littleims.home}" includes="*.sh,**/*.sh" eol="lf" eof="remove" />
