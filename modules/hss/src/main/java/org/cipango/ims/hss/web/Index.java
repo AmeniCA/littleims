@@ -15,16 +15,18 @@ package org.cipango.ims.hss.web;
 
 import org.apache.wicket.PageParameters;
 
-public class Index extends BasePage {
+public class Index extends BasePage
+{
 
-
-	public Index(PageParameters pageParameters) {
+	public Index(PageParameters pageParameters)
+	{
 
 	}
-	
+
 	@Override
-	public String getTitle() {
-		return getString("log.registrations.title");			
+	public String getTitle()
+	{
+		return getString("home.title");
 	}
 
 }

@@ -61,6 +61,11 @@ public class ImsSession extends WebSession
 		return _adminModel != null;
 	}
 	
+	public ImsApplication getImsApplication()
+	{
+		return (ImsApplication) super.getApplication();
+	}
+	
 	public String getLogin()
 	{
 		return _adminModel == null ? null : _adminModel.getLogin();
