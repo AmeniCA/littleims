@@ -69,7 +69,7 @@ public class PcscfService
 			}
 			processHeaders(request, _requestHeadersToRemove, _requestHeadersToAdd);
 			
-			request.setAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER, asserted);
+			request.setAddressHeader(Headers.P_ASSERTED_IDENTITY, asserted);
 		}
 		Proxy proxy = request.getProxy();
 		proxy.setRecordRoute(true);

@@ -57,7 +57,7 @@ public class DebugIdService
 			_log.info("Debug subscription expiration (" + expires + ") is shorter"
 					+ " than minimum value (" + _minExpires + "). Sending 423 response");
 			_messageSender.sendResponse(subscribe, SipServletResponse.SC_INTERVAL_TOO_BRIEF,
-					Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
+					Headers.MIN_EXPIRES, String.valueOf(_minExpires));
 			return;
 		}
 

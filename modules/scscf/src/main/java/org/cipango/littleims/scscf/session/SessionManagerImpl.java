@@ -410,7 +410,7 @@ public class SessionManagerImpl implements SessionManager
 			if (originating)
 			{
 				// Couple of sanity checks first
-				served = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER);
+				served = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY);
 				if (served != null)
 					_log.debug("No P-Served-User. Using P-Asserted-Identity");
 				else

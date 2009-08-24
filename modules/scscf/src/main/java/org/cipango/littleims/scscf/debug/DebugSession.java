@@ -53,7 +53,7 @@ public class DebugSession implements UserProfileListener
 					"version=\"0\"", "version=\"" + (_version++) + "\"");
 			notify.setContent(serviceLevelTraceInfo.getBytes(),
 					DEBUG_INFO_CONTENT_TYPE);
-			notify.setHeader(Headers.EVENT_HEADER, DebugIdService.DEBUG_EVENT);
+			notify.setHeader(Headers.EVENT, DebugIdService.DEBUG_EVENT);
 			int expires = getExpires();
 			if (expires == 0)
 				notify.setHeader(Headers.SUBSCRIPTION_STATE,

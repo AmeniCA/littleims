@@ -142,7 +142,7 @@ public class Registrar
 		}
 
 	
-		Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
+		Address contact = request.getAddressHeader(Headers.CONTACT);
 
 		int expires = contact.getExpires();
 		if (expires == -1)
@@ -178,7 +178,7 @@ public class Registrar
 			__log.info("Registration expiration (" + expires + ") is shorter"
 					+ " than minimum value (" + _minExpires + "). Sending 423 response");
 			_messageSender.sendResponse(request, SipServletResponse.SC_INTERVAL_TOO_BRIEF,
-							Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
+							Headers.MIN_EXPIRES, String.valueOf(_minExpires));
 			return;
 		}
 
@@ -255,7 +255,7 @@ public class Registrar
 			URI aor = getAor(request);
 			RegistrationInfo regInfo;	
 	
-			Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
+			Address contact = request.getAddressHeader(Headers.CONTACT);
 			int expires = contact.getExpires();
 			if (expires == -1)
 			{
@@ -293,7 +293,7 @@ public class Registrar
 				{
 					Address c = contacts.get(i);
 					c.setExpires(expires);
-					response.addAddressHeader(Headers.CONTACT_HEADER,
+					response.addAddressHeader(Headers.CONTACT,
 							(Address) contacts.get(i), false);
 				}
 			}
@@ -304,10 +304,10 @@ public class Registrar
 			while (it.hasNext())
 			{
 				Address associatedURI = _sipFactory.createAddress(it.next());
-				response.addAddressHeader(Headers.P_ASSOCIATED_URI_HEADER, associatedURI, false);
+				response.addAddressHeader(Headers.P_ASSOCIATED_URI, associatedURI, false);
 			}
 	
-			response.addAddressHeader(Headers.SERVICE_ROUTE_HEADER, _serviceRoute, true);
+			response.addAddressHeader(Headers.SERVICE_ROUTE, _serviceRoute, true);
 			
 			UserProfile profile = _userProfileCache.getProfile(aor.toString(), null);
 			if (profile != null && profile.getServiceLevelTraceInfo() != null)
@@ -580,9 +580,9 @@ public class Registrar
 					if (pAccessNetworkInfo != null)
 						register.setHeader(Headers.P_ACCESS_NETWORK_INFO, pAccessNetworkInfo);
 					
-					String pChargingVector = request.getHeader(Headers.P_CHARCHING_VECTOR);
+					String pChargingVector = request.getHeader(Headers.P_CHARGING_VECTOR);
 					if (pChargingVector != null)
-						register.setHeader(Headers.P_CHARCHING_VECTOR, pChargingVector);
+						register.setHeader(Headers.P_CHARGING_VECTOR, pChargingVector);
 					
 					String serviceInfo = ifc.getAS().getServiceInfo();
 					if (serviceInfo != null && !serviceInfo.trim().equals(""))
@@ -597,7 +597,7 @@ public class Registrar
 						register.setContent(response.toString().getBytes(), MSG_SIP_CONTENT_TYPE);
 					
 					// TODO support multipart
-					register.setAddressHeader(Headers.CONTACT_HEADER, _sipFactory.createAddress(_scscfUri));
+					register.setAddressHeader(Headers.CONTACT, _sipFactory.createAddress(_scscfUri));
 					register.send();
 				}
 			}
@@ -644,9 +644,9 @@ public class Registrar
 						if (pAccessNetworkInfo != null)
 							register.setHeader(Headers.P_ACCESS_NETWORK_INFO, pAccessNetworkInfo);
 						
-						String pChargingVector = request.getHeader(Headers.P_CHARCHING_VECTOR);
+						String pChargingVector = request.getHeader(Headers.P_CHARGING_VECTOR);
 						if (pChargingVector != null)
-							register.setHeader(Headers.P_CHARCHING_VECTOR, pChargingVector);
+							register.setHeader(Headers.P_CHARGING_VECTOR, pChargingVector);
 						
 						String serviceInfo = ifc.getAS().getServiceInfo();
 						if (serviceInfo != null && !serviceInfo.trim().equals(""))
@@ -657,7 +657,7 @@ public class Registrar
 						}
 
 						// TODO support multipart
-						register.setAddressHeader(Headers.CONTACT_HEADER, _sipFactory.createAddress(_scscfUri));
+						register.setAddressHeader(Headers.CONTACT, _sipFactory.createAddress(_scscfUri));
 						register.send();
 					}
 				}

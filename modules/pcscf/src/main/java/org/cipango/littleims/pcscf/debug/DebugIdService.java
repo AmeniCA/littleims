@@ -63,8 +63,8 @@ public class DebugIdService
 						Methods.SUBSCRIBE,
 						_pcscfUri,
 						aor);
-				request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
+				request.addHeader(Headers.EVENT, EVENT_DEBUG);
+				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
 				request.setExpires(expires);
 				request.pushRoute(_icscfUri);
 				if (_userAgent != null)
@@ -81,8 +81,8 @@ public class DebugIdService
 			else
 			{
 				SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
-				request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
+				request.addHeader(Headers.EVENT, EVENT_DEBUG);
+				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
 				request.setExpires(expires);
 				if (_userAgent != null)
 					request.setHeader(Headers.USER_AGENT, _userAgent);

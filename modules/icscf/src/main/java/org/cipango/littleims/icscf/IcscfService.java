@@ -197,7 +197,7 @@ public class IcscfService
 	
 	private int getUserAuthorizationType(SipServletRequest request) throws ServletParseException
 	{
-		Address contact = request.getAddressHeader(Headers.CONTACT_HEADER);
+		Address contact = request.getAddressHeader(Headers.CONTACT);
 
 		int expires = contact.getExpires();
 		if (expires == -1)
@@ -222,7 +222,7 @@ public class IcscfService
 		
 		if (isOriginating(request))
 		{
-			URI pAssertedId = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER).getURI();
+			URI pAssertedId = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY).getURI();
 			
 			request.removeHeader(Headers.P_PROFILE_KEY);
 			

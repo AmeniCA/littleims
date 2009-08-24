@@ -13,10 +13,17 @@
 // ========================================================================
 package org.cipango.ims.hss.web.spt;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.model.spt.SPT;
+import org.cipango.littleims.util.Headers;
 
 public class HeaderSptPanel extends Panel
 {
@@ -24,7 +31,29 @@ public class HeaderSptPanel extends Panel
 	public HeaderSptPanel(String id, IModel<SPT> sptModel)
 	{
 		super(id, sptModel);
-		add(new RequiredTextField("header", String.class));
+		add(new AutoCompleteTextField<String>("header", String.class)
+				{
+
+					@Override
+					protected Iterator<String> getChoices(String input)
+					{
+						if (Strings.isEmpty(input))
+				        {
+				            return Headers.ALL_HEADERS.iterator();
+				        }
+				        input = input.trim().toLowerCase();
+				        List<String> headers = new ArrayList<String>();
+				        Iterator<String> it = Headers.ALL_HEADERS.iterator();
+				        while (it.hasNext())
+						{
+							String name = (String) it.next();
+							if (name.toLowerCase().startsWith(input))
+								headers.add(name);
+						}
+				        return headers.iterator();
+					}
+			
+				}.setRequired(true));
 		add(new RequiredTextField("content", String.class));
 	}
 }

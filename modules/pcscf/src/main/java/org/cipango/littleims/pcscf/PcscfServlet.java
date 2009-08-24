@@ -84,7 +84,7 @@ public class PcscfServlet extends SipServlet
 					String name = (String) it.next();
 					if (name.equalsIgnoreCase(Headers.P_DEBUG_ID))
 					{
-						Address contact = response.getAddressHeader(Headers.CONTACT_HEADER);
+						Address contact = response.getAddressHeader(Headers.CONTACT);
 						int expires = -1;
 						if (contact != null)
 							expires = contact.getExpires();

@@ -87,7 +87,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 			}
 			else if (Methods.SUBSCRIBE.equals(method))
 			{
-				String event = request.getHeader(Headers.EVENT_HEADER);
+				String event = request.getHeader(Headers.EVENT);
 				if (RegEventManager.REG_EVENT.equalsIgnoreCase(event))
 				{
 					request.getSession().setHandler(REGISTRAR_SERVLET_NAME);

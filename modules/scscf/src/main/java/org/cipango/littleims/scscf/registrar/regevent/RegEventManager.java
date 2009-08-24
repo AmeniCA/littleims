@@ -82,7 +82,7 @@ public class RegEventManager implements Runnable, RegEventListener
 					+ " than minimum value (" + _minExpires + "). Sending 423 response");
 			SipServletResponse response = 
 				subscribe.createResponse(SipServletResponse.SC_INTERVAL_TOO_BRIEF);
-			response.setHeader(Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
+			response.setHeader(Headers.MIN_EXPIRES, String.valueOf(_minExpires));
 			response.send();
 			subscribe.getApplicationSession().invalidate();
 			return;
@@ -210,7 +210,7 @@ public class RegEventManager implements Runnable, RegEventListener
 		{
 			session.setAttribute(ExpiryTask.LAST_EVENT, e);
 			final SipServletRequest notify = session.createRequest(Methods.NOTIFY);
-			notify.setHeader(Headers.EVENT_HEADER, REG_EVENT);
+			notify.setHeader(Headers.EVENT, REG_EVENT);
 			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session));
 			Integer version = (Integer) session.getAttribute(NOTIFY_VERSION);
 			if (version == null)

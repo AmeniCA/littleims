@@ -310,7 +310,7 @@ public class ImsAuthenticator implements Authenticator
 			{
 				wwwAuthenticate += ", stale=TRUE";
 			}
-			_messageSender.sendResponse(request, SipServletResponse.SC_UNAUTHORIZED, Headers.WWW_AUTHENTICATE_HEADER, wwwAuthenticate);
+			_messageSender.sendResponse(request, SipServletResponse.SC_UNAUTHORIZED, Headers.WWW_AUTHENTICATE, wwwAuthenticate);
 		}
 		catch (Exception e)
 		{

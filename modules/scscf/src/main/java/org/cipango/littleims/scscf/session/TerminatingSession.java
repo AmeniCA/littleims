@@ -145,15 +145,15 @@ public class TerminatingSession extends Session
 				// 9. Forward the request to served user
 
 				// insert a P-Called-Party header with original request URI
-				request.setAddressHeader(Headers.P_CALLED_PARTY_HEADER, 
+				request.setAddressHeader(Headers.P_CALLED_PARTY_ID, 
 						getSessionManager().getSipFactory().createAddress(_originalURI));
 
 				// 11. apply privacy to P-Asserted-ID
-				String privacy = request.getHeader(Headers.PRIVACY_HEADER);
+				String privacy = request.getHeader(Headers.PRIVACY);
 				if (privacy != null && privacy.equalsIgnoreCase(PRIVACY_ID))
 				{
 					__log.debug("Privacy required, removing P-Asserted-Identity");
-					request.removeHeader(Headers.PRIVACY_HEADER);
+					request.removeHeader(Headers.PRIVACY);
 				}
 
 				if (_contacts.size() == 0)
