@@ -158,4 +158,9 @@ public class DebugSubscription
 	{
 		return _configs;
 	}
+
+	public DebugIdService getDebugIdService()
+	{
+		return _debugIdService;
+	}
 }

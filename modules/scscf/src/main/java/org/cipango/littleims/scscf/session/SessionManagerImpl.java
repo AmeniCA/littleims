@@ -42,6 +42,7 @@ import org.cipango.littleims.scscf.media.Policy;
 import org.cipango.littleims.scscf.registrar.Context;
 import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.scscf.util.IDGenerator;
+import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 import org.cipango.littleims.util.URIHelper;
@@ -52,13 +53,13 @@ public class SessionManagerImpl implements SessionManager
 	public static final String TERM_PARAM = "term";
 	private static final String ODI = "odi";
 	
-	private static final Logger __log = Logger.getLogger(SessionManagerImpl.class);
+	private final Logger _log = Logger.getLogger(SessionManagerImpl.class);
 
 	
 	private boolean _terminatingDefault;
 	private IDGenerator _idgen = new IDGenerator();
 	private SessionMap _sessionMap;
-	private SipFactory sipFactory;
+	private SipFactory _sipFactory;
 	private EnumClient _enumClient;
 
 	private Policy _mediaPolicy;
@@ -69,19 +70,20 @@ public class SessionManagerImpl implements SessionManager
 	private SipURI _scscfUri;
 	private SipURI _bgcfUri;
 	private CxManager _cxManager;
-
+	private MessageSender _messageSender;
+	
 	
 	public void init()
 	{
 		_icscfUri.setLrParam(true);
 		if (!_terminatingDefault)
 		{
-			__log.info("Using Originating as default mode");
+			_log.info("Using Originating as default mode");
 			_icscfUri.setParameter(TERM_PARAM, "");
 		}
 		else
 		{
-			__log.info("Using Terminating as default mode");
+			_log.info("Using Terminating as default mode");
 		}
 		_bgcfUri.setLrParam(true);
 		_sessionMap = new SessionMap();
@@ -94,8 +96,8 @@ public class SessionManagerImpl implements SessionManager
 	
 	public void doInitialRequest(SipServletRequest request, boolean sarAnswer) throws ServletException, IOException
 	{
-		if (!sarAnswer && __log.isDebugEnabled())
-			__log.debug("Received initial request: " + request.getMethod() + " " + request.getRequestURI());
+		if (!sarAnswer && _log.isDebugEnabled())
+			_log.debug("Received initial request: " + request.getMethod() + " " + request.getRequestURI());
 		
 		if (!isComeFromTrustedDomain(request))
 			request.removeHeader(Headers.P_SERVED_USER);
@@ -109,13 +111,13 @@ public class SessionManagerImpl implements SessionManager
 			// first time
 
 			odi = generateODI();
-			__log.trace("No original dialog identifier. Generating ODI: " + odi);
+			_log.trace("No original dialog identifier. Generating ODI: " + odi);
 
 			// new session, we need to determine session case
 			Session session = null;
 			UserProfile profile = null;
 			boolean isOrig = isOriginating(request);
-			__log.debug("Processing request in " + (isOrig ? "originating" : "terminating")
+			_log.debug("Processing request in " + (isOrig ? "originating" : "terminating")
 					+ " mode.");
 			String pProfileKey = request.getHeader(Headers.P_PROFILE_KEY);
 			
@@ -143,7 +145,7 @@ public class SessionManagerImpl implements SessionManager
 				session = new OriginatingSession(profile, context != null);
 				
 				session.setSessionManager(this);
-				__log.debug("Creating originating session for served user: " + served);
+				_log.debug("Creating originating session for served user: " + served);
 
 			}
 			else
@@ -154,7 +156,7 @@ public class SessionManagerImpl implements SessionManager
 				Context context = _registrar.getContext(served);
 				boolean registered = context != null;
 				
-				__log.debug("Creating terminating session for served user: " + served
+				_log.debug("Creating terminating session for served user: " + served
 						+ (registered ? " (registered)" : " (unregistered)"));
 
 				// check if we have user profile and, if not, download it
@@ -176,19 +178,19 @@ public class SessionManagerImpl implements SessionManager
 				if (profile == null)
 				{
 
-					__log.info("Called user: " + served + " is not known.");
+					_log.info("Called user: " + served + " is not known.");
 					if (isCSUser(served))
 					{
 						if (_bgcfUri != null)
 						{
 
 							String number = ((SipURI) served).getUser();
-							SipURI telSip = sipFactory.createSipURI(number, _bgcfUri.getHost());
+							SipURI telSip = _sipFactory.createSipURI(number, _bgcfUri.getHost());
 							if (_bgcfUri.getPort() != -1)
 							{
 								telSip.setPort(_bgcfUri.getPort());
 							}
-							__log.info("Target: " + served + " is CS user. Routing to "
+							_log.info("Target: " + served + " is CS user. Routing to "
 									+ telSip);
 							request.getSession().setAttribute("scscf.role", "terminating");
 							request.getProxy().setRecordRoute(true);
@@ -198,15 +200,15 @@ public class SessionManagerImpl implements SessionManager
 						}
 						else
 						{
-							__log.warn("CS user but no BGCF configured.");
-							request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+							_log.warn("CS user but no BGCF configured.");
+							_messageSender.sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 							return;
 						}
 					}
 					else
 					{
-						__log.info("Not CS user. Sending 404 response");
-						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+						_log.info("Not CS user. Sending 404 response");
+						_messageSender.sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 						return;
 					}
 
@@ -225,8 +227,8 @@ public class SessionManagerImpl implements SessionManager
 			// first check media policy
 			if (!_mediaPolicy.isAcceptable(request, profile))
 			{
-				__log.info("Media is not accepted. Sending 488 response");
-				request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE).send();
+				_log.info("Media is not accepted. Sending 488 response");
+				_messageSender.sendResponse(request, SipServletResponse.SC_NOT_ACCEPTABLE);
 				return;
 			}
 
@@ -245,7 +247,7 @@ public class SessionManagerImpl implements SessionManager
 		}
 		else
 		{
-			__log.debug("ODI: " + odi + " found in request. Invoking session.");
+			_log.debug("ODI: " + odi + " found in request. Invoking session.");
 			Session session = _sessionMap.getSession(odi);
 			boolean processingOver = session.handleInitialRequest(request);
 			/*
@@ -264,7 +266,7 @@ public class SessionManagerImpl implements SessionManager
 			if (saa.getResultCode() >= 3000)
 			{
 				// FIXME what to do ????
-				__log.debug("Diameter SAA answer is not valid: " + saa.getResultCode());
+				_log.debug("Diameter SAA answer is not valid: " + saa.getResultCode());
 			}
 			else
 			{
@@ -281,7 +283,7 @@ public class SessionManagerImpl implements SessionManager
 		}
 		catch (Exception e) 
 		{
-			__log.warn("Unable to process SAA answer", e);
+			_log.warn("Unable to process SAA answer", e);
 		}
 
 	}
@@ -296,7 +298,7 @@ public class SessionManagerImpl implements SessionManager
 			{
 				subscription = IMSSubscriptionDocument.Factory.parse(userData.getString());
 				_userProfileCache.cacheUserProfile(subscription);
-				__log.info("Update user profile of " 
+				_log.info("Update user profile of " 
 						+ subscription.getIMSSubscription().getPrivateID()
 						+ " after PPR request");
 			}
@@ -305,7 +307,7 @@ public class SessionManagerImpl implements SessionManager
 		}
 		catch (Exception e) 
 		{
-			__log.warn("Unable to process PPR request", e);
+			_log.warn("Unable to process PPR request", e);
 			try { ppr.createAnswer(Base.DIAMETER_UNABLE_TO_COMPLY).send(); } catch (Exception e1) { }
 		}
 	}
@@ -349,11 +351,11 @@ public class SessionManagerImpl implements SessionManager
 
 			if (ROLE_ORIGINATING.equals(role))
 			{
-				__log.info("Received 200 OK for originating session");
+				_log.info("Received 200 OK for originating session");
 			}
 			else if (ROLE_TERMINATING.equals(role))
 			{
-				__log.info("Received 200 OK for terminating session");
+				_log.info("Received 200 OK for terminating session");
 			}
 			if (_cdf.isEnabled())
 			{
@@ -369,12 +371,12 @@ public class SessionManagerImpl implements SessionManager
 		SipSession session = request.getSession();
 		String role = (String) session.getAttribute(SCSCF_ROLE);
 		String method = request.getMethod();
-		if (__log.isTraceEnabled())
+		if (_log.isTraceEnabled())
 		{
 			if (ROLE_ORIGINATING.equals(role))
-				__log.trace("Received " + method + " for originating session: " + session);
+				_log.trace("Received " + method + " for originating session: " + session);
 			else if (ROLE_TERMINATING.equals(role))
-				__log.trace("Received  " + method + " for terminating session: " + session);
+				_log.trace("Received  " + method + " for terminating session: " + session);
 		}
 		
 		if (Methods.BYE.equals(method) && _cdf.isEnabled())
@@ -410,23 +412,23 @@ public class SessionManagerImpl implements SessionManager
 				// Couple of sanity checks first
 				served = request.getAddressHeader(Headers.P_ASSERTED_IDENTITY_HEADER);
 				if (served != null)
-					__log.debug("No P-Served-User. Using P-Asserted-Identity");
+					_log.debug("No P-Served-User. Using P-Asserted-Identity");
 				else
 				{
 					served = request.getAddressHeader(Headers.P_PREFERRED_IDENTITY);
 					if (served != null)
-						__log.debug("No P-Asserted-Identity. Using P-Preferred-Identity");
+						_log.debug("No P-Asserted-Identity. Using P-Preferred-Identity");
 					else
 					{
 						served = request.getFrom();
-						__log.debug("No P-Asserted-Identity. Using From identity");
+						_log.debug("No P-Asserted-Identity. Using From identity");
 					}
 				}
 			}
 			else
-				return URIHelper.getCanonicalForm(sipFactory, request.getRequestURI());
+				return URIHelper.getCanonicalForm(_sipFactory, request.getRequestURI());
 		}
-		return URIHelper.getCanonicalForm(sipFactory, served.getURI());
+		return URIHelper.getCanonicalForm(_sipFactory, served.getURI());
 	}
 	
 	private boolean isComeFromTrustedDomain(SipServletRequest request)
@@ -437,13 +439,13 @@ public class SessionManagerImpl implements SessionManager
 
 	public SipFactory getSipFactory()
 	{
-		return sipFactory;
+		return _sipFactory;
 	}
 
 
 	public void setSipFactory(SipFactory sipFactory)
 	{
-		this.sipFactory = sipFactory;
+		this._sipFactory = sipFactory;
 	}
 
 
@@ -561,7 +563,7 @@ public class SessionManagerImpl implements SessionManager
 	public void setIcscfUri(SipURI icscfUri)
 	{
 		_icscfUri = icscfUri;
-		__log.info("I-CSCF URI: " + _icscfUri);
+		_log.info("I-CSCF URI: " + _icscfUri);
 	}
 
 	public SipURI getScscfUri()
@@ -572,7 +574,7 @@ public class SessionManagerImpl implements SessionManager
 	public void setScscfUri(SipURI scscfUri)
 	{
 		_scscfUri = scscfUri;
-		__log.info("S-CSCF URI: " + _scscfUri);
+		_log.info("S-CSCF URI: " + _scscfUri);
 	}
 
 	public Iterator<Session> getSessions()
@@ -580,5 +582,14 @@ public class SessionManagerImpl implements SessionManager
 		return _sessionMap.getSessions();
 	}
 
+	public MessageSender getMessageSender()
+	{
+		return _messageSender;
+	}
+
+	public void setMessageSender(MessageSender messageSender)
+	{
+		_messageSender = messageSender;
+	}
 
 }

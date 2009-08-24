@@ -49,13 +49,14 @@ public class IcscfService
 	private SipFactory _sipFactory;
 	private boolean _terminatingDefault;
 	private List<String> _psiSubDomains;
+	private String _userAgent = "littleIMS :: I-CSCF";
 	
 	public void doRegister(SipServletRequest request) throws ServletException, IOException
 	{
 		// TS 22229 §5.3.
 		if(!comesFromTrustedDomain(request))
 		{
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+			sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 			return;
 		}
 		
@@ -82,7 +83,7 @@ public class IcscfService
 			{
 				_log.debug("Diameter UAA answer is not valid: " + uaa.getResultCode() + ". Sending 403 response");
 	
-				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+				sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 				return;
 			}
 			
@@ -98,7 +99,7 @@ public class IcscfService
 		catch (Throwable e) 
 		{
 			_log.warn("Cannot handle UAA answer, send 480/REGISTER", e);
-			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
+			sendResponse(request, SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 		}
 		finally
 		{
@@ -117,8 +118,8 @@ public class IcscfService
 				if (lia.getResultCode() >= 3000)
 				{
 					_log.debug("Diameter LIA answer from " + request.getFrom().getURI() + " is not valid: " + lia.getResultCode() 
-							+ ". Sending 404 response");	
-					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+							+ ". Sending 404 response");
+					sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 					return;
 				}
 				
@@ -140,13 +141,13 @@ public class IcscfService
 					if (scheme.equals("tel"))
 					{
 						// TODO send to bgcf.
-						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+						sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 					}
 					else
 					{
 						_log.debug("User " + requestUri + " is unknown. Sending '404 Not found' response for "
 								+ request.getMethod());
-						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+						sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 					}
 					return;
 				}
@@ -154,14 +155,14 @@ public class IcscfService
 				{
 					_log.debug("User " + requestUri + " is not registered. Sending '480 Temporarly unvailable' response for " 
 							+ request.getMethod());
-					request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
+					sendResponse(request, SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 					return;
 				}
 				else if (lia.getResultCode() >= 3000)
 				{
 					_log.debug("Diameter LIA answer to " + requestUri + " is not valid: " + lia.getResultCode() 
 							+ ". Sending 404 response");
-					request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+					sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 					return;
 				}
 					
@@ -185,7 +186,7 @@ public class IcscfService
 		catch (Throwable e) 
 		{
 			_log.warn("Cannot handle LIA answer, send 480/" + request.getMethod(), e);
-			try { request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send(); } catch (Exception _) {}
+			sendResponse(request, SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 		}
 		finally
 		{
@@ -215,7 +216,7 @@ public class IcscfService
 		// TS 24229 §5.3.2.1A
 		if(!comesFromTrustedDomain(request))
 		{
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+			sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 			return;
 		}
 		
@@ -330,6 +331,24 @@ public class IcscfService
 	public void setCxManager(CxManager cxManager)
 	{
 		_cxManager = cxManager;
+	}
+	
+	public void sendResponse(SipServletRequest request, int statusCode)
+	{
+		try
+		{
+			SipServletResponse response = request.createResponse(statusCode);
+			String pDebugId = request.getHeader(Headers.P_DEBUG_ID);
+			if (pDebugId != null)
+				response.setHeader(Headers.P_DEBUG_ID, pDebugId);
+			if (_userAgent != null)
+				response.setHeader(Headers.SERVER, _userAgent);
+			response.send();
+		}
+		catch (Throwable e)
+		{
+			_log.warn("Failed to send " + statusCode + "/" + request.getMethod(), e);
+		}
 	}
 
 }

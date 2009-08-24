@@ -35,8 +35,10 @@ public abstract class Headers
 	public static final String PATH 						= "Path";
 	public static final String PRIVACY_HEADER 				= "Privacy";
 	public static final String ROUTE 						= "Route";
+	public static final String SERVER				 		= "Server";
 	public static final String SERVICE_ROUTE_HEADER 		= "Service-Route";
 	public static final String SUBSCRIPTION_STATE	 		= "Subscription-State";
+	public static final String USER_AGENT			 		= "User-Agent";
 	public static final String WWW_AUTHENTICATE_HEADER 		= "WWW-Authenticate";
 	
 }

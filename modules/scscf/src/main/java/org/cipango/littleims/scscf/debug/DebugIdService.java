@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
+import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
 
 public class DebugIdService
@@ -37,7 +38,7 @@ public class DebugIdService
 	private int _maxExpires;
 	private UserProfileCache _userProfileCache;
 	private TimerService _timerService;
-	
+	private MessageSender _messageSender;
 
 	public void doSubscribe(SipServletRequest subscribe) throws ServletException, IOException
 	{
@@ -55,11 +56,8 @@ public class DebugIdService
 		{
 			_log.info("Debug subscription expiration (" + expires + ") is shorter"
 					+ " than minimum value (" + _minExpires + "). Sending 423 response");
-			SipServletResponse response = 
-				subscribe.createResponse(SipServletResponse.SC_INTERVAL_TOO_BRIEF);
-			response.setHeader(Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
-			response.send();
-			subscribe.getApplicationSession().invalidate();
+			_messageSender.sendResponse(subscribe, SipServletResponse.SC_INTERVAL_TOO_BRIEF,
+					Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
 			return;
 		}
 
@@ -73,6 +71,8 @@ public class DebugIdService
 		}
 
 		SipServletResponse response = subscribe.createResponse(SipServletResponse.SC_OK);
+		if (_messageSender.getUserAgent() != null)
+			response.setHeader(Headers.SERVER, _messageSender.getUserAgent());
 		response.setExpires(expires);
 		response.send();
 		
@@ -174,6 +174,18 @@ public class DebugIdService
 						expires, false, this);
 		}
 		
+	}
+
+	public MessageSender getMessageSender()
+	{
+		return _messageSender;
+	}
+
+
+
+	public void setMessageSender(MessageSender messageSender)
+	{
+		_messageSender = messageSender;
 	}
 
 }

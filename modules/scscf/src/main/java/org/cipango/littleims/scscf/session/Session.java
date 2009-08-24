@@ -126,7 +126,7 @@ public abstract class Session
 					if (_sessionManager.getBgcfUri() == null)
 					{
 						__log.info("TelURI: " + requestURI + " and no BGCF. Sending 404.");
-						request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+						_sessionManager.getMessageSender().sendResponse(request, SipServletResponse.SC_NOT_FOUND);
 						return;
 					}
 					else
@@ -138,7 +138,7 @@ public abstract class Session
 				else
 				{
 					__log.info("Unsupported URI scheme: " + requestURI);
-					request.createResponse(SipServletResponse.SC_UNSUPPORTED_URI_SCHEME).send();
+					_sessionManager.getMessageSender().sendResponse(request, SipServletResponse.SC_UNSUPPORTED_URI_SCHEME);
 					return;
 				}
 			}

@@ -20,9 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
@@ -74,8 +71,8 @@ public class RegistrarServlet extends SipServlet
 		}
 		finally
 		{
-			if (request.isCommitted())
-				request.getSession().invalidate();
+			if (request.isCommitted() && request.getApplicationSession().isValid())
+				request.getApplicationSession().invalidate();
 		}
 	}
 	

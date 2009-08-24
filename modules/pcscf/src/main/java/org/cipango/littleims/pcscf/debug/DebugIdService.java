@@ -43,6 +43,7 @@ public class DebugIdService
 	
 	private Map<String, DebugSubscription> _subscriptions = new HashMap<String, DebugSubscription>();
 	private Map<String, DebugConf> _confs = new ConcurrentHashMap<String, DebugConf>();
+	private String _userAgent = "littleIMS :: P-CSCF";
 	
 	/**
 	 * See 3GPP 24.229 §5.2.3A	Subscription to the user's debug event package 
@@ -66,7 +67,9 @@ public class DebugIdService
 				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
 				request.setExpires(expires);
 				request.pushRoute(_icscfUri);
-	
+				if (_userAgent != null)
+					request.setHeader(Headers.USER_AGENT, _userAgent);
+					
 				subscription = new DebugSubscription(this, request.getSession(), aor.toString());
 				_subscriptions.put(aor.toString(), subscription);
 				request.getApplicationSession().setAttribute(DebugSubscription.class.getName(), 
@@ -81,6 +84,8 @@ public class DebugIdService
 				request.addHeader(Headers.EVENT_HEADER, EVENT_DEBUG);
 				request.addHeader(Headers.P_ASSERTED_IDENTITY_HEADER, _pcscfUri.toString());
 				request.setExpires(expires);
+				if (_userAgent != null)
+					request.setHeader(Headers.USER_AGENT, _userAgent);
 				request.send();
 			}
 		}
@@ -209,5 +214,15 @@ public class DebugIdService
 	public void setIcscfUri(SipURI icscfUri)
 	{
 		_icscfUri = icscfUri;
+	}
+
+	public String getUserAgent()
+	{
+		return _userAgent;
+	}
+
+	public void setUserAgent(String userAgent)
+	{
+		_userAgent = userAgent;
 	}
 }

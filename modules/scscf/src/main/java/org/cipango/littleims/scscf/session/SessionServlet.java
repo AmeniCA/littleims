@@ -115,14 +115,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 			__log.warn("Failed to handle request:\n" + request, e);
 			if (!request.isCommitted() && request.isInitial())
 			{
-				try
-				{
-					request.createResponse(SipServletResponse.SC_SERVICE_UNAVAILABLE).send();
-				}
-				catch (Throwable t) 
-				{
-					__log.debug("Failed to send 503 response after exception", t);
-				}
+				_sessionManager.getMessageSender().sendResponse(request, SipServletResponse.SC_SERVICE_UNAVAILABLE);
 			}
 				
 		}

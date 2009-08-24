@@ -137,7 +137,8 @@ public class TerminatingSession extends Session
 			{
 				// No AS or only proxy AS, send 480 (Temporarily unavailable)
 				__log.info("User is not registered. Sending 480 response");
-				request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
+				getSessionManager().getMessageSender().sendResponse(request, 
+						SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 			}
 			else
 			{
@@ -159,7 +160,8 @@ public class TerminatingSession extends Session
 				{
 					// should not happen
 					__log.warn("No Contact found for registered user! Sending 480 response");
-					request.createResponse(SipServletResponse.SC_TEMPORARLY_UNAVAILABLE).send();
+					getSessionManager().getMessageSender().sendResponse(request, 
+							SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 				}
 				else if (_contacts.size() == 1)
 				{

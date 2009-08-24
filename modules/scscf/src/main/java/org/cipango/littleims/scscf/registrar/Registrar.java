@@ -53,6 +53,7 @@ import org.cipango.littleims.scscf.registrar.regevent.RegEvent;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventListener;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo;
 import org.cipango.littleims.scscf.registrar.regevent.RegState;
+import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.LittleimsException;
 import org.cipango.littleims.util.Methods;
@@ -86,6 +87,7 @@ public class Registrar
 	private CxManager _cxManager;
 	
 	private boolean _permanentAssignation;
+	private MessageSender _messageSender;
 	
 	public Registrar()
 	{
@@ -135,8 +137,7 @@ public class Registrar
 		if (_maxUsers > 0 && (getNbContexts() >= _maxUsers))
 		{
 			__log.warn("Max registered users has been reached. Sending 503 response");
-			request.createResponse(SipServletResponse.SC_SERVICE_UNAVAILABLE).send();
-			request.getApplicationSession().invalidate();
+			_messageSender.sendResponse(request, SipServletResponse.SC_SERVICE_UNAVAILABLE);
 			return;
 		}
 
@@ -176,11 +177,8 @@ public class Registrar
 		{
 			__log.info("Registration expiration (" + expires + ") is shorter"
 					+ " than minimum value (" + _minExpires + "). Sending 423 response");
-			SipServletResponse response = request
-					.createResponse(SipServletResponse.SC_INTERVAL_TOO_BRIEF);
-			response.setHeader(Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
-			response.send();
-			request.getApplicationSession().invalidate();
+			_messageSender.sendResponse(request, SipServletResponse.SC_INTERVAL_TOO_BRIEF,
+							Headers.MIN_EXPIRES_HEADER, String.valueOf(_minExpires));
 			return;
 		}
 
@@ -195,8 +193,7 @@ public class Registrar
 
 		if (contact == null)
 		{
-			request.createResponse(SipServletResponse.SC_BAD_REQUEST).send();
-			request.getApplicationSession().invalidate();
+			_messageSender.sendResponse(request, SipServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		
@@ -249,14 +246,7 @@ public class Registrar
 			if (saa.getResultCode() >= 3000)
 			{
 				__log.debug("Diameter SAA answer is not valid: " + saa.getResultCode() + ". Sending 403 response");
-				try
-				{
-					request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-				}
-				catch (IOException e)
-				{
-					__log.trace(e.getMessage(), e);
-				}
+				_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 				return;
 			}
 			
@@ -324,6 +314,9 @@ public class Registrar
 				response.setHeader(Headers.P_DEBUG_ID, "");
 			//TODO check also associated URI for serviceLevelTraceInfo
 			
+			if (_messageSender.getUserAgent() != null)
+				response.setHeader(Headers.SERVER, _messageSender.getUserAgent());
+			
 			response.send();
 	
 			if (_cdf.isEnabled())
@@ -339,13 +332,13 @@ public class Registrar
 		catch (LittleimsException e) {
 			__log.warn(e.getMessage(), e);
 			if (!request.isCommitted())
-				try { request.createResponse(e.getStatusCode()).send(); } catch (IOException e2) { }
+				_messageSender.sendResponse(request, e.getStatusCode());
 		}
 		catch (Exception e)
 		{
 			__log.warn(e.getMessage(), e);
 			if (!request.isCommitted())
-				try { request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();} catch (IOException e2) { }
+				_messageSender.sendResponse(request, SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 		}
 		finally
 		{
@@ -962,6 +955,16 @@ public class Registrar
 			}
 		}
 
+	}
+
+	public MessageSender getMessageSender()
+	{
+		return _messageSender;
+	}
+
+	public void setMessageSender(MessageSender messageSender)
+	{
+		_messageSender = messageSender;
 	}
 
 

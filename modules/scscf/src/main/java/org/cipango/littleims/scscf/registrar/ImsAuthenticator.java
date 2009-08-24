@@ -33,6 +33,7 @@ import org.cipango.diameter.ims.IMS;
 import org.cipango.ims.Cx.AuthenticationScheme;
 import org.cipango.littleims.scscf.cx.CxManager;
 import org.cipango.littleims.scscf.registrar.AuthorizationException.Reason;
+import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.scscf.util.NonceManager;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Base64;
@@ -53,7 +54,8 @@ public class ImsAuthenticator implements Authenticator
 	private SipFactory _sipFactory;
 	private String _realm;
 	private Map<String, AuthWaitTimerTask> _secContexts = new HashMap<String, AuthWaitTimerTask>();
-
+	private MessageSender _messageSender;
+	
 	public ImsAuthenticator()
 	{
 		_timer = new Timer();
@@ -104,11 +106,11 @@ public class ImsAuthenticator implements Authenticator
 					{
 					case INVALID:
 						__log.debug("Registration is not valid. Sending 400 response");
-						request.createResponse(SipServletResponse.SC_BAD_REQUEST).send();
+						_messageSender.sendResponse(request, SipServletResponse.SC_BAD_REQUEST);
 						break;
 					case ERROR:
 						__log.debug("Credentials are not accepted. Sending 403 response");
-						request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+						_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 						break;
 					case STALE:
 						__log.debug("Registration is stale. Sending 401 response");
@@ -131,8 +133,7 @@ public class ImsAuthenticator implements Authenticator
 		catch (IOException e)
 		{
 			__log.warn("Failed to send MAR request", e);
-			request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
-			request.getApplicationSession().invalidate();
+			_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 
 			return null;
 				
@@ -158,7 +159,7 @@ public class ImsAuthenticator implements Authenticator
 			{
 				__log.debug("Diameter MAA answer is not valid: " + maa.getResultCode() + ". Sending 403 response");
 	
-				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+				_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 				return;
 			}
 			String aor = maa.getRequest().getAVP(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
@@ -208,12 +209,8 @@ public class ImsAuthenticator implements Authenticator
 			else
 			{
 				__log.warn("Received unsupported scheme: " + scheme + " in MAA response");
-				request.createResponse(SipServletResponse.SC_FORBIDDEN).send();
+				_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 			}
-		}
-		catch (IOException e)
-		{
-			__log.trace(e.getMessage(), e);
 		}
 		finally
 		{
@@ -307,15 +304,13 @@ public class ImsAuthenticator implements Authenticator
 		try
 		{
 			__log.debug("Sending 401 response");
-			SipServletResponse response = request.createResponse(SipServletResponse.SC_UNAUTHORIZED);
 			String wwwAuthenticate = "Digest realm=\"" + realm + "\", qop=\"auth\", nonce=\"" + nonce
 					+ "\", algorithm=\"" + algorithm + "\"";
 			if (stale)
 			{
 				wwwAuthenticate += ", stale=TRUE";
 			}
-			response.setHeader(Headers.WWW_AUTHENTICATE_HEADER, wwwAuthenticate);
-			response.send();
+			_messageSender.sendResponse(request, SipServletResponse.SC_UNAUTHORIZED, Headers.WWW_AUTHENTICATE_HEADER, wwwAuthenticate);
 		}
 		catch (Exception e)
 		{
@@ -384,6 +379,17 @@ public class ImsAuthenticator implements Authenticator
 			authWaitExpired(_uri);
 		}
 
+	}
+
+	public MessageSender getMessageSender()
+	{
+		return _messageSender;
+	}
+
+
+	public void setMessageSender(MessageSender messageSender)
+	{
+		_messageSender = messageSender;
 	}
 
 

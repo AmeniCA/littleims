@@ -25,6 +25,10 @@
 		<property name="attributeName" value="org.cipango.diameter.DiameterFactory" />
 	</bean>
 	
+	<bean id="messageSender" class="org.cipango.littleims.scscf.util.MessageSender">
+		<property name="userAgent" value="littleIMS :: S-CSCF" />
+	</bean>
+	
 	<bean id="customEditorConfigurator" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>
@@ -95,6 +99,7 @@
 		<property name="userProfileCache" ref="userProfileCache" />
 		<property name="cdf" ref="cdf" />
 		<property name="sipFactory" ref="sipFactory" />
+		<property name="messageSender" ref="messageSender" />
 	</bean>
 	
 	
@@ -124,6 +129,7 @@
 		S-CSCF policy for maximum debug event subscription time in seconds
 		-->
 		<property name="maxExpires" value="600000" />
+		<property name="messageSender" ref="messageSender" />
 	</bean>
 		
 		
@@ -149,6 +155,7 @@
 		<property name="cxManager" ref="cxManager" />
 		<property name="sipFactory" ref="sipFactory" />
 		<property name="realm" value="scscf.cipango.org" />
+		<property name="messageSender" ref="messageSender" />
 	</bean>
 	
 	<bean id="sessionManager" 
@@ -194,6 +201,7 @@
 		<property name="userProfileCache" ref="userProfileCache" />
 		<property name="cxManager" ref="cxManager" />
 		<property name="enumClient" ref="enumClient" />
+		<property name="messageSender" ref="messageSender" />
 	</bean>
 	
 	

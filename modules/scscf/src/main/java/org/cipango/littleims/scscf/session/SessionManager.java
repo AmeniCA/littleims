@@ -27,6 +27,7 @@ import org.cipango.diameter.DiameterRequest;
 import org.cipango.littleims.scscf.charging.CDF;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.Registrar;
+import org.cipango.littleims.scscf.util.MessageSender;
 
 public interface SessionManager
 {
@@ -59,5 +60,7 @@ public interface SessionManager
 	public void handleSaa(DiameterAnswer saa);
 	
 	public void handlePpr(DiameterRequest ppr);
+	
+	public MessageSender getMessageSender();
 
 }

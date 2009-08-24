@@ -21,6 +21,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.util.Headers;
 
 public class DebugIdServlet extends SipServlet
 {
@@ -31,14 +32,20 @@ public class DebugIdServlet extends SipServlet
 	protected void doNotify(SipServletRequest request) throws ServletException,
 			IOException
 	{
-		request.createResponse(SipServletResponse.SC_OK).send();
+		SipServletResponse response = request.createResponse(SipServletResponse.SC_OK);
+		
 		DebugSubscription subscription = 
 			(DebugSubscription) request.getApplicationSession().getAttribute(DebugSubscription.class.getName());
 		if (subscription == null)
 			_log.warn("No subscription session found for\n" + request);
 		else
+		{
+			String userAgent = subscription.getDebugIdService().getUserAgent();
+			if (userAgent != null)
+				response.setHeader(Headers.SERVER, userAgent);
 			subscription.handleNotify(request);
-		
+		}
+		response.send();
 		// TODO refresh if expired
 		
 	}
