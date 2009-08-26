@@ -43,7 +43,7 @@ public class SessionCaseSpt extends SPT
 	@Override
 	public String getExpression()
 	{
-		return "SessionCase " + (isConditionNegated() ? "!=" : "=")  + SessionCase.toString(_sessionCase);
+		return "SessionCase" + (isConditionNegated() ? " != " : " = ")  + SessionCase.toString(_sessionCase);
 	}
 
 	public static class SessionCase

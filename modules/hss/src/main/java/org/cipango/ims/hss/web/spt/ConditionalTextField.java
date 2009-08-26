@@ -1,5 +1,5 @@
 // ========================================================================
-// Copyright 2008-2009 NEXCOM Systems
+// Copyright 2009 NEXCOM Systems
 // ------------------------------------------------------------------------
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +11,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
+package org.cipango.ims.hss.web.spt;
 
-package org.cipango.ims.hss.db;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextField;
 
-import org.cipango.ims.hss.model.spt.SPT;
-
-public interface SptDao extends Dao, ImsDao<SPT>
+public class ConditionalTextField extends TextField<String>
 {
-	void save(SPT spt);
-	SPT findById(Long id);
+
+	public ConditionalTextField(String id)
+	{
+		super(id, String.class);
+		
+		add(new EditSptsPage.SptUpdatingBehaviour());
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isRequired()
+	{
+		return EditSptsPage.isRequired((Form) findParent(Form.class));
+	}
+
 }

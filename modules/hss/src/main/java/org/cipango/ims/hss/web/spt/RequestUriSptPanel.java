@@ -13,17 +13,15 @@
 // ========================================================================
 package org.cipango.ims.hss.web.spt;
 
-import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.spt.SPT;
 
 public class RequestUriSptPanel extends Panel
 {
-	@SuppressWarnings("unchecked")
 	public RequestUriSptPanel(String id, IModel<SPT> sptModel)
 	{
 		super(id, sptModel);
-		add(new RequiredTextField("requestUri", String.class));
+		add(new ConditionalTextField("requestUri"));
 	}
 }

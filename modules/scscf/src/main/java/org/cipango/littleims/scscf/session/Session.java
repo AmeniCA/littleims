@@ -121,7 +121,7 @@ public abstract class Session
 			requestURI = request.getRequestURI();
 			if (!requestURI.isSipURI())
 			{
-				if (requestURI.getScheme().equals("tel"))
+				if (requestURI instanceof TelURL)
 				{
 					if (_sessionManager.getBgcfUri() == null)
 					{

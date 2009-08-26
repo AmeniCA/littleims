@@ -17,12 +17,10 @@
 				<div class="body">
 					<ul>
 						<li wicket:id="spts">
-							<form wicket:id="form">
-								<wicket:message key="spt.not"/>
-								<input wicket:id="conditionNegated" type="checkbox"/>
-								<span wicket:id="spt.specific"></span>
-								<input type="submit" wicket:id="delete" wicket:message="value:button.delete" />
-							</form>
+							<wicket:message key="spt.not"/>
+							<input wicket:id="conditionNegated" type="checkbox"/>
+							<span wicket:id="spt.specific"></span>
+							<input type="submit" wicket:id="delete" wicket:message="value:button.delete" />
 							<li wicket:id="conditionType">OR</li>
 						</li>	
 						<li>

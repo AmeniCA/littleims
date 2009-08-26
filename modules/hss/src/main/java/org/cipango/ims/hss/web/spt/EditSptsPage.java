@@ -14,14 +14,19 @@
 package org.cipango.ims.hss.web.spt;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -68,10 +73,11 @@ public class EditSptsPage extends BasePage
 	@SpringBean
 	private IfcDao _ifcDao;
 	
-	private Integer _ifcId;
+	private IModel<InitialFilterCriteria> _ifcModel;
 	
-	private List<Integer> groupIds;
 	private String _title;
+	private Map<Integer, List<SPT>> _spts;
+	private List<SPT> _sptsToDelete = new ArrayList<SPT>();
 	
 	public EditSptsPage(PageParameters pageParameters)
 	{
@@ -86,7 +92,7 @@ public class EditSptsPage extends BasePage
 						new MicroMap("id", ifcKey)));
 			}
 			else
-				_ifcId = ifc.getId();
+				_ifcModel = new IfcModel(ifc);
 		}
 		setOutputMarkupId(true);
 
@@ -95,11 +101,20 @@ public class EditSptsPage extends BasePage
 		
 		add(new Label("title", _title));
 		
-		groupIds = _dao.getGroups(_ifcId);
 		final Form sptsForm = new Form("sptsForm");
 		add(sptsForm);
+		_spts = getSpts(ifc);
 		
-		sptsForm.add(new ListView<Integer>("groups", groupIds) {
+		
+		
+		sptsForm.add(new ListView<Integer>("groups", new LoadableDetachableModel()
+		{
+			@Override
+			protected Object load()
+			{
+				return new ArrayList<Integer>(_spts.keySet());
+			}
+		}) {
 
 
 			@Override
@@ -128,7 +143,6 @@ public class EditSptsPage extends BasePage
 					@Override
 					protected void doSubmit(AjaxRequestTarget target, Form<?> form) throws InstantiationException, IllegalAccessException
 					{
-						saveSpts(form);
 						Class<SPT> clazz = (Class<SPT>) item.get("panel:sptType").getDefaultModelObject();
 						if (clazz == null)
 						{
@@ -138,18 +152,21 @@ public class EditSptsPage extends BasePage
 						SPT spt = clazz.newInstance();
 						spt.setConditionNegated(false);
 						spt.setGroupId(groupId);
-						spt.setInitialFilterCriteria(_ifcDao.findByRealKey(_ifcId));
-						_dao.save(spt);
-												
+						List<SPT> l = _spts.get(groupId);
+						l.add(spt);
+						
+						warn(MapVariableInterpolator.interpolate(getString("spt.modification"),
+								new MicroMap("spt", getExpression())));
+						
 						if (target != null)
 						{
-							target.addComponent(form);
+							target.addComponent(item.get("panel"));
 						}	
 					}
 					
 				});
 				
-				boolean conditonType =  _ifcDao.findByRealKey(_ifcId).isConditionTypeCnf();
+				boolean conditonType = _ifcModel.getObject().isConditionTypeCnf();
 				item.add(new Label("conditionType", conditonType ? "AND" : "OR"));
 			}
 		});	
@@ -161,9 +178,11 @@ public class EditSptsPage extends BasePage
 			{
 				saveSpts(form);
 
-				getCxManager().ifcUpdated(_ifcDao.findByRealKey(_ifcId));
+				getCxManager().ifcUpdated(_ifcModel.getObject());
 				
-				getSession().info(getString("modification.success"));
+				info(MapVariableInterpolator.interpolate(getString("spt.modification.done"),
+						new MicroMap("spt", getExpression())));
+				
 				if (target != null)
 				{
 					target.addComponent(form);
@@ -177,13 +196,12 @@ public class EditSptsPage extends BasePage
 			@Override
 			protected void doSubmit(AjaxRequestTarget target, Form<?> form)
 			{
-				saveSpts(form);
-				for (int i = groupIds.size(); i >= 0; i--)
+				for (int i = _spts.size(); i >= 0; i--)
 				{
 					boolean found = false;
-					for (int j = 0; j < groupIds.size(); j++)
+					for (Integer j : _spts.keySet())
 					{
-						if (groupIds.get(j) == i)
+						if (j == i)
 						{
 							found = true;
 							break;
@@ -191,16 +209,19 @@ public class EditSptsPage extends BasePage
 					}
 					if (!found)
 					{
-						groupIds.add(i);
+						_spts.put(i, new ArrayList<SPT>());
 						break;
 					}
 				}
+				
+				warn(MapVariableInterpolator.interpolate(getString("spt.modification"),
+						new MicroMap("spt", getExpression())));
 				if (target != null)
 				{
 					target.addComponent(form);
 				}
 			}		
-		}.setDefaultFormProcessing(false));
+		});
 		
 		if (ifc != null)
 			setContextMenu(new ContextPanel(ifc));
@@ -210,7 +231,7 @@ public class EditSptsPage extends BasePage
 	{
 		ListView groups = (ListView) form.get("groups");
 		Iterator<ListItem<?>> it = groups.iterator();
-		
+		InitialFilterCriteria ifc = _ifcModel.getObject();
 		while (it.hasNext())
 		{
 			ListItem<?> listItem = (ListItem<?>) it.next();
@@ -219,9 +240,16 @@ public class EditSptsPage extends BasePage
 			while (it2.hasNext())
 			{
 				SPT spt = (SPT) it2.next();
+				spt.setInitialFilterCriteria(ifc);
 				_dao.save(spt);
 			}
 		}
+		for (SPT spt : _sptsToDelete)
+		{
+			spt.setInitialFilterCriteria(ifc);
+			_dao.delete(spt);
+		}
+		_sptsToDelete.clear();
 	}
 	
 	private Panel getPanel(IModel<SPT> sptModel)
@@ -243,14 +271,7 @@ public class EditSptsPage extends BasePage
 	
 	private RefreshingView<SPT> getSpts(final Integer groupId)
 	{
-		IModel<Collection<SPT>> ifcsModel = new LoadableDetachableModel<Collection<SPT>>() {
-			@Override
-			protected Collection<SPT> load()
-			{
-				return _dao.getSptsByIfc(_ifcId, groupId);
-			}
-			
-		};
+		IModel<Collection<SPT>> ifcsModel = new Model((Serializable) _spts.get(groupId));
 		
 		return new RefreshingView<SPT>("spts", ifcsModel) {
 
@@ -261,30 +282,111 @@ public class EditSptsPage extends BasePage
 			}
 
 			@Override
-			protected void populateItem(Item<SPT> item)
+			protected void populateItem(final Item<SPT> item)
 			{
-				Form<SPT> form = new Form<SPT>("form", item.getModel());
-				item.add(form);
-				form.add(new CheckBox("conditionNegated"));
-				form.add(getPanel(item.getModel()));
-				form.add(new AjaxFallbackButton("delete", form) {
+				item.add(new CheckBox("conditionNegated").add(new SptUpdatingBehaviour()));
+				item.add(getPanel(item.getModel()));
+				item.add(new AjaxFallbackButton("delete", (Form) getPage().get("sptsForm")) {
 					@Override
 					protected void doSubmit(AjaxRequestTarget target, Form<?> form)
 					{
-						SPT spt = (SPT) form.getDefaultModelObject();
-						_dao.delete(spt);
-						if (target != null)
+						SPT spt = (SPT) item.getDefaultModelObject();
+						_sptsToDelete.add(spt);
+						List<SPT> l = _spts.get(spt.getGroupId());
+						if (l != null)
 						{
-							target.addComponent(EditSptsPage.this);
+							l.remove(spt);
+							if (l.isEmpty())
+								_spts.remove(spt.getGroupId());
 						}
+						
+						warn(MapVariableInterpolator.interpolate(getString("spt.modification"),
+								new MicroMap("spt", getExpression())));
+						if (target != null)
+							target.addComponent(form);
 					}
-				}.setDefaultFormProcessing(false));
-				boolean conditonType = item.getModelObject().getInitialFilterCriteria().isConditionTypeCnf();
+				});
+				boolean conditonType = _ifcModel.getObject().isConditionTypeCnf();
 				item.add(new Label("conditionType", conditonType ? "OR" : "AND"));
 			}
 			
 		};
 	}
+	
+	@Override
+	public void detachModels()
+	{
+		if (_ifcModel != null)
+			_ifcModel.detach();
+		for (List<SPT> l : _spts.values())
+		{
+			for (SPT spt : l)
+				spt.detach();
+		}
+		super.detachModels();
+	}
+	
+	protected String getExpression()
+	{
+		if (_spts.isEmpty())
+			return "";
+
+		Iterator<List<SPT>> it = _spts.values().iterator();
+		StringBuilder sb = new StringBuilder();
+		boolean conditionTypeCnf = _ifcModel.getObject().isConditionTypeCnf();
+		boolean first = true;
+		while (it.hasNext())
+		{
+			List<SPT> l = it.next();
+			if (!l.isEmpty())
+			{
+				if (!first)
+					sb.append(conditionTypeCnf ? " && " : " || ");
+				first = false;
+				sb.append('(');
+				Iterator<SPT> it2 = l.iterator();
+				while (it2.hasNext())
+				{
+					SPT spt = (SPT) it2.next();
+					sb.append(spt.getExpression());
+					if (it2.hasNext())
+						sb.append(conditionTypeCnf ? " || " : " && ");
+				}
+				sb.append(')');
+			}
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public String getTitle()
+	{
+		return _title;
+	}
+	
+	private Map<Integer, List<SPT>> getSpts(InitialFilterCriteria ifc)
+	{
+		Set<SPT> set = ifc.getSpts();
+		Map<Integer, List<SPT>> map = new TreeMap<Integer, List<SPT>>();
+		for (SPT spt : set)
+		{
+			List<SPT> l = map.get(spt.getGroupId());
+			if (l == null)
+			{
+				l = new ArrayList<SPT>();
+				map.put(spt.getGroupId(), l);
+				spt.detach();
+			}
+			l.add(spt);
+		}
+		return map;
+	}
+		
+	protected static boolean isRequired(Form form) {
+		if (form == null || form.getRootForm().findSubmittingButton() == null)
+			return false;
+        return "ok".equals(form.getRootForm().findSubmittingButton().getInputName());
+    }
 	
 	class CompoundModelIterator extends ModelIteratorAdapter<SPT> implements Serializable {
 		public CompoundModelIterator(Collection<SPT> modelObject) {
@@ -294,33 +396,44 @@ public class EditSptsPage extends BasePage
 		@Override
 		protected IModel<SPT> model(SPT spt)
 		{
-			return new CompoundPropertyModel<SPT>(new DaoLoadableMode(spt));
+			return new CompoundPropertyModel<SPT>(spt);
 		}
 	}
 	
-	class DaoLoadableMode extends LoadableDetachableModel<SPT>
+	class IfcModel extends LoadableDetachableModel<InitialFilterCriteria>
 	{
-		private Long _id;
+		private Integer _ifcId;
 		
-		public DaoLoadableMode(SPT spt)
+		public IfcModel(InitialFilterCriteria ifc)
 		{
-			super(spt);
-			if (spt != null)
-				_id = spt.getId();
+			super(ifc);
+			_ifcId = ifc.getId();
 		}
 		
-
 		@Override
-		protected SPT load()
+		protected InitialFilterCriteria load()
 		{
-			return _dao.findById(_id);
+			return _ifcDao.findByRealKey(_ifcId);
 		}
 		
 	}
-
-	@Override
-	public String getTitle()
+	
+	public static class SptUpdatingBehaviour extends AjaxFormComponentUpdatingBehavior
 	{
-		return _title;
+		public SptUpdatingBehaviour()
+		{
+			super("onChange");
+		}
+		
+		@Override
+		protected void onUpdate(AjaxRequestTarget target)
+		{
+			EditSptsPage page = (EditSptsPage) getComponent().getPage();
+			page.warn(MapVariableInterpolator.interpolate(page.getString("spt.modification"),
+					new MicroMap("spt", page.getExpression())));
+			target.addComponent(page.get("feedback"));
+			target.addComponent(getFormComponent());
+		}
 	}
+
 }

@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.spt.SPT;
@@ -38,6 +39,11 @@ public class SessionCaseSptPanel extends Panel
 				return SessionCase.toString(sessionCase);
 			}
 			
-		}));
+		})
+		{
+			public boolean isRequired() {
+		        return EditSptsPage.isRequired((Form) findParent(Form.class));
+		    }
+		}.add(new EditSptsPage.SptUpdatingBehaviour()));
 	}
 }

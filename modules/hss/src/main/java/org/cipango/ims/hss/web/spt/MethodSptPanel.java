@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.spt;
 
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.spt.SPT;
@@ -23,6 +24,12 @@ public class MethodSptPanel extends Panel
 	public MethodSptPanel(String id, IModel<SPT> sptModel)
 	{
 		super(id, sptModel);
-		add(new MethodField("method").setRequired(true));
+		add(new MethodField("method")
+		{
+			@SuppressWarnings("unchecked")
+			public boolean isRequired() {
+		        return EditSptsPage.isRequired((Form) findParent(Form.class));
+		    }
+		}.add(new EditSptsPage.SptUpdatingBehaviour()));
 	}
 }

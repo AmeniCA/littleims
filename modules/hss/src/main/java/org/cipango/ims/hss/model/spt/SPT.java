@@ -13,6 +13,8 @@
 // ========================================================================
 package org.cipango.ims.hss.model.spt;
 
+import java.io.Serializable;
+
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -32,7 +34,7 @@ import org.cipango.ims.hss.util.XML.Output;
 @DiscriminatorColumn(
 		name = "SPT_TYPE",
 		discriminatorType = DiscriminatorType.STRING)
-public abstract class SPT implements XML.Convertible, Comparable<SPT>, Cloneable
+public abstract class SPT implements XML.Convertible, Comparable<SPT>, Cloneable, Serializable
 {
 	@Id @GeneratedValue
 	private Long _id;
@@ -108,6 +110,11 @@ public abstract class SPT implements XML.Convertible, Comparable<SPT>, Cloneable
 	public static boolean isRegex(String expression)
 	{
 		return expression != null && expression.indexOf('!') != -1;
+	}
+	
+	public void detach()
+	{
+		_initialFilterCriteria = null;
 	}
 	
 	@Override

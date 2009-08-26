@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
-import org.apache.wicket.markup.html.form.RequiredTextField;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.Strings;
@@ -27,7 +27,7 @@ import org.cipango.littleims.util.Headers;
 
 public class HeaderSptPanel extends Panel
 {
-	@SuppressWarnings("unchecked")
+
 	public HeaderSptPanel(String id, IModel<SPT> sptModel)
 	{
 		super(id, sptModel);
@@ -52,8 +52,13 @@ public class HeaderSptPanel extends Panel
 						}
 				        return headers.iterator();
 					}
+					
+					@SuppressWarnings("unchecked")
+					public boolean isRequired() {
+				        return EditSptsPage.isRequired((Form) findParent(Form.class));
+				    }
 			
-				}.setRequired(true));
-		add(new RequiredTextField("content", String.class));
+				}.add(new EditSptsPage.SptUpdatingBehaviour()));
+		add(new ConditionalTextField("content"));
 	}
 }

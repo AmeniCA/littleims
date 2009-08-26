@@ -13,11 +13,8 @@
 // ========================================================================
 package org.cipango.ims.hss.db.hibernate;
 
-import java.util.List;
-
 import org.cipango.ims.hss.db.SptDao;
 import org.cipango.ims.hss.model.spt.SPT;
-import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SptDaoImpl extends AbstractHibernateDao<SPT> implements SptDao
 {
 
-	private static final String GET_SPTS_BY_IFC =
-		"FROM SPT WHERE _initialFilterCriteria.id = :ifcId AND _groupId = :groupId ORDER BY _id";
-	
-	private static final String GET_GROUPS_BY_IFC =
-		"SELECT distinct _groupId FROM SPT WHERE _initialFilterCriteria.id = :ifcId ORDER BY _groupId";
-	
 	public SptDaoImpl(SessionFactory sessionFactory) 
 	{
 		super(sessionFactory);
@@ -47,19 +38,5 @@ public class SptDaoImpl extends AbstractHibernateDao<SPT> implements SptDao
 		currentSession().saveOrUpdate(spt);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<SPT> getSptsByIfc(Integer ifcId, Integer groupId)
-	{
-		Query query = currentSession().createQuery(GET_SPTS_BY_IFC);
-		query.setParameter("ifcId", ifcId);
-		query.setParameter("groupId", groupId);
-		return query.list();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Integer> getGroups(Integer ifcId)
-	{
-		return currentSession().createQuery(GET_GROUPS_BY_IFC).setParameter("ifcId", ifcId).list();
-	}
 
 }
