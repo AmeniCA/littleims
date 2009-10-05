@@ -74,7 +74,7 @@ public class ImsAuthenticator implements Authenticator
 			String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
 			AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 						
-			if ((ah == null || ah.getParameter(Digest.NONCE_PARAM) == null || ah.getParameter(Digest.NONCE_PARAM).trim().equals("")))
+			if ((ah == null || ah.getNonce() == null || ah.getNonce().trim().equals("")))
 			{
 				// No authorization, must be first REGISTER request
 				// Inform registrar module and challenge UE
@@ -93,7 +93,7 @@ public class ImsAuthenticator implements Authenticator
 
 					__log.debug("Authorizing registration ...");
 					checkRegistration(aor, ah, request.getMethod());
-					privateUserIdentity = ah.getParameter(Digest.USERNAME_PARAM);
+					privateUserIdentity = ah.getUsername();
 					
 					// digest authentication is successful
 					__log.debug("Registration of public identity " + aor + " has been authorized");
@@ -271,7 +271,7 @@ public class ImsAuthenticator implements Authenticator
 				xres = Digest.calculateResponseWithHa1(ah, method, authWaitTimerTask.getHa1());
 				break;
 			case AuthenticationScheme.DIGEST_AKA_MD5_ORDINAL:
-				String auts = ah.getParameter(Digest.AUTS);
+				String auts = ah.getAuts();
 				if (auts != null)
 				{
 					throw new AuthorizationException(Reason.RESYNCHRONIZATION);
@@ -290,7 +290,7 @@ public class ImsAuthenticator implements Authenticator
 			throw new AuthorizationException(Reason.INVALID);
 		}
 
-		String res = ah.getParameter(Digest.RESPONSE_PARAM);
+		String res = ah.getResponse();
 		if (!res.equals(xres))
 		{
 			__log.info("Response is not correct for " + uri);

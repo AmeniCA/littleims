@@ -27,8 +27,8 @@ import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.ims.Cx.AuthenticationScheme;
 import org.cipango.littleims.util.AuthorizationHeader;
-import org.cipango.littleims.util.Base642;
 import org.cipango.littleims.util.Digest;
+import org.cipango.littleims.util.HexString;
 import org.cipango.littleims.util.URIHelper;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
@@ -119,7 +119,7 @@ public class CxManager
 	{
 		String privateId;
 		if (authorization != null)
-			privateId = authorization.getParameter(Digest.USERNAME_PARAM);
+			privateId = authorization.getUsername();
 		else
 			privateId = URIHelper.extractPrivateIdentity(publicUserIdentity);
 		DiameterRequest mar = newRequest(IMS.MAR, publicUserIdentity.toString(), privateId);
@@ -194,7 +194,7 @@ public class CxManager
 	private AVP getSipAuthDataItem(AuthorizationHeader authorizationHeader)
 	{
 		String scheme = null;
-		String algorithm = authorizationHeader == null ? null : authorizationHeader.getParameter(Digest.ALGORITHM_PARAM);
+		String algorithm = authorizationHeader == null ? null : authorizationHeader.getAlgorithm();
 		if (authorizationHeader == null)
 			scheme = AuthenticationScheme.SIP_DIGEST.getName();
 		else if (algorithm == null)
@@ -211,11 +211,12 @@ public class CxManager
 				scheme = authScheme.getName();
 		}
 		
-		String auts = authorizationHeader == null ? null : authorizationHeader.getParameter(Digest.AUTS);
+		String auts = authorizationHeader == null ? null : authorizationHeader.getAuts();
 		if (auts != null)
 		{
-			byte[] rand = getRand(authorizationHeader.getParameter(Digest.NONCE_PARAM));
-			byte[] bAuts = Base642.decode(auts).getBytes();
+			__log.debug("Detect auts parameter in authorization header, try to resynchronized");
+			byte[] rand = getRand(authorizationHeader.getNonce());
+			byte[] bAuts = HexString.hexToBuffer(auts);
 			
 			byte[] sipAuthorization = Digest.concat(rand, bAuts);
 			

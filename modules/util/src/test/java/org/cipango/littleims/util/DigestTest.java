@@ -11,13 +11,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.scscf.util;
+package org.cipango.littleims.util;
 
 import org.cipango.littleims.util.AuthorizationHeader;
+import org.cipango.littleims.util.Digest;
 
 import junit.framework.TestCase;
 
-public class AuthorizationHeaderTest extends TestCase
+public class DigestTest extends TestCase
 {
 
 	static String rfc2617 = "Digest username=\"Mufasa\"," + "realm=\"testrealm@host.com\","
@@ -26,10 +27,16 @@ public class AuthorizationHeaderTest extends TestCase
 			+ "response=\"6629fae49393a05397450978507c4ef1\","
 			+ "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
 
-	public void testParsing()
+	/*
+	 * Test method for
+	 * 'com.nexcom.scscf.util.Digest.calculateResponse(AuthorizationHeader,
+	 * String, String)'
+	 */
+	public void testCalculateResponse()
 	{
 		AuthorizationHeader ah = new AuthorizationHeader(rfc2617);
-		assertEquals("Digest", ah.getScheme());
-		assertEquals("0a4f113b", ah.getParameter("cnonce"));
+		String res = Digest.calculateResponse(ah, "GET", "Circle Of Life".getBytes());
+		assertEquals("6629fae49393a05397450978507c4ef1", res);
 	}
+
 }
