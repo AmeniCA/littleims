@@ -33,7 +33,6 @@ import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.ims.IMS;
 import org.cipango.littleims.cx.UserAuthorizationType;
 import org.cipango.littleims.util.AuthorizationHeader;
-import org.cipango.littleims.util.Digest;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.URIHelper;
 
@@ -65,7 +64,7 @@ public class IcscfService
 		AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 		String  privateUserId = null;
 		if (ah != null)
-			privateUserId = ah.getParameter(Digest.USERNAME_PARAM);
+			privateUserId = ah.getUsername();
 		else
 			privateUserId = URIHelper.extractPrivateIdentity(aor);
 		
