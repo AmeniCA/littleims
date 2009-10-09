@@ -151,7 +151,7 @@
     <junit-version>3.8.1</junit-version>
     <sip-api-version>1.1</sip-api-version>
     <cipango-version>1.0-SNAPSHOT</cipango-version>
-    <wicket.version>1.4.0</wicket.version>
+    <wicket.version>1.4.1</wicket.version>
     <slf4j.version>1.4.0</slf4j.version>
     <scscf.home>${littleims.home}/S-CSCF</scscf.home>
     <pcscf.home>${littleims.home}/P-CSCF</pcscf.home>
