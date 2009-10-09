@@ -438,7 +438,10 @@ public class Hss
 			if (scscf != null && !serverName.equals(scscf.getUri()))
 			{
 				AVP avp = AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, scscf.getUri());
-				throw new DiameterException(IMS.IMS_VENDOR_ID, IMS.DIAMETER_ERROR_IDENTITY_ALREADY_REGISTERED).addAvp(avp);
+				throw new DiameterException(IMS.IMS_VENDOR_ID, 
+						IMS.DIAMETER_ERROR_IDENTITY_ALREADY_REGISTERED,
+						"S-CSCF " + scscf.getUri() + " assigned to " + publicIdentity.getIdentity()
+						+ " does not match with server name " + serverName).addAvp(avp);
 			}
 
 			publicIdentity.updateState(impi, State.REGISTERED);

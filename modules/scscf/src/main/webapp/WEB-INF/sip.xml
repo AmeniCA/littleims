@@ -5,7 +5,9 @@
           version="1.1">
   <app-name>org.cipango.littleims.scscf</app-name>
 
-  <main-servlet>session</main-servlet>
+  <servlet-selection>
+    <main-servlet>session</main-servlet>
+  </servlet-selection>
   <display-name>littleIMS: S-CSCF</display-name>
 
 	<context-param>

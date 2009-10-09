@@ -5,7 +5,10 @@
 					version="1.1">
 	<app-name>org.cipango.littleims.pcscf</app-name>
 
-	<main-servlet>pcscf</main-servlet>
+	<servlet-selection>
+		<main-servlet>pcscf</main-servlet>
+	</servlet-selection>
+	
 	<display-name>LittleIMS: P-CSCF</display-name>
 
 	<context-param>
