@@ -37,12 +37,7 @@
 		Default: sip:pcscf@${pcscf.host}:${pcscf.port}
 		-->
 		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
-		<!--
-		This URI is used by P-CSCF function for routing REGISTER request
-		
-		Default: sip:icscf@${icscf.host}:${icscf.port}
-		-->
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port}" />
+
 		<!--
 		List of headers to process when receiving a REGISTER request.
 		Headers set in remove list are removed then headers in add list are added to the request.
@@ -55,7 +50,7 @@
 		<property name="registerHeadersToAdd">
 			<map>
 				<entry key="Require" value="path" />
-				<entry key="P-Visited-Network-ID" value="Visited Network Number 1" />
+				<entry key="P-Visited-Network-ID" value="cipango.voip"/>
 				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso=023551024" />
 			</map>
 		</property>
@@ -92,7 +87,6 @@
 	<bean id="debugIdService" 
 			class="org.cipango.littleims.pcscf.debug.DebugIdService">
 		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port};lr" />
 		<property name="sipFactory" ref="sipFactory" />
 	</bean>
 

@@ -29,10 +29,6 @@
               <value>.</value>
             </systemProperty>
             <systemProperty>
-              <name>sip.port</name>
-              <value>5080</value>
-            </systemProperty>
-            <systemProperty>
               <name>sip.host</name>
               <value>i-cscf.cipango.voip</value>
             </systemProperty>

@@ -75,11 +75,16 @@ public class SessionManagerImpl implements SessionManager
 	
 	public void init()
 	{
-		_icscfUri.setLrParam(true);
+		if (_icscfUri != null)
+			_icscfUri.setLrParam(true);
+		
 		if (!_terminatingDefault)
 		{
 			_log.info("Using Originating as default mode");
-			_icscfUri.setParameter(TERM_PARAM, "");
+			if (_icscfUri == null)
+				_log.warn("Terminating is set as default mode and I-CSCF uri is defined");
+			else
+				_icscfUri.setParameter(TERM_PARAM, "");
 		}
 		else
 		{

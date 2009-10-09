@@ -36,7 +36,6 @@ public class PcscfService
 	
 	private SipFactory _sipFactory;
 	private SipURI _pcscfUri;
-	private SipURI _icscfUri;
 	private Map<String, String> _registerHeadersToAdd;
 	private List<String> _registerHeadersToRemove;
 	private Map<String, String> _requestHeadersToAdd;
@@ -44,7 +43,6 @@ public class PcscfService
 	
 	public void doRegister(SipServletRequest request) throws TooManyHopsException
 	{
-		request.pushRoute(_icscfUri);
 		request.addAddressHeader(Headers.PATH, _sipFactory.createAddress(_pcscfUri), true);
 		processHeaders(request, _registerHeadersToRemove, _registerHeadersToAdd);
 		Proxy proxy = request.getProxy();
@@ -92,16 +90,6 @@ public class PcscfService
 		}
 	}
 	
-	public SipURI getIcscfUri()
-	{
-		return _icscfUri;
-	}
-	public void setIcscfUri(SipURI icscfUri)
-	{
-		_icscfUri = icscfUri;
-		_icscfUri.setLrParam(true);
-		_log.info("I-CSCF URI: " + _icscfUri);
-	}
 	public Map<String, String> getRegisterHeadersToAdd()
 	{
 		return _registerHeadersToAdd;

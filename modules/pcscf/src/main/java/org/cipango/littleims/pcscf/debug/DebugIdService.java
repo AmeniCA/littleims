@@ -39,7 +39,6 @@ public class DebugIdService
 	
 	private SipFactory _sipFactory;
 	private SipURI _pcscfUri;
-	private SipURI _icscfUri;
 	
 	private Map<String, DebugSubscription> _subscriptions = new HashMap<String, DebugSubscription>();
 	private Map<String, DebugConf> _confs = new ConcurrentHashMap<String, DebugConf>();
@@ -66,7 +65,6 @@ public class DebugIdService
 				request.addHeader(Headers.EVENT, EVENT_DEBUG);
 				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
 				request.setExpires(expires);
-				request.pushRoute(_icscfUri);
 				if (_userAgent != null)
 					request.setHeader(Headers.USER_AGENT, _userAgent);
 					
@@ -204,16 +202,6 @@ public class DebugIdService
 	public void setPcscfUri(SipURI pcscfUri)
 	{
 		_pcscfUri = pcscfUri;
-	}
-
-	public SipURI getIcscfUri()
-	{
-		return _icscfUri;
-	}
-
-	public void setIcscfUri(SipURI icscfUri)
-	{
-		_icscfUri = icscfUri;
 	}
 
 	public String getUserAgent()

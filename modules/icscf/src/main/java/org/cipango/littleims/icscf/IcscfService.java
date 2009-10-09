@@ -229,7 +229,8 @@ public class IcscfService
 		}
 		else
 		{
-			request.removeHeader(Headers.P_PROFILE_KEY);
+			if (!request.isCommitted())
+				request.removeHeader(Headers.P_PROFILE_KEY);
 			
 			URI requestUri = request.getRequestURI();
 			String scheme = requestUri.getScheme();
