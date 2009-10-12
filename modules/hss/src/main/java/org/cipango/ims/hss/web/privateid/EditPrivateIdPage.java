@@ -18,6 +18,7 @@ import java.util.Arrays;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -95,7 +96,7 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 			}
 		});
 		form.add(passwordEdit);
-		passwordEdit.add(new AjaxFormComponentUpdatingBehavior("onChange")
+		passwordEdit.add(new AjaxFormChoiceComponentUpdatingBehavior()
 		{
 			@Override
 			protected void onUpdate(AjaxRequestTarget target)
