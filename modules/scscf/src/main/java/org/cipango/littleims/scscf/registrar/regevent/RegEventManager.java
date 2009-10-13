@@ -214,13 +214,10 @@ public class RegEventManager implements Runnable, RegEventListener
 			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session));
 			Integer version = (Integer) session.getAttribute(NOTIFY_VERSION);
 			if (version == null)
-			{
 				version = new Integer(0);
-			}
 			else
-			{
 				version = new Integer(version.intValue() + 1);
-			}
+			
 			session.setAttribute(NOTIFY_VERSION, version);
 
 			String body = generateRegInfo(e, state, version.intValue());
@@ -269,7 +266,10 @@ public class RegEventManager implements Runnable, RegEventListener
 			{
 				ContactInfo contactInfo = it2.next();
 				sb.append("<contact state=\"").append(contactInfo.getContactState().getValue()).append("\" ");
-				sb.append("event=\"").append(contactInfo.getContactEvent().getValue()).append("\">\n");
+				sb.append("event=\"").append(contactInfo.getContactEvent().getValue()).append("\"");
+				if (contactInfo.getContactState() == RegState.ACTIVE)
+					sb.append(" expires=\"" + contactInfo.getExpires() + "\"");
+				sb.append(">\n");
 				sb.append("<uri>").append(contactInfo.getContact()).append("</uri>\n");
 				if (contactInfo.getDisplayName() != null)
 					sb.append("<display-name>").append(contactInfo.getDisplayName()).append("</display-name>\n");

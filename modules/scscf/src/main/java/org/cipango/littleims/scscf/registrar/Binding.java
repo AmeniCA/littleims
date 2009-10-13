@@ -39,9 +39,9 @@ public class Binding
 
 	public Binding(String privateUserIdentity, Address contact, SipURI path, int expires)
 	{
-		this._privateUserIdentity = privateUserIdentity;
-		this._contact = contact;
-		this._path = path;
+		_privateUserIdentity = privateUserIdentity;
+		_contact = contact;
+		_path = path;
 		setExpires(expires);
 	}
 
@@ -67,8 +67,8 @@ public class Binding
 
 	public void refresh(Address contact, SipURI path, int expires)
 	{
-		this._contact = contact;
-		this._path = path;
+		_contact = contact;
+		_path = path;
 		setExpires(expires);
 	}
 	
@@ -105,7 +105,7 @@ public class Binding
 
 	public void setRegTimer(TimerTask task)
 	{
-		this._regTimer = task;
+		_regTimer = task;
 	}
 
 	public TimerTask getRegTimer()

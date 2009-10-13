@@ -24,6 +24,8 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
@@ -41,13 +43,14 @@ public class OamServlet extends HttpServlet
 {
 
 	private SessionManager _sessionManager;
+	private SipFactory _sipFactory;
 	private static final Logger __log = Logger.getLogger(OamServlet.class);
 	
 	public void init() throws ServletException
 	{
 		WebApplicationContext context = WebApplicationContextUtils
 		.getWebApplicationContext(getServletContext());
-
+		_sipFactory = (SipFactory) getServletContext().getAttribute(SipFactory.class.getName());
 		try 
 		{
 			_sessionManager = (SessionManager) context.getBean("sessionManager");
@@ -93,7 +96,7 @@ public class OamServlet extends HttpServlet
 		{
 			out.println("<table border=\"1\" cellspacing=\"0\">" +
 				"<th>AOR</th><th>State</th><th>Contact</th><th>Private identity</th>" +
-				"<th>Expires</th><th>Path</th><th>Service Profile</th>");
+				"<th>Expires</th><th>Path</th><th>Service Profile</th><th>Action</th>");
 			while (it.hasNext())
 			{
 				Context context = it.next();
@@ -121,6 +124,11 @@ public class OamServlet extends HttpServlet
 						printProfile(context.getRegInfo().getAor(), out);
 						out.println("</td>");
 					}
+					out.println("<td><form method=\"get\" action=\"#\">");
+					out.println("<input type=\"hidden\" name=\"aor\" value=\"" + context.getRegInfo().getAor() + "\"/>");
+					out.println("<input type=\"hidden\" name=\"privateIdentity\" value=\"" + binding.getPrivateUserIdentity() + "\"/>");
+					out.println("<input type=\"submit\" name=\"action\" value=\"Network-initiated reauthentication\"/>");
+					out.println("</form></td>");
 					out.println("</tr>");
 				}
 			}
@@ -233,6 +241,7 @@ public class OamServlet extends HttpServlet
 			if (action.equals("clear user profiles cache"))
 				_sessionManager.getRegistrar().getUserProfileCache().clearAllProfiles();
 			else if (action.equals("refresh shared IFCs"))
+			{
 				try
 				{
 					_sessionManager.getRegistrar().getUserProfileCache().refreshSharedIFCs();
@@ -240,6 +249,13 @@ public class OamServlet extends HttpServlet
 				{
 					__log.warn("Failed to refesh shared IFCs", e);
 				}
+			}
+			else if (action.equals("Network-initiated reauthentication"))
+			{
+				URI aor = _sipFactory.createURI(req.getParameter("aor"));
+				_sessionManager.getRegistrar().requestReauthentication(aor, 
+						req.getParameter("privateIdentity"));
+			}
 			resp.sendRedirect(req.getRequestURI());
 		}
 		PrintWriter out = resp.getWriter();

@@ -95,6 +95,12 @@
 		On unregister keep the user profile in cache if set to true.
 		-->
 		<property name="permanentAssignation" value="false" />
+		
+		<!--
+		On Network-initiated reauthentication, the expires set in seconds.
+		Default: 60s
+		-->
+		<property name="reauthicationExpires" value="60" />
 		<property name="cxManager" ref="cxManager" />
 		<property name="userProfileCache" ref="userProfileCache" />
 		<property name="cdf" ref="cdf" />

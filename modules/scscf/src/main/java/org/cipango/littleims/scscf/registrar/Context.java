@@ -110,7 +110,8 @@ public class Context
 						binding.getContact().getURI().toString(), 
 						binding.getContact().getDisplayName(),
 						binding.getState(), 
-						binding.getEvent());
+						binding.getEvent(),
+						binding.getExpires());
 				if (binding.getRegTimer() != null)
 				{
 					binding.getRegTimer().cancel();
@@ -157,7 +158,8 @@ public class Context
 				binding.getContact().getURI().toString(), 
 				binding.getContact().getDisplayName(),
 				binding.getState(), 
-				binding.getEvent());
+				binding.getEvent(),
+				binding.getExpires());
 
 		if (binding.getRegTimer() != null)
 		{
@@ -181,7 +183,8 @@ public class Context
 						binding.getContact().getURI().toString(),
 						binding.getContact().getDisplayName(),
 						binding.getState(), 
-						binding.getEvent());
+						binding.getEvent(),
+						binding.getExpires());
 			}
 		}
 		return regInfo;
@@ -227,7 +230,8 @@ public class Context
 							binding.getContact().getURI().toString(), 
 							binding.getContact().getDisplayName(),
 							RegState.TERMINATED, 
-							ContactEvent.DEACTIVATED);
+							ContactEvent.DEACTIVATED,
+							0);
 					if (explicit)
 						binding.setEvent(ContactEvent.REGISTERED);
 					else
@@ -252,9 +256,31 @@ public class Context
 					contact.getURI().toString(), 
 					contact.getDisplayName(),
 					binding.getState(), 
-					binding.getEvent());
+					binding.getEvent(),
+					binding.getExpires());
 			return regInfo;
 		}
+	}
+	
+	public RegInfo requestReauthentication(String privateIdentity, int expires)
+	{
+		Binding binding = _bindings.get(privateIdentity);
+		if (binding == null)
+			return null;
+		if (binding.getExpires() < expires)
+		{
+			__log.info("Could not request authentication: expire " + expires + " < " + binding.getExpires());
+			return null;
+		}
+		binding.refresh(binding.getContact(), binding.getPath(), expires);
+		binding.setEvent(ContactEvent.SHORTENED);
+		RegInfo regInfo = new RegInfo(_publicUserIdentity.toString(), _state);
+		regInfo.addContactInfo(binding.getContact().getURI().toString(),
+				binding.getContact().getDisplayName(),
+				binding.getState(), 
+				binding.getEvent(),
+				binding.getExpires());
+		return regInfo;
 	}
 
 	public void setAssociatedURIs(List<String> associatedURIs)

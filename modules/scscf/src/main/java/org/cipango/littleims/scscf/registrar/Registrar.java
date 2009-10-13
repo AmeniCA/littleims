@@ -88,6 +88,7 @@ public class Registrar
 	
 	private boolean _permanentAssignation;
 	private MessageSender _messageSender;
+	private int _reauthicationExpires = 600;
 	
 	public Registrar()
 	{
@@ -428,6 +429,44 @@ public class Registrar
 		}
 	}
 	
+	public void requestReauthentication(URI aor, String privateIdentity)
+	{
+		__log.debug("Network-initiated reauthentication for private identity: " + privateIdentity);
+		List<String> associatedURIs = null;
+		synchronized (_regContexts)
+		{
+			Context regContext = _regContexts.get(aor.toString());
+			if (regContext == null)
+			{
+				__log.warn("Network-initiated reauthentication failed: no context for " + aor);
+				return;
+			}
+			associatedURIs = regContext.getAssociatedURIs();
+			
+			RegEvent regEvent = new RegEvent();
+			Iterator<String> it = associatedURIs.iterator();
+			while (it.hasNext())
+			{
+				String publicID = it.next();
+				Context context = _regContexts.get(publicID);
+				RegInfo regInfo = context.requestReauthentication(privateIdentity, _reauthicationExpires);
+				if (regInfo != null)
+					regEvent.addRegInfo(regInfo);
+				
+			}
+			
+			notifyListeners(regEvent);
+			
+			// start reg timer
+			RegTimerTask regTimer = new RegTimerTask(aor, privateIdentity);
+			_timer.schedule(regTimer, _reauthicationExpires * 1000);
+			regContext.setRegTimer(privateIdentity, regTimer);
+		}
+		
+		
+	}
+
+	
 	public RegInfo getBindings(String aor)
 	{
 		synchronized (_regContexts)
@@ -517,7 +556,7 @@ public class Registrar
 			__log.debug("Failed to notify HSS about timeout registration for " + uri, e);
 		}
 	}
-
+	
 	public void setListener(RegEventListener listener)
 	{
 		_regEventListener = listener;
@@ -965,6 +1004,16 @@ public class Registrar
 	public void setMessageSender(MessageSender messageSender)
 	{
 		_messageSender = messageSender;
+	}
+
+	public int getReauthicationExpires()
+	{
+		return _reauthicationExpires;
+	}
+
+	public void setReauthicationExpires(int reauthicationExpires)
+	{
+		_reauthicationExpires = reauthicationExpires;
 	}
 
 

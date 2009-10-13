@@ -33,9 +33,9 @@ public class RegInfo
 		this._aorState = state;
 	}
 
-	public void addContactInfo(String contact, String displayName, RegState state, ContactEvent event)
+	public void addContactInfo(String contact, String displayName, RegState state, ContactEvent event, int expires)
 	{
-		_contacts.add(new ContactInfo(contact, displayName, event, state));
+		_contacts.add(new ContactInfo(contact, displayName, event, state, expires));
 	}
 
 	public String getAor()
@@ -60,13 +60,15 @@ public class RegInfo
 		private String _displayName;
 		private RegState _contactState;
 		private ContactEvent _contactEvent;
+		private int _expires;
 
-		public ContactInfo(String contact, String displayName, ContactEvent event, RegState state)
+		public ContactInfo(String contact, String displayName, ContactEvent event, RegState state, int expires)
 		{
-			this._contact = contact;
+			_contact = contact;
 			_contactEvent = event;
 			_contactState = state;
 			_displayName = displayName;
+			_expires = expires;
 		}
 
 		public String getContact()
@@ -89,6 +91,10 @@ public class RegInfo
 			return _displayName;
 		}
 
+		public int getExpires()
+		{
+			return _expires;
+		}
 	}
 
 

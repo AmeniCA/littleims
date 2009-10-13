@@ -23,6 +23,7 @@ public class ContactEvent
 	public static final ContactEvent REJECTED = new ContactEvent("rejected");
 	public static final ContactEvent REFRESHED = new ContactEvent("refreshed");
 	public static final ContactEvent EXPIRED = new ContactEvent("expired");
+	public static final ContactEvent SHORTENED = new ContactEvent("shortened");
 
 	private ContactEvent(String value)
 	{
