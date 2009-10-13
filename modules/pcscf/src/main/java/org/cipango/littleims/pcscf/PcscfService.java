@@ -23,6 +23,7 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 
@@ -40,6 +41,7 @@ public class PcscfService
 	private List<String> _registerHeadersToRemove;
 	private Map<String, String> _requestHeadersToAdd;
 	private List<String> _requestHeadersToRemove;
+	private String _userAgent = "littleIMS :: P-CSCF";
 	
 	public void doRegister(SipServletRequest request) throws TooManyHopsException
 	{
@@ -151,4 +153,23 @@ public class PcscfService
 	{
 		_requestHeadersToRemove = requestHeadersToRemove;
 	}
+	
+	public void sendResponse(SipServletRequest request, int statusCode)
+	{
+		try
+		{
+			SipServletResponse response = request.createResponse(statusCode);
+			String pDebugId = request.getHeader(Headers.P_DEBUG_ID);
+			if (pDebugId != null)
+				response.setHeader(Headers.P_DEBUG_ID, pDebugId);
+			if (_userAgent != null)
+				response.setHeader(Headers.SERVER, _userAgent);
+			response.send();
+		}
+		catch (Throwable e)
+		{
+			_log.warn("Failed to send " + statusCode + "/" + request.getMethod(), e);
+		}
+	}
+
 }

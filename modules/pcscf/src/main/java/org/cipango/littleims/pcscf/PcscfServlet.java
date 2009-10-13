@@ -67,6 +67,10 @@ public class PcscfServlet extends SipServlet
 		catch (Throwable e) 
 		{
 			_log.warn("Failed to handle request:\n" + request, e);
+			if (!request.isCommitted())
+			{
+				_pcscfService.sendResponse(request, SipServletResponse.SC_SERVICE_UNAVAILABLE);
+			}
 		}
 	}
 
