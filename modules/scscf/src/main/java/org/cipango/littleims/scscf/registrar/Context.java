@@ -191,6 +191,7 @@ public class Context
 			boolean explicit, SipURI path)
 	{
 		Binding binding = null;
+		RegInfo regInfo = null;
 		synchronized (_bindings)
 		{
 
@@ -202,13 +203,9 @@ public class Context
 				binding.setState(RegState.ACTIVE);
 				_bindings.put(privateUserIdentity, binding);
 				if (explicit)
-				{
 					binding.setEvent(ContactEvent.REGISTERED);
-				}
 				else
-				{
 					binding.setEvent(ContactEvent.CREATED);
-				}
 			}
 			else
 			{
@@ -218,8 +215,26 @@ public class Context
 					binding.setRegTimer(null);
 				}
 				// Refresh registration
+				if (contact.getURI().equals(binding.getContact().getURI()) && path.equals(binding.getPath()))
+					binding.setEvent(ContactEvent.REFRESHED);
+				else
+				{
+					__log.info("Public identity " + _publicUserIdentity + " already registered with different contact "
+							+ binding.getContact().getURI() + ", so remove old contact");
+					if (regInfo == null)
+						regInfo = new RegInfo(_publicUserIdentity.toString(), _state);
+					regInfo.addContactInfo(
+							binding.getContact().getURI().toString(), 
+							binding.getContact().getDisplayName(),
+							RegState.TERMINATED, 
+							ContactEvent.DEACTIVATED);
+					if (explicit)
+						binding.setEvent(ContactEvent.REGISTERED);
+					else
+						binding.setEvent(ContactEvent.CREATED);
+				}
+
 				binding.refresh(contact, path, expires);
-				binding.setEvent(ContactEvent.REFRESHED);
 			}
 
 		}
@@ -231,7 +246,8 @@ public class Context
 		}
 		else
 		{
-			RegInfo regInfo = new RegInfo(_publicUserIdentity.toString(), _state);
+			if (regInfo == null)
+				regInfo = new RegInfo(_publicUserIdentity.toString(), _state);
 			regInfo.addContactInfo(
 					contact.getURI().toString(), 
 					contact.getDisplayName(),
