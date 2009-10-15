@@ -174,15 +174,6 @@
 		Default: sip:scscf@${scscf.host}:${scscf.sip.port}
 		-->
 		<property name="scscfUri" value="sip:scscf@${scscf.host}:${scscf.sip.port}" />
-		<!--
-		This URI is used by S-CSCF function for routing outgoing request to terminating 
-		"network" (i.e. I-CSCF node)
-		If this parameter is not present, the Request-URI is used thanks DNS or etc/host
-		file for resolving domain name. 
-		
-		Default: sip:icscf@${icscf.host}:${icscf.sip.port}
-		-->
-		<property name="icscfUri" value="sip:icscf@${icscf.host}:${icscf.sip.port}" />
 		
 		<!--
 		Requests are routed to the SIP element defined by this SIP URI:
