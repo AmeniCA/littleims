@@ -81,7 +81,7 @@
 		-->
 		<property name="requestHeadersToAdd">
 			<map>
-				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso=023551024" />
+				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso023551024" />
 			</map>
 		</property>
 		<property name="requestHeadersToRemove">
