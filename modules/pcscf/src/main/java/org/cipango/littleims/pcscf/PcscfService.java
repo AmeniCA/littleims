@@ -37,6 +37,7 @@ public class PcscfService
 	
 	private SipFactory _sipFactory;
 	private SipURI _pcscfUri;
+	private SipURI _icscfUri;
 	private Map<String, String> _registerHeadersToAdd;
 	private List<String> _registerHeadersToRemove;
 	private Map<String, String> _requestHeadersToAdd;
@@ -50,6 +51,8 @@ public class PcscfService
 		Proxy proxy = request.getProxy();
 		proxy.setRecordRoute(true);
 		proxy.setSupervised(true);
+		if (_icscfUri != null)
+			request.pushRoute(_icscfUri);
 		proxy.proxyTo(request.getRequestURI());
 	}
 	
@@ -170,6 +173,16 @@ public class PcscfService
 		{
 			_log.warn("Failed to send " + statusCode + "/" + request.getMethod(), e);
 		}
+	}
+
+	public SipURI getIcscfUri()
+	{
+		return _icscfUri;
+	}
+
+	public void setIcscfUri(SipURI icscfUri)
+	{
+		_icscfUri = icscfUri;
 	}
 
 }
