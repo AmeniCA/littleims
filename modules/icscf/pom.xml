@@ -30,7 +30,7 @@
             </systemProperty>
             <systemProperty>
               <name>sip.host</name>
-              <value>i-cscf.cipango.voip</value>
+              <value>i-cscf.${domain}</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
@@ -45,10 +45,10 @@
                 <port>3888</port>
               </connector>
             </connectors>
-            <identity>i-cscf.cipango.voip</identity>
+            <identity>i-cscf.${domain}</identity>
             <peers>
               <peer implementation="org.cipango.diameter.Peer">
-                <host>hss.cipango.voip</host>
+                <host>hss.${domain}</host>
               </peer>
             </peers>
           </diameterNode>

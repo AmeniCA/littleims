@@ -42,7 +42,7 @@
             </systemProperty>
             <systemProperty>
               <name>sip.host</name>
-              <value>s-cscf.cipango.voip</value>
+              <value>s-cscf.${domain}</value>
             </systemProperty>
             <systemProperty>
               <name>jetty.port</name>
@@ -61,13 +61,13 @@
             <connectors>
               <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
                 <port>3878</port>
-                <host>s-cscf.cipango.voip</host>
+                <host>s-cscf.${domain}</host>
               </connector>
             </connectors>
-            <identity>s-cscf.cipango.voip</identity>
+            <identity>s-cscf.${domain}</identity>
             <peers>
               <peer implementation="org.cipango.diameter.Peer">
-                <host>hss.cipango.voip</host>
+                <host>hss.${domain}</host>
               </peer>
             </peers>
           </diameterNode>

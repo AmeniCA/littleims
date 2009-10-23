@@ -90,7 +90,7 @@ public class TerminatingSession extends Session
 				__log.debug("Request URI has changed (new is " + requestURI
 								+ "). Forwarding request");
 			routeRequest(request);
-			return true;
+			return false;
 
 		}
 		else
@@ -139,6 +139,7 @@ public class TerminatingSession extends Session
 				__log.info("User is not registered. Sending 480 response");
 				getSessionManager().getMessageSender().sendResponse(request, 
 						SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
+				return true;
 			}
 			else
 			{
@@ -205,7 +206,7 @@ public class TerminatingSession extends Session
 					request.getProxy().proxyTo(targets);
 				}
 			}
-			return true;
+			return false;
 		}
 	}
 

@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
-import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
@@ -82,7 +81,7 @@ public class OriginatingSession extends Session
 			}
 		}
 		routeRequest(request);
-		return true;
+		return false;
 	}
 
 	@Override

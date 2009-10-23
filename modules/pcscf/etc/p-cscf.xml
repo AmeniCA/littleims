@@ -58,7 +58,7 @@
 		<property name="registerHeadersToAdd">
 			<map>
 				<entry key="Require" value="path" />
-				<entry key="P-Visited-Network-ID" value="cipango.voip"/>
+				<entry key="P-Visited-Network-ID" value="${pcscf.visitedNetworkId}"/>
 				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso023551024" />
 			</map>
 		</property>

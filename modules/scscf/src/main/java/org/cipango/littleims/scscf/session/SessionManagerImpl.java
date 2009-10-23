@@ -214,6 +214,7 @@ public class SessionManagerImpl implements SessionManager
 					{
 						_log.info("Not CS user. Sending 404 response");
 						_messageSender.sendResponse(request, SipServletResponse.SC_NOT_FOUND);
+						
 						return;
 					}
 
@@ -246,18 +247,17 @@ public class SessionManagerImpl implements SessionManager
 
 			request.getSession().setAttribute(ODI, odi);
 			boolean processingOver = session.handleInitialRequest(request);
-			/*
-			 * if (processingOver) { sessionMap.removeSession(odi); }
-			 */
+			if (processingOver) 
+				_sessionMap.removeSession(odi);
+			 
 		}
 		else
 		{
 			_log.debug("ODI: " + odi + " found in request. Invoking session.");
 			Session session = _sessionMap.getSession(odi);
 			boolean processingOver = session.handleInitialRequest(request);
-			/*
-			 * if (processingOver) { sessionMap.removeSession(odi); }
-			 */
+			if (processingOver) 
+				_sessionMap.removeSession(odi);
 		}
 	}
 	

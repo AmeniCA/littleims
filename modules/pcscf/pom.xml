@@ -26,7 +26,7 @@
             </systemProperty>
             <systemProperty>
               <name>sip.host</name>
-              <value>p-cscf.cipango.voip</value>
+              <value>p-cscf.${domain}</value>
             </systemProperty>
             <systemProperty>
               <name>sip.port</name>

@@ -161,6 +161,7 @@
     <pcscf.home>${littleims.home}/P-CSCF</pcscf.home>
     <icscf.home>${littleims.home}/I-CSCF</icscf.home>
     <hss.home>${littleims.home}/HSS</hss.home>
+    <domain>cipango.voip</domain>
   </properties>
 
 
