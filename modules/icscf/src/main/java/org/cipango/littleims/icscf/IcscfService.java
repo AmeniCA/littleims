@@ -232,7 +232,7 @@ public class IcscfService
 			if (!request.isCommitted())
 				request.removeHeader(Headers.P_PROFILE_KEY);
 			
-			URI requestUri = request.getRequestURI();
+			URI requestUri = URIHelper.getCanonicalForm(_sipFactory, request.getRequestURI());
 			String scheme = requestUri.getScheme();
 			// a pres: or an im: URI, then translate the pres: or im: URI to a public user identity
 			// and replace the Request-URI of the incoming request with that public user identity; or

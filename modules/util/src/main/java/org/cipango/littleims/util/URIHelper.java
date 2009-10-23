@@ -20,25 +20,44 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class URIHelper
 {
-
-	@Deprecated
-	public static SipURI getCanonicalForm(SipFactory sipFactory, SipURI sipURI)
-	{
-		SipURI canonicalURI = sipFactory.createSipURI(sipURI.getUser(), sipURI.getHost());
-		canonicalURI.setPort(sipURI.getPort());
-		return canonicalURI;
-	}
+	private static final Logger __log = LoggerFactory.getLogger(URIHelper.class);
 	
+	/**
+	 * Canonical form is defined in TS 23003 §13.4
+	 * @param sipFactory
+	 * @param uri
+	 * @return
+	 */
 	public static URI getCanonicalForm(SipFactory sipFactory, URI uri)
 	{
 		if (uri instanceof SipURI)
 		{
 			SipURI sipURI = (SipURI) uri;
 			SipURI canonicalURI = sipFactory.createSipURI(sipURI.getUser(), sipURI.getHost());
-			canonicalURI.setPort(sipURI.getPort());
 			return canonicalURI;
+		}
+		else if (uri instanceof TelURL)
+		{
+			TelURL telURL = (TelURL) uri.clone();
+			String phoneNumber = telURL.getPhoneNumber();
+			phoneNumber = phoneNumber.replaceAll("\\.", "").replaceAll("\\-", "");
+			phoneNumber = phoneNumber.replaceAll("\\(", "").replaceAll("\\)", "");
+
+			if (!telURL.isGlobal())
+				__log.warn("Could not get canonical form for tel URL {}, as it not global", uri);
+			else
+				phoneNumber = "+" + phoneNumber;
+			
+			telURL.setPhoneNumber(phoneNumber);
+			Iterator<String> it = telURL.getParameterNames();
+			while (it.hasNext())
+				telURL.removeParameter(it.next());
+			return telURL;	
 		}
 		else
 		{

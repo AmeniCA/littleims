@@ -45,7 +45,7 @@ public class ImsAuthenticator implements Authenticator
 {
 
 	public static final Logger __log = Logger.getLogger(ImsAuthenticator.class);
-	private static final int AUTH_TIMER = 5000; // 5s
+	private static final int DEFAULT_AUTH_TIMEOUT = 5000; // 5s
 	
 	private Timer _timer;
 
@@ -53,6 +53,7 @@ public class ImsAuthenticator implements Authenticator
 	private NonceManager _nonceManager;
 	private SipFactory _sipFactory;
 	private String _realm;
+	private long _authTimeout = DEFAULT_AUTH_TIMEOUT;
 	private Map<String, AuthWaitTimerTask> _secContexts = new HashMap<String, AuthWaitTimerTask>();
 	private MessageSender _messageSender;
 	
@@ -70,7 +71,7 @@ public class ImsAuthenticator implements Authenticator
 	{
 		try
 		{
-			URI aor = URIHelper.getCanonicalForm(_sipFactory,  request.getFrom().getURI());
+			URI aor = URIHelper.getCanonicalForm(_sipFactory,  request.getTo().getURI());
 			String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
 			AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 						
@@ -179,7 +180,7 @@ public class ImsAuthenticator implements Authenticator
 	
 				// Start Reg-await-auth timer
 				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, digestAuthenticate.getAVP(Base.DIGEST_HA1).getString());
-				_timer.schedule(authTimer, AUTH_TIMER);
+				_timer.schedule(authTimer, _authTimeout);
 	
 				synchronized (_secContexts)
 				{
@@ -198,7 +199,7 @@ public class ImsAuthenticator implements Authenticator
 				String nonce = Base64.encode(bNonce);
 				byte[] xres = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHORIZATION).getBytes();
 				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, xres);
-				_timer.schedule(authTimer, AUTH_TIMER);
+				_timer.schedule(authTimer, _authTimeout);
 	
 				synchronized (_secContexts)
 				{
@@ -390,6 +391,18 @@ public class ImsAuthenticator implements Authenticator
 	public void setMessageSender(MessageSender messageSender)
 	{
 		_messageSender = messageSender;
+	}
+
+
+	public long getAuthTimer()
+	{
+		return _authTimeout;
+	}
+
+
+	public void setAuthTimer(long authTimer)
+	{
+		_authTimeout = authTimer;
 	}
 
 
