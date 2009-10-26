@@ -44,8 +44,7 @@ public class ContextPanel extends Panel {
 		boolean foundSub = false;
 		if (!publicIdentity.getPrivateIdentities().isEmpty())
 		{
-			Subscription subscription = 
-				publicIdentity.getPrivateIdentities().iterator().next().getSubscription();
+			Subscription subscription = publicIdentity.getSubscription();
 			if (subscription != null)
 			{
 				add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, 

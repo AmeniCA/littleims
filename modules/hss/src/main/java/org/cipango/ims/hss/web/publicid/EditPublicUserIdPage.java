@@ -13,7 +13,10 @@
 // ========================================================================
 package org.cipango.ims.hss.web.publicid;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
@@ -83,7 +86,6 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 			return;
 		}
 		
-
 		DaoDetachableModel model = new DaoDetachableModel(publicIdentity);
 		
 		if (isAdding()) {
@@ -132,6 +134,70 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 					
 				}).setRequired(true));
 		
+		form.add(new DropDownChoice("implicitRegistrationSet",
+				new LoadableDetachableModel() {
+			
+					@Override
+					protected Object load()
+					{
+						List<ImplicitRegistrationSet> set = null;
+						if (!isAdding())
+						{
+							PublicUserIdentity publicUserIdentity = (PublicUserIdentity) _dao.findById(_key);
+							set = _implicitRegistrationSetDao.getImplicitRegistrationSet(
+									publicUserIdentity.getSubscription().getId());
+							if (publicUserIdentity.getImplicitRegistrationSet().getPublicIds().size() > 1)
+								set.add(new ImplicitRegistrationSet());
+						}
+						else if (_privateIdKey != null)
+						{
+							PrivateIdentity privateIdentity = _privateIdentityDao.findById(_privateIdKey);
+							if (privateIdentity != null)
+							{
+								set = _implicitRegistrationSetDao.getImplicitRegistrationSet(
+										privateIdentity.getSubscription().getId());
+								set.add(new ImplicitRegistrationSet());
+							}
+						}
+						if (set == null)
+						{
+							set = new ArrayList<ImplicitRegistrationSet>();
+							set.add(new ImplicitRegistrationSet());
+						}
+						return set;
+					}
+			
+				},
+				new ChoiceRenderer<ImplicitRegistrationSet>()
+				{
+					@Override
+					public Object getDisplayValue(ImplicitRegistrationSet set)
+					{
+						if (set.getPublicIds().size() == 0)
+							return "new set";
+						
+						StringBuilder sb = new StringBuilder();
+						sb.append(set.getId());
+						Iterator<String> it = set.getPublicIds().iterator();
+						sb.append(" {");
+						int index = 0;
+						while (it.hasNext())
+						{
+							sb.append(it.next());
+							if (it.hasNext())
+								sb.append(", ");
+							if (++index == 2)
+							{
+								sb.append("...");
+								break;
+							}
+						}
+						sb.append('}');
+						return sb.toString();
+					}
+					
+				}).setRequired(true));
+		
 		form.add(new Button("submit")
 		{
 			@Override
@@ -147,6 +213,9 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 						_implicitRegistrationSetDao.save(implicitRegistrationSet);
 						publicIdentity.setImplicitRegistrationSet(implicitRegistrationSet);
 					}
+					else if (publicIdentity.getImplicitRegistrationSet().getId() == null)
+						_implicitRegistrationSetDao.save(publicIdentity.getImplicitRegistrationSet());
+					
 					
 					if (_privateIdKey != null)
 					{

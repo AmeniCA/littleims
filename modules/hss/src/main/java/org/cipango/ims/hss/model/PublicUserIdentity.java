@@ -129,6 +129,14 @@ public class PublicUserIdentity extends PublicIdentity
 	{
 		getPrivateIdentities().iterator().next().getSubscription().setScscf(scscf);
 	}
+	
+	public Subscription getSubscription()
+	{
+		Iterator<PrivateIdentity> it = getPrivateIdentities().iterator();
+		if (it.hasNext())
+			return it.next().getSubscription();
+		return null;
+	}
 
 	public String toString()
 	{
