@@ -14,18 +14,15 @@
 package org.cipango.littleims.pcscf;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
-import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
-import org.cipango.littleims.pcscf.debug.DebugIdService;
-import org.cipango.littleims.util.Headers;
+import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
 import org.cipango.littleims.util.Methods;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -81,24 +78,7 @@ public class PcscfServlet extends SipServlet
 		try
 		{
 			if (response.getMethod().equals(Methods.REGISTER))
-			{
-				Iterator<String> it = response.getHeaderNames();
-				while (it.hasNext())
-				{
-					String name = (String) it.next();
-					if (name.equalsIgnoreCase(Headers.P_DEBUG_ID))
-					{
-						Address contact = response.getAddressHeader(Headers.CONTACT);
-						int expires = -1;
-						if (contact != null)
-							expires = contact.getExpires();
-						if (expires == -1)
-							expires = response.getExpires();
-						_debugIdService.subscribe(response.getFrom().getURI(), expires);
-					}
-				}
-				response.getApplicationSession().invalidate();
-			}
+				_pcscfService.doRegisterResponse(response);
 			else
 				_debugIdService.handleDebug(response);
 		}

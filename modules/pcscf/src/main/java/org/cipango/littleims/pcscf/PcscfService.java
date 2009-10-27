@@ -14,6 +14,8 @@
 package org.cipango.littleims.pcscf;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +28,14 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
+import org.cipango.littleims.pcscf.subscription.reg.RegEventService;
+import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Headers;
+import org.cipango.littleims.util.URIHelper;
 
 public class PcscfService
 {
@@ -44,6 +51,17 @@ public class PcscfService
 	private List<String> _requestHeadersToRemove;
 	private String _userAgent = "littleIMS :: P-CSCF";
 	
+	private DebugIdService _debugIdService;
+	private RegEventService _regEventService;
+	
+	public void init()
+	{
+		if (_debugIdService.getUserAgent() == null)
+			_debugIdService.setUserAgent(_userAgent);
+		if (_regEventService.getUserAgent() == null)
+			_regEventService.setUserAgent(_userAgent);
+	}
+	
 	public void doRegister(SipServletRequest request) throws TooManyHopsException
 	{
 		request.addAddressHeader(Headers.PATH, _sipFactory.createAddress(_pcscfUri), true);
@@ -55,6 +73,47 @@ public class PcscfService
 			request.pushRoute(_icscfUri);
 		proxy.proxyTo(request.getRequestURI());
 	}
+	
+	public void doRegisterResponse(SipServletResponse response) throws ServletException
+	{
+		if (response.getStatus() < 200 || response.getStatus() >= 300)
+			return;
+		
+		Address contact = response.getAddressHeader(Headers.CONTACT);
+		int expires = -1;
+		if (contact != null)
+			expires = contact.getExpires();
+		if (expires == -1)
+			expires = response.getExpires();
+		
+		if (expires != 0)
+		{
+			URI aor = URIHelper.getCanonicalForm(_sipFactory, response.getTo().getURI());
+			String authorization = response.getRequest().getHeader(Headers.AUTHORIZATION);
+			AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
+			String  privateUserId = null;
+			if (ah != null)
+				privateUserId = ah.getUsername();
+			else
+				privateUserId = URIHelper.extractPrivateIdentity(aor);
+			
+			_regEventService.subscribe(aor, expires, privateUserId, response.getAddressHeaders(Headers.P_ASSOCIATED_URI));
+		}
+		
+		
+		// Handle debug-ID
+		Iterator<String> it2 = response.getHeaderNames();
+		while (it2.hasNext())
+		{
+			String name = it2.next();
+			
+			if (name.equalsIgnoreCase(Headers.P_DEBUG_ID))
+				_debugIdService.subscribe(response.getFrom().getURI(), expires);
+			
+		}
+		response.getApplicationSession().invalidate();
+	}
+	
 	
 	public void doNonRegisterRequest(SipServletRequest request) throws IOException, ServletException
 	{
@@ -183,6 +242,36 @@ public class PcscfService
 	public void setIcscfUri(SipURI icscfUri)
 	{
 		_icscfUri = icscfUri;
+	}
+
+	public String getUserAgent()
+	{
+		return _userAgent;
+	}
+
+	public void setUserAgent(String userAgent)
+	{
+		_userAgent = userAgent;
+	}
+
+	public DebugIdService getDebugIdService()
+	{
+		return _debugIdService;
+	}
+
+	public void setDebugIdService(DebugIdService debugIdService)
+	{
+		_debugIdService = debugIdService;
+	}
+
+	public RegEventService getRegEventService()
+	{
+		return _regEventService;
+	}
+
+	public void setRegEventService(RegEventService regEventService)
+	{
+		_regEventService = regEventService;
 	}
 
 }

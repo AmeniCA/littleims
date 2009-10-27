@@ -60,7 +60,7 @@ public class IcscfService
 		}
 		
 		URI aor = URIHelper.getCanonicalForm(_sipFactory, request.getTo().getURI());
-		String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
+		String authorization = request.getHeader(Headers.AUTHORIZATION);
 		AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 		String  privateUserId = null;
 		if (ah != null)

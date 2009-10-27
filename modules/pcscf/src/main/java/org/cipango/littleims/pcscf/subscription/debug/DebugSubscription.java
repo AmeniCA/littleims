@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.debug;
+package org.cipango.littleims.pcscf.subscription.debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,9 +25,10 @@ import org.apache.log4j.Logger;
 import org.cipango.ims.pcscf.debug.data.DebuginfoDocument;
 import org.cipango.ims.pcscf.debug.data.DebugconfigDocument.Debugconfig;
 import org.cipango.ims.pcscf.debug.data.DebuginfoDocument.Debuginfo;
+import org.cipango.littleims.pcscf.subscription.Subscription;
 import org.cipango.littleims.util.Headers;
 
-public class DebugSubscription
+public class DebugSubscription implements Subscription
 {
 	
 	private static final Logger __log = Logger.getLogger(DebugSubscription.class);
@@ -49,7 +50,7 @@ public class DebugSubscription
 	{
 		if (response.getStatus() > SipServletResponse.SC_MULTIPLE_CHOICES)
 		{
-			__log.warn("Subscription to " + _aor + " failed: " 
+			__log.warn("Debug subscription to " + _aor + " failed: " 
 					+ response.getStatus() + " " + response.getReasonPhrase());
 			invalidate();
 		}
@@ -162,5 +163,10 @@ public class DebugSubscription
 	public DebugIdService getDebugIdService()
 	{
 		return _debugIdService;
+	}
+
+	public String getUserAgent()
+	{
+		return _debugIdService.getUserAgent();
 	}
 }

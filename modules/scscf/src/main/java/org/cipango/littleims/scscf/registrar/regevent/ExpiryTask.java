@@ -39,7 +39,7 @@ public class ExpiryTask extends TimerTask
 			log.info("Subscription session has expired");
 			RegEvent e = (RegEvent) session.getAttribute(LAST_EVENT);
 			manager.sendNotification(e, session, "full");
-			manager.removeSubscription(aor);
+			manager.removeSubscription(aor, session);
 		}
 		catch (Throwable e)
 		{

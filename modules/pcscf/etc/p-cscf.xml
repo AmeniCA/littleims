@@ -28,8 +28,20 @@
 			</map>
 		</property>
 	</bean>
+		
+	<bean id="debugIdService" class="org.cipango.littleims.pcscf.subscription.debug.DebugIdService">
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+	
+	<bean id="regEventService" class="org.cipango.littleims.pcscf.subscription.reg.RegEventService">
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
 
-	<bean id="pcscfService" class="org.cipango.littleims.pcscf.PcscfService">
+	<bean id="pcscfService" 
+			class="org.cipango.littleims.pcscf.PcscfService"
+			init-method="init">
 		<!--
 		This URI is used to set own route on path header
 		Must match with IP address and port on which P-SCF is listening.
@@ -90,12 +102,8 @@
 			</list>
 		</property>
 		<property name="sipFactory" ref="sipFactory" />
-	</bean>
-	
-	<bean id="debugIdService" 
-			class="org.cipango.littleims.pcscf.debug.DebugIdService">
-		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
-		<property name="sipFactory" ref="sipFactory" />
+		<property name="debugIdService" ref="debugIdService" />
+		<property name="regEventService" ref="regEventService" />
 	</bean>
 
 </beans>

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.debug;
+package org.cipango.littleims.pcscf.subscription.debug;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -14,10 +14,12 @@
 package org.cipango.littleims.scscf.registrar.regevent;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
@@ -45,7 +47,7 @@ public class RegEventManager implements Runnable, RegEventListener
 
 	private Timer _timer = new Timer("RegEventTimer");
 	
-	private Map<String, SipSession> _subscriptions = new HashMap<String, SipSession>();
+	private Map<String, List<SipSession>> _subscriptions = new HashMap<String, List<SipSession>>();
 	private LinkedList<RegEvent> _queue = new LinkedList<RegEvent>();
 	private Registrar _registrar;
 
@@ -119,17 +121,21 @@ public class RegEventManager implements Runnable, RegEventListener
 	{
 		synchronized (_subscriptions)
 		{
+			List<SipSession> l = _subscriptions.get(aor);
 			if (expires != 0)
 			{
-				_subscriptions.put(aor, session);
+				if (l == null)
+				{
+					l = new ArrayList<SipSession>();
+					_subscriptions.put(aor, l);
+				}
+				l.add(session);
 			}
 			else
 			{
-				Object o = _subscriptions.get(aor);
-				if (session.equals(o))
-				{
+				l.remove(session);
+				if (l.isEmpty())
 					_subscriptions.remove(aor);
-				}
 			}
 		}
 
@@ -189,10 +195,12 @@ public class RegEventManager implements Runnable, RegEventListener
 					String aor = regInfo.getAor();
 					synchronized (_subscriptions)
 					{
-						if (_subscriptions.containsKey(aor))
+						List<SipSession> l = _subscriptions.get(aor);
+						if (l != null)
 						{
-							SipSession session = (SipSession) _subscriptions.get(aor);
-							sendNotification(e, session, "partial");
+							Iterator<SipSession> it2 = l.iterator();
+							while (it2.hasNext())
+								sendNotification(e, it2.next(), "partial");	
 						}
 					}
 				}
@@ -281,11 +289,14 @@ public class RegEventManager implements Runnable, RegEventListener
 		return sb.toString();
 	}
 
-	protected void removeSubscription(String aor)
+	protected void removeSubscription(String aor, SipSession session)
 	{
 		synchronized (_subscriptions)
 		{
-			_subscriptions.remove(aor);
+			List<SipSession> l = _subscriptions.get(aor);
+			l.remove(session);
+			if (l.isEmpty())
+				_subscriptions.remove(aor);
 		}
 	}
 

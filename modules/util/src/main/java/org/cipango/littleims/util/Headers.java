@@ -40,7 +40,6 @@ public abstract class Headers
 		ALLOW 							= add("Allow"),
 		ALLOW_EVENTS 					= add("Allow-Events"),	
 		AUTHENTICATION_INFO 			= add("Authentication-Info"),
-		AUTHORIZATION_HEADER 			= add("Authorization"),
 		AUTHORIZATION 					= add("Authorization"), 
 		CALL_ID 						= add("Call-ID"),
 		CALL_INFO 						= add("Call-Info"),

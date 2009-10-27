@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.debug;
+package org.cipango.littleims.pcscf.subscription.debug;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,6 +28,8 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.pcscf.subscription.Subscription;
+import org.cipango.littleims.pcscf.subscription.SubscriptionServlet;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 import org.cipango.littleims.util.URIHelper;
@@ -42,7 +44,7 @@ public class DebugIdService
 	
 	private Map<String, DebugSubscription> _subscriptions = new HashMap<String, DebugSubscription>();
 	private Map<String, DebugConf> _confs = new ConcurrentHashMap<String, DebugConf>();
-	private String _userAgent = "littleIMS :: P-CSCF";
+	private String _userAgent;
 	
 	/**
 	 * See 3GPP 24.229 §5.2.3A	Subscription to the user's debug event package 
@@ -70,9 +72,9 @@ public class DebugIdService
 					
 				subscription = new DebugSubscription(this, request.getSession(), aor.toString());
 				_subscriptions.put(aor.toString(), subscription);
-				request.getApplicationSession().setAttribute(DebugSubscription.class.getName(), 
+				request.getApplicationSession().setAttribute(Subscription.class.getName(), 
 						subscription);
-				request.getSession().setHandler("DebugIdServlet");
+				request.getSession().setHandler(SubscriptionServlet.class.getSimpleName());
 				request.send();
 				_log.debug("Start debug subscription of user " + aor);
 			}

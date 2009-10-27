@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.debug;
+package org.cipango.littleims.pcscf.subscription;
 
 import java.io.IOException;
 
@@ -23,29 +23,34 @@ import javax.servlet.sip.SipServletResponse;
 import org.apache.log4j.Logger;
 import org.cipango.littleims.util.Headers;
 
-public class DebugIdServlet extends SipServlet
+public class SubscriptionServlet extends SipServlet
 {
 	
-	private final Logger _log = Logger.getLogger(DebugIdServlet.class);
+	private final Logger _log = Logger.getLogger(SubscriptionServlet.class);
 
 	@Override
 	protected void doNotify(SipServletRequest request) throws ServletException,
 			IOException
 	{
-		SipServletResponse response = request.createResponse(SipServletResponse.SC_OK);
 		
-		DebugSubscription subscription = 
-			(DebugSubscription) request.getApplicationSession().getAttribute(DebugSubscription.class.getName());
+		Subscription subscription = 
+			(Subscription) request.getApplicationSession().getAttribute(Subscription.class.getName());
 		if (subscription == null)
+		{
 			_log.warn("No subscription session found for\n" + request);
+			request.createResponse(SipServletResponse.SC_CALL_LEG_DONE).send();
+		}
 		else
 		{
-			String userAgent = subscription.getDebugIdService().getUserAgent();
+
+			SipServletResponse response = request.createResponse(SipServletResponse.SC_OK);
+			String userAgent = subscription.getUserAgent();
 			if (userAgent != null)
 				response.setHeader(Headers.SERVER, userAgent);
 			subscription.handleNotify(request);
+
+			response.send();
 		}
-		response.send();
 		// TODO refresh if expired
 		
 	}
@@ -54,8 +59,8 @@ public class DebugIdServlet extends SipServlet
 	protected void doResponse(SipServletResponse response) throws ServletException,
 			IOException
 	{
-		DebugSubscription subscription = 
-			(DebugSubscription) response.getApplicationSession().getAttribute(DebugSubscription.class.getName());
+		Subscription subscription = 
+			(Subscription) response.getApplicationSession().getAttribute(Subscription.class.getName());
 		if (subscription != null)
 			subscription.handleSubscribeResponse(response);		
 	}

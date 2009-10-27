@@ -1,4 +1,4 @@
-package org.cipango.littleims.pcscf.debug;
+package org.cipango.littleims.pcscf.subscription.debug;
 
 import java.util.Calendar;
 

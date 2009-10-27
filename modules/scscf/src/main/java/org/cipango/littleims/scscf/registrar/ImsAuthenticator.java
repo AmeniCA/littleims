@@ -72,7 +72,7 @@ public class ImsAuthenticator implements Authenticator
 		try
 		{
 			URI aor = URIHelper.getCanonicalForm(_sipFactory,  request.getTo().getURI());
-			String authorization = request.getHeader(Headers.AUTHORIZATION_HEADER);
+			String authorization = request.getHeader(Headers.AUTHORIZATION);
 			AuthorizationHeader ah = authorization == null ? null : new AuthorizationHeader(authorization);
 						
 			if ((ah == null || ah.getNonce() == null || ah.getNonce().trim().equals("")))

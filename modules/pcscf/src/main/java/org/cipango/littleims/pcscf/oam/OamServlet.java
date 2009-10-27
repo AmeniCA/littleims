@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -25,10 +26,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.cipango.littleims.pcscf.debug.DebugConf;
-import org.cipango.littleims.pcscf.debug.DebugIdService;
-import org.cipango.littleims.pcscf.debug.DebugSession;
-import org.cipango.littleims.pcscf.debug.DebugSubscription;
+import org.cipango.littleims.pcscf.PcscfService;
+import org.cipango.littleims.pcscf.subscription.debug.DebugConf;
+import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
+import org.cipango.littleims.pcscf.subscription.debug.DebugSession;
+import org.cipango.littleims.pcscf.subscription.debug.DebugSubscription;
+import org.cipango.littleims.pcscf.subscription.reg.RegSubscription;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -37,6 +40,7 @@ public class OamServlet extends HttpServlet
 {
 
 	private DebugIdService _debugIdService;
+	private PcscfService _pcscfService;
 	private static final Logger __log = Logger.getLogger(OamServlet.class);
 	
 	public void init() throws ServletException
@@ -47,6 +51,7 @@ public class OamServlet extends HttpServlet
 		try 
 		{
 			_debugIdService = (DebugIdService) context.getBean("debugIdService");
+			_pcscfService = (PcscfService) context.getBean("pcscfService");
 		} 
 		catch (BeansException e) 
 		{
@@ -86,6 +91,59 @@ public class OamServlet extends HttpServlet
 						first = false;
 					out.println("</tr>");
 				}
+				out.println("</tr>");
+			}
+		}
+		out.println("</table>");
+	}
+	
+	private void printRegSubscriptions(PrintWriter out)
+	{
+
+		out.println("<h2>Reg subscriptions</h2>");
+		out.println("<table border=\"1\" cellspacing=\"0\">" +
+		"<th>Subscription AOR</th><th>Version</th>");
+
+		Iterator<RegSubscription> it = _pcscfService.getRegEventService().getRegSubscriptions();
+		synchronized (it)
+		{
+			while (it.hasNext())
+			{
+				RegSubscription subscription = it.next();				
+				out.println("<tr>");
+				out.println("<td>" + subscription.getAor() + "</td>");
+				out.println("<td>" + subscription.getVersion() + "</td>");
+				out.println("</tr>");
+			}
+		}
+		out.println("</table>");
+	}
+	
+	private void printRegisteredUsers(PrintWriter out)
+	{
+
+		out.println("<h2>Registered users</h2>");
+		out.println("<table border=\"1\" cellspacing=\"0\">" +
+		"<th>AOR</th><th>associated identities</th>");
+
+		Map<String, List<String>> map = _pcscfService.getRegEventService().getRegisteredUsers();
+		synchronized (map)
+		{
+			Iterator<String> it = map.keySet().iterator();
+			while (it.hasNext())
+			{
+				String aor = it.next();				
+				out.println("<tr>");
+				out.println("<td>" + aor + "</td>");
+				
+				out.println("<td><ul>");
+				List<String> l = map.get(aor);
+				Iterator<String> it2 = l.iterator();
+				while (it2.hasNext())
+				{
+					out.println("<li>" + it2.next() + "</li>");
+				}
+				out.println("</ul></td>");
 				out.println("</tr>");
 			}
 		}
@@ -146,6 +204,8 @@ public class OamServlet extends HttpServlet
 		out.println("<h1>littleIMS :: P-CSCF: OAM</h1>");
 		printDebugSubscriptions(out);		
 		printDebugSessions(out);
+		printRegSubscriptions(out);
+		printRegisteredUsers(out);
 		out.println("</body></html>");
 	}
 	
