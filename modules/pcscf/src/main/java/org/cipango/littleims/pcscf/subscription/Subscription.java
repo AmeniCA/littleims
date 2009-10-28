@@ -14,14 +14,15 @@
 package org.cipango.littleims.pcscf.subscription;
 
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 
 public interface Subscription
 {
 
 	public String getUserAgent();
-	
-	public void handleSubscribeResponse(SipServletResponse response);
-	
+		
 	public void handleNotify(SipServletRequest notify);
+	
+	public void invalidate();
+	
+	public String getAor();
 }

@@ -18,17 +18,29 @@ import java.util.List;
 
 public class RegEvent
 {
-
+	private List<RegInfo> _regInfos = new ArrayList<RegInfo>();
+	private boolean _terminated;
+	
 	public void addRegInfo(RegInfo regInfo)
 	{
-		regInfos.add(regInfo);
+		_regInfos.add(regInfo);
 	}
 
 	public List<RegInfo> getRegInfos()
 	{
-		return regInfos;
+		return _regInfos;
 	}
 
-	private List<RegInfo> regInfos = new ArrayList<RegInfo>();
+	public boolean isTerminated()
+	{
+		return _terminated;
+	}
+
+	public void setTerminated(boolean terminated)
+	{
+		_terminated = terminated;
+	}
+
+
 
 }

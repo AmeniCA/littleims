@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
@@ -26,7 +25,6 @@ import org.cipango.ims.pcscf.reg.data.ReginfoDocument.Reginfo;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration.State;
 import org.cipango.littleims.pcscf.subscription.Subscription;
-import org.cipango.littleims.util.Headers;
 
 public class RegSubscription implements Subscription
 {
@@ -37,26 +35,16 @@ public class RegSubscription implements Subscription
 	private RegEventService _regService;
 	private SipSession _session;
 	private String _aor;
+	private String _privateIdentity;
 	
-	public RegSubscription(RegEventService service, SipSession session, String aor)
+	public RegSubscription(RegEventService service, SipSession session, String aor, String privateIdentity)
 	{
 		_regService = service;
 		_session = session;
 		_aor = aor;
+		_privateIdentity = privateIdentity;
 	}
-	
-	public void handleSubscribeResponse(SipServletResponse response)
-	{
-		if (response.getStatus() > SipServletResponse.SC_MULTIPLE_CHOICES)
-		{
-			__log.warn("Reg Subscription to " + _aor + " failed: " 
-					+ response.getStatus() + " " + response.getReasonPhrase());
-			invalidate();
-		}
-		else
-			_session.getApplicationSession().setExpires(response.getExpires() / 60 + 30);
-	}
-	
+		
 	public void handleNotify(SipServletRequest notify)
 	{
 		try
@@ -91,10 +79,6 @@ public class RegSubscription implements Subscription
 			
 			_regService.addIdentitie(registered, reginfo.getState() == Reginfo.State.FULL);
 			_regService.removeIdentitie(unregistered);
-									
-			String state = notify.getHeader(Headers.SUBSCRIPTION_STATE);
-			if (state != null && state.startsWith("terminated"))
-				invalidate();
 		}
 		catch (Exception e)
 		{
@@ -102,10 +86,11 @@ public class RegSubscription implements Subscription
 		}
 	}
 	
-	private void invalidate()
+	public void invalidate()
 	{
 		__log.debug("Remove reg subscription for user " + _aor);
 		_session.invalidate();
+		_regService.removeSubscription(this);
 	}
 	
 	public SipSession getSession()
@@ -126,6 +111,11 @@ public class RegSubscription implements Subscription
 	public String getUserAgent()
 	{
 		return _regService.getUserAgent();
+	}
+
+	public String getPrivateIdentity()
+	{
+		return _privateIdentity;
 	}
 
 }

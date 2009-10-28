@@ -48,21 +48,40 @@ public class SubscriptionServlet extends SipServlet
 			if (userAgent != null)
 				response.setHeader(Headers.SERVER, userAgent);
 			subscription.handleNotify(request);
-
 			response.send();
+			
+			String state = request.getHeader(Headers.SUBSCRIPTION_STATE);
+			if (state != null && state.startsWith("terminated"))
+				subscription.invalidate();
 		}
 		// TODO refresh if expired
-		
 	}
 
 	@Override
 	protected void doResponse(SipServletResponse response) throws ServletException,
 			IOException
 	{
+		
 		Subscription subscription = 
 			(Subscription) response.getApplicationSession().getAttribute(Subscription.class.getName());
+		
 		if (subscription != null)
-			subscription.handleSubscribeResponse(response);		
+		{
+			if (response.getStatus() > SipServletResponse.SC_MULTIPLE_CHOICES)
+			{
+				_log.warn(subscription.getClass().getSimpleName() + " to "
+						+ subscription.getAor() + " failed: " 
+						+ response.getStatus() + " " + response.getReasonPhrase());
+				subscription.invalidate();
+				// TODO if it is 481, do a new subscription
+			}
+			else
+				response.getApplicationSession().setExpires(response.getExpires() / 60 + 30);
+		}
+		else
+		{
+			_log.warn("No subscription session found for\n" + response);
+		}	
 	}
 
 	

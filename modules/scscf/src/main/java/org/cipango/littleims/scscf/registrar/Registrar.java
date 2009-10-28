@@ -412,6 +412,7 @@ public class Registrar
 					regEvent.addRegInfo(regInfo);
 				}
 			}
+			regEvent.setTerminated(false);
 			notifyListeners(regEvent);
 
 			RegistrationInfo info = new RegistrationInfo();
@@ -454,7 +455,7 @@ public class Registrar
 					regEvent.addRegInfo(regInfo);
 				
 			}
-			
+			regEvent.setTerminated(false);
 			notifyListeners(regEvent);
 			
 			// start reg timer
@@ -465,21 +466,30 @@ public class Registrar
 		
 		
 	}
-
 	
-	public RegInfo getBindings(String aor)
+	public RegEvent getFullRegEvent(String aor)
 	{
 		synchronized (_regContexts)
 		{
-			if (!_regContexts.containsKey(aor))
+			RegEvent regEvent = new RegEvent();
+			Context regContext = (Context) _regContexts.get(aor);
+			if (regContext == null)
 			{
-				return new RegInfo(aor, RegState.INIT);
+				regEvent.addRegInfo(new RegInfo(aor, RegState.TERMINATED));
+				regEvent.setTerminated(true);
 			}
 			else
 			{
-				Context regContext = (Context) _regContexts.get(aor);
-				return regContext.getRegInfo();
+				Iterator<String> it = regContext.getAssociatedURIs().iterator();
+				while (it.hasNext())
+				{
+					Context context = _regContexts.get(it.next());
+					if (context != null)
+						regEvent.addRegInfo(context.getRegInfo());
+				}
+				regEvent.setTerminated(false);
 			}
+			return regEvent;
 		}
 	}
 
@@ -501,6 +511,7 @@ public class Registrar
 			}
 			List<String> associatedURIs = regContext.getAssociatedURIs();
 			Iterator<String> it = associatedURIs.iterator();
+			boolean allTerminating = true;
 			while (it.hasNext())
 			{
 				String publicID = (String) it.next();
@@ -519,8 +530,10 @@ public class Registrar
 						__log.info("User " + publicID + " has been deregistered");
 						_regContexts.remove(publicID);
 					}
+					allTerminating = allTerminating && regContext.getState() == RegState.TERMINATED;
 				}
 			}
+			regEvent.setTerminated(allTerminating);
 			notifyListeners(regEvent);
 
 			RegistrationInfo info = new RegistrationInfo();
@@ -773,8 +786,10 @@ public class Registrar
 						__log.info("User " + associatedIdentity + " has been network deregistered");
 						_regContexts.remove(associatedIdentity);
 						_userProfileCache.clearUserProfile(associatedIdentity);
+						
 					}
 				}
+				regEvent.setTerminated(true);
 				notifyListeners(regEvent);
 			}
 		}

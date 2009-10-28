@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -35,7 +34,7 @@ import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 
 
-public class RegEventManager implements Runnable, RegEventListener
+public class RegEventManager implements RegEventListener
 {
 
 	private static final Logger __log = Logger.getLogger(RegEventManager.class);
@@ -48,23 +47,36 @@ public class RegEventManager implements Runnable, RegEventListener
 	private Timer _timer = new Timer("RegEventTimer");
 	
 	private Map<String, List<SipSession>> _subscriptions = new HashMap<String, List<SipSession>>();
-	private LinkedList<RegEvent> _queue = new LinkedList<RegEvent>();
 	private Registrar _registrar;
 
 	private int _minExpires;
 	private int _maxExpires;
 
-	public void start()
-	{
-		new Thread(this, "RegEventManager").start();
-	}
 
 	public void registrationEvent(RegEvent e)
 	{
-		synchronized (_queue)
+		try
 		{
-			_queue.addLast(e);
-			_queue.notifyAll();
+			Iterator<RegInfo> it = e.getRegInfos().iterator();
+			while (it.hasNext())
+			{
+				RegInfo regInfo = it.next();
+				String aor = regInfo.getAor();
+				synchronized (_subscriptions)
+				{
+					List<SipSession> l = _subscriptions.get(aor);
+					if (l != null)
+					{
+						Iterator<SipSession> it2 = l.iterator();
+						while (it2.hasNext())
+							sendNotification(e, it2.next(), "partial");	
+					}
+				}
+			}
+		} 
+		catch (Throwable e1)
+		{
+			__log.warn("Got unexpected exception on regEvent manager", e1);
 		}
 	}
 	
@@ -119,6 +131,10 @@ public class RegEventManager implements Runnable, RegEventListener
 
 	private void addSubscription(String aor, SipSession session, int expires)
 	{
+		RegEvent e = _registrar.getFullRegEvent(aor);
+		if (e.isTerminated())
+			expires = 0;
+		
 		synchronized (_subscriptions)
 		{
 			List<SipSession> l = _subscriptions.get(aor);
@@ -131,7 +147,7 @@ public class RegEventManager implements Runnable, RegEventListener
 				}
 				l.add(session);
 			}
-			else
+			else if (l != null)
 			{
 				l.remove(session);
 				if (l.isEmpty())
@@ -141,9 +157,8 @@ public class RegEventManager implements Runnable, RegEventListener
 
 		session.setAttribute(ABSOLUTE_EXPIRES,
 				new Date(System.currentTimeMillis() + expires * 1000));
-		RegInfo regInfo = _registrar.getBindings(aor);
-		RegEvent e = new RegEvent();
-		e.addRegInfo(regInfo);
+
+		
 		sendNotification(e, session, "full");
 
 		ExpiryTask task = (ExpiryTask) session.getAttribute(ExpiryTask.class.getName());
@@ -166,60 +181,14 @@ public class RegEventManager implements Runnable, RegEventListener
 		}
 	}
 
-	public void run()
-	{
-		while (true)
-		{
-			try
-			{
-				RegEvent e;
-				synchronized (_queue)
-				{
-					while (_queue.size() == 0)
-					{
-						try
-						{
-							_queue.wait();
-						}
-						catch (InterruptedException _)
-						{
-						}
-					}
-					e = _queue.removeFirst();
-				}
-	
-				Iterator<RegInfo> it = e.getRegInfos().iterator();
-				while (it.hasNext())
-				{
-					RegInfo regInfo = it.next();
-					String aor = regInfo.getAor();
-					synchronized (_subscriptions)
-					{
-						List<SipSession> l = _subscriptions.get(aor);
-						if (l != null)
-						{
-							Iterator<SipSession> it2 = l.iterator();
-							while (it2.hasNext())
-								sendNotification(e, it2.next(), "partial");	
-						}
-					}
-				}
-			} 
-			catch (Throwable e)
-			{
-				__log.warn("Got unexpected exception on regEvent manager", e);
-			}
-		}
-	}
-
 	protected void sendNotification(RegEvent e, SipSession session, String state)
 	{
 		try
 		{
 			session.setAttribute(ExpiryTask.LAST_EVENT, e);
-			final SipServletRequest notify = session.createRequest(Methods.NOTIFY);
+			SipServletRequest notify = session.createRequest(Methods.NOTIFY);
 			notify.setHeader(Headers.EVENT, REG_EVENT);
-			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session));
+			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session, e.isTerminated()));
 			Integer version = (Integer) session.getAttribute(NOTIFY_VERSION);
 			if (version == null)
 				version = new Integer(0);
@@ -239,18 +208,17 @@ public class RegEventManager implements Runnable, RegEventListener
 		}
 	}
 
-	private String getSubscriptionState(SipSession session)
+	private String getSubscriptionState(SipSession session, boolean terminated)
 	{
+		if (terminated)
+			return "terminated";
+		
 		Date absExpiry = (Date) session.getAttribute(ABSOLUTE_EXPIRES);
 		int expires = (int) (absExpiry.getTime() - System.currentTimeMillis()) / 1000;
 		if (expires <= 0)
-		{
 			return "terminated;reason=timeout";
-		}
 		else
-		{
 			return "active;expires=" + expires;
-		}
 	}
 	
 	private String generateRegInfo(RegEvent e, String state, int version)
@@ -266,7 +234,7 @@ public class RegEventManager implements Runnable, RegEventListener
 		{
 			RegInfo regInfo = it.next();
 			sb.append("<registration aor=\"").append(regInfo.getAor()).append("\" ");
-			sb.append("id=\"").append("123").append("\" ");
+			sb.append("id=\"").append(regInfo.getAor().hashCode()).append("\" ");
 			sb.append("state=\"").append(regInfo.getAorState().getValue()).append("\">\n");
 
 			Iterator<ContactInfo> it2 = regInfo.getContacts().iterator();

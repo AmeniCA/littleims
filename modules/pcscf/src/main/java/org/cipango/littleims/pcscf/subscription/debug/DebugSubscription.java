@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
@@ -26,7 +25,6 @@ import org.cipango.ims.pcscf.debug.data.DebuginfoDocument;
 import org.cipango.ims.pcscf.debug.data.DebugconfigDocument.Debugconfig;
 import org.cipango.ims.pcscf.debug.data.DebuginfoDocument.Debuginfo;
 import org.cipango.littleims.pcscf.subscription.Subscription;
-import org.cipango.littleims.util.Headers;
 
 public class DebugSubscription implements Subscription
 {
@@ -45,19 +43,7 @@ public class DebugSubscription implements Subscription
 		_session = session;
 		_aor = aor;
 	}
-	
-	public void handleSubscribeResponse(SipServletResponse response)
-	{
-		if (response.getStatus() > SipServletResponse.SC_MULTIPLE_CHOICES)
-		{
-			__log.warn("Debug subscription to " + _aor + " failed: " 
-					+ response.getStatus() + " " + response.getReasonPhrase());
-			invalidate();
-		}
-		else
-			_session.getApplicationSession().setExpires(response.getExpires() / 60 + 30);
-	}
-	
+		
 	public void handleNotify(SipServletRequest notify)
 	{
 		try
@@ -108,10 +94,6 @@ public class DebugSubscription implements Subscription
 					_configs.remove(debugConf);
 				}
 			}
-						
-			String state = notify.getHeader(Headers.SUBSCRIPTION_STATE);
-			if (state != null && state.startsWith("terminated"))
-				invalidate();
 		}
 		catch (Exception e)
 		{
@@ -119,7 +101,7 @@ public class DebugSubscription implements Subscription
 		}
 	}
 	
-	private void invalidate()
+	public void invalidate()
 	{
 		__log.debug("Remove debug subscription for user " + _aor);
 		_session.invalidate();

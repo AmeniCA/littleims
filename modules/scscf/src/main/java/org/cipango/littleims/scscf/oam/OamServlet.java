@@ -104,7 +104,7 @@ public class OamServlet extends HttpServlet
 				out.println("<tr>");
 				List<Binding> bindings = context.getBindings();
 				String tdRowspan = "<td rowspan=\"" + bindings.size() + "\">" ;
-				out.println(tdRowspan + context.getRegInfo().getAor() + "</td>");
+				out.println(tdRowspan + context.getPublicIdentity() + "</td>");
 				out.println(tdRowspan + context.getState().getValue() +  "</td>");
 				Iterator<Binding> it2 = bindings.iterator();
 				boolean first = true;
@@ -121,11 +121,11 @@ public class OamServlet extends HttpServlet
 					{
 						first = false;
 						out.println(tdRowspan);
-						printProfile(context.getRegInfo().getAor(), out);
+						printProfile(context.getPublicIdentity(), out);
 						out.println("</td>");
 					}
 					out.println("<td><form method=\"get\" action=\"#\">");
-					out.println("<input type=\"hidden\" name=\"aor\" value=\"" + context.getRegInfo().getAor() + "\"/>");
+					out.println("<input type=\"hidden\" name=\"aor\" value=\"" + context.getPublicIdentity() + "\"/>");
 					out.println("<input type=\"hidden\" name=\"privateIdentity\" value=\"" + binding.getPrivateUserIdentity() + "\"/>");
 					out.println("<input type=\"submit\" name=\"action\" value=\"Network-initiated reauthentication\"/>");
 					out.println("</form></td>");

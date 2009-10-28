@@ -65,40 +65,42 @@ public class RegEventService
 					}
 				}
 			}
-			
-			RegSubscription subscription = _subscriptions.get(privateIdentity);
-			
-			if (subscription == null || !subscription.getSession().isValid())
+			synchronized (_subscriptions)
 			{
-				SipServletRequest request = _sipFactory.createRequest(
-						_sipFactory.createApplicationSession(),
-						Methods.SUBSCRIBE,
-						_pcscfUri,
-						aor);
-				request.addHeader(Headers.EVENT, EVENT_REG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
-				request.setExpires(expires);
-				if (_userAgent != null)
-					request.setHeader(Headers.USER_AGENT, _userAgent);
-					
-				subscription = new RegSubscription(this, request.getSession(), aor.toString());
-				_subscriptions.put(privateIdentity, subscription);
-				request.getApplicationSession().setAttribute(Subscription.class.getName(), 
-						subscription);
-				request.getSession().setHandler(SubscriptionServlet.class.getSimpleName());
-				request.send();
-				_log.debug("Start reg subscription of user " + aor);
-			}
-			else
-			{
-				SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
-				request.addHeader(Headers.EVENT, EVENT_REG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
-				request.setExpires(expires);
-				if (_userAgent != null)
-					request.setHeader(Headers.USER_AGENT, _userAgent);
-				request.send();
-			}
+				RegSubscription subscription = _subscriptions.get(privateIdentity);
+				
+				if (subscription == null || !subscription.getSession().isValid())
+				{
+					SipServletRequest request = _sipFactory.createRequest(
+							_sipFactory.createApplicationSession(),
+							Methods.SUBSCRIBE,
+							_pcscfUri,
+							aor);
+					request.addHeader(Headers.EVENT, EVENT_REG);
+					request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
+					request.setExpires(expires);
+					if (_userAgent != null)
+						request.setHeader(Headers.USER_AGENT, _userAgent);
+						
+					subscription = new RegSubscription(this, request.getSession(), aor.toString(), privateIdentity);
+					_subscriptions.put(privateIdentity, subscription);
+					request.getApplicationSession().setAttribute(Subscription.class.getName(), 
+							subscription);
+					request.getSession().setHandler(SubscriptionServlet.class.getSimpleName());
+					request.send();
+					_log.debug("Start reg subscription of user " + aor);
+				}
+				else
+				{
+					SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
+					request.addHeader(Headers.EVENT, EVENT_REG);
+					request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
+					request.setExpires(expires);
+					if (_userAgent != null)
+						request.setHeader(Headers.USER_AGENT, _userAgent);
+					request.send();
+				}
+			}		
 		}
 		catch (Exception e)
 		{
@@ -147,6 +149,8 @@ public class RegEventService
 		synchronized (_registeredUsers)
 		{
 			Iterator<String> it = identities.iterator();
+			List<String> previous = fullState ? _registeredUsers.put(identities.get(0), identities) : null;
+			
 			while (it.hasNext())
 			{
 				String identity = (String) it.next();
@@ -154,6 +158,8 @@ public class RegEventService
 				if (fullState)
 				{
 					_registeredUsers.put(identity, identities);
+					if (previous != null)
+						previous.remove(identity);
 				}
 				else
 				{
@@ -167,6 +173,17 @@ public class RegEventService
 						l.add(identity);
 				}
 			}
+			
+			if (previous != null)
+				removeIdentitie(previous);
+		}
+	}
+	
+	protected void removeSubscription(RegSubscription subscription)
+	{
+		synchronized (_subscriptions)
+		{
+			_subscriptions.remove(subscription.getPrivateIdentity());
 		}
 	}
 	

@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.pcscf.PcscfService;
 import org.cipango.littleims.pcscf.subscription.debug.DebugConf;
 import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
@@ -41,7 +40,6 @@ public class OamServlet extends HttpServlet
 
 	private DebugIdService _debugIdService;
 	private PcscfService _pcscfService;
-	private static final Logger __log = Logger.getLogger(OamServlet.class);
 	
 	public void init() throws ServletException
 	{
@@ -102,7 +100,7 @@ public class OamServlet extends HttpServlet
 
 		out.println("<h2>Reg subscriptions</h2>");
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
-		"<th>Subscription AOR</th><th>Version</th>");
+		"<th>Subscription AOR</th><th>Private identity</th><th>Version</th>");
 
 		Iterator<RegSubscription> it = _pcscfService.getRegEventService().getRegSubscriptions();
 		synchronized (it)
@@ -112,6 +110,7 @@ public class OamServlet extends HttpServlet
 				RegSubscription subscription = it.next();				
 				out.println("<tr>");
 				out.println("<td>" + subscription.getAor() + "</td>");
+				out.println("<td>" + subscription.getPrivateIdentity() + "</td>");
 				out.println("<td>" + subscription.getVersion() + "</td>");
 				out.println("</tr>");
 			}
