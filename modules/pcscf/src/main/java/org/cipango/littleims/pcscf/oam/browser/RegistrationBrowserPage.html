@@ -1,0 +1,39 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1 wicket:id="title"></h1>
+  	
+  	<h2>Registered users</h2>
+  	<table class="filteredTable" >
+        <tr>
+            <th>AOR</th>
+            <th>Associated identities</th>
+        </tr>
+        <tr wicket:id="registrations">
+            <td><span wicket:id="aor"/></td>
+            <td>
+                <ul>
+                    <li wicket:id="associated"><span wicket:id="identity"/></li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+  	
+  	<h2>Registrations subscriptions</h2>
+  	<table class="filteredTable">
+  	    <tr>
+            <th>AOR</th>
+            <th>Private identity</th>
+            <th>version</th>
+        </tr>
+        <tr wicket:id="subscriptions">
+            <td><span wicket:id="aor"/></td>
+            <td><span wicket:id="privateIdentity"/></td>
+            <td><span wicket:id="version"/></td>
+        </tr>
+  	</table>
+  </div>
+</wicket:extend>
+</body>
+</html>

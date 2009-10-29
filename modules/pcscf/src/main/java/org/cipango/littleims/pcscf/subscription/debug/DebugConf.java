@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.subscription.debug;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import javax.servlet.sip.SipServletRequest;
 
 import org.cipango.ims.pcscf.debug.data.SessionDocument.Session;
 
-public class DebugConf
+public class DebugConf implements Serializable
 {
 	private List<DebugSession> _sessions = new ArrayList<DebugSession>();
 	private String _aor;

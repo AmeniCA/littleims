@@ -1,0 +1,154 @@
+body {
+	font-family:Arial,verdana,Helvetica,sans-serif;
+    font-size:12px;
+    font-size-adjust:none;
+    font-style:normal;
+    font-variant:normal;
+    font-weight:normal;
+    line-height:normal;
+    padding: 0px;
+    margin: 0px;
+}
+
+#contentContainer {
+}
+
+#content {
+     left:50px;
+    margin:8px 8px 8px 10em;
+    position:absolute;
+}
+
+#footer {
+	padding: 20px 0px;
+	clear: both;
+	font-size: 80%;
+}
+
+#loginPanel { width:400px; font-size:16px; padding: 4px; background:#ECF2F6; margin:20px 0 0; text-align:left;}
+#loginPanel div {padding: 4px; }
+#loginPanel .label { width:150px; text-align:right; float:left; margin:0 4px 0 0;}
+#loginPanel .title { font-size:20px; text-align:center;}
+#loginPanel .button { text-align:center; padding: 10px; }
+
+h2 {margin: 5px 0px; }
+
+
+th { background:#0068B2 none repeat scroll 0% 50%; color:#FFFFFF; font-weight:bold; line-height: 120%; text-align:left; }
+tr.odd { background-color: #ECF2F6; }
+tr.even { background-color: #FFFFFF; }
+
+a {color:#003399;}
+
+
+/* ------------------------------------------------------------------------- */
+/*                                Wicket                                     */
+/* ------------------------------------------------------------------------- */
+
+.dataDetails { width:400px; border-collapse:collapse; border-color:#BBBBBB; border-style:dashed; border-width:0pt 1px 1px; margin:10px 0px 0pt 0pt; }
+.dataDetails td { padding: 4px; }
+.dataDetails th { text-align:left; vertical-align:top; color: black; background:white; font-weight:normal; white-space:nowrap; padding:3px; }
+.dataDetails .description { color:#555555;}
+.dataDetails .defaultValue { font-style:italic; margin:0px 30px; }
+.dataDetails ul {padding:0pt; margin: 0px;}
+.dataDetails li {list-style: none; padding: 2px;}
+.dataDetails .longText { width: 300px; }
+.actions { color: black; background:white; width:400px; margin:10px 0px 0pt 0pt; }
+.actions th { text-align:left; vertical-align:top; color: black; background:white; font-weight:normal; white-space:nowrap; padding:3px; }
+
+.dataDetails .title th { background-color: #CCCCCC; padding:4px;}
+
+.feedbackPanelERROR { color:#FF0000; }
+.feedbackPanelWARNING { color:#FF0000; }
+.feedbackPanelINFO { }
+.feedback li {list-style: none;}
+
+
+table.filteredTable tr th { padding: 3px 24px 3px 8px; text-align: left; white-space: nowrap; vertical-align: middle;}
+table.filteredTable tr th a { padding-right: 15px; background-position: right; background-repeat:no-repeat; color:white; text-decoration: none; }
+table.filteredTable tr th.wicket_orderDown a { background-image: url(arrow_down.png); }
+table.filteredTable tr th.wicket_orderUp a { background-image: url(arrow_up.png); }
+table.filteredTable tr th.wicket_orderNone a { background-image: url(arrow_off.png); }
+table.filteredTable tr td { padding:4px;}
+table.filteredTable tr td span li  {list-style: none;}
+
+.filter { background-color:#fffff0; border:1px solid #BBBBBB; padding:5px 30px;}
+.filter li {list-style: none; display: inline; padding: 30px;}
+
+.editUserGroup div { display:inline; padding:10px 40px; float:left;}
+.editUserGroup div li {list-style: none; padding:5px; text-align:center;}
+
+#quicklinks {clear:right; float:right; margin:5px 0pt; padding:5px; width:15em;}
+#quicklinks li {list-style: none;}
+
+.longInput {width:20em; }
+
+#bysy_indicator {
+  display: none;
+  background: rgb(255,241,168);
+  margin-top: 5px;
+  z-index: 1000;
+  width: 200;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
+.elementPanel { 
+    width:700px;
+    border-color:#BBBBBB;
+    border-style:dashed;
+    border-width:0pt 1px 1px;
+    margin:10px 0px 0pt 0pt;
+}
+.elementPanel .title { background-color: #CCCCCC; padding:4px;}
+.elementPanel .title .hideLink { float:right; text-decoration:underline; color:#003399;}
+.elementPanel .title a { float:none; text-decoration:none; color:#000000;}
+.elementPanel .body {padding:4px;}
+.elementPanel .body a { float:none;}
+.elementPanel .body ul {padding:0px 10px;}
+.elementPanel .body ul li {list-style-type:none; }
+
+/* Autocomplete field */
+div.wicket-aa { font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; font-size: 12px;
+                 background-color: white; border-width: 1px; border-color: #cccccc; border-style: solid;
+                 padding: 2px; margin: 1px 0 0 0; text-align:left; }
+div.wicket-aa ul { list-style:none; padding: 2px; margin:0; }
+div.wicket-aa ul li.selected { background-color: #FFFF00; padding: 2px; margin:0; }
+
+.pprPanel .details { background:#FFFFFF; position: absolute; left: -999em; padding: 5px;}
+.pprPanel:hover .details{ left: auto; }
+.pprPanel:sfhover .details{ left: auto; }
+
+/* ------------------------------------------------------------------------- */
+/*                                Menu                                       */
+/* ------------------------------------------------------------------------- */
+
+#header {
+    line-height:1; 
+    overflow:hidden;
+    padding:0pt 2px 0pt 4px;
+}
+
+#logo { 
+    font-size:16px;
+    padding:5px;
+    float:left;
+}
+
+#statusBar { height:20px; line-height:20px; padding: 0px; text-align:right; margin: 6px 10px 0px 0px; font-size:8pt; vertical-align:bottom;}
+#statusBar .link-delimiter {padding:0px 4px; color: #A0A0A0;}
+
+#nav-container {background-color:#0068B2; margin:0px;float:left; padding:0pt; width:100%;}
+#nav-container ul { float:left; margin:0pt; padding:0pt; width:auto;}
+#nav-container ul li {float:left; list-style-type:none; margin:0pt; padding:0pt; width:auto;}
+#nav-container ul li a {display:block; font-weight:700; margin:0pt; padding:6px 7px; text-decoration:none; text-transform:uppercase; color:#FFFFFF;}
+#nav-container ul li a:hover { color:#0068B2; background-color:#FFFFFF;}
+#nav-container ul li span em { color:#0068B2; background-color:#FFFFFF; display:block; font-weight:700; margin:0pt; padding:6px 7px; text-transform:uppercase;}
+
+.contextMenu {width:200px; float:left; min-width:10em;}
+.contextMenu ul {padding:0pt 0pt 0pt 15pt; }
+.contextMenu li { list-style-image:none; list-style-position:outside; list-style-type:square; padding:5px 0pt;}
+.contextMenu ul li ul {padding:0pt 0pt 0pt 5pt; }
+.contextMenu a {text-decoration: none; color:#000000; }
+.contextMenu a:hover {text-decoration: underline; }

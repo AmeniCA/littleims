@@ -176,14 +176,14 @@ public class DebugIdService
 		_subscriptions.remove(subscription.getAor());
 	}
 	
-	public Iterator<DebugConf> getDebugConfs()
+	public Map<String, DebugConf> getDebugConfs()
 	{
-		return _confs.values().iterator();
+		return _confs;
 	}
 	
-	public Iterator<DebugSubscription> getDebugSubscriptions()
+	public Map<String, DebugSubscription> getDebugSubscriptions()
 	{
-		return _subscriptions.values().iterator();
+		return _subscriptions;
 	}
 
 	public SipFactory getSipFactory()

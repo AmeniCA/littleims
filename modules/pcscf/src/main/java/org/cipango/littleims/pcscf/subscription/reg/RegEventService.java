@@ -108,9 +108,9 @@ public class RegEventService
 		}
 	}
 	
-	public Iterator<RegSubscription> getRegSubscriptions()
+	public Map<String, RegSubscription> getRegSubscriptions()
 	{
-		return _subscriptions.values().iterator();
+		return _subscriptions;
 	}
 	
 	public Map<String, List<String>> getRegisteredUsers()
@@ -121,6 +121,14 @@ public class RegEventService
 	public boolean isRegistered(URI aor)
 	{
 		return _registeredUsers.containsKey(aor.toString());
+	}
+	
+	public List<String> getAssociatedUris(URI aor)
+	{
+		synchronized (_registeredUsers)
+		{
+			return _registeredUsers.get(aor.toString());
+		}
 	}
 	
 	protected void removeIdentitie(List<String> identities)

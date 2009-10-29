@@ -15,7 +15,8 @@
   </context-param>
     
   <filter>
-    <filter-name>osiv</filter-name> <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+    <filter-name>osiv</filter-name> 
+    <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
   </filter>
   
   <filter>
@@ -34,7 +35,7 @@
 
   <filter-mapping>
     <filter-name>wicket</filter-name>
-  <url-pattern>/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
     
   <listener>

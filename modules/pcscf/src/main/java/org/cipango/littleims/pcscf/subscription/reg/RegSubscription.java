@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.subscription.reg;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +26,15 @@ import org.cipango.ims.pcscf.reg.data.ReginfoDocument.Reginfo;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration.State;
 import org.cipango.littleims.pcscf.subscription.Subscription;
+import org.springframework.transaction.annotation.Transactional;
 
-public class RegSubscription implements Subscription
+public class RegSubscription implements Subscription, Serializable
 {
 	
 	private static final Logger __log = Logger.getLogger(RegSubscription.class);
 	
 	private int _version = -1;
-	private RegEventService _regService;
+	private transient RegEventService _regService;
 	private SipSession _session;
 	private String _aor;
 	private String _privateIdentity;

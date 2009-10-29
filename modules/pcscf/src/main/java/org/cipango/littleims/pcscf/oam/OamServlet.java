@@ -64,8 +64,9 @@ public class OamServlet extends HttpServlet
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>Subscription AOR</th><th>Version</th><th>Conf AOR</th><th>Nb sessions</th>");
 
-		Iterator<DebugSubscription> it = _debugIdService.getDebugSubscriptions();
-		synchronized (it)
+		Map<String, DebugSubscription> map = _debugIdService.getDebugSubscriptions();
+		Iterator<DebugSubscription> it = map.values().iterator();
+		synchronized (map)
 		{
 			while (it.hasNext())
 			{
@@ -102,8 +103,10 @@ public class OamServlet extends HttpServlet
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>Subscription AOR</th><th>Private identity</th><th>Version</th>");
 
-		Iterator<RegSubscription> it = _pcscfService.getRegEventService().getRegSubscriptions();
-		synchronized (it)
+		Map<String, RegSubscription> map = _pcscfService.getRegEventService().getRegSubscriptions();
+		
+		Iterator<RegSubscription> it = map.values().iterator();
+		synchronized (map)
 		{
 			while (it.hasNext())
 			{
@@ -156,8 +159,9 @@ public class OamServlet extends HttpServlet
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>AOR</th><th>Session ID</th><th>Start trigger</th><th>Stop trigger</th><th>Debug ID</th>");
 
-		Iterator<DebugConf> it = _debugIdService.getDebugConfs();
-		synchronized (it)
+		Map<String, DebugConf> map = _debugIdService.getDebugConfs();
+		Iterator<DebugConf> it = map.values().iterator();
+		synchronized (map)
 		{
 			while (it.hasNext())
 			{

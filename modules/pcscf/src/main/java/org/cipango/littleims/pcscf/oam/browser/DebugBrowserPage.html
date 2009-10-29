@@ -1,0 +1,43 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1 wicket:id="title"></h1>
+  	
+  	<h2>Debug configurations</h2>
+  	<table class="filteredTable">
+        <tr>
+            <th>AOR</th>
+            <th>Sessions</th>
+        </tr>
+        <tr wicket:id="debugConfs">
+            <td><span wicket:id="aor"/></td>
+            <td wicket:id="debugSessions">
+                <div class="elementPanel" wicket:id="session"/>
+            </td>
+        </tr>
+    </table>
+  	
+  	<h2>Debug subscriptions</h2>
+  	<table class="filteredTable">
+  	    <tr>
+            <th>Subscription AOR</th>
+            <th>version</th>
+            <th>Sessions</th>
+        </tr>
+        <tr wicket:id="subscriptions">
+            <td><span wicket:id="aor"/></td>
+            <td><span wicket:id="version"/></td>  
+            <td>
+                <ul>
+                    <li wicket:id="configs">
+                        <span wicket:id="aor"/> (<span wicket:id="nbSessions"/> sessions)
+                    </li>
+                </ul>
+            </td>
+        </tr>
+  	</table>
+  </div>
+</wicket:extend>
+</body>
+</html>

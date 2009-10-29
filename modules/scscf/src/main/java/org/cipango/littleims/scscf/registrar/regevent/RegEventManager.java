@@ -164,14 +164,10 @@ public class RegEventManager implements RegEventListener
 		ExpiryTask task = (ExpiryTask) session.getAttribute(ExpiryTask.class.getName());
 
 		if (task != null)
-		{
 			task.cancel();
-		}
 
 		if (expires == 0)
-		{
 			session.getApplicationSession().invalidate();
-		}
 		else
 		{
 			task = new ExpiryTask(session, this);

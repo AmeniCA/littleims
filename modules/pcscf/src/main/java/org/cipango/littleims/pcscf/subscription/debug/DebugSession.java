@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.subscription.debug;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ import org.cipango.ims.pcscf.debug.data.StopTriggerDocument.StopTrigger;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 
-public class DebugSession
+public class DebugSession implements Serializable
 {
 	private final Logger __log = Logger.getLogger(DebugSession.class);
 	private String _id;

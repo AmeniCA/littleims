@@ -105,6 +105,13 @@
 		<property name="debugIdService" ref="debugIdService" />
 		<property name="regEventService" ref="regEventService" />
 	</bean>
+	
+	<bean id="webApplication" 
+			class="org.cipango.littleims.pcscf.oam.OamApplication" 
+			factory-method="getInstance"
+			init-method="springStart"
+			destroy-method="springStop">
+	</bean>
 
 </beans>
 
