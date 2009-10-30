@@ -19,8 +19,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.littleims.pcscf.oam.HideableLink;
@@ -43,7 +45,7 @@ public class DebugSessionPanel extends Panel
 		_debugId = debugSession.getDebugId();
 		refreshLog();
 		
-		add(new AjaxFallbackLink("viewLog")
+		AjaxFallbackLink viewLink = new AjaxFallbackLink("viewLog")
 		{
 
 			@Override
@@ -51,12 +53,45 @@ public class DebugSessionPanel extends Panel
 			{
 				_viewLog = true;
 				refreshLog();
+				Component hideLink = getParent().get("hideLog");
+				hideLink.setVisible(true);
+				Component refresh = new Label("view", "Refresh log").setOutputMarkupId(true);
+				replace(refresh);
 				if (target != null)
+				{
 					target.addComponent(getParent().get("content"));
+					target.addComponent(hideLink);
+					target.addComponent(refresh);
+				}
 			}
-		});
+		};
+		add(viewLink);
+		viewLink.setOutputMarkupId(true);
+		viewLink.add(new Label("view", "View log").setOutputMarkupId(true));
 		
-		
+		AjaxFallbackLink hideLink = new AjaxFallbackLink("hideLog")
+		{
+
+			@Override
+			public void onClick(AjaxRequestTarget target)
+			{
+				_viewLog = false;
+				setVisible(false);
+				Component refresh = new Label("view", "View log").setOutputMarkupId(true);
+				((WebMarkupContainer) getParent().get("viewLog")).replace(refresh);
+				refreshLog();
+				if (target != null)
+				{
+					target.addComponent(getParent().get("content"));
+					target.addComponent(this);
+					target.addComponent(refresh);
+				}
+			}
+		};
+		add(hideLink);
+		hideLink.setVisible(false);
+		hideLink.setOutputMarkupId(true);
+		hideLink.setOutputMarkupPlaceholderTag(true);
 	}
 	
 	private void refreshLog()

@@ -34,7 +34,7 @@ import org.cipango.littleims.util.Methods;
 
 public class DebugSession implements Serializable
 {
-	private final Logger __log = Logger.getLogger(DebugSession.class);
+	private static final Logger __log = Logger.getLogger(DebugSession.class);
 	private String _id;
 	private List<Trigger> _startTriggers = new ArrayList<Trigger>();
 	private List<Trigger> _stopTriggers = new ArrayList<Trigger>();
@@ -150,7 +150,7 @@ public class DebugSession implements Serializable
 		message.getApplicationSession().removeAttribute(DebugSession.class.getName());
 	}
 	
-	private interface Trigger
+	private interface Trigger extends Serializable
 	{
 		public boolean match(SipServletMessage message);
 	}

@@ -3,11 +3,6 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-
-	<servlet>
-		<servlet-name>oam</servlet-name>
-		<servlet-class>org.cipango.littleims.pcscf.oam.OamServlet</servlet-class>
-	</servlet>
 	
 	<filter>
     <filter-name>wicket</filter-name>
@@ -17,11 +12,6 @@
       <param-value>org.apache.wicket.spring.SpringWebApplicationFactory</param-value>
     </init-param>
   </filter>
-	
-	<servlet-mapping>
-		<servlet-name>oam</servlet-name>
-		<url-pattern>/oam</url-pattern>
-	</servlet-mapping>
 	
   <filter-mapping>
     <filter-name>wicket</filter-name>

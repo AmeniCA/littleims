@@ -15,9 +15,11 @@ package org.cipango.littleims.pcscf.oam;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.cipango.littleims.pcscf.oam.browser.DebugBrowserPage;
 import org.cipango.littleims.pcscf.oam.browser.RegistrationBrowserPage;
+import org.cipango.littleims.pcscf.oam.browser.UserPage;
 
 public class OamApplication extends WebApplication
 {
@@ -56,6 +58,9 @@ public class OamApplication extends WebApplication
 		springStart();
 		mountBookmarkablePage("/registrations", RegistrationBrowserPage.class); 
 		mountBookmarkablePage("/debug-id", DebugBrowserPage.class); 
+		String[] id = new String[] {"id"};
+		
+		mount(new MixedParamUrlCodingStrategy("/user", UserPage.class, id));
 	}
 
 	/**

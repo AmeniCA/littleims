@@ -13,7 +13,6 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.oam.browser;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,10 @@ import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.littleims.pcscf.oam.AbstractListDataProvider;
+import org.cipango.littleims.pcscf.oam.AorLink;
 import org.cipango.littleims.pcscf.oam.BasePage;
 import org.cipango.littleims.pcscf.subscription.reg.RegEventService;
 import org.cipango.littleims.pcscf.subscription.reg.RegSubscription;
@@ -56,7 +58,6 @@ public class RegistrationBrowserPage extends BasePage
 			l = new ArrayList(_service.getRegisteredUsers().keySet());
 			Collections.sort(l);
 		}
-
 		
 		DataView dataView = new DataView("registrations", new ListDataProvider(l))
 		{
@@ -64,7 +65,8 @@ public class RegistrationBrowserPage extends BasePage
 			@Override
 			protected void populateItem(final Item item)
 			{
-				item.add(new Label("aor", item.getModel()));
+				item.add(new AorLink("aorLink", (String) item.getModelObject()));
+				
 				List l2 = _service.getRegisteredUsers().get(item.getModelObject().toString());
 				item.add(new ListView("associated", l2)
 				{
@@ -72,7 +74,7 @@ public class RegistrationBrowserPage extends BasePage
 					@Override
 					protected void populateItem(ListItem item)
 					{
-						item.add(new Label("identity", item.getModel()));
+						item.add(new AorLink("aorLink", (String) item.getModelObject()));
 					}
 					
 				});
@@ -95,17 +97,21 @@ public class RegistrationBrowserPage extends BasePage
 	@SuppressWarnings("unchecked")
 	private void addSubscriptions()
 	{
-		List l;
-		synchronized (_service.getRegSubscriptions())
-		{
-			l = new ArrayList(_service.getRegSubscriptions().values());
-		}
-		IDataProvider provider = new ListDataProvider(l)
+		IDataProvider provider = new AbstractListDataProvider<RegSubscription>()
 		{
 			
-			public IModel model(Serializable object)
+			public IModel<RegSubscription> model(RegSubscription o)
 			{
-				return new CompoundPropertyModel(object);
+				return new CompoundPropertyModel<RegSubscription>(new LoadableSubscription(o));
+			}
+
+			@Override
+			public List<RegSubscription> load()
+			{
+				synchronized (_service.getRegSubscriptions())
+				{
+					return new ArrayList(_service.getRegSubscriptions().values());
+				}
 			}		
 		};
 		
@@ -116,7 +122,7 @@ public class RegistrationBrowserPage extends BasePage
 			@Override
 			protected void populateItem(final Item<RegSubscription> item)
 			{
-				item.add(new Label("aor"));
+				item.add(new AorLink("aorLink", item.getModelObject().getAor()));
 				item.add(new Label("privateIdentity"));
 				item.add(new Label("version"));
 
@@ -141,4 +147,20 @@ public class RegistrationBrowserPage extends BasePage
 		return "Registrations";
 	}
 	
+	class LoadableSubscription extends LoadableDetachableModel<RegSubscription>
+	{
+		private String _key;
+	
+		public LoadableSubscription(RegSubscription o)
+		{
+			super(o);
+			_key = o.getPrivateIdentity();
+		}
+	
+		@Override
+		protected RegSubscription load()
+		{
+			return _service.getRegSubscriptions().get(_key);
+		}
+	}
 }

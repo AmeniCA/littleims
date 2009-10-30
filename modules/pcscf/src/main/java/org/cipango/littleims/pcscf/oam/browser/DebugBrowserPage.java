@@ -38,6 +38,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.littleims.pcscf.oam.AbstractListDataProvider;
+import org.cipango.littleims.pcscf.oam.AorLink;
 import org.cipango.littleims.pcscf.oam.BasePage;
 import org.cipango.littleims.pcscf.subscription.debug.DebugConf;
 import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
@@ -80,7 +81,7 @@ public class DebugBrowserPage extends BasePage
 			protected void populateItem(final Item item)
 			{
 				DebugConf debugConf = (DebugConf) item.getModelObject();
-				item.add(new Label("aor", debugConf.getAor()));
+				item.add(new AorLink("aorLink", debugConf.getAor()));
 				item.add(new ListView("debugSessions", debugConf.getSessions())
 				{
 
@@ -111,17 +112,21 @@ public class DebugBrowserPage extends BasePage
 	@SuppressWarnings("unchecked")
 	private void addSubscriptions()
 	{
-		List l;
-		synchronized (_service.getDebugSubscriptions())
-		{
-			l = new ArrayList(_service.getDebugSubscriptions().values());
-		}
-		IDataProvider provider = new AbstractListDataProvider<DebugSubscription>(l)
+		IDataProvider provider = new AbstractListDataProvider<DebugSubscription>()
 		{
 			
 			public IModel<DebugSubscription> model(DebugSubscription o)
 			{
 				return new CompoundPropertyModel<DebugSubscription>(new LoadableSubscription(o));
+			}
+
+			@Override
+			public List<DebugSubscription> load()
+			{
+				synchronized (_service.getDebugSubscriptions())
+				{
+					return new ArrayList(_service.getDebugSubscriptions().values());
+				}
 			}		
 		};
 		
@@ -157,7 +162,7 @@ public class DebugBrowserPage extends BasePage
 					protected void populateItem(Item item2)
 					{
 						DebugConf debugConf = (DebugConf) item2.getModelObject();
-						item2.add(new Label("aor", debugConf.getAor()));
+						item2.add(new AorLink("aorLink", debugConf.getAor()));
 						item2.add(new Label("nbSessions", String.valueOf(debugConf.getSessions().size())));
 					}
 					

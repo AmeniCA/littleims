@@ -1,5 +1,5 @@
 // ========================================================================
-// Copyright 2008-2009 NEXCOM Systems
+// Copyright 2009 NEXCOM Systems
 // ------------------------------------------------------------------------
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,41 +13,19 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.oam;
 
-import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.cipango.littleims.pcscf.oam.browser.UserPage;
 
-public abstract class BasePage extends WebPage
+@SuppressWarnings("unchecked")
+public class AorLink extends BookmarkablePageLink
 {
-	public BasePage()
+
+	public AorLink(String id, String aor)
 	{
-		add(new HeaderPanel().setRenderBodyOnly(true));
-		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+		super("aorLink", UserPage.class, new PageParameters("id=" + aor));
+		add(new Label("aor", aor));
 	}
 
-	public void setContextMenu(Component panel)
-	{
-		panel.setOutputMarkupId(true);
-		addOrReplace(panel);
-	}
-
-
-	public abstract String getTitle();
-
-	@Override
-	protected void onBeforeRender()
-	{
-		super.onBeforeRender();
-		// The title can need subclass construction done
-		if (get("page.title") == null)
-		{
-			add(new Label("page.title", "P-CSCF :: " + getTitle()));
-		}
-	}
-
-	public int getItemByPage()
-	{
-		return 20;
-	}
 }

@@ -35,34 +35,21 @@ public abstract class AbstractListDataProvider<T> implements IDataProvider<T>
 	private static final long serialVersionUID = 1L;
 
 	/** reference to the list used as dataprovider for the dataview */
-	private final List<T> list;
-
-	/**
-	 * 
-	 * @param list
-	 *            the list used as dataprovider for the dataview
-	 */
-	public AbstractListDataProvider(List<T> list)
-	{
-		if (list == null)
-		{
-			throw new IllegalArgumentException("argument [list] cannot be null");
-		}
-
-		this.list = list;
-	}
+	private List<T> _list;
 
 	/**
 	 * @see IDataProvider#iterator(int, int)
 	 */
 	public Iterator<? extends T> iterator(final int first, final int count)
 	{
+		if (_list == null)
+			_list = load();
 		int toIndex = first + count;
-		if (toIndex > list.size())
+		if (toIndex > _list.size())
 		{
-			toIndex = list.size();
+			toIndex = _list.size();
 		}
-		return list.subList(first, toIndex).listIterator();
+		return _list.subList(first, toIndex).listIterator();
 	}
 
 	/**
@@ -70,7 +57,9 @@ public abstract class AbstractListDataProvider<T> implements IDataProvider<T>
 	 */
 	public int size()
 	{
-		return list.size();
+		if (_list == null)
+			_list = load();
+		return _list.size();
 	}
 
 	/**
@@ -78,6 +67,9 @@ public abstract class AbstractListDataProvider<T> implements IDataProvider<T>
 	 */
 	public void detach()
 	{
+		_list = null;
 	}
+	
+	public abstract List<T> load();
 
 }

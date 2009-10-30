@@ -11,7 +11,7 @@
             <th>Sessions</th>
         </tr>
         <tr wicket:id="debugConfs">
-            <td><span wicket:id="aor"/></td>
+            <td><A wicket:id="aorLink"><span wicket:id="aor"/></A></td>
             <td wicket:id="debugSessions">
                 <div class="elementPanel" wicket:id="session"/>
             </td>
@@ -31,7 +31,7 @@
             <td>
                 <ul>
                     <li wicket:id="configs">
-                        <span wicket:id="aor"/> (<span wicket:id="nbSessions"/> sessions)
+                        <A wicket:id="aorLink"><span wicket:id="aor"/></A> (<span wicket:id="nbSessions"/> sessions)
                     </li>
                 </ul>
             </td>

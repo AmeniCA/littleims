@@ -11,10 +11,12 @@
             <th>Associated identities</th>
         </tr>
         <tr wicket:id="registrations">
-            <td><span wicket:id="aor"/></td>
+            <td><A wicket:id="aorLink"><span wicket:id="aor"/></A></td>
             <td>
                 <ul>
-                    <li wicket:id="associated"><span wicket:id="identity"/></li>
+                    <li wicket:id="associated">
+                        <A wicket:id="aorLink"><span wicket:id="aor"/></A>
+                    </li>
                 </ul>
             </td>
         </tr>
@@ -28,7 +30,7 @@
             <th>version</th>
         </tr>
         <tr wicket:id="subscriptions">
-            <td><span wicket:id="aor"/></td>
+            <td><A wicket:id="aorLink"><span wicket:id="aor"/></A></td>
             <td><span wicket:id="privateIdentity"/></td>
             <td><span wicket:id="version"/></td>
         </tr>
