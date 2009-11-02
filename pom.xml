@@ -120,6 +120,21 @@
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.wicket</groupId>
+        <artifactId>wicket</artifactId>
+        <version>${wicket.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.wicket</groupId>
+        <artifactId>wicket-extensions</artifactId>
+        <version>${wicket.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.wicket</groupId>
+        <artifactId>wicket-spring</artifactId>
+        <version>${wicket.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   
