@@ -12,11 +12,12 @@
 // limitations under the License.
 // ========================================================================
 
-package org.cipango.ims.hss.web.util;
+package org.cipango.ims.oam.util;
 
 import java.util.Random;
 
-import org.cipango.ims.hss.util.HexString;
+import org.cipango.littleims.util.HexString;
+
 
 public abstract class ID 
 {
@@ -35,7 +36,7 @@ public abstract class ID
     	{
         	__random.nextBytes(b);
 		}
-    	return HexString.toHexString(b);
+    	return HexString.bufferToHex(b);
     }
 
     public static String newTag() 

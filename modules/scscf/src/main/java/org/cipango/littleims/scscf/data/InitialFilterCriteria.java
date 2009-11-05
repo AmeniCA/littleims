@@ -13,12 +13,14 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data;
 
+import java.io.Serializable;
+
 import javax.servlet.sip.SipServletRequest;
 
 import org.cipango.littleims.scscf.data.trigger.CriteriaMatch;
 
 
-public class InitialFilterCriteria
+public class InitialFilterCriteria implements Serializable
 {
 
 	private int _priority;
@@ -61,7 +63,7 @@ public class InitialFilterCriteria
 		return _priority;
 	}
 
-	public AS getAS()
+	public AS getAs()
 	{
 		return _as;
 	}

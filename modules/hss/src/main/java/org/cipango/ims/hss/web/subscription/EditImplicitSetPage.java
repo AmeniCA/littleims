@@ -47,8 +47,8 @@ import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
-import org.cipango.ims.hss.web.util.AjaxFallbackButton;
-import org.cipango.ims.hss.web.util.StringModelIterator;
+import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.StringModelIterator;
 
 
 public class EditImplicitSetPage extends SubscriptionPage

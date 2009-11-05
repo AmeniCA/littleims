@@ -33,12 +33,12 @@ import org.cipango.ims.hss.model.DebugSession;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
+import org.cipango.ims.hss.web.UriValidator;
 import org.cipango.ims.hss.web.publicid.ContextPanel;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.publicid.PsiContextPanel;
-import org.cipango.ims.hss.web.util.ID;
-import org.cipango.ims.hss.web.util.MethodField;
-import org.cipango.ims.hss.web.util.UriValidator;
+import org.cipango.ims.oam.util.ID;
+import org.cipango.ims.oam.util.MethodField;
 
 public class EditDebugSessionPage extends DebugSessionPage
 {

@@ -16,7 +16,8 @@ package org.cipango.littleims.scscf.registrar.regevent;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cipango.littleims.scscf.registrar.ContactEvent;
+import org.cipango.littleims.scscf.registrar.Context.ContactEvent;
+import org.cipango.littleims.scscf.registrar.Context.RegState;
 
 
 public class RegInfo

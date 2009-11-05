@@ -3,8 +3,8 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-	
-	<filter>
+
+  <filter>
     <filter-name>wicket</filter-name>
     <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
     <init-param>
@@ -12,10 +12,10 @@
       <param-value>org.apache.wicket.spring.SpringWebApplicationFactory</param-value>
     </init-param>
   </filter>
-	
+
   <filter-mapping>
     <filter-name>wicket</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-	
+
 </web-app>

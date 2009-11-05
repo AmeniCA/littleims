@@ -25,7 +25,7 @@ import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.littleims.pcscf.oam.HideableLink;
+import org.cipango.ims.oam.util.HideableLink;
 import org.cipango.littleims.pcscf.subscription.debug.DebugSession;
 
 public class DebugSessionPanel extends Panel

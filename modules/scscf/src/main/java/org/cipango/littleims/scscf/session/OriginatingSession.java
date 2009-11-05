@@ -47,7 +47,7 @@ public class OriginatingSession extends Session
 		// 1. Check that user is not barred
 		if (getProfile() == null || getProfile().isBarred())
 		{
-			__log.info("Barred user: " + getProfile().getURI() + ". Sending 403 response");
+			__log.info("Barred user: " + getProfile().getUri() + ". Sending 403 response");
 			request.createResponse(SipServletResponse.SC_NOT_FOUND, "Barred identity").send();
 			return true;
 		}
@@ -68,13 +68,13 @@ public class OriginatingSession extends Session
 			ifcMatched = ifc.matches(request, _sessionCase);
 			if (ifcMatched)
 			{
-				SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAS().getURI());
+				SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAs().getURI());
 
-				__log.debug("IFC " +  ifc + " matched for user " + getProfile().getURI() + ". Forwarding request to: " + asURI);
+				__log.debug("IFC " +  ifc + " matched for user " + getProfile().getUri() + ". Forwarding request to: " + asURI);
 				request.pushRoute(getOwnURI());
 				request.pushRoute(asURI);
 				request.getProxy().setRecordRoute(false);
-				request.setHeader(Headers.P_SERVED_USER, getProfile().getURI());
+				request.setHeader(Headers.P_SERVED_USER, getProfile().getUri());
 				
 				request.getProxy().proxyTo(request.getRequestURI());
 				return false;
@@ -88,6 +88,12 @@ public class OriginatingSession extends Session
 	public boolean isOriginating()
 	{
 		return true;
+	}
+
+	@Override
+	public SessionCase getSessionCase()
+	{
+		return _sessionCase;
 	}
 
 }

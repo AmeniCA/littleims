@@ -216,14 +216,14 @@ public class UserProfileCache
 		_sharedIfcsUrl = sharedIfcsUrl;
 	}
 	
-	public Collection<UserProfile> getUserProfiles()
+	public Map<String, UserProfile> getUserProfiles()
 	{
-		return _serviceProfiles.values();
+		return _serviceProfiles;
 	}
 	
-	public Collection<UserProfile> getWildcardUserProfiles()
+	public Map<String, UserProfile> getWildcardUserProfiles()
 	{
-		return _wildcardServiceProfiles.values();
+		return _wildcardServiceProfiles;
 	}
 	
 	public void clearAllProfiles()

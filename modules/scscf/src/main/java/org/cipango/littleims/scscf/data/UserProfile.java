@@ -52,7 +52,7 @@ public class UserProfile
 		return _serviceProfile;
 	}
 
-	public String getURI()
+	public String getUri()
 	{
 		return _uri;
 	}

@@ -57,8 +57,8 @@ import org.cipango.ims.hss.model.spt.SessionCaseSpt;
 import org.cipango.ims.hss.model.spt.SessionDescriptionSpt;
 import org.cipango.ims.hss.web.BasePage;
 import org.cipango.ims.hss.web.ifc.ContextPanel;
-import org.cipango.ims.hss.web.util.AjaxFallbackButton;
-import org.cipango.ims.hss.web.util.HideableLink;
+import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.HideableLink;
 
 
 @SuppressWarnings("unchecked")

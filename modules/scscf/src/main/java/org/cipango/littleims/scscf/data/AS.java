@@ -13,9 +13,11 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data;
 
+import java.io.Serializable;
+
 import org.cipango.littleims.cx.data.userprofile.TApplicationServer;
 
-public class AS
+public class AS implements Serializable
 {
 
 	private String _uri;
@@ -63,4 +65,8 @@ public class AS
 		return _includeRegisterResponse;
 	}
 
+	public String toString()
+	{
+		return _uri;
+	}
 }

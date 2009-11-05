@@ -18,7 +18,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.DebugSessionDao;
 import org.cipango.ims.hss.model.DebugSession;
 import org.cipango.ims.hss.web.BasePage;
-import org.cipango.ims.hss.web.util.ID;
+import org.cipango.ims.oam.util.ID;
 
 public abstract class DebugSessionPage extends BasePage
 {

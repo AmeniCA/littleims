@@ -26,7 +26,6 @@ import javax.servlet.sip.SipURI;
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar.RegTimerTask;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo;
-import org.cipango.littleims.scscf.registrar.regevent.RegState;
 
 
 public class Context
@@ -39,6 +38,45 @@ public class Context
 	private List<String> _associatedURIs;
 
 	private RegState _state;
+	
+	public enum RegState {
+		INIT("init"), 
+		ACTIVE("active"), 
+		TERMINATED("terminated");
+		
+		private String _value;
+		private RegState(String value)
+		{
+			_value = value;
+		}
+		
+		public String getValue()
+		{
+			return _value;
+		}
+	}
+	
+	public enum ContactEvent {
+		REGISTERED("registered"),
+		CREATED("created"),
+		UNREGISTERED("unregistered"),
+		DEACTIVATED("deactivated"),
+		REJECTED("rejected"),
+		REFRESHED("refreshed"),
+		EXPIRED("expired"),
+		SHORTENED("shortened");
+		
+		private String _value;
+		private ContactEvent(String value)
+		{
+			_value = value;
+		}
+		
+		public String getValue()
+		{
+			return _value;
+		}
+	}
 
 	
 	public Context(String publicUserIdentity)
@@ -79,6 +117,14 @@ public class Context
 			}
 		}
 		return list;
+	}
+	
+	public Binding getBinding(String privateIdentity)
+	{
+		synchronized (_bindings)
+		{
+			return _bindings.get(privateIdentity);
+		}
 	}
 
 	public RegState getState()

@@ -14,19 +14,16 @@
 package org.cipango.littleims.pcscf.oam;
 
 import org.apache.wicket.Page;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
-import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
+import org.cipango.ims.oam.SpringApplication;
 import org.cipango.littleims.pcscf.oam.browser.DebugBrowserPage;
 import org.cipango.littleims.pcscf.oam.browser.RegistrationBrowserPage;
 import org.cipango.littleims.pcscf.oam.browser.UserPage;
 
-public class OamApplication extends WebApplication
+public class OamApplication extends SpringApplication
 {
 	private static OamApplication __instance;
-	private SpringComponentInjector _injector;
 
-	private boolean _wicketStarted = false;
 
 	@Override
 	public Class<? extends Page> getHomePage()
@@ -34,28 +31,12 @@ public class OamApplication extends WebApplication
 		return RegistrationBrowserPage.class;
 	}
 
-	public void springStart()
-	{
-		// If Wicket not started could not addComponentInstantiationListener.
-		// As Wicket is not managed, ensure a new injector is set after refresh.
-		if (_wicketStarted)
-		{
-			_injector = new SpringComponentInjector(this);
-			addComponentInstantiationListener(_injector);
-		}
-	}
 
-	public void springStop()
-	{
-		removeComponentInstantiationListener(_injector);
-	}
 
 	@Override
 	protected void init()
 	{
 		super.init();
-		_wicketStarted = true;
-		springStart();
 		mountBookmarkablePage("/registrations", RegistrationBrowserPage.class); 
 		mountBookmarkablePage("/debug-id", DebugBrowserPage.class); 
 		String[] id = new String[] {"id"};

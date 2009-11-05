@@ -1,4 +1,4 @@
-package org.cipango.ims.hss.web.util;
+package org.cipango.ims.oam.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -38,7 +38,7 @@ import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
-import org.cipango.ims.hss.web.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.AjaxFallbackButton;
 
 
 public class EditPublicIdsPage extends PrivateIdentityPage

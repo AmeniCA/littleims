@@ -21,10 +21,9 @@ import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.Request;
 import org.apache.wicket.Response;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
+import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.ISecuritySettings;
-import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.convert.IConverter;
@@ -67,16 +66,15 @@ import org.cipango.ims.hss.web.subscription.EditImplicitSetPage;
 import org.cipango.ims.hss.web.subscription.EditSubscriptionPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
-import org.cipango.ims.hss.web.util.ClassResolver;
-import org.cipango.ims.hss.web.util.SignOutPage;
+import org.cipango.ims.oam.SpringApplication;
+import org.cipango.ims.oam.util.ClassResolver;
+import org.cipango.ims.oam.util.SignOutPage;
 
 
-public class ImsApplication extends WebApplication {
+public class ImsApplication extends SpringApplication {
 
 	private static ImsApplication __instance;
-	private SpringComponentInjector _injector;
 
-	private boolean _wicketStarted = false;
 	private SipFactory _sipFactory;
 	private boolean _webAuthentication = true;
 	
@@ -84,28 +82,7 @@ public class ImsApplication extends WebApplication {
 	
 	private ImsApplication() {	
 	}
-	
-	public void springStart() {
-		// If Wicket not started could not addComponentInstantiationListener.
-		// As Wicket is not managed, ensure a new injector is set after refresh.
-		if (_wicketStarted) {
-			_injector = new SpringComponentInjector(this);
-			addComponentInstantiationListener(_injector);	
-			
-			if (_webAuthentication)
-			{
-				AuthorizationStrategy authStrat = new AuthorizationStrategy();
-			    ISecuritySettings securitySettings = getSecuritySettings();
-			    securitySettings.setAuthorizationStrategy(authStrat);
-			    securitySettings.setUnauthorizedComponentInstantiationListener(authStrat);
-			}
-		}
-	}
-	
-	public void springStop() {
-		removeComponentInstantiationListener(_injector);	
-	}
-	
+		
 	@Override
 	protected void init() {
 		super.init();
@@ -164,9 +141,15 @@ public class ImsApplication extends WebApplication {
 		mount(new MixedParamUrlCodingStrategy("/debug-session/edit", EditDebugSessionPage.class, id));
 		mountBookmarkablePage("/signin", SigninPage.class);
 		mountBookmarkablePage("/signout", SignOutPage.class);
-				
-		_wicketStarted = true;
-		springStart();
+		
+		if (_webAuthentication)
+		{
+			AuthorizationStrategy authStrat = new AuthorizationStrategy();
+		    ISecuritySettings securitySettings = getSecuritySettings();
+		    securitySettings.setAuthorizationStrategy(authStrat);
+		    securitySettings.setUnauthorizedComponentInstantiationListener(authStrat);
+		}
+	
 	}
 	
 	@Override

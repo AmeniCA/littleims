@@ -17,7 +17,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.cipango.ims.hss.model.spt.SPT;
-import org.cipango.ims.hss.web.util.MethodField;
+import org.cipango.ims.oam.util.MethodField;
 
 public class MethodSptPanel extends Panel
 {

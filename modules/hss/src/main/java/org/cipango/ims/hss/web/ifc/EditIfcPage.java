@@ -45,7 +45,7 @@ import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
-import org.cipango.ims.hss.web.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.AjaxFallbackButton;
 
 public class EditIfcPage extends IfcPage
 {

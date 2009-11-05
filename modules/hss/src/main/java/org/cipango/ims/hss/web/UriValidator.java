@@ -1,4 +1,4 @@
-package org.cipango.ims.hss.web.util;
+package org.cipango.ims.hss.web;
 
 import java.util.Map;
 
@@ -9,7 +9,6 @@ import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidatorAddListener;
 import org.apache.wicket.validation.validator.AbstractValidator;
-import org.cipango.ims.hss.web.BasePage;
 
 
 public class UriValidator extends AbstractValidator<String> implements IValidatorAddListener

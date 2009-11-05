@@ -18,7 +18,8 @@ import java.util.TimerTask;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipURI;
 
-import org.cipango.littleims.scscf.registrar.regevent.RegState;
+import org.cipango.littleims.scscf.registrar.Context.ContactEvent;
+import org.cipango.littleims.scscf.registrar.Context.RegState;
 
 
 /**

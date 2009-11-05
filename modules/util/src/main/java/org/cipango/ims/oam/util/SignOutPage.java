@@ -16,7 +16,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.cipango.ims.hss.web.util;
+package org.cipango.ims.oam.util;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.PageParameters;

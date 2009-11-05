@@ -13,7 +13,9 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.oam;
 
+import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.cipango.ims.oam.SpringApplication;
 
 public class HeaderPanel extends Panel
 {
@@ -21,7 +23,7 @@ public class HeaderPanel extends Panel
 	public HeaderPanel()
 	{
 		super("header");
-		
+		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style.css"));
 	}
 	
 

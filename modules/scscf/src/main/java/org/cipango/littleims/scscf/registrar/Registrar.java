@@ -49,10 +49,11 @@ import org.cipango.littleims.scscf.cx.CxManager;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileCache;
+import org.cipango.littleims.scscf.registrar.Context.ContactEvent;
+import org.cipango.littleims.scscf.registrar.Context.RegState;
 import org.cipango.littleims.scscf.registrar.regevent.RegEvent;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventListener;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo;
-import org.cipango.littleims.scscf.registrar.regevent.RegState;
 import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.LittleimsException;
@@ -116,7 +117,15 @@ public class Registrar
 	{
 		synchronized (_regContexts)
 		{
-			return (Context) _regContexts.get(uri.toString());
+			return _regContexts.get(uri.toString());
+		}
+	}
+	
+	public Context getContext(String uri)
+	{
+		synchronized (_regContexts)
+		{
+			return _regContexts.get(uri);
 		}
 	}
 
@@ -626,7 +635,7 @@ public class Registrar
 					SipServletRequest register = _sipFactory.createRequest(request
 							.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
 					register.setExpires(expires);
-					register.setRequestURI(_sipFactory.createURI(ifc.getAS().getURI()));
+					register.setRequestURI(_sipFactory.createURI(ifc.getAs().getURI()));
 					
 					String pAccessNetworkInfo = request.getHeader(Headers.P_ACCESS_NETWORK_INFO);
 					if (pAccessNetworkInfo != null)
@@ -636,16 +645,16 @@ public class Registrar
 					if (pChargingVector != null)
 						register.setHeader(Headers.P_CHARGING_VECTOR, pChargingVector);
 					
-					String serviceInfo = ifc.getAS().getServiceInfo();
+					String serviceInfo = ifc.getAs().getServiceInfo();
 					if (serviceInfo != null && !serviceInfo.trim().equals(""))
 					{
 						register.setContent(
 								generateXML(serviceInfo).getBytes(),
 								SERVICE_INFO_TYPE);
 					}
-					if (ifc.getAS().getIncludeRegisterRequest())
+					if (ifc.getAs().getIncludeRegisterRequest())
 						register.setContent(request.toString().getBytes(), MSG_SIP_CONTENT_TYPE);
-					if (ifc.getAS().getIncludeRegisterResponse())
+					if (ifc.getAs().getIncludeRegisterResponse())
 						register.setContent(response.toString().getBytes(), MSG_SIP_CONTENT_TYPE);
 					
 					// TODO support multipart
@@ -690,7 +699,7 @@ public class Registrar
 						SipServletRequest register = _sipFactory.createRequest(request
 								.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
 						register.setExpires(0);
-						register.setRequestURI(_sipFactory.createURI(ifc.getAS().getURI()));
+						register.setRequestURI(_sipFactory.createURI(ifc.getAs().getURI()));
 						
 						String pAccessNetworkInfo = request.getHeader(Headers.P_ACCESS_NETWORK_INFO);
 						if (pAccessNetworkInfo != null)
@@ -700,7 +709,7 @@ public class Registrar
 						if (pChargingVector != null)
 							register.setHeader(Headers.P_CHARGING_VECTOR, pChargingVector);
 						
-						String serviceInfo = ifc.getAS().getServiceInfo();
+						String serviceInfo = ifc.getAs().getServiceInfo();
 						if (serviceInfo != null && !serviceInfo.trim().equals(""))
 						{
 							register.setContent(
@@ -959,9 +968,12 @@ public class Registrar
 		_maxExpires = maxExpires;
 	}
 
-	public Iterator<Context> getRegContextsIt()
+	public List<Context> getRegContexts()
 	{
-		return _regContexts.values().iterator();
+		synchronized (_regContexts)
+		{
+			return new ArrayList<Context>(_regContexts.values());
+		}
 	}
 
 

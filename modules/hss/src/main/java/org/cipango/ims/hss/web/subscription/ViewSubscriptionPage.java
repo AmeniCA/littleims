@@ -37,8 +37,8 @@ import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
 import org.cipango.ims.hss.web.serviceprofile.ViewServiceProfilePage;
-import org.cipango.ims.hss.web.util.HideableLink;
-import org.cipango.ims.hss.web.util.StringModelIterator;
+import org.cipango.ims.oam.util.HideableLink;
+import org.cipango.ims.oam.util.StringModelIterator;
 
 public class ViewSubscriptionPage extends SubscriptionPage
 {

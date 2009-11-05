@@ -46,7 +46,7 @@ import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.web.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.AjaxFallbackButton;
 
 public class DeregistrationPage extends SubscriptionPage
 {

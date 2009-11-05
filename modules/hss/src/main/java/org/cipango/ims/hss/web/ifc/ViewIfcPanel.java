@@ -13,7 +13,7 @@ import org.cipango.ims.hss.util.XML.Output;
 import org.cipango.ims.hss.web.as.EditAsPage;
 import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
-import org.cipango.ims.hss.web.util.HideableLink;
+import org.cipango.ims.oam.util.HideableLink;
 
 @SuppressWarnings("unchecked")
 public class ViewIfcPanel extends Panel

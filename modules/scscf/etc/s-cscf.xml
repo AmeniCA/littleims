@@ -200,6 +200,11 @@
 		<property name="messageSender" ref="messageSender" />
 	</bean>
 	
-	
+	<bean id="webApplication" 
+			class="org.cipango.littleims.scscf.oam.OamApplication" 
+			factory-method="getInstance"
+			init-method="springStart"
+			destroy-method="springStop">
+	</bean>
 </beans>
 

@@ -68,7 +68,7 @@ public class OamServlet extends HttpServlet
 		out.println("<table border=\"1\" cellspacing=\"0\">" +
 		"<th>AOR</th><th>Barred</th><th>Originating</th><th>Current IFC</th>");
 
-		Iterator<Session> it = _sessionManager.getSessions();
+		Iterator<Session> it = _sessionManager.getSessions().iterator();
 		synchronized (it)
 		{
 			while (it.hasNext())
@@ -77,7 +77,7 @@ public class OamServlet extends HttpServlet
 				UserProfile profile = session.getProfile();
 				
 				out.println("<tr>");
-				out.println("<td>" + profile.getURI() + "</td>");
+				out.println("<td>" + profile.getUri() + "</td>");
 				out.println("<td>" + profile.isBarred() +  "</td>");
 				out.println("<td>" + session.isOriginating() + "</td>");
 				out.println("<td>" + session.getCurrentIfc() + "</td>");
@@ -91,7 +91,7 @@ public class OamServlet extends HttpServlet
 	private void printUsers(PrintWriter out)
 	{
 		out.println("<h2>Registered users</h2>");
-		Iterator<Context> it = _sessionManager.getRegistrar().getRegContextsIt();
+		Iterator<Context> it = _sessionManager.getRegistrar().getRegContexts().iterator();
 		synchronized (it)
 		{
 			out.println("<table border=\"1\" cellspacing=\"0\">" +
@@ -146,7 +146,7 @@ public class OamServlet extends HttpServlet
 			{
 				UserProfile profile = it.next();
 				out.println("<tr>");
-				out.println("<td>" + profile.getURI() + "</td>");
+				out.println("<td>" + profile.getUri() + "</td>");
 				out.println("<td>" + profile.isBarred() +  "</td>");
 				out.println("<td>");
 				printProfile(profile, out);
@@ -183,7 +183,7 @@ public class OamServlet extends HttpServlet
 			out.println("<td>" + id + "</td>");
 			out.println("<td>" + ifc.getPriority() + "</td>");
 			out.println("<td>" + ifc.getTriggerPoint() +  "</td>");
-			out.println("<td>" + ifc.getAS().getURI() + "</td>");
+			out.println("<td>" + ifc.getAs().getURI() + "</td>");
 			out.println("</tr>");
 		}
 		out.println("</table>");
@@ -223,7 +223,7 @@ public class OamServlet extends HttpServlet
 			out.println("<tr>");
 			out.println("<td>" + ifc.getPriority() + "</td>");
 			out.println("<td>" + ifc.getTriggerPoint() +  "</td>");
-			out.println("<td>" + ifc.getAS().getURI() + "</td>");
+			out.println("<td>" + ifc.getAs().getURI() + "</td>");
 			out.println("</tr>");
 		}
 		out.println("</table>");
@@ -264,9 +264,9 @@ public class OamServlet extends HttpServlet
 		printUsers(out);
 		
 		out.println("<h2>Cache user profiles</h2>");
-		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getUserProfiles().iterator(), out);
+		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getUserProfiles().values().iterator(), out);
 		out.println("<h2>Cache wilcard user profiles</h2>");
-		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getWildcardUserProfiles().iterator(), out);
+		printProfiles(_sessionManager.getRegistrar().getUserProfileCache().getWildcardUserProfiles().values().iterator(), out);
 		
 		out.println("<h2>Shared IFCs</h2>");
 		printSharedIfc(out);

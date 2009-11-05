@@ -31,7 +31,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.cipango.littleims.pcscf.oam.AbstractListDataProvider;
+import org.cipango.ims.oam.util.AbstractListDataProvider;
 import org.cipango.littleims.pcscf.oam.AorLink;
 import org.cipango.littleims.pcscf.oam.BasePage;
 import org.cipango.littleims.pcscf.subscription.reg.RegEventService;

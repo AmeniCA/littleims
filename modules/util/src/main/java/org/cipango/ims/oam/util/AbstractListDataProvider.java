@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.cipango.littleims.pcscf.oam;
+package org.cipango.ims.oam.util;
 
 import java.util.Iterator;
 import java.util.List;

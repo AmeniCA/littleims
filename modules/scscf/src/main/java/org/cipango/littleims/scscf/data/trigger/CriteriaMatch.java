@@ -13,11 +13,13 @@
 // ========================================================================
 package org.cipango.littleims.scscf.data.trigger;
 
+import java.io.Serializable;
+
 import javax.servlet.sip.SipServletRequest;
 
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
 
-public interface CriteriaMatch
+public interface CriteriaMatch extends Serializable
 {
 
 	public boolean matches(SipServletRequest request, SessionCase sessionCase);

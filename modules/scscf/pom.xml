@@ -12,6 +12,23 @@
 
   <build>
     <finalName>${project.artifactId}</finalName>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -72,6 +89,7 @@
             </peers>
           </diameterNode>
 
+          <scanIntervalSeconds>5</scanIntervalSeconds>
           <stopKey>foo</stopKey>
           <stopPort>9999</stopPort>
           <webAppConfig>
@@ -91,6 +109,18 @@
            </execution>
         </executions>
         <inherited>true</inherited>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <additionalProjectnatures>
+            <projectnature>wicketbench.wicketnature</projectnature>
+          </additionalProjectnatures>
+          <additionalBuildcommands>
+            <buildcommand>wicketbench.associatedMarkupAuditor</buildcommand>
+          </additionalBuildcommands>
+        </configuration>
       </plugin>
       
     </plugins>

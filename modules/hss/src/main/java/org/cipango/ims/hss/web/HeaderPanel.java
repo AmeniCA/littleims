@@ -23,7 +23,7 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.web.ImsSession.DaoDetachableModel;
 import org.cipango.ims.hss.web.adminuser.EditAdminUserPage;
-import org.cipango.ims.hss.web.util.SignOutPage;
+import org.cipango.ims.oam.util.SignOutPage;
 
 public class HeaderPanel extends Panel
 {

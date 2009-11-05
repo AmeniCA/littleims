@@ -29,6 +29,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar;
+import org.cipango.littleims.scscf.registrar.Context.RegState;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo.ContactInfo;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;

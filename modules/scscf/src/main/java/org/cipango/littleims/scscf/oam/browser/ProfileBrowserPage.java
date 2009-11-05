@@ -11,38 +11,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.oam;
+package org.cipango.littleims.scscf.oam.browser;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.basic.Label;
+import org.cipango.littleims.scscf.oam.BasePage;
 
-@SuppressWarnings("unchecked")
-public class HideableLink extends AjaxLink
-{	
-	private String _markupId;
-	
-	public HideableLink(String id, String markupId)
-	{
-		super(id);
-		_markupId = markupId;
-		setOutputMarkupId(true);
+public class ProfileBrowserPage extends BasePage
+{
+		
+	public ProfileBrowserPage(PageParameters pageParameters)
+	{		
+		add(new Label("title", getTitle()));
+		add(new UserProfilePanel("userProfile", false, getItemByPage()));
+		add(new UserProfilePanel("wilcardUserProfile", true, getItemByPage()));
 	}
 	
-	public IAjaxCallDecorator getAjaxCallDecorator() 
-	{
-		return new AjaxCallDecorator() 
-		{
-			public CharSequence decorateScript(CharSequence script)
-			{
-				return "var wcall=0;hide('" + _markupId + "','" + getMarkupId(true)
-						+ "','[show]','[hide]');";
-			}
-		};
-	}
+	
 	@Override
-	public void onClick(AjaxRequestTarget target)
+	public String getTitle()
 	{
-	}	
+		return "Cache user profiles";
+	}
+	
+
 }

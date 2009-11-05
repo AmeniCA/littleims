@@ -40,7 +40,7 @@ import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
-import org.cipango.ims.hss.web.util.UriValidator;
+import org.cipango.ims.hss.web.UriValidator;
 
 public class AddSubscriptionPage extends SubscriptionPage
 {

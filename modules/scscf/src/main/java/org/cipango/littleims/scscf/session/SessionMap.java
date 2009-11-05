@@ -13,8 +13,9 @@
 // ========================================================================
 package org.cipango.littleims.scscf.session;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class SessionMap
@@ -50,8 +51,8 @@ public class SessionMap
 		}
 	}
 	
-	public Iterator<Session> getSessions()
+	public List<Session> getSessions()
 	{
-		return _sessions.values().iterator();
+		return new ArrayList<Session>(_sessions.values());
 	}
 }

@@ -11,24 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.scscf.registrar.regevent;
+package org.cipango.ims.oam.util;
 
-public class RegState
-{
+import java.util.Collection;
 
-	public static final RegState INIT = new RegState("init");
-	public static final RegState ACTIVE = new RegState("active");
-	public static final RegState TERMINATED = new RegState("terminated");
+import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 
-	private RegState(String value)
-	{
-		this.value = value;
+public class StringModelIterator extends ModelIteratorAdapter<String> {
+	public StringModelIterator(Collection<String> modelObject) {
+		super(modelObject.iterator());
 	}
-
-	public String getValue()
+	
+	@Override
+	protected IModel<String> model(String id)
 	{
-		return value;
+		return new Model<String>(id);
 	}
-
-	private String value;
 }

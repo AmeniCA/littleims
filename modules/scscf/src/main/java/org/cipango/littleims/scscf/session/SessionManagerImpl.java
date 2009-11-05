@@ -15,6 +15,8 @@ package org.cipango.littleims.scscf.session;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -582,9 +584,14 @@ public class SessionManagerImpl implements SessionManager
 		_log.info("S-CSCF URI: " + _scscfUri);
 	}
 
-	public Iterator<Session> getSessions()
+	public List<Session> getSessions()
 	{
 		return _sessionMap.getSessions();
+	}
+	
+	public Session getSession(String odi)
+	{
+		return _sessionMap.getSession(odi);
 	}
 
 	public MessageSender getMessageSender()

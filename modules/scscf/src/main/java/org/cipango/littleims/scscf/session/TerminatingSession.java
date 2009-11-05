@@ -100,21 +100,15 @@ public class TerminatingSession extends Session
 			boolean ifcMatched = false;
 
 			while ((ifc = nextIFC()) != null)
-			{
-				SessionCase sessionCase;
-				if (_context != null)
-					sessionCase = SessionCase.TERMINATING_REGISTERED;
-				else
-					sessionCase = SessionCase.TERMINATING_UNREGISTERED;
-				
+			{			
 				__log.debug("Evaluating filter criteria with priority: " + ifc.getPriority());
-				ifcMatched = ifc.matches(request, sessionCase);
+				ifcMatched = ifc.matches(request, getSessionCase());
 				if (ifcMatched)
 				{
-					SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAS().getURI());
+					SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAs().getURI());
 
 					if (__log.isDebugEnabled())
-						__log.debug("IFC " + ifc + " matched for user " + getProfile().getURI() 
+						__log.debug("IFC " + ifc + " matched for user " + getProfile().getUri() 
 								+ ". Forwarding request to: " + asURI);
 					if (asURI.getLrParam() == true)
 					{
@@ -238,5 +232,14 @@ public class TerminatingSession extends Session
 	public boolean isOriginating()
 	{
 		return false;
+	}
+
+	@Override
+	public SessionCase getSessionCase()
+	{
+		if (_context != null)
+			return SessionCase.TERMINATING_REGISTERED;
+		else
+			return SessionCase.TERMINATING_UNREGISTERED;
 	}
 }

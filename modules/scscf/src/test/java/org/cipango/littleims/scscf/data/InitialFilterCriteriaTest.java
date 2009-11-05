@@ -19,7 +19,7 @@ public class InitialFilterCriteriaTest extends TestCase
 		InitialFilterCriteria ifc = getIfc("IfcHeader.xml");
 						
 		assertEquals(1, ifc.getPriority());
-		AS as = ifc.getAS();
+		AS as = ifc.getAs();
 		assertEquals("sip:tispan@cipango.org;lr", as.getURI());
 		assertEquals(0, as.getDefaultHandling());
 		assertEquals("", as.getServiceInfo());

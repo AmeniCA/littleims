@@ -26,6 +26,7 @@ import javax.servlet.sip.URI;
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
 import org.cipango.littleims.scscf.data.UserProfile;
+import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
 import org.cipango.littleims.util.Headers;
 
 
@@ -58,6 +59,8 @@ public abstract class Session
 			ServletException;
 	
 	public abstract boolean isOriginating();
+	
+	public abstract SessionCase getSessionCase();
 	
 	public UserProfile getProfile()
 	{
