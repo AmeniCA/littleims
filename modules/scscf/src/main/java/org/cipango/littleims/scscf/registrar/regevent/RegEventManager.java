@@ -15,13 +15,14 @@ package org.cipango.littleims.scscf.registrar.regevent;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -29,25 +30,19 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar;
-import org.cipango.littleims.scscf.registrar.Context.RegState;
-import org.cipango.littleims.scscf.registrar.regevent.RegInfo.ContactInfo;
 import org.cipango.littleims.util.Headers;
-import org.cipango.littleims.util.Methods;
 
 
 public class RegEventManager implements RegEventListener
 {
 
 	private static final Logger __log = Logger.getLogger(RegEventManager.class);
-	private static final String ABSOLUTE_EXPIRES = "absoluteExpires";
-	private static final String NOTIFY_VERSION = "notifyVersion";
-	private static final String REG_INFO_CONTENT_TYPE = "application/reginfo+xml";
 	public static final String REG_EVENT = "reg";
 	
 
 	private Timer _timer = new Timer("RegEventTimer");
 	
-	private Map<String, List<SipSession>> _subscriptions = new HashMap<String, List<SipSession>>();
+	private Map<String, List<RegSubscription>> _subscriptions = new HashMap<String, List<RegSubscription>>();
 	private Registrar _registrar;
 
 	private int _minExpires;
@@ -65,13 +60,15 @@ public class RegEventManager implements RegEventListener
 				String aor = regInfo.getAor();
 				synchronized (_subscriptions)
 				{
-					List<SipSession> l = _subscriptions.get(aor);
+					List<RegSubscription> l = _subscriptions.get(aor);
 					if (l != null)
 					{
-						Iterator<SipSession> it2 = l.iterator();
+						Iterator<RegSubscription> it2 = l.iterator();
 						while (it2.hasNext())
-							sendNotification(e, it2.next(), "partial");	
+							it2.next().sendNotification(e, "partial");	
 					}
+					if (e.isTerminated())
+						_subscriptions.remove(aor);
 				}
 			}
 		} 
@@ -81,9 +78,21 @@ public class RegEventManager implements RegEventListener
 		}
 	}
 	
-	public void doSubscribe(SipServletRequest subscribe) throws IOException
+	public List<RegSubscription> getSubscriptions(String aor)
 	{
+		synchronized (_subscriptions)
+		{
+			return _subscriptions.get(aor);
+		}
+	}
+	
+	public void doSubscribe(SipServletRequest subscribe) throws IOException, ServletParseException
+	{
+		Address subscriber = subscribe.getAddressHeader(Headers.P_ASSERTED_IDENTITY);
+		if (subscriber == null)
+			subscriber = subscribe.getFrom();
 		// TODO check if user if authorized
+		
 		int expires = subscribe.getExpires();
 		if (expires == -1)
 		{
@@ -127,42 +136,45 @@ public class RegEventManager implements RegEventListener
 		URI aor = subscribe.getRequestURI();
 		SipSession session = subscribe.getSession();
 
-		addSubscription(aor.toString(), session, expires);
+		addSubscription(aor.toString(), session, expires, subscriber.getURI());
 	}
 
-	private void addSubscription(String aor, SipSession session, int expires)
+	private void addSubscription(String aor, SipSession session, int expires, URI subscriberUri)
 	{
 		RegEvent e = _registrar.getFullRegEvent(aor);
 		if (e.isTerminated())
 			expires = 0;
 		
+		RegSubscription subscription = new RegSubscription(session, expires, subscriberUri.toString());
 		synchronized (_subscriptions)
 		{
-			List<SipSession> l = _subscriptions.get(aor);
+			List<RegSubscription> l = _subscriptions.get(aor);
 			if (expires != 0)
 			{
 				if (l == null)
 				{
-					l = new ArrayList<SipSession>();
+					l = new ArrayList<RegSubscription>();
 					_subscriptions.put(aor, l);
 				}
-				l.add(session);
+				l.add(subscription);
 			}
 			else if (l != null)
 			{
-				l.remove(session);
+				Iterator<RegSubscription> it = l.iterator();
+				while (it.hasNext())
+				{
+					if (it.next().getSession().equals(session))
+						it.remove();
+				}
 				if (l.isEmpty())
 					_subscriptions.remove(aor);
 			}
 		}
 
-		session.setAttribute(ABSOLUTE_EXPIRES,
-				new Date(System.currentTimeMillis() + expires * 1000));
-
 		
-		sendNotification(e, session, "full");
+		subscription.sendNotification(e, "full");
 
-		ExpiryTask task = (ExpiryTask) session.getAttribute(ExpiryTask.class.getName());
+		ExpiryTask task = subscription.getExpiryTask();
 
 		if (task != null)
 			task.cancel();
@@ -171,95 +183,20 @@ public class RegEventManager implements RegEventListener
 			session.getApplicationSession().invalidate();
 		else
 		{
-			task = new ExpiryTask(session, this);
+			task = new ExpiryTask(subscription, this);
 			_timer.schedule(task, expires * 1000);
-			session.setAttribute(ExpiryTask.class.getName(), task);
+			subscription.setExpiryTask(task);
 			session.getApplicationSession().setExpires(expires / 60 + 2);
 		}
 	}
 
-	protected void sendNotification(RegEvent e, SipSession session, String state)
-	{
-		try
-		{
-			session.setAttribute(ExpiryTask.LAST_EVENT, e);
-			SipServletRequest notify = session.createRequest(Methods.NOTIFY);
-			notify.setHeader(Headers.EVENT, REG_EVENT);
-			notify.setHeader(Headers.SUBSCRIPTION_STATE, getSubscriptionState(session, e.isTerminated()));
-			Integer version = (Integer) session.getAttribute(NOTIFY_VERSION);
-			if (version == null)
-				version = new Integer(0);
-			else
-				version = new Integer(version.intValue() + 1);
-			
-			session.setAttribute(NOTIFY_VERSION, version);
 
-			String body = generateRegInfo(e, state, version.intValue());
-			byte[] content = body.getBytes();
-			notify.setContent(content, REG_INFO_CONTENT_TYPE);
-			notify.send();			
-		}
-		catch (Exception ex)
-		{
-			__log.warn("Failed to send NOTIFY", ex);
-		}
-	}
-
-	private String getSubscriptionState(SipSession session, boolean terminated)
-	{
-		if (terminated)
-			return "terminated";
-		
-		Date absExpiry = (Date) session.getAttribute(ABSOLUTE_EXPIRES);
-		int expires = (int) (absExpiry.getTime() - System.currentTimeMillis()) / 1000;
-		if (expires <= 0)
-			return "terminated;reason=timeout";
-		else
-			return "active;expires=" + expires;
-	}
-	
-	private String generateRegInfo(RegEvent e, String state, int version)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("<?xml version=\"1.0\"?>\n");
-		sb.append("<reginfo xmlns=\"urn:ietf:params:xml:ns:reginfo\" ");
-		sb.append("version=\"").append(version).append("\" ");
-		sb.append("state=\"").append(state).append("\">\n");
-		
-		Iterator<RegInfo> it = e.getRegInfos().iterator();
-		while (it.hasNext())
-		{
-			RegInfo regInfo = it.next();
-			sb.append("<registration aor=\"").append(regInfo.getAor()).append("\" ");
-			sb.append("id=\"").append(regInfo.getAor().hashCode()).append("\" ");
-			sb.append("state=\"").append(regInfo.getAorState().getValue()).append("\">\n");
-
-			Iterator<ContactInfo> it2 = regInfo.getContacts().iterator();
-			while (it2.hasNext())
-			{
-				ContactInfo contactInfo = it2.next();
-				sb.append("<contact state=\"").append(contactInfo.getContactState().getValue()).append("\" ");
-				sb.append("event=\"").append(contactInfo.getContactEvent().getValue()).append("\"");
-				if (contactInfo.getContactState() == RegState.ACTIVE)
-					sb.append(" expires=\"" + contactInfo.getExpires() + "\"");
-				sb.append(">\n");
-				sb.append("<uri>").append(contactInfo.getContact()).append("</uri>\n");
-				if (contactInfo.getDisplayName() != null)
-					sb.append("<display-name>").append(contactInfo.getDisplayName()).append("</display-name>\n");
-				sb.append("</contact>\n");
-			}
-			sb.append("</registration>\n");
-		}
-		sb.append("</reginfo>\n");
-		return sb.toString();
-	}
-
-	protected void removeSubscription(String aor, SipSession session)
+	protected void removeSubscription(String aor, RegSubscription subscription)
 	{
 		synchronized (_subscriptions)
 		{
-			List<SipSession> l = _subscriptions.get(aor);
-			l.remove(session);
+			List<RegSubscription> l = _subscriptions.get(aor);
+			l.remove(subscription);
 			if (l.isEmpty())
 				_subscriptions.remove(aor);
 		}

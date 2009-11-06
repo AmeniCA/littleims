@@ -14,6 +14,7 @@
 package org.cipango.littleims.scscf.oam;
 
 import org.apache.wicket.markup.html.CSSPackageResource;
+import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.oam.SpringApplication;
 
@@ -24,7 +25,7 @@ public class HeaderPanel extends Panel
 	{
 		super("header");
 		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style.css"));
-		
+		add(JavascriptPackageResource.getHeaderContribution(SpringApplication.class, "common-util.js"));
 	}
 	
 

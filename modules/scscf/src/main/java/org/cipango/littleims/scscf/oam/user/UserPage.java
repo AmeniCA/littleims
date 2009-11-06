@@ -14,10 +14,16 @@
 package org.cipango.littleims.scscf.oam.user;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.URI;
+
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -25,12 +31,15 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.oam.util.HideableLink;
 import org.cipango.littleims.scscf.data.ServiceProfile;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileCache;
+import org.cipango.littleims.scscf.data.UserProfileListener;
+import org.cipango.littleims.scscf.debug.DebugSession;
 import org.cipango.littleims.scscf.oam.AorLink;
 import org.cipango.littleims.scscf.oam.BasePage;
 import org.cipango.littleims.scscf.oam.browser.ServiceProfilePanel;
@@ -38,6 +47,7 @@ import org.cipango.littleims.scscf.registrar.Binding;
 import org.cipango.littleims.scscf.registrar.Context;
 import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
+import org.cipango.littleims.scscf.registrar.regevent.RegSubscription;
 
 public class UserPage extends BasePage
 {
@@ -50,14 +60,34 @@ public class UserPage extends BasePage
 	@SpringBean
 	private RegEventManager _regEventManager;
 	
+	@SpringBean
+	private SipFactory _sipFactory;
+	
 	private String _publicIdentity;
+	
+	private IModel<UserProfile> _userProfileModel;
 	
 	public UserPage(PageParameters pageParameters)
 	{		
 		_publicIdentity = pageParameters.getString("id");
 		
+		_userProfileModel = new LoadableDetachableModel<UserProfile>()
+		{
+
+			@Override
+			protected UserProfile load()
+			{
+				UserProfile userProfile = _userProfileCache.getUserProfiles().get(_publicIdentity);
+				if (userProfile == null)
+					userProfile = _userProfileCache.getWildcardUserProfiles().get(_publicIdentity);
+				return userProfile;
+			}
+			
+		};
+		
 		addUserProfile();
 		addRegistration();
+		addSubscriptions();
 				
 		add(new Label("title", getTitle()));
 	}
@@ -65,7 +95,7 @@ public class UserPage extends BasePage
 	@SuppressWarnings("unchecked")
 	private void addRegistration()
 	{
-		final Context context = _registrar.getContext(_publicIdentity);
+		Context context = _registrar.getContext(_publicIdentity);
 		if (context == null)
 		{
 			add(new WebMarkupContainer("registration").setVisible(false));
@@ -74,11 +104,12 @@ public class UserPage extends BasePage
 			return;
 		}
 		
-		WebMarkupContainer markup = new WebMarkupContainer("registration", 
-				new CompoundPropertyModel(context));
+		
+		
+		WebMarkupContainer markup = new WebMarkupContainer("registration");
 		add(markup);
 		markup.add(new Label("aor", _publicIdentity));
-		markup.add(new Label("state"));
+		markup.add(new Label("state", context.getState().toString()));
 		markup.add(new ListView("associated", context.getAssociatedURIs())
 		{
 
@@ -89,14 +120,14 @@ public class UserPage extends BasePage
 			}
 			
 		});
-		markup.add(new HideableLink("hideLink", getMarkupId()));
+		markup.add(new HideableLink("hideLink", markup));
 		
 		add(new RefreshingView("bindings")
 		{
 			@Override
 			protected Iterator getItemModels()
 			{
-				Iterator<Binding> it = context.getBindings().iterator();
+				Iterator<Binding> it = _registrar.getContext(_publicIdentity).getBindings().iterator();
 				List l = new ArrayList();
 				while (it.hasNext())
 					l.add(new CompoundPropertyModel(new LoadableBinding(it.next())));
@@ -104,7 +135,7 @@ public class UserPage extends BasePage
 			}
 
 			@Override
-			protected void populateItem(Item item)
+			protected void populateItem(final Item item)
 			{
 				item.add(new Label("contact"));
 				item.add(new Label("path"));
@@ -112,21 +143,45 @@ public class UserPage extends BasePage
 				item.add(new Label("expires"));
 				item.add(new Label("privateUserIdentity"));
 				item.add(new Label("event"));
-				item.add(new HideableLink("hideLink", getMarkupId()));
+				item.add(new HideableLink("hideLink", item));
+				item.add(new AjaxFallbackLink("reAuthLink")
+				{
+
+					@Override
+					public void onClick(AjaxRequestTarget target)
+					{
+						if (target != null)
+							target.addComponent(getPage().get("feedback"));
+						
+						try
+						{
+							Binding binding = (Binding) item.getModelObject();
+							URI aor = _sipFactory.createURI(_publicIdentity);
+							_registrar.requestReauthentication(aor, 
+									binding.getPrivateUserIdentity());
+							info("Network intiated re-authentication send for identity: " + _publicIdentity);
+							if (target != null)
+								target.addComponent(getParent());
+						}
+						catch (Exception e)
+						{
+							warn("Failed to request re-authentication: " + e);
+						}
+					}
+					
+				});
+				item.setOutputMarkupId(true);
 			}
 			
 		});
 		
 		
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private void addUserProfile()
 	{
-		UserProfile userProfile = _userProfileCache.getUserProfiles().get(_publicIdentity);
-		if (userProfile == null)
-			userProfile = _userProfileCache.getWildcardUserProfiles().get(_publicIdentity);
-		
+		UserProfile userProfile = _userProfileModel.getObject();
 		if (userProfile == null)
 		{
 			add(new WebMarkupContainer("userProfile").setVisible(false));
@@ -134,14 +189,15 @@ public class UserPage extends BasePage
 		}
 		else
 		{
-			WebMarkupContainer markup = new WebMarkupContainer("userProfile", new CompoundPropertyModel(userProfile));
+			IModel model = new CompoundPropertyModel(_userProfileModel);
+			WebMarkupContainer markup = new WebMarkupContainer("userProfile", model);
 			add(markup);
 			markup.add(new Label("aor", _publicIdentity));
 			markup.add(new Label("uri"));
 			markup.add(new Label("barred"));
 			markup.add(new Label("serviceLevelTraceInfo"));
 			
-			markup.add(new HideableLink("hideLink", getMarkupId()));
+			markup.add(new HideableLink("hideLink", markup));
 			
 			ServiceProfile serviceProfile = userProfile.getServiceProfile();
 			
@@ -154,15 +210,107 @@ public class UserPage extends BasePage
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void addSubscriptions()
 	{
-		//_regEventManager.
+		
+		add(new RefreshingView("regSubscription")
+		{
+			@Override
+			protected Iterator getItemModels()
+			{
+				List<RegSubscription> l1 = _regEventManager.getSubscriptions(_publicIdentity);
+				if (l1 == null || l1.isEmpty())
+					return Collections.EMPTY_LIST.iterator();
+				List l = new ArrayList();
+				for (int i = 0; i < l1.size(); i++)
+					l.add(new CompoundPropertyModel(new LoadableRegSub(l1.get(i), i)));
+				return l.iterator();
+			}
+
+			@Override
+			protected void populateItem(Item item)
+			{
+				item.add(new Label("version"));
+				item.add(new Label("subscriberUri"));
+				item.add(new Label("expires"));
+				item.add(new HideableLink("hideLink", item));
+			}
+			
+		});
+		
+		add(new RefreshingView("debugSubscription")
+		{
+			@Override
+			protected Iterator getItemModels()
+			{
+				UserProfile profile = _userProfileModel.getObject();
+				if (profile == null)
+					return Collections.EMPTY_LIST.iterator();
+				
+				List<UserProfileListener> l1 = profile.getListeners();
+				if (l1 == null || l1.isEmpty())
+					return Collections.EMPTY_LIST.iterator();
+				List l = new ArrayList();
+				for (int i = 0; i < l1.size(); i++)
+				{
+					UserProfileListener listener = l1.get(i);
+					if (listener instanceof DebugSession)
+						l.add(new CompoundPropertyModel(new LoadableDebugSub((DebugSession) listener, i)));
+				}
+				return l.iterator();
+			}
+
+			@Override
+			protected void populateItem(Item item)
+			{
+				item.add(new Label("version"));
+				item.add(new Label("subscriberUri"));
+				item.add(new Label("expires"));
+				item.add(new HideableLink("hideLink", item));
+			}
+			
+		});
 	}
 
 	@Override
 	public String getTitle()
 	{
 		return "public identity: " + _publicIdentity;
+	}
+	
+	class LoadableRegSub extends LoadableDetachableModel<RegSubscription>
+	{
+		private int _i;
+	
+		public LoadableRegSub(RegSubscription o, int i)
+		{
+			super(o);
+			_i = i;
+		}
+	
+		@Override
+		protected RegSubscription load()
+		{
+			return _regEventManager.getSubscriptions(_publicIdentity).get(_i);
+		}
+	}
+	
+	class LoadableDebugSub extends LoadableDetachableModel<DebugSession>
+	{
+		private int _i;
+	
+		public LoadableDebugSub(DebugSession o, int i)
+		{
+			super(o);
+			_i = i;
+		}
+	
+		@Override
+		protected DebugSession load()
+		{
+			return (DebugSession) _userProfileModel.getObject().getListeners().get(_i);
+		}
 	}
 	
 	class LoadableBinding extends LoadableDetachableModel<Binding>
@@ -181,5 +329,12 @@ public class UserPage extends BasePage
 			return _registrar.getContext(_publicIdentity).getBinding(_key);
 		}
 	}
-	
+
+	@Override
+	protected void detachModel()
+	{
+		super.detachModel();
+		_userProfileModel.detach();
+	}
+
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.TimerService;
@@ -44,7 +45,7 @@ public class DebugIdService
 	{
 		DebugSession session = (DebugSession) subscribe.getSession().getAttribute(DebugSession.class.getName());
 		
-		// TODO check if user if authorized
+		
 		int expires = subscribe.getExpires();
 		if (expires == -1)
 		{
@@ -69,7 +70,24 @@ public class DebugIdService
 					+ "). Setting expires to max expires");
 			expires = _maxExpires;
 		}
-
+		
+		if (session == null)
+		{	
+			Address subscriber = subscribe.getAddressHeader(Headers.P_ASSERTED_IDENTITY);
+			if (subscriber == null)
+				subscriber = subscribe.getFrom();
+			// TODO check if user if authorized
+			
+			session = new DebugSession(subscribe.getSession(), expires, subscriber.getURI().toString());
+			session.setAor(subscribe.getRequestURI().toString());
+			_timerService.createTimer(subscribe.getApplicationSession(), 
+					expires, false, new ExpirationTask(session, _timerService));
+		}
+		else
+		{
+			session.setExpires(expires);
+		}
+		
 		SipServletResponse response = subscribe.createResponse(SipServletResponse.SC_OK);
 		if (_messageSender.getUserAgent() != null)
 			response.setHeader(Headers.SERVER, _messageSender.getUserAgent());
@@ -79,17 +97,6 @@ public class DebugIdService
 		// Wait a little to ensure 200/SUBSCRIBE is received before NOTIFY
 		try { Thread.sleep(100); } catch (Exception e) {}
 		
-		if (session == null)
-		{	
-			session = new DebugSession(subscribe.getSession(), expires);
-			session.setAor(subscribe.getRequestURI().toString());
-			_timerService.createTimer(subscribe.getApplicationSession(), 
-					expires, false, new ExpirationTask(session, _timerService));
-		}
-		else
-		{
-			session.setExpires(expires);
-		}
 		
 		UserProfile profile = _userProfileCache.getProfile(session.getAor(), null);
 		if (profile != null)

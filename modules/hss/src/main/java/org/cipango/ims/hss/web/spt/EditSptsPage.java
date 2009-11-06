@@ -122,9 +122,8 @@ public class EditSptsPage extends BasePage
 			{
 				final Integer groupId = item.getModelObject();
 				WebMarkupContainer panel = new WebMarkupContainer("panel");
-				item.add(panel);
-				panel.setOutputMarkupId(true);		
-				panel.add(new HideableLink("hideLink", panel.getMarkupId()));
+				item.add(panel);	
+				panel.add(new HideableLink("hideLink", panel));
 				panel.add(new Label("groupId", item.getModel()));
 				panel.add(getSpts(groupId));
 

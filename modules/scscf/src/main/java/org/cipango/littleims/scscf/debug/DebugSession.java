@@ -33,13 +33,15 @@ public class DebugSession implements UserProfileListener
 	private SipSession _session;
 	private long _absoluteExpires;
 	private String _aor;
+	private String _subscriberUri;
 	
-	public DebugSession(SipSession session, int expires)
+	public DebugSession(SipSession session, int expires, String subscriberUri)
 	{
 		_session = session;
 		setExpires(expires);
 		_version = 0;
 		session.setAttribute(DebugSession.class.getName(), this);
+		_subscriberUri = subscriberUri;
 	}
 	
 	public void sendNotify(String serviceLevelTraceInfo)
@@ -107,6 +109,15 @@ public class DebugSession implements UserProfileListener
 	public void setAor(String aor)
 	{
 		_aor = aor;
+	}
+	public int getVersion()
+	{
+		return _version;
+	}
+
+	public String getSubscriberUri()
+	{
+		return _subscriberUri;
 	}
 	
 }

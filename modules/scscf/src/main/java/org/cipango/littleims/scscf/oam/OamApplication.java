@@ -17,7 +17,9 @@ import org.apache.wicket.Page;
 import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
 import org.cipango.ims.oam.SpringApplication;
 import org.cipango.littleims.scscf.oam.browser.ProfileBrowserPage;
+import org.cipango.littleims.scscf.oam.browser.RegistrationBrowserPage;
 import org.cipango.littleims.scscf.oam.browser.SessionBrowserPage;
+import org.cipango.littleims.scscf.oam.browser.SharedIfcBrowserPage;
 import org.cipango.littleims.scscf.oam.user.UserPage;
 
 public class OamApplication extends SpringApplication
@@ -39,7 +41,9 @@ public class OamApplication extends SpringApplication
 		super.init();
 		mountBookmarkablePage("/user-profiles", ProfileBrowserPage.class); 
 		mountBookmarkablePage("/sessions", SessionBrowserPage.class); 
-
+		mountBookmarkablePage("/registrations", RegistrationBrowserPage.class); 
+		mountBookmarkablePage("/shared-ifcs", SharedIfcBrowserPage.class); 
+		
 		String[] id = new String[] {"id"};
 		
 		mount(new MixedParamUrlCodingStrategy("/user", UserPage.class, id));

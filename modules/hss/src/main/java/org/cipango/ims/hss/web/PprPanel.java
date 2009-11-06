@@ -119,7 +119,7 @@ public class PprPanel extends Panel
 			form.addOrReplace(new Label("title", title));
 			
 			WebMarkupContainer details = new WebMarkupContainer("details");
-			form.add(details);
+			form.addOrReplace(details);
 			
 			details.add(new RefreshingView("publicIdentities", new Model((Serializable) page.getCxManager().getPublicIdsToUpdateAsString())){
 

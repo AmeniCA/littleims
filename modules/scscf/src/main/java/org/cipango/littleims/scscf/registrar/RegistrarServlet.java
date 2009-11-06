@@ -78,7 +78,7 @@ public class RegistrarServlet extends SipServlet
 	
 
 
-	public void doSubscribe(SipServletRequest subscribe) throws IOException
+	public void doSubscribe(SipServletRequest subscribe) throws IOException, ServletException
 	{
 		_regEventManager.doSubscribe(subscribe);
 	}

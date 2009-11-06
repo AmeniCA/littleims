@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.oam.util;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
@@ -23,10 +24,19 @@ public class HideableLink extends AjaxLink
 {	
 	private String _markupId;
 	
+	@Deprecated
 	public HideableLink(String id, String markupId)
 	{
 		super(id);
 		_markupId = markupId;
+		setOutputMarkupId(true);
+	}
+	
+	public HideableLink(String id, Component parent)
+	{
+		super(id);
+		parent.setOutputMarkupId(true);
+		_markupId = parent.getMarkupId();
 		setOutputMarkupId(true);
 	}
 	

@@ -106,7 +106,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 					}
 				});
 				item.setOutputMarkupId(true);
-				item.add(new HideableLink("hideLink", item.getMarkupId()));
+				item.add(new HideableLink("hideLink", item));
 			}
 			
 		});
@@ -147,7 +147,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 				item.add(serviceProfileLink);
 				serviceProfileLink.add(new Label("serviceProfile", publicIdentity.getServiceProfile().getName()));
 				item.setOutputMarkupId(true);
-				item.add(new HideableLink("hideLink", item.getMarkupId()));
+				item.add(new HideableLink("hideLink", item));
 					
 				item.add(new RefreshingView("privateIds", new Model((Serializable) publicIdentity.getPrivateIds())){
 
@@ -191,8 +191,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 			link.add(new Label("name"));
 			scscf.add(link);
 			scscf.add(new Label("uri"));
-			scscf.setOutputMarkupId(true);
-			scscf.add(new HideableLink("hideLink", scscf.getMarkupId()));
+			scscf.add(new HideableLink("hideLink", scscf));
 		}
 		
 		

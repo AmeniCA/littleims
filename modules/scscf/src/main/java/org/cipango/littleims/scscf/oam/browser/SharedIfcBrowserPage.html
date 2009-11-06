@@ -1,0 +1,28 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1 wicket:id="title"></h1>
+  	
+  	Shared IFC url: <span wicket:id="url"/><br/>
+  	<a href="#" wicket:id="refreshLink">Refresh shared iFCs</a><br/><br/>
+    
+  	<table class="filteredTable" >
+        <tr>
+            <th>Shared iFC ID</th>
+            <th>Priority</th>
+            <th>Trigger</th>
+            <th>Application server</th>
+        </tr>
+        <tr wicket:id="ifcs">
+            <td><span wicket:id="id"/></td>
+            <td><span wicket:id="priority"/></td>
+            <td><span wicket:id="trigger"/></td>
+            <td><span wicket:id="as"/></td>
+        </tr>
+    </table>
+  	
+  </div>
+</wicket:extend>
+</body>
+</html>

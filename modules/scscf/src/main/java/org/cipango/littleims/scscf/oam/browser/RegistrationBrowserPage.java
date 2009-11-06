@@ -13,14 +13,22 @@
 // ========================================================================
 package org.cipango.littleims.scscf.oam.browser;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.URI;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -39,6 +47,9 @@ public class RegistrationBrowserPage extends BasePage
 {
 	@SpringBean
 	private Registrar _registrar;
+	
+	@SpringBean
+	private SipFactory _sipFactory;
 		
 	@SuppressWarnings("unchecked")
 	public RegistrationBrowserPage(PageParameters pageParameters)
@@ -83,18 +94,55 @@ public class RegistrationBrowserPage extends BasePage
 					
 				});
 				
-				item.add(new ListView("bindings", context.getBindings())
+				item.add(new RefreshingView("bindings")
 				{
 
 					@Override
-					protected void populateItem(ListItem item)
+					protected void populateItem(Item item)
 					{
 						Binding binding = (Binding) item.getModelObject();
 						item.add(new Label("uri", binding.getContact().toString()));
 					}
+
+					@Override
+					protected Iterator getItemModels()
+					{
+						Context context = (Context) item.getModelObject();
+						Iterator<Binding> it = context.getBindings().iterator();
+						List l = new ArrayList();
+						while (it.hasNext())
+							l.add(new LoadableBinding(it.next(), context.getPublicIdentity()));
+						return l.iterator();
+					}
 					
 				});
-				
+				item.add(new AjaxFallbackLink("reAuthLink")
+				{
+
+					@Override
+					public void onClick(AjaxRequestTarget target)
+					{
+						if (target != null)
+							target.addComponent(getPage().get("feedback"));
+						
+						try
+						{
+							Context context = (Context) item.getModelObject();
+							URI aor = _sipFactory.createURI(context.getPublicIdentity());
+							_registrar.requestReauthentication(aor, 
+									context.getBindings().get(0).getPrivateUserIdentity());
+							info("Network intiated re-authentication send for identity: " + aor);
+							if (target != null)
+								target.addComponent(getParent());
+						}
+						catch (Exception e)
+						{
+							warn("Failed to request re-authentication: " + e);
+						}
+					}
+					
+				});
+				item.setOutputMarkupId(true);
 				
 				item.add(new AttributeModifier("class", true, new AbstractReadOnlyModel<String>()
 				{
@@ -134,4 +182,24 @@ public class RegistrationBrowserPage extends BasePage
 			return _registrar.getContext(_key);
 		}
 	}
+	
+	class LoadableBinding extends LoadableDetachableModel<Binding>
+	{
+		private String _key;
+		private String _aor;
+	
+		public LoadableBinding(Binding o, String aor)
+		{
+			super(o);
+			_key = o.getPrivateUserIdentity();
+			_aor = aor;
+		}
+	
+		@Override
+		protected Binding load()
+		{
+			return _registrar.getContext(_aor).getBinding(_key);
+		}
+	}
+
 }

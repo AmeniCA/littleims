@@ -60,8 +60,7 @@ public class ViewIfcPanel extends Panel
 		String xml = out.toString();
 		add(new Label("xml", xml));
 										
-		setOutputMarkupId(true);
-		add(new HideableLink("hideLink", getMarkupId()));
+		add(new HideableLink("hideLink", this));
 	}
 
 }

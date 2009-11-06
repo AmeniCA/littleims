@@ -13,11 +13,9 @@
 // ========================================================================
 package org.cipango.littleims.scscf.registrar.regevent;
 
-import org.apache.log4j.Logger;
-
 import java.util.TimerTask;
 
-import javax.servlet.sip.SipSession;
+import org.apache.log4j.Logger;
 
 public class ExpiryTask extends TimerTask
 {
@@ -25,10 +23,14 @@ public class ExpiryTask extends TimerTask
 	 * Logger for this class
 	 */
 	private static final Logger log = Logger.getLogger(ExpiryTask.class);
+	
+	private RegSubscription _subscription;
+	private RegEventManager manager;
+	private String aor;
 
-	public ExpiryTask(SipSession session, RegEventManager manager)
+	public ExpiryTask(RegSubscription subscription, RegEventManager manager)
 	{
-		this.session = session;
+		_subscription = subscription;
 		this.manager = manager;
 	}
 
@@ -36,10 +38,9 @@ public class ExpiryTask extends TimerTask
 	{
 		try
 		{
-			log.info("Subscription session has expired");
-			RegEvent e = (RegEvent) session.getAttribute(LAST_EVENT);
-			manager.sendNotification(e, session, "full");
-			manager.removeSubscription(aor, session);
+			log.info("Reg Subscription " + _subscription + " has expired");
+			_subscription.sendNotification(_subscription.getLastEvent(), "full");
+			manager.removeSubscription(aor, _subscription);
 		}
 		catch (Throwable e)
 		{
@@ -47,10 +48,6 @@ public class ExpiryTask extends TimerTask
 		}
 	}
 
-	private SipSession session;
-	private RegEventManager manager;
-	private String aor;
 
-	public static final String LAST_EVENT = "lastEvent";
 
 }

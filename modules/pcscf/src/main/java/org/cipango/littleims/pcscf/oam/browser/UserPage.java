@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.WebMarkupContainerWithAssociatedMarkup;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -46,9 +45,8 @@ public class UserPage extends BasePage
 		List<String> associated = _regEventService.getRegisteredUsers().get(_publicIdentity);
 		if (associated == null)
 		{
-			WebMarkupContainer c = new WebMarkupContainer("associated");
-			add(c);
-			c.add(new Label("aor", "User is not registered"));
+			add(new WebMarkupContainer("associated").setVisible(false));
+			info("User is not registered");
 		}
 		else
 		{
@@ -67,7 +65,7 @@ public class UserPage extends BasePage
 		DebugConf debugConf = _debugIdService.getDebugConfs().get(_publicIdentity);
 		if (debugConf == null)
 		{
-			WebMarkupContainer markup = new WebMarkupContainerWithAssociatedMarkup("debugSessions");
+			WebMarkupContainer markup = new WebMarkupContainer("debugSessions");
 			markup.add(new Label("session", "No debug configuration found"));
 			add(markup);
 		}	

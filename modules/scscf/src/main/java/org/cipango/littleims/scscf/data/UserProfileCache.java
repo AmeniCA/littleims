@@ -15,7 +15,6 @@ package org.cipango.littleims.scscf.data;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

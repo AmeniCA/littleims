@@ -15,6 +15,8 @@ package org.cipango.ims.hss.web;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.CSSPackageResource;
+import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -23,6 +25,7 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.web.ImsSession.DaoDetachableModel;
 import org.cipango.ims.hss.web.adminuser.EditAdminUserPage;
+import org.cipango.ims.oam.SpringApplication;
 import org.cipango.ims.oam.util.SignOutPage;
 
 public class HeaderPanel extends Panel
@@ -50,6 +53,8 @@ public class HeaderPanel extends Panel
 			add(new WebMarkupContainer("profileLink").setVisible(false));
 			add(new WebMarkupContainer("signout").setVisible(false));
 		}
+		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style.css"));
+		add(JavascriptPackageResource.getHeaderContribution(SpringApplication.class, "common-util.js"));
 	}
 	
 	@SuppressWarnings("unchecked")

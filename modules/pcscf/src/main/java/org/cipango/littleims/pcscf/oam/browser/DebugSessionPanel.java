@@ -41,7 +41,7 @@ public class DebugSessionPanel extends Panel
 		add(new Label("debugId", debugSession.getDebugId()));
 		add(new Label("startTrigger", debugSession.getStartTriggerAsString()));
 		add(new Label("stopTrigger", debugSession.getStoptTriggerAsString()));
-		add(new HideableLink("hideLink", getMarkupId()));
+		add(new HideableLink("hideLink", this));
 		_debugId = debugSession.getDebugId();
 		refreshLog();
 		

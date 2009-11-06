@@ -35,6 +35,7 @@
                 <li>Expires: <span wicket:id="expires"/></li>
                 <li>State: <span wicket:id="state"/></li>
                 <li>Last event: <span wicket:id="event"/></li>
+                <li><A wicket:id="reAuthLink">Network-initiated reauthentication</A></li>
             </ul>
         </div>      
     </div>
@@ -55,22 +56,34 @@
         </div>    	
      </div>
   	
-  	<!-- h2>Subscriptions</h2>
-  	<div class="elementPanel" wicket:id="regEvent">
+  	<h2>Subscriptions</h2>
+  	<div class="elementPanel" wicket:id="regSubscription">
         <div class="title">
             <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
             event: <b>reg</b>
         </div>
         <div class="body">
             <ul>
-                <li>Contact: <span wicket:id="contact"/></li>
-                <li>Path: <span wicket:id="path"/></li>
+                <li>Subscriber URI: <span wicket:id="subscriberUri"/></li>
+                <li>Version: <span wicket:id="version"/></li>
                 <li>Expires: <span wicket:id="expires"/></li>
-                <li>State: <span wicket:id="state"/></li>
-                <li>Last event: <span wicket:id="event"/></li>
             </ul>
         </div>      
-    </div -->
+    </div>
+    
+    <div class="elementPanel" wicket:id="debugSubscription">
+        <div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            event: <b>debug</b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>Subscriber URI: <span wicket:id="subscriberUri"/></li>
+                <li>Version: <span wicket:id="version"/></li>
+                <li>Expires: <span wicket:id="expires"/></li>
+            </ul>
+        </div>      
+    </div>
 
   </div>
 </wicket:extend>
