@@ -17,6 +17,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileListener;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
@@ -34,6 +35,7 @@ public class DebugSession implements UserProfileListener
 	private long _absoluteExpires;
 	private String _aor;
 	private String _subscriberUri;
+	private UserProfile _userProfile;
 	
 	public DebugSession(SipSession session, int expires, String subscriberUri)
 	{
@@ -44,13 +46,14 @@ public class DebugSession implements UserProfileListener
 		_subscriberUri = subscriberUri;
 	}
 	
-	public void sendNotify(String serviceLevelTraceInfo)
+	protected void sendNotify(String serviceLevelTraceInfo)
 	{
 		try
 		{
 			SipServletRequest notify = _session.createRequest(Methods.NOTIFY);
 			if (serviceLevelTraceInfo == null)
 				serviceLevelTraceInfo = EMPTY_SERVICE_LEVEL_TRACE_INFO;
+			
 			serviceLevelTraceInfo = serviceLevelTraceInfo.replace(
 					"version=\"0\"", "version=\"" + (_version++) + "\"");
 			notify.setContent(serviceLevelTraceInfo.getBytes(),
@@ -65,7 +68,10 @@ public class DebugSession implements UserProfileListener
 						+ expires);
 			notify.send();
 			if (expires == 0)
+			{
+				_userProfile.removeListener(this);
 				_session.getApplicationSession().invalidate();
+			}
 			
 			__log.debug("Send NOTIFY No " + (_version - 1) + " to " 
 					+ _aor + " for debug event");
@@ -118,6 +124,22 @@ public class DebugSession implements UserProfileListener
 	public String getSubscriberUri()
 	{
 		return _subscriberUri;
+	}
+
+	public void userProfileUncached()
+	{
+		_absoluteExpires = System.currentTimeMillis();
+		sendNotify(_userProfile.getServiceLevelTraceInfo());
+	}
+
+	public UserProfile getUserProfile()
+	{
+		return _userProfile;
+	}
+
+	public void setUserProfile(UserProfile userProfile)
+	{
+		_userProfile = userProfile;
 	}
 	
 }

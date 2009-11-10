@@ -80,7 +80,10 @@ public class PcscfServlet extends SipServlet
 			if (response.getMethod().equals(Methods.REGISTER))
 				_pcscfService.doRegisterResponse(response);
 			else
+			{
+				_pcscfService.doNonRegisterResponse(response);
 				_debugIdService.handleDebug(response);
+			}
 		}
 		catch (Throwable e) 
 		{

@@ -101,6 +101,7 @@ public class DebugIdService
 		UserProfile profile = _userProfileCache.getProfile(session.getAor(), null);
 		if (profile != null)
 		{
+			session.setUserProfile(profile);
 			profile.addListener(session);
 			session.sendNotify(profile.getServiceLevelTraceInfo());
 		}
@@ -175,7 +176,8 @@ public class DebugIdService
 		{
 			int expires = _session.getExpires();
 			if (expires == 0)
-				_session.sendNotify(null);
+				_session.sendNotify(_session.getUserProfile() == null ? 
+						null : _session.getUserProfile().getServiceLevelTraceInfo());
 			else
 				_timerService.createTimer(_session.getSipSession().getApplicationSession(), 
 						expires, false, this);

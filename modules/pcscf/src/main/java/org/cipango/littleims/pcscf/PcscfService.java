@@ -14,8 +14,6 @@
 package org.cipango.littleims.pcscf;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +135,26 @@ public class PcscfService
 		proxy.setRecordRoute(true);
 		proxy.setSupervised(true);
 		proxy.proxyTo(request.getRequestURI());
+	}
+	
+	/**
+	 * cf TS 24229 §5.2.6.4.4
+	 */
+	public void doNonRegisterResponse(SipServletResponse response)
+	{
+		SipServletRequest request = response.getRequest();
+		if (!request.isInitial())
+			return;
+		
+		// Add headers only if response is UE originating 
+		if (request.getTo().getURI().equals(request.getRequestURI()))
+			return;
+		
+		response.removeHeader(Headers.P_CALLED_PARTY_ID);
+		
+		String pCalledParty = request.getHeader(Headers.P_CALLED_PARTY_ID);
+		if (pCalledParty != null)
+			response.setHeader(Headers.P_ASSERTED_IDENTITY, pCalledParty);
 	}
 	
 	private void processHeaders(SipServletRequest request, List<String> toRemove, Map<String, String> toAdd)

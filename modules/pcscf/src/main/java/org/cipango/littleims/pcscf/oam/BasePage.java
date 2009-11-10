@@ -42,7 +42,7 @@ public abstract class BasePage extends WebPage
 		// The title can need subclass construction done
 		if (get("page.title") == null)
 		{
-			add(new Label("page.title", "P-CSCF :: " + getTitle()));
+			add(new Label("page.title", getString("prefix.pcscf") + getTitle()));
 		}
 	}
 

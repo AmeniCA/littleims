@@ -160,9 +160,12 @@ public class UserProfileCache
 	
 	public void clearUserProfile(String publicID)
 	{
-		if (_serviceProfiles.remove(publicID) == null)
+		UserProfile profile = _serviceProfiles.remove(publicID);
+		if (profile == null)
 			__log.debug("Could not remove profile for public identity " + publicID 
 					+ ": Profile not found");
+		else
+			profile.fireUncacheProfile();
 
 	}
 	

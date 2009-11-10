@@ -74,6 +74,15 @@ public class UserProfile
 		_serviceLevelTraceInfo = serviceLevelTraceInfo;
 	}
 	
+	protected void fireUncacheProfile()
+	{
+		if (_listeners != null)
+		{
+			for (UserProfileListener l : _listeners)
+				l.userProfileUncached();
+		}
+	}
+	
 	public void addListener(UserProfileListener l)
 	{
 		if (_listeners == null)

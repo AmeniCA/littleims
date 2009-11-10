@@ -19,4 +19,6 @@ public interface UserProfileListener extends EventListener
 {
 
 	public void serviceLevelTraceInfoChanged(String newValue);
+	
+	public void userProfileUncached();
 }
