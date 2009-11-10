@@ -9,6 +9,8 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RefreshingView;
@@ -72,6 +74,7 @@ public class ContextPanel extends Panel {
 				new PageParameters("id=" + publicIdentity.getServiceProfile().getName())));
 
 		addPrivateIds(publicIdentity);
+		addImplicitSet(publicIdentity);
 		addDebugSessions(publicIdentity);
 	}
 	
@@ -111,6 +114,24 @@ public class ContextPanel extends Panel {
 		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, 
 				new PageParameters("publicId=" + publicIdentity.getIdentity())));
 		
+	}
+	
+	private void addImplicitSet(PublicUserIdentity identity)
+	{
+		List<String> l = identity.getImplicitRegistrationSet().getPublicIds();
+		l.remove(identity.getIdentity());
+		add(new ListView("publicIds", l){
+
+			@Override
+			protected void populateItem(ListItem item)
+			{
+				MarkupContainer link = new BookmarkablePageLink("identity", 
+						EditPublicUserIdPage.class, 
+						new PageParameters("id=" + item.getModelObject()));
+				item.add(link);
+				link.add(new Label("name", item.getModel()));
+			}
+		});
 	}
 	
 	private void addDebugSessions(PublicIdentity publicIdentity)

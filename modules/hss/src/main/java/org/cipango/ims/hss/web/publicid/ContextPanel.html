@@ -26,11 +26,6 @@
 		<li>
 			<a href="#" wicket:id="xmlSubscriptionLink"><wicket:message key="contextPanel.xmlSubscription"/></a>
 		</li>
-		<wicket:enclosure>
-    		<li>
-    			<a href="#" wicket:id="implicitSetLink"><wicket:message key="contextPanel.implicitSets"/></a>
-    		</li>
-    	</wicket:enclosure>
 		<li>
 			<a href="#" wicket:id="serviceProfileLink"><wicket:message key="contextPanel.serviceProfile"/></a>
 		</li>
@@ -47,6 +42,19 @@
 				</li>
 			</ul>
 		</li>
+		<li>
+            <wicket:message key="contextPanel.implicitSet"/>
+            <ul>
+                <li wicket:id="publicIds">
+                    <a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
+                </li>
+                <wicket:enclosure>
+                    <li>
+                        <a href="#" wicket:id="implicitSetLink"><wicket:message key="contextPanel.implicitSets"/></a>
+                    </li>
+                </wicket:enclosure>
+            </ul>
+        </li>
 		<li>
 			<wicket:message key="contextPanel.debugSessions"/>
 			<ul>

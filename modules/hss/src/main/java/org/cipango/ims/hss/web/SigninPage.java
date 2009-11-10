@@ -3,6 +3,7 @@ package org.cipango.ims.hss.web;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.PasswordTextField;
@@ -15,6 +16,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.model.AdminUser;
+import org.cipango.ims.oam.SpringApplication;
 
 @SuppressWarnings("unused")
 public class SigninPage extends WebPage
@@ -29,6 +31,7 @@ public class SigninPage extends WebPage
 		add(new Label("title", getString("signin.title")));
 		add(new SignInForm("signInForm"));
 		add(new FeedbackPanel("feedback"));
+		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style.css"));
 	}
 	
 	@SuppressWarnings("unchecked")
