@@ -14,9 +14,8 @@
 package org.cipango.littleims.scscf.session;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.ListIterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -26,6 +25,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
@@ -73,7 +73,7 @@ public class SessionManagerImpl implements SessionManager
 	private SipURI _bgcfUri;
 	private CxManager _cxManager;
 	private MessageSender _messageSender;
-	
+	private String _domain;
 	
 	public void init()
 	{
@@ -147,6 +147,8 @@ public class SessionManagerImpl implements SessionManager
 							request);
 					return;
 				}
+				
+				addPassertedIdentities(request, profile);
 				
 				// TODO add support to P-Asserted-Service
 				session = new OriginatingSession(profile, context != null);
@@ -263,6 +265,39 @@ public class SessionManagerImpl implements SessionManager
 		}
 	}
 	
+	
+	private void addPassertedIdentities(SipServletRequest request, UserProfile profile) throws ServletParseException
+	{
+		ListIterator<Address> it = request.getAddressHeaders(Headers.P_ASSERTED_IDENTITY);
+		int nb = 0;
+		while (it.hasNext())
+		{
+			it.next();
+			nb++;
+		}
+		if (nb == 1)
+		{
+			Address address = it.previous();
+			if (address.getURI().isSipURI())
+			{
+				String alias = profile.getTelUriAlias();
+				if (alias != null)
+					request.addHeader(Headers.P_ASSERTED_IDENTITY, alias);
+			}
+			else if (address.getURI() instanceof TelURL)
+			{
+				TelURL telURL = (TelURL) address.getURI();
+				if (telURL.isGlobal())
+				{
+					SipURI sipURI = _sipFactory.createSipURI("+" + telURL.getPhoneNumber(), _domain);
+					sipURI.setUserParam("phone");
+					Address addr = _sipFactory.createAddress(sipURI);
+					addr.setDisplayName(address.getDisplayName());
+					request.addAddressHeader(Headers.P_ASSERTED_IDENTITY, addr, false);
+				}
+			}
+		}
+	}
 	
 	public void handleSaa(DiameterAnswer saa)
 	{
@@ -602,6 +637,16 @@ public class SessionManagerImpl implements SessionManager
 	public void setMessageSender(MessageSender messageSender)
 	{
 		_messageSender = messageSender;
+	}
+
+	public String getDomain()
+	{
+		return _domain;
+	}
+
+	public void setDomain(String domain)
+	{
+		_domain = domain;
 	}
 
 }

@@ -120,5 +120,11 @@ public class PSI extends PublicIdentity
 		_applicationServer = applicationServer;
 	}
 
+	@Override
+	protected String getAliasGroupId()
+	{
+		return null;
+	}
+
 	
 }

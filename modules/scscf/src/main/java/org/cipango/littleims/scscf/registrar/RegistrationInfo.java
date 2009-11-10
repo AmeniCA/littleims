@@ -20,30 +20,31 @@ import javax.servlet.sip.Address;
 public class RegistrationInfo
 {
 
+	private List<Address> _contacts;
+	private List<Address> _associatedURIs;
+	
 	public RegistrationInfo()
 	{
 	}
 
 	public void setContacts(List<Address> contacts)
 	{
-		this.contacts = contacts;
+		_contacts = contacts;
 	}
 
 	public List<Address> getContacts()
 	{
-		return contacts;
+		return _contacts;
 	}
 
-	public void setAssociatedURIs(List<String> associatedURIs)
+	public void setAssociatedUris(List<Address> associatedURIs)
 	{
-		this.associatedURIs = associatedURIs;
+		_associatedURIs = associatedURIs;
 	}
 
-	public List<String> getAssociatedURIs()
+	public List<Address> getAssociatedURIs()
 	{
-		return associatedURIs;
+		return _associatedURIs;
 	}
 
-	private List<Address> contacts;
-	private List<String> associatedURIs;
 }

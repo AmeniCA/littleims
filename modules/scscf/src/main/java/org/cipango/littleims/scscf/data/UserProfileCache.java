@@ -15,7 +15,10 @@ package org.cipango.littleims.scscf.data;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,6 +29,7 @@ import org.cipango.littleims.cx.data.userprofile.SharedIFCsDocument;
 import org.cipango.littleims.cx.data.userprofile.TCoreNetworkServicesAuthorization;
 import org.cipango.littleims.cx.data.userprofile.TInitialFilterCriteria;
 import org.cipango.littleims.cx.data.userprofile.TPublicIdentity;
+import org.cipango.littleims.cx.data.userprofile.TPublicIdentityExtension2;
 import org.cipango.littleims.cx.data.userprofile.TServiceProfile;
 import org.cipango.littleims.cx.data.userprofile.TSharedIFC;
 import org.cipango.littleims.scscf.data.trigger.CriteriaMatch;
@@ -56,6 +60,8 @@ public class UserProfileCache
 	{
 		try
 		{
+			Map<String, List<UserProfile>> aliases = new HashMap<String, List<UserProfile>>();
+			
 			// check all Service Profiles
 			TServiceProfile[] profiles = imsSub.getIMSSubscription().getServiceProfileArray();
 			for (TServiceProfile profile :profiles)
@@ -141,15 +147,40 @@ public class UserProfileCache
 					
 					userProfile.setBarred(publicID.getBarringIndication());
 					userProfile.setServiceProfile(serviceProfile);
-					if (publicID.getExtension() != null
-							&& publicID.getExtension().getExtension() != null
-							&& publicID.getExtension().getExtension().getExtension() != null)
-						userProfile.setServiceLevelTraceInfo(publicID.getExtension().getExtension().getExtension().getServiceLevelTraceInfo());
+					
+					if (publicID.getExtension() != null && publicID.getExtension().getExtension() != null)
+					{
+						TPublicIdentityExtension2 extension = publicID.getExtension().getExtension();
+						userProfile.setDisplayName(extension.getDisplayName());
+						if (extension.getAliasIdentityGroupID() != null)
+						{
+							List<UserProfile> alias = aliases.get(extension.getAliasIdentityGroupID());
+							if (alias == null)
+							{
+								alias = new ArrayList<UserProfile>();
+								aliases.put(extension.getAliasIdentityGroupID(), alias);
+							}
+							alias.add(userProfile);
+						}
+						
+						if (extension.getExtension() != null)
+							userProfile.setServiceLevelTraceInfo(extension.getExtension().getServiceLevelTraceInfo());
+						else
+							userProfile.setServiceLevelTraceInfo(null);
+					}
 					else
 						userProfile.setServiceLevelTraceInfo(null);
 					__log.debug("Cache user profile for identity " + identity);
-					// TODO add UserProfileListener to unregister user if no debug subscription is set. 
 				}
+			}
+			
+			Iterator<List<UserProfile>> it = aliases.values().iterator();
+			while (it.hasNext())
+			{
+				List<UserProfile> list = it.next();
+				Iterator<UserProfile> it2 = list.iterator();
+				while (it2.hasNext())
+					it2.next().setAliases(list);		
 			}
 		}
 		catch (Exception e)

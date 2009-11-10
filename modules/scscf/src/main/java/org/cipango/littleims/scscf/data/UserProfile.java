@@ -14,6 +14,7 @@
 package org.cipango.littleims.scscf.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -25,6 +26,8 @@ public class UserProfile
 	private boolean _barred;
 	private ServiceProfile _serviceProfile;
 	private String _serviceLevelTraceInfo;
+	private List<String> _aliases;
+	private String _displayName;
 	private List<UserProfileListener> _listeners;
 	
 	public UserProfile(String uri)
@@ -40,6 +43,44 @@ public class UserProfile
 	public void setBarred(boolean b)
 	{
 		_barred = b;
+	}
+	
+	public void setAliases(List<UserProfile> aliases)
+	{
+		_aliases = null;
+		if (aliases == null)
+			return;
+		
+		Iterator<UserProfile> it = aliases.iterator();
+		while (it.hasNext())
+		{
+			UserProfile profile = (UserProfile) it.next();
+			if (profile != this)
+			{
+				if (_aliases == null)
+					_aliases = new ArrayList<String>();
+				_aliases.add(profile.getUri());
+			}
+		}
+	}
+	
+	public List<String> getAliases()
+	{
+		return _aliases;
+	}
+	
+	public String getTelUriAlias()
+	{
+		if (_aliases == null)
+			return null;
+		Iterator<String> it = _aliases.iterator();
+		while (it.hasNext())
+		{
+			String uri = (String) it.next();
+			if (uri.startsWith("tel:"))
+				return uri;
+		}
+		return null;
 	}
 
 	public void setServiceProfile(ServiceProfile profile)
@@ -99,5 +140,15 @@ public class UserProfile
 	public List<UserProfileListener> getListeners()
 	{
 		return _listeners;
+	}
+
+	public String getDisplayName()
+	{
+		return _displayName;
+	}
+
+	public void setDisplayName(String displayName)
+	{
+		_displayName = displayName;
 	}
 }

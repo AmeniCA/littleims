@@ -59,7 +59,7 @@ public class IcscfServlet extends SipServlet implements DiameterListener
 			{
 				_service.doRegister(request);
 			}
-			else
+			else if (!Methods.CANCEL.equals(request.getMethod()))
 			{
 				_service.doRequest(request);
 			}

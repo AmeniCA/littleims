@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.URI;
 
@@ -110,13 +111,13 @@ public class UserPage extends BasePage
 		add(markup);
 		markup.add(new Label("aor", _publicIdentity));
 		markup.add(new Label("state", context.getState().toString()));
-		markup.add(new ListView("associated", context.getAssociatedURIs())
+		markup.add(new ListView("associated", context.getAssociatedUris())
 		{
 
 			@Override
 			protected void populateItem(ListItem item)
 			{
-				item.add(new AorLink("aorLink", (String) item.getModelObject()));
+				item.add(new AorLink("aorLink", ((Address) item.getModelObject()).getURI().toString()));
 			}
 			
 		});
@@ -194,8 +195,25 @@ public class UserPage extends BasePage
 			add(markup);
 			markup.add(new Label("aor", _publicIdentity));
 			markup.add(new Label("uri"));
+			markup.add(new Label("displayName"));
 			markup.add(new Label("barred"));
 			markup.add(new Label("serviceLevelTraceInfo"));
+			
+			if (userProfile.getAliases() == null)
+			{
+				markup.add(new WebMarkupContainer("aliases").setVisible(false));
+			}
+			else
+				markup.add(new ListView("aliases", userProfile.getAliases())
+				{
+
+					@Override
+					protected void populateItem(ListItem item)
+					{
+						item.add(new AorLink("aorLink", (String) item.getModelObject()));
+					}
+					
+				});
 			
 			markup.add(new HideableLink("hideLink", markup));
 			

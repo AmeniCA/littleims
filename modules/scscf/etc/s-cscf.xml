@@ -166,6 +166,14 @@
 	<bean id="sessionManager" 
 			class="org.cipango.littleims.scscf.session.SessionManagerImpl"
 			init-method="init">
+			
+		<!--
+		The domain is used to add a SIP URI to the P-Asserted-Identity when 
+		P-Asserted-Identity is a Tel URL.
+		
+		Default: ${domain}
+		-->
+		<property name="domain" value="${domain}" />
 		<!--
 		This URI is used to push own route after AS processing
 		Must match with IP address and port on which S-SCF is listening.

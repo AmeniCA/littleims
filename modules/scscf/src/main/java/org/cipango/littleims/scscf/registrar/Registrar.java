@@ -310,12 +310,9 @@ public class Registrar
 			else
 				response.setExpires(0);
 	
-			Iterator<String> it = regInfo.getAssociatedURIs().iterator();
+			Iterator<Address> it = regInfo.getAssociatedURIs().iterator();
 			while (it.hasNext())
-			{
-				Address associatedURI = _sipFactory.createAddress(it.next());
-				response.addAddressHeader(Headers.P_ASSOCIATED_URI, associatedURI, false);
-			}
+				response.addAddressHeader(Headers.P_ASSOCIATED_URI, it.next(), false);
 	
 			response.addAddressHeader(Headers.SERVICE_ROUTE, _serviceRoute, true);
 			
@@ -358,15 +355,15 @@ public class Registrar
 	}
 
 	public RegistrationInfo register(URI to, Address contact,
-			String privateUserIdentity, int expires, SipURI path, IMSSubscriptionDocument subscription)
+			String privateUserIdentity, int expires, SipURI path, IMSSubscriptionDocument subscription) throws ServletParseException
 	{
-		List<String> associatedURIs = null;
+		List<Address> associatedURIs = null;
 		synchronized (_regContexts)
 		{
 			Context regContext = _regContexts.get(to.toString());
 			if (regContext != null)
 			{
-				associatedURIs = regContext.getAssociatedURIs();
+				associatedURIs = regContext.getAssociatedUris();
 			}
 		}
 
@@ -377,7 +374,7 @@ public class Registrar
 				
 		if (associatedURIs == null)
 		{
-			associatedURIs = new ArrayList<String>();
+			associatedURIs = new ArrayList<Address>();
 			TServiceProfile[] profiles = subscription.getIMSSubscription().getServiceProfileArray();
 			_userProfileCache.cacheUserProfile(subscription);
 			
@@ -388,7 +385,10 @@ public class Registrar
 				{	
 					if (!identity.getBarringIndication())
 					{
-						associatedURIs.add(identity.getIdentity());
+						Address addr = _sipFactory.createAddress(identity.getIdentity());
+						if (identity.getExtension() != null && identity.getExtension().getExtension() != null)
+							addr.setDisplayName(identity.getExtension().getExtension().getDisplayName());
+						associatedURIs.add(addr);
 					}
 				}
 			}
@@ -401,17 +401,17 @@ public class Registrar
 		{
 
 			// create all registration contexts if they are null
-			Iterator<String> it = associatedURIs.iterator();
+			Iterator<Address> it = associatedURIs.iterator();
 			while (it.hasNext())
 			{
-				String publicID = (String) it.next();
-				boolean explicit = publicID.equals(aor);
-				Context regContext = (Context) _regContexts.get(publicID);
+				URI publicID = it.next().getURI();
+				boolean explicit = publicID.equals(to);
+				Context regContext = (Context) _regContexts.get(publicID.toString());
 				if (regContext == null)
 				{
-					regContext = new Context(publicID);
-					regContext.setAssociatedURIs(associatedURIs);
-					_regContexts.put(publicID, regContext);
+					regContext = new Context(publicID.toString());
+					regContext.setAssociatedUris(associatedURIs);
+					_regContexts.put(publicID.toString(), regContext);
 					__log.info("User " + publicID + " has been registered");
 				}
 				RegInfo regInfo = regContext.updateBinding(contact, privateUserIdentity, expires,
@@ -425,7 +425,7 @@ public class Registrar
 			notifyListeners(regEvent);
 
 			RegistrationInfo info = new RegistrationInfo();
-			info.setAssociatedURIs(associatedURIs);
+			info.setAssociatedUris(associatedURIs);
 
 			Context explicit = (Context) _regContexts.get(to.toString());
 			// start reg timer
@@ -442,7 +442,7 @@ public class Registrar
 	public void requestReauthentication(URI aor, String privateIdentity)
 	{
 		__log.debug("Network-initiated reauthentication for private identity: " + privateIdentity);
-		List<String> associatedURIs = null;
+		List<Address> associatedURIs = null;
 		synchronized (_regContexts)
 		{
 			Context regContext = _regContexts.get(aor.toString());
@@ -451,13 +451,13 @@ public class Registrar
 				__log.warn("Network-initiated reauthentication failed: no context for " + aor);
 				return;
 			}
-			associatedURIs = regContext.getAssociatedURIs();
+			associatedURIs = regContext.getAssociatedUris();
 			
 			RegEvent regEvent = new RegEvent();
-			Iterator<String> it = associatedURIs.iterator();
+			Iterator<Address> it = associatedURIs.iterator();
 			while (it.hasNext())
 			{
-				String publicID = it.next();
+				String publicID = it.next().getURI().toString();
 				Context context = _regContexts.get(publicID);
 				RegInfo regInfo = context.requestReauthentication(privateIdentity, _reauthicationExpires);
 				if (regInfo != null)
@@ -489,10 +489,10 @@ public class Registrar
 			}
 			else
 			{
-				Iterator<String> it = regContext.getAssociatedURIs().iterator();
+				Iterator<Address> it = regContext.getAssociatedUris().iterator();
 				while (it.hasNext())
 				{
-					Context context = _regContexts.get(it.next());
+					Context context = _regContexts.get(it.next().getURI().toString());
 					if (context != null)
 						regEvent.addRegInfo(context.getRegInfo());
 				}
@@ -515,15 +515,15 @@ public class Registrar
 			if (regContext == null)
 			{
 				RegistrationInfo info = new RegistrationInfo();
-				info.setAssociatedURIs(new ArrayList<String>());
+				info.setAssociatedUris(new ArrayList<Address>());
 				return info;
 			}
-			List<String> associatedURIs = regContext.getAssociatedURIs();
-			Iterator<String> it = associatedURIs.iterator();
+			List<Address> associatedURIs = regContext.getAssociatedUris();
+			Iterator<Address> it = associatedURIs.iterator();
 			boolean allTerminating = true;
 			while (it.hasNext())
 			{
-				String publicID = (String) it.next();
+				String publicID = it.next().getURI().toString();
 				regContext = (Context) _regContexts.get(publicID);
 				if (regContext != null)
 				{
@@ -546,7 +546,7 @@ public class Registrar
 			notifyListeners(regEvent);
 
 			RegistrationInfo info = new RegistrationInfo();
-			info.setAssociatedURIs(associatedURIs);
+			info.setAssociatedUris(associatedURIs);
 			info.setContacts(regContext.getContacts());
 			
 			return info;
@@ -614,26 +614,25 @@ public class Registrar
 	{
 		// send third-party registration to relevant application servers
 		// @see 24.229 5.4.1.7
-		Iterator<String> it = regInfo.getAssociatedURIs().iterator();
+		Iterator<Address> it = regInfo.getAssociatedURIs().iterator();
 		while (it.hasNext())
 		{
-			String sURI = it.next();
-			UserProfile profile = _userProfileCache.getProfile(sURI, null);
+			URI uri = it.next().getURI();
+			UserProfile profile = _userProfileCache.getProfile(uri.toString(), null);
 
 			Iterator<InitialFilterCriteria> ifcs = profile.getServiceProfile().getIFCsIterator();
 
 			while (ifcs.hasNext())
 			{
-				URI toUri = _sipFactory.createURI(sURI);
 				URI fromUri = _scscfUri;
 				InitialFilterCriteria ifc = (InitialFilterCriteria) ifcs.next();
 				__log.debug("Evaluating ifc: " + ifc);
 				if (ifc.matches(request,
 						InitialFilterCriteria.SessionCase.ORIGINATING_SESSION))
 				{
-					__log.debug("IFC matches for URI: " + sURI + ". Sending Third-Party REGISTER");
+					__log.debug("IFC matches for URI: " + uri + ". Sending Third-Party REGISTER");
 					SipServletRequest register = _sipFactory.createRequest(request
-							.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
+							.getApplicationSession(), Methods.REGISTER, fromUri, uri);
 					register.setExpires(expires);
 					register.setRequestURI(_sipFactory.createURI(ifc.getAs().getURI()));
 					
@@ -678,26 +677,25 @@ public class Registrar
 					aor);
 			request.setExpires(0);
 			
-			Iterator<String> it = regInfo.getAssociatedURIs().iterator();
+			Iterator<Address> it = regInfo.getAssociatedURIs().iterator();
 			while (it.hasNext())
 			{
-				String sURI = it.next();
-				UserProfile profile = _userProfileCache.getProfile(sURI, null);
+				URI uri = it.next().getURI();
+				UserProfile profile = _userProfileCache.getProfile(uri.toString(), null);
 
 				Iterator<InitialFilterCriteria> ifcs = profile.getServiceProfile().getIFCsIterator();
 
 				while (ifcs.hasNext())
 				{
-					URI toUri = _sipFactory.createURI(sURI);
 					URI fromUri = _scscfUri;
 					InitialFilterCriteria ifc = (InitialFilterCriteria) ifcs.next();
 					__log.debug("Evaluating ifc: " + ifc);
 					if (ifc.matches(request,
 							InitialFilterCriteria.SessionCase.ORIGINATING_SESSION))
 					{
-						__log.debug("IFC matches for URI: " + sURI + ". Sending Third-Party REGISTER");
+						__log.debug("IFC matches for URI: " + uri + ". Sending Third-Party REGISTER");
 						SipServletRequest register = _sipFactory.createRequest(request
-								.getApplicationSession(), Methods.REGISTER, fromUri, toUri);
+								.getApplicationSession(), Methods.REGISTER, fromUri, uri);
 						register.setExpires(0);
 						register.setRequestURI(_sipFactory.createURI(ifc.getAs().getURI()));
 						
@@ -777,14 +775,14 @@ public class Registrar
 					continue;
 				
 				RegistrationInfo info = new RegistrationInfo();
-				info.setAssociatedURIs(regContext.getAssociatedURIs());
+				info.setAssociatedUris(regContext.getAssociatedUris());
 				sendThirdPartyRegister(publicId, info);
 				
 				RegEvent regEvent = new RegEvent();
-				Iterator<String> it2 = regContext.getAssociatedURIs().iterator();
+				Iterator<Address> it2 = regContext.getAssociatedUris().iterator();
 				while (it2.hasNext())
 				{
-					String associatedIdentity = it2.next();
+					String associatedIdentity = it2.next().getURI().toString();
 					Context context = _regContexts.get(associatedIdentity);
 
 					if (context != null)
@@ -818,11 +816,11 @@ public class Registrar
 					String publicId = context.getPublicIdentity();
 					RegEvent regEvent = new RegEvent();
 						
-					List<String> associatedURIs = context.getAssociatedURIs();
-					Iterator<String> it3 = associatedURIs.iterator();
+					List<Address> associatedURIs = context.getAssociatedUris();
+					Iterator<Address> it3 = associatedURIs.iterator();
 					while (it3.hasNext())
 					{
-						String publicID = it3.next();
+						String publicID = it3.next().getURI().toString();
 						context = (Context) _regContexts.get(publicID);
 						if (context != null)
 						{
@@ -841,7 +839,7 @@ public class Registrar
 					notifyListeners(regEvent);
 
 					RegistrationInfo info = new RegistrationInfo();
-					info.setAssociatedURIs(associatedURIs);
+					info.setAssociatedUris(associatedURIs);
 					info.setContacts(context.getContacts());
 											
 					sendThirdPartyRegister(publicId, info);

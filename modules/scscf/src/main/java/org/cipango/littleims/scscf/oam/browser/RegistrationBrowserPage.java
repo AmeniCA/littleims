@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.URI;
 
@@ -83,13 +84,13 @@ public class RegistrationBrowserPage extends BasePage
 				item.add(new AorLink("aorLink", context.getPublicIdentity()));
 				item.add(new Label("state"));
 				
-				item.add(new ListView("associated", context.getAssociatedURIs())
+				item.add(new ListView("associated", context.getAssociatedUris())
 				{
 
 					@Override
 					protected void populateItem(ListItem item)
 					{
-						item.add(new AorLink("aorLink", (String) item.getModelObject()));
+						item.add(new AorLink("aorLink", ((Address) item.getModelObject()).getURI().toString()));
 					}
 					
 				});

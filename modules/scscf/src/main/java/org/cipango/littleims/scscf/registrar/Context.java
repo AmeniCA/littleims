@@ -35,7 +35,7 @@ public class Context
 	private String _publicUserIdentity;
 	private Map<String, Binding> _bindings = new HashMap<String, Binding>();
 
-	private List<String> _associatedURIs;
+	private List<Address> _associatedUris;
 
 	private RegState _state;
 	
@@ -329,14 +329,15 @@ public class Context
 		return regInfo;
 	}
 
-	public void setAssociatedURIs(List<String> associatedURIs)
+	public void setAssociatedUris(List<Address> associatedURIs)
 	{
-		this._associatedURIs = associatedURIs;
+		_associatedUris = associatedURIs;
+	}
+	
+	public List<Address> getAssociatedUris()
+	{
+		return _associatedUris;
 	}
 
-	public List<String> getAssociatedURIs()
-	{
-		return _associatedURIs;
-	}
 
 }

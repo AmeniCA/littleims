@@ -96,6 +96,11 @@ public class PublicUserIdentity extends PublicIdentity
 		return out.toString();
 	}
 	
+	protected String getAliasGroupId()
+	{
+		return String.valueOf(getImplicitRegistrationSet().getId()) + "-" + getServiceProfile().getId();
+	}
+	
 	@Override
 	public void setIdentityType(Short identityType)
 	{

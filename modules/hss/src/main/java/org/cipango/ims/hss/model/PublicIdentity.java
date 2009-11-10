@@ -160,12 +160,15 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.add("IdentityType", getIdentityType());
 		if (_regex != null)
 			out.add("WildcardedPSI", _identity);
-		if (!Strings.isEmpty(_displayName) || !_debugSessions.isEmpty())
+		if (!Strings.isEmpty(_displayName) || !_debugSessions.isEmpty() || !Strings.isEmpty(getAliasGroupId()))
 		{
 			out.open("Extension");
 			
 			if (!Strings.isEmpty(_displayName))
 				out.add("DisplayName", _displayName);
+			
+			if (!Strings.isEmpty(getAliasGroupId()))
+				out.add("AliasIdentityGroupID", getAliasGroupId());
 			
 			if (!_debugSessions.isEmpty())
 			{
@@ -176,7 +179,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 				out.open(/*"?xml version=\"1.0\"?>\n\t\t\t\t\t\t\t<"
 						+ */"debuginfo xmlns=\"urn:ietf:params:xml:ns:debuginfo\" "
 						+ "version=\"0\" state=\"full\"");
-				//FIXME manage version			
+							
 				out.open("debugconfig aor=\"" + (realImpu != null ? realImpu : _identity) + '"');
 				Map<String, String> attributes = new HashMap<String, String>();
 				for (DebugSession debugSession : _debugSessions)
@@ -222,6 +225,8 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	public abstract String getImsSubscriptionAsXml(String privateIdentity, String realImpu, boolean prettyPrint);
 	
 	public abstract Short getState();
+	
+	protected abstract String getAliasGroupId();
 	
 	public String getStateAsString()
 	{
