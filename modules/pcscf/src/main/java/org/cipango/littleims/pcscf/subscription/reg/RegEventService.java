@@ -67,12 +67,12 @@ public class RegEventService
 					}
 					else
 					{
-						// TODO update
+						regContext.addAssociatedIp(associatedIp);
 					}
 				}
 				else if (regContext != null)
 				{
-					// TODO
+					regContext.removeAssociatedIp(associatedIp);
 				}
 			}
 			

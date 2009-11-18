@@ -13,8 +13,6 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.oam.browser;
 
-import java.util.List;
-
 import javax.servlet.sip.Address;
 
 import org.apache.wicket.PageParameters;
@@ -49,6 +47,7 @@ public class UserPage extends BasePage
 		if (context == null)
 		{
 			add(new WebMarkupContainer("associated").setVisible(false));
+			add(new WebMarkupContainer("associatedIps").setVisible(false));
 			info("User is not registered");
 		}
 		else
@@ -60,6 +59,16 @@ public class UserPage extends BasePage
 				protected void populateItem(ListItem item)
 				{
 					item.add(new AorLink("aorLink", (Address) item.getModelObject()));
+				}
+				
+			});
+			add(new ListView("associatedIps", context.getAssociatedIps())
+			{
+	
+				@Override
+				protected void populateItem(ListItem item)
+				{
+					item.add(new Label("ip", (String) item.getModelObject()));
 				}
 				
 			});

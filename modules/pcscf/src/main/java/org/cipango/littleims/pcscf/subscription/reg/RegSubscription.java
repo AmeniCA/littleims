@@ -45,7 +45,7 @@ public class RegSubscription implements Subscription
 		_regService = service;
 		_session = session;
 		_regContext = context;
-		_aor = context.getDefaultIdentity().toString();
+		_aor = context.getDefaultIdentity().getURI().toString();
 		_privateIdentity = privateIdentity;
 	}
 		

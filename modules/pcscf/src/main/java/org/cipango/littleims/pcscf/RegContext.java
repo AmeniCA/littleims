@@ -36,6 +36,17 @@ public class RegContext
 		_associatedIps.add(remoteAddr);
 	}
 	
+	public void addAssociatedIp(String host)
+	{
+		if (!_associatedIps.contains(host))
+			_associatedIps.add(host);
+	}
+	
+	public void removeAssociatedIp(String host)
+	{
+		_associatedIps.remove(host);
+	}
+	
 	public boolean match(Address identity)
 	{
 		Iterator<Address> it = _associatedUris.iterator();
@@ -45,6 +56,11 @@ public class RegContext
 				return true;	
 		}
 		return false;
+	}
+	
+	public boolean match(String remoteAddr)
+	{
+		return _associatedIps.contains(remoteAddr);
 	}
 	
 	public Address getAssertedIdentity(Address identity)
@@ -120,5 +136,10 @@ public class RegContext
 			removeIdentity(identity);
 		}
 
+	}
+
+	public List<String> getAssociatedIps()
+	{
+		return _associatedIps;
 	}
 }

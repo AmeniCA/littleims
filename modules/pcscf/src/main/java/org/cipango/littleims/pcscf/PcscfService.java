@@ -52,6 +52,8 @@ public class PcscfService
 	private DebugIdService _debugIdService;
 	private RegEventService _regEventService;
 	
+	private boolean _checkRegistered = true;
+	
 	public void init()
 	{
 		if (_debugIdService.getUserAgent() == null)
@@ -98,7 +100,7 @@ public class PcscfService
 			_regEventService.subscribe(aor, 
 					expires, privateUserId, 
 					response.getAddressHeaders(Headers.P_ASSOCIATED_URI),
-					response.getRequest().getRemoteAddr());
+					response.getProxy().getOriginalRequest().getRemoteAddr());
 		}
 		
 		
@@ -121,7 +123,7 @@ public class PcscfService
 		if (!request.isInitial())
 			return;
 				
-		
+		RegContext context;
 		// Add headers only in originating mode
 		if (request.getTo().getURI().equals(request.getRequestURI()))
 		{
@@ -130,16 +132,20 @@ public class PcscfService
 			{
 				preferred = (Address) request.getFrom().clone();
 				preferred.removeParameter("tag");
-				RegContext context = _regEventService.getRegContext(preferred.getURI());
+				context = _regEventService.getRegContext(preferred.getURI());
 				if (context != null)
 					preferred = context.getDefaultIdentity();
 			}
 			else
 			{
-				RegContext context = _regEventService.getRegContext(preferred.getURI());
+				context = _regEventService.getRegContext(preferred.getURI());
 				if (context != null)
 					preferred = context.getAssertedIdentity(preferred);
 			}
+
+			if (checkIsRegistered(request, context, preferred))
+				return;
+			
 			processHeaders(request, _requestHeadersToRemove, _requestHeadersToAdd);
 			
 			request.setAddressHeader(Headers.P_ASSERTED_IDENTITY, preferred);
@@ -148,6 +154,37 @@ public class PcscfService
 		proxy.setRecordRoute(true);
 		proxy.setSupervised(true);
 		proxy.proxyTo(request.getRequestURI());
+	}
+	
+	/**
+	 * @return true if a response has been sent.
+	 */
+	private boolean checkIsRegistered(SipServletRequest request, RegContext context, Address preferred)
+	{
+		if (context == null)
+		{
+			_log.warn("Received a " + request.getMethod() + " from " + preferred.getURI()
+					+ " which is not registered");
+			if (_checkRegistered)
+			{
+				sendResponse(request, SipServletResponse.SC_FORBIDDEN);
+				return true;
+			}
+			return false;
+		}
+		
+		if (!context.match(request.getRemoteAddr()))
+		{
+			_log.warn("Received a " + request.getMethod() + " from " + preferred.getURI()
+					+ " which is not registered on address " + request.getRemoteAddr()
+					+ " but on " + context.getAssociatedIps());
+			if (_checkRegistered)
+			{
+				sendResponse(request, SipServletResponse.SC_FORBIDDEN);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -303,6 +340,16 @@ public class PcscfService
 	public void setRegEventService(RegEventService regEventService)
 	{
 		_regEventService = regEventService;
+	}
+
+	public boolean isCheckRegistered()
+	{
+		return _checkRegistered;
+	}
+
+	public void setCheckRegistered(boolean checkRegistered)
+	{
+		_checkRegistered = checkRegistered;
 	}
 
 }

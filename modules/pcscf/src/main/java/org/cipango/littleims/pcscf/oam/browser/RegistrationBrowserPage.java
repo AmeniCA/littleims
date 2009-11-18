@@ -71,14 +71,24 @@ public class RegistrationBrowserPage extends BasePage
 				item.add(new AorLink("aorLink", (String) item.getModelObject()));
 				
 				RegContext regContext = _service.getRegisteredUsers().get(item.getModelObject().toString());
-				List<Address> l2 = regContext.getAssociatedUris(); 
-				item.add(new ListView("associated", l2)
+
+				item.add(new ListView("associated", regContext.getAssociatedUris())
 				{
 
 					@Override
 					protected void populateItem(ListItem item)
 					{
 						item.add(new AorLink("aorLink", (Address) item.getModelObject()));
+					}
+					
+				});
+				item.add(new ListView("associatedIps", regContext.getAssociatedIps())
+				{
+
+					@Override
+					protected void populateItem(ListItem item)
+					{
+						item.add(new Label("ip", (String) item.getModelObject()));
 					}
 					
 				});

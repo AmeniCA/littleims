@@ -14,7 +14,6 @@
 package org.cipango.littleims.pcscf.subscription.debug;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,46 +51,48 @@ public class DebugIdService
 	 */
 	public void subscribe(URI aor, int expires)
 	{
-		try
+		synchronized (_subscriptions)
 		{
-			// TODO check if subscription exists
-			DebugSubscription subscription = _subscriptions.get(aor.toString());
-			
-			if (subscription == null || !subscription.getSession().isValid())
+			try
 			{
-				SipServletRequest request = _sipFactory.createRequest(
-						_sipFactory.createApplicationSession(),
-						Methods.SUBSCRIBE,
-						_pcscfUri,
-						aor);
-				request.addHeader(Headers.EVENT, EVENT_DEBUG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
-				request.setExpires(expires);
-				if (_userAgent != null)
-					request.setHeader(Headers.USER_AGENT, _userAgent);
-					
-				subscription = new DebugSubscription(this, request.getSession(), aor.toString());
-				_subscriptions.put(aor.toString(), subscription);
-				request.getApplicationSession().setAttribute(Subscription.class.getName(), 
-						subscription);
-				request.getSession().setHandler(SubscriptionServlet.class.getSimpleName());
-				request.send();
-				_log.debug("Start debug subscription of user " + aor);
+				DebugSubscription subscription = _subscriptions.get(aor.toString());
+				
+				if (subscription == null || !subscription.getSession().isValid())
+				{
+					SipServletRequest request = _sipFactory.createRequest(
+							_sipFactory.createApplicationSession(),
+							Methods.SUBSCRIBE,
+							_pcscfUri,
+							aor);
+					request.addHeader(Headers.EVENT, EVENT_DEBUG);
+					request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
+					request.setExpires(expires);
+					if (_userAgent != null)
+						request.setHeader(Headers.USER_AGENT, _userAgent);
+						
+					subscription = new DebugSubscription(this, request.getSession(), aor.toString());
+					_subscriptions.put(aor.toString(), subscription);
+					request.getApplicationSession().setAttribute(Subscription.class.getName(), 
+							subscription);
+					request.getSession().setHandler(SubscriptionServlet.class.getSimpleName());
+					request.send();
+					_log.debug("Start debug subscription of user " + aor);
+				}
+				else
+				{
+					SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
+					request.addHeader(Headers.EVENT, EVENT_DEBUG);
+					request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
+					request.setExpires(expires);
+					if (_userAgent != null)
+						request.setHeader(Headers.USER_AGENT, _userAgent);
+					request.send();
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				SipServletRequest request = subscription.getSession().createRequest(Methods.SUBSCRIBE);
-				request.addHeader(Headers.EVENT, EVENT_DEBUG);
-				request.addHeader(Headers.P_ASSERTED_IDENTITY, _pcscfUri.toString());
-				request.setExpires(expires);
-				if (_userAgent != null)
-					request.setHeader(Headers.USER_AGENT, _userAgent);
-				request.send();
+				_log.warn("Failed to SUBSCRIBE to debug event", e);
 			}
-		}
-		catch (Exception e)
-		{
-			_log.warn("Failed to SUBSCRIBE to debug event", e);
 		}
 	}
 	
@@ -173,7 +174,10 @@ public class DebugIdService
 	
 	public void removeSubscription(DebugSubscription subscription)
 	{
-		_subscriptions.remove(subscription.getAor());
+		synchronized (_subscriptions)
+		{
+			_subscriptions.remove(subscription.getAor());
+		}
 	}
 	
 	public Map<String, DebugConf> getDebugConfs()
