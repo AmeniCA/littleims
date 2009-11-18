@@ -16,6 +16,7 @@ package org.cipango.littleims.pcscf.subscription.reg;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
@@ -24,6 +25,7 @@ import org.cipango.ims.pcscf.reg.data.ReginfoDocument;
 import org.cipango.ims.pcscf.reg.data.ReginfoDocument.Reginfo;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration.State;
+import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.subscription.Subscription;
 
 public class RegSubscription implements Subscription
@@ -34,14 +36,16 @@ public class RegSubscription implements Subscription
 	private int _version = -1;
 	private RegEventService _regService;
 	private SipSession _session;
-	private String _aor;
 	private String _privateIdentity;
+	private RegContext _regContext;
+	private String _aor;
 	
-	public RegSubscription(RegEventService service, SipSession session, String aor, String privateIdentity)
+	public RegSubscription(RegEventService service, SipSession session, RegContext context, String privateIdentity)
 	{
 		_regService = service;
 		_session = session;
-		_aor = aor;
+		_regContext = context;
+		_aor = context.getDefaultIdentity().toString();
 		_privateIdentity = privateIdentity;
 	}
 		
@@ -67,18 +71,19 @@ public class RegSubscription implements Subscription
 			}
 			_version = version;
 			
-			List<String> registered = new ArrayList<String>();
-			List<String> unregistered = new ArrayList<String>();
+			List<Address> registered = new ArrayList<Address>();
+			List<Address> unregistered = new ArrayList<Address>();
 			for (Registration registration : reginfo.getRegistrationArray())
 			{
+				Address address = _regService.getSipFactory().createAddress(registration.getAor());
 				if (registration.getState() == State.ACTIVE)
-					registered.add(registration.getAor());
+					registered.add(address);
 				else	
-					unregistered.add(registration.getAor());
+					unregistered.add(address);
 			}
 			
-			_regService.addIdentitie(registered, reginfo.getState() == Reginfo.State.FULL);
-			_regService.removeIdentitie(unregistered);
+			_regContext.setIdentitie(registered, unregistered, reginfo.getState() == Reginfo.State.FULL);
+			_regService.normalize(_regContext, unregistered);
 		}
 		catch (Exception e)
 		{
@@ -88,7 +93,7 @@ public class RegSubscription implements Subscription
 	
 	public void invalidate()
 	{
-		__log.debug("Remove reg subscription for user " + _aor);
+		__log.debug("Remove reg subscription for user " +  _aor);
 		_session.invalidate();
 		_regService.removeSubscription(this);
 	}
@@ -100,7 +105,7 @@ public class RegSubscription implements Subscription
 
 	public String getAor()
 	{
-		return _aor;
+		return  _aor;
 	}
 
 	public int getVersion()

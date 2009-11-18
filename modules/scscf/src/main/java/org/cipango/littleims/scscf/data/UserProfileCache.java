@@ -95,18 +95,15 @@ public class UserProfileCache
 				if (profile.getExtension() != null)
 				{
 					int[] sIFCs = profile.getExtension().getSharedIFCSetIDArray();
-
-					if (_sharedIFCs == null)
-						refreshSharedIFCs();
 					
 					for (int j = 0; j < sIFCs.length; j++)
 					{
 						Integer ifcID = new Integer(sIFCs[j]);
 						
-						if (_sharedIFCs == null)
+						if (getSharedIFCs() == null)
 						{
 							__log.warn("Could not found shared IFC with ID: " + ifcID);
-							continue;
+							break;
 						}
 						InitialFilterCriteria ifc = (InitialFilterCriteria) _sharedIFCs.get(ifcID);
 						if (ifc != null)
@@ -267,10 +264,12 @@ public class UserProfileCache
 
 	public Map<Integer, InitialFilterCriteria> getSharedIFCs()
 	{
+		if (_sharedIFCs == null)
+			refreshSharedIFCs();
 		return _sharedIFCs;
 	}
 	
-	public void refreshSharedIFCs() throws XmlException, IOException
+	public void refreshSharedIFCs()
 	{
 		if (_sharedIfcsUrl != null)
 		{
@@ -294,6 +293,11 @@ public class UserProfileCache
 				__log.warn("Failed to get shared IFCs from URL: " 
 						+ _sharedIfcsUrl + ": " + e);
 				__log.trace("Failed to get shared IFCs from URL: " + _sharedIfcsUrl, e);
+			}
+			catch (XmlException e)
+			{
+				__log.warn("Failed to get shared IFCs from URL: " 
+						+ _sharedIfcsUrl, e);
 			}
 		}
 	}

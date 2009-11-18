@@ -89,7 +89,7 @@
             </peers>
           </diameterNode>
 
-          <scanIntervalSeconds>5</scanIntervalSeconds>
+          <scanIntervalSeconds>0</scanIntervalSeconds>
           <stopKey>foo</stopKey>
           <stopPort>9999</stopPort>
           <webAppConfig>

@@ -11,29 +11,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.littleims.pcscf.oam;
+package org.cipango.ims.hss.web;
 
-import javax.servlet.sip.Address;
+import java.io.Serializable;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.cipango.littleims.pcscf.oam.browser.UserPage;
+import org.apache.wicket.model.LoadableDetachableModel;
 
-@SuppressWarnings("unchecked")
-public class AorLink extends BookmarkablePageLink
+public abstract class DaoLoadableModel<T, K extends Serializable> extends LoadableDetachableModel<T>
 {
-
-	public AorLink(String id, String aor)
+	private K _key;
+	
+	public DaoLoadableModel(K key)
 	{
-		super("aorLink", UserPage.class, new PageParameters("id=" + aor));
-		add(new Label("aor", aor));
+		_key = key;
 	}
 	
-	public AorLink(String id, Address aor)
+	public DaoLoadableModel(T t, K key)
 	{
-		super("aorLink", UserPage.class, new PageParameters("id=" + aor.getURI()));
-		add(new Label("aor", aor.toString()));
+		super(t);
+		_key = key;
+	}
+
+	protected K getKey()
+	{
+		return _key;
 	}
 
 }

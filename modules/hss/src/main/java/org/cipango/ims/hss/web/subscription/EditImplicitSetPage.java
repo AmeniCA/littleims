@@ -21,11 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
@@ -46,9 +48,9 @@ import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
+import org.cipango.ims.hss.web.DaoLoadableModel;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
-import org.cipango.ims.oam.util.StringModelIterator;
 
 
 public class EditImplicitSetPage extends SubscriptionPage
@@ -62,9 +64,7 @@ public class EditImplicitSetPage extends SubscriptionPage
 	
 	private Long _key;
 	private String _title;
-	
-	private static final Logger __log = Logger.getLogger(EditImplicitSetPage.class);
-	
+		
 	@SuppressWarnings("unchecked")
 	public EditImplicitSetPage(PageParameters pageParameters) {
 		String key = pageParameters.getString("id");
@@ -156,7 +156,9 @@ public class EditImplicitSetPage extends SubscriptionPage
 
 		});
 
-		form.add(new RefreshingView("implicitSet", implicitSets)
+		WebMarkupContainer container = new WebMarkupContainer("container");
+		form.add(container);
+		container.add(new RefreshingView("implicitSet", implicitSets)
 		{
 
 			@Override
@@ -166,38 +168,118 @@ public class EditImplicitSetPage extends SubscriptionPage
 			}
 
 			@Override
-			protected void populateItem(Item item)
+			protected void populateItem(final Item item)
 			{
-				ImplicitRegistrationSet implicitRegistrationSet = (ImplicitRegistrationSet) item.getDefaultModelObject();
 				item.add(new Label("id"));
-				item.add(new RefreshingView("publicIds", new Model((Serializable) implicitRegistrationSet.getPublicIds())){
-
-					@Override
-					protected Iterator getItemModels()
-					{
-						return new StringModelIterator(((Collection) getDefaultModelObject()));
-					}
-
-					@Override
-					protected void populateItem(Item item2)
-					{
-						MarkupContainer link = new BookmarkablePageLink("identity", 
-								EditPublicUserIdPage.class, 
-								new PageParameters("id=" + item2.getModelObject()));
-						item2.add(link);
-						link.add(new Label("name", item2.getModel()));
-					}
-				});
+				item.add(getPublicIdView(item));
 			}
 			
 		});
-		
+		container.setOutputMarkupId(true);
 		setContextMenu(new ContextPanel(subscription));
 	}
 	
 	@Override
 	public String getTitle() {
 		return _title;
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	private RefreshingView getPublicIdView(final Item item)
+	{
+		final IModel<SortedSet<PublicUserIdentity>> model = new LoadableDetachableModel<SortedSet<PublicUserIdentity>>()
+		{
+
+			@Override
+			protected SortedSet<PublicUserIdentity> load()
+			{
+				return ((ImplicitRegistrationSet) item.getModelObject()).getPublicIdentities();
+			}
+		};
+		
+		return new RefreshingView<PublicUserIdentity>("publicIds", model)
+		{
+
+			@Override
+			protected Iterator<IModel<PublicUserIdentity>> getItemModels()
+			{
+				List<IModel<PublicUserIdentity>> l = new ArrayList<IModel<PublicUserIdentity>>();
+				Iterator<PublicUserIdentity> it = model.getObject().iterator();
+				while (it.hasNext())
+				{
+					PublicUserIdentity identity = it.next();
+					l.add(new DaoLoadableModel<PublicUserIdentity, String>(identity, identity.getIdentity())
+					{
+
+						@Override
+						protected PublicUserIdentity load()
+						{
+							return (PublicUserIdentity) _publicIdentityDao.findById(getKey());
+						}
+					});
+					
+				}
+				return l.iterator();
+			}
+			
+			@Override
+			protected void populateItem(Item<PublicUserIdentity> item2)
+			{
+				PublicUserIdentity identity = item2.getModelObject();
+				MarkupContainer link = new BookmarkablePageLink("identity", 
+						EditPublicUserIdPage.class, 
+						new PageParameters("id=" + identity.getIdentity()));
+				item2.add(link);
+				link.add(new Label("name", identity.getIdentity()));
+				
+				if (identity.isDefaultIdentity())
+				{
+					item2.add(new WebMarkupContainer("default"));
+					item2.add(new WebMarkupContainer("makeDefault").setVisible(false));
+				}
+				else
+				{
+					item2.add(new WebMarkupContainer("default").setVisible(false));
+					item2.add(new AjaxFallbackLink("makeDefault", item2.getModel())
+					{
+
+						@Override
+						public void onClick(AjaxRequestTarget target)
+						{
+							PublicUserIdentity identity = (PublicUserIdentity) getDefaultModelObject();
+							identity.setDefaultIdentity(true);
+							SortedSet<PublicUserIdentity> ids = 
+								(SortedSet<PublicUserIdentity>) getParent().getParent().getDefaultModelObject();
+
+							Iterator<PublicUserIdentity> it = ids.iterator();
+							while (it.hasNext())
+							{
+								PublicUserIdentity publicId = it.next();
+								publicId.setDefaultIdentity(identity == publicId);	
+								_publicIdentityDao.save(publicId);
+							}
+							resort(ids);
+							
+							if (target != null)
+							{
+								target.addComponent(getPage().get("form:container"));
+								target.addComponent(getPage().get("feedback"));
+							}
+						}
+					});
+				}
+			}
+
+		};
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void resort(SortedSet set)
+	{
+		List l = new ArrayList(set);
+		set.clear();
+		set.addAll(l);
 	}
 	
 	@SuppressWarnings("unchecked")

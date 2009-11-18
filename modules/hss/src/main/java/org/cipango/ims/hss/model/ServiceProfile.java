@@ -31,6 +31,8 @@ import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.model.spt.SessionCaseSpt;
 import org.cipango.ims.hss.model.spt.SessionCaseSpt.SessionCase;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 
 @Entity
 public class ServiceProfile
@@ -45,7 +47,8 @@ public class ServiceProfile
 	private Set<PublicIdentity> _publicIdentites = new HashSet<PublicIdentity>();
 	
 	@OneToMany (mappedBy = "_serviceProfile")
-	private Set<SpIfc> _allIfcs = new HashSet<SpIfc>();
+	@Sort (type = SortType.NATURAL)
+	private SortedSet<SpIfc> _allIfcs = new TreeSet<SpIfc>();
 
 	public boolean hasSharedIfcs()
 	{
@@ -194,12 +197,12 @@ public class ServiceProfile
 		_publicIdentites = publicIdentites;
 	}
 
-	public Set<SpIfc> getAllIfcs()
+	public SortedSet<SpIfc> getAllIfcs()
 	{
 		return _allIfcs;
 	}
 
-	public void setAllIfcs(Set<SpIfc> allIfcs)
+	public void setAllIfcs(SortedSet<SpIfc> allIfcs)
 	{
 		_allIfcs = allIfcs;
 	}

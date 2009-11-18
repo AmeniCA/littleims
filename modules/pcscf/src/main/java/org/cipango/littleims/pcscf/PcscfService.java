@@ -95,7 +95,10 @@ public class PcscfService
 			else
 				privateUserId = URIHelper.extractPrivateIdentity(aor);
 			
-			_regEventService.subscribe(aor, expires, privateUserId, response.getAddressHeaders(Headers.P_ASSOCIATED_URI));
+			_regEventService.subscribe(aor, 
+					expires, privateUserId, 
+					response.getAddressHeaders(Headers.P_ASSOCIATED_URI),
+					response.getRequest().getRemoteAddr());
 		}
 		
 		
@@ -118,18 +121,28 @@ public class PcscfService
 		if (!request.isInitial())
 			return;
 				
+		
 		// Add headers only in originating mode
 		if (request.getTo().getURI().equals(request.getRequestURI()))
 		{
-			Address asserted = request.getAddressHeader(Headers.P_PREFERRED_IDENTITY);
-			if (asserted == null)
+			Address preferred = request.getAddressHeader(Headers.P_PREFERRED_IDENTITY);
+			if (preferred == null)
 			{
-				asserted = (Address) request.getFrom().clone();
-				asserted.removeParameter("tag");
+				preferred = (Address) request.getFrom().clone();
+				preferred.removeParameter("tag");
+				RegContext context = _regEventService.getRegContext(preferred.getURI());
+				if (context != null)
+					preferred = context.getDefaultIdentity();
+			}
+			else
+			{
+				RegContext context = _regEventService.getRegContext(preferred.getURI());
+				if (context != null)
+					preferred = context.getAssertedIdentity(preferred);
 			}
 			processHeaders(request, _requestHeadersToRemove, _requestHeadersToAdd);
 			
-			request.setAddressHeader(Headers.P_ASSERTED_IDENTITY, asserted);
+			request.setAddressHeader(Headers.P_ASSERTED_IDENTITY, preferred);
 		}
 		Proxy proxy = request.getProxy();
 		proxy.setRecordRoute(true);

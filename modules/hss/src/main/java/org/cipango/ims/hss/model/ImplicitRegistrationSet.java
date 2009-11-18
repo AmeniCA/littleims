@@ -14,16 +14,22 @@
 package org.cipango.ims.hss.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 
 @Entity
 public class ImplicitRegistrationSet
@@ -32,11 +38,12 @@ public class ImplicitRegistrationSet
 	private Long _id;
 	
 	@OneToMany (mappedBy="_implicitRegistrationSet")
-	private Set<PublicUserIdentity> _publicIdentities = new HashSet<PublicUserIdentity>();
+	@Sort (type = SortType.COMPARATOR, comparator = IdentityCompator.class)
+	private SortedSet<PublicUserIdentity> _publicIdentities = new TreeSet<PublicUserIdentity>();
 	
 	@OneToMany (mappedBy="_implicitRegistrationSet", cascade = { CascadeType.ALL, CascadeType.REMOVE })
 	private Set<RegistrationState> _states = new HashSet<RegistrationState>();
-	
+		
 	public Long getId()
 	{
 		return _id;
@@ -47,12 +54,12 @@ public class ImplicitRegistrationSet
 		_id = id;
 	}
 
-	public Set<PublicUserIdentity> getPublicIdentities()
+	public SortedSet<PublicUserIdentity> getPublicIdentities()
 	{
 		return _publicIdentities;
 	}
 
-	public void setPublicIdentities(Set<PublicUserIdentity> publicIdentities)
+	public void setPublicIdentities(SortedSet<PublicUserIdentity> publicIdentities)
 	{
 		_publicIdentities = publicIdentities;
 	}
@@ -163,5 +170,19 @@ public class ImplicitRegistrationSet
 				return "Unknown id " + id;
 			}
 		}
+	}
+	
+	public static class IdentityCompator implements Comparator<PublicUserIdentity>
+	{
+
+		public int compare(PublicUserIdentity id1, PublicUserIdentity id2)
+		{
+			if (id1.isDefaultIdentity() == id2.isDefaultIdentity())
+				return id1.getIdentity().compareTo(id2.getIdentity());
+			if (id1.isDefaultIdentity())
+				return -1;
+			return 1;
+		}
+		
 	}
 }

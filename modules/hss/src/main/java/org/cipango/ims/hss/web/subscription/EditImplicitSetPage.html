@@ -17,15 +17,24 @@
 				<input type="submit" wicket:id="addButton" wicket:message="value:button.implicitSet.addToNew" />
 			</li>
 		</ul>
-		<span wicket:id="implicitSet">
-			<h2><wicket:message key="susbcription.implicititRegistrationSet.title"/><b wicket:id="id"></b></h2>
-			<ul>
-				<li wicket:id="publicIds">
-					<a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
-				</li>
-			</ul>
-	    </span>
+		<span wicket:id="container">
+          <span wicket:id="implicitSet">
+            <h2><wicket:message key="susbcription.implicititRegistrationSet.title"/><b wicket:id="id"></b></h2>
+            <ul>
+                <li wicket:id="publicIds">
+                    <a href="#" wicket:id="identity"><span wicket:id="name"></span></a> 
+                    (<span wicket:id="default">
+                        <wicket:message key="susbcription.implicititRegistrationSet.defaultIdentity"/>
+                    </span>
+                    <a href="#" wicket:id="makeDefault">
+                        <wicket:message key="susbcription.implicititRegistrationSet.setAsDefaultIdentity"/>
+                    </a>)
+                </li>
+            </ul>
+          </span>
+        </span>
 	</form>
+
 </wicket:extend>
 </body>
 </html>

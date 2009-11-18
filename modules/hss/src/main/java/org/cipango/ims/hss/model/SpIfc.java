@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class SpIfc
+public class SpIfc implements Comparable<SpIfc>
 {
 	@Embeddable
 	public static class Id implements Serializable {
@@ -111,5 +111,10 @@ public class SpIfc
 	public void setId(Id id)
 	{
 		_id = id;
+	}
+
+	public int compareTo(SpIfc o)
+	{
+		return getIfc().compareTo(o.getIfc());
 	}
 }

@@ -164,7 +164,7 @@ public class RegistrationBrowserPage extends BasePage
 	@Override
 	public String getTitle()
 	{
-		return "Cache user profiles";
+		return "Registrations";
 	}
 	
 	class LoadableContext extends LoadableDetachableModel<Context>

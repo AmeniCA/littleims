@@ -90,7 +90,7 @@ public class SessionBrowserPage extends BasePage
 	@Override
 	public String getTitle()
 	{
-		return "Cache user profiles";
+		return "Sessions";
 	}
 	
 	class LoadableSession extends LoadableDetachableModel<Session>

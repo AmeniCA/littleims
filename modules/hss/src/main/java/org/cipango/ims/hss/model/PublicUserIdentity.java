@@ -24,6 +24,8 @@ public class PublicUserIdentity extends PublicIdentity
 	@ManyToMany (mappedBy="_publicIdentities")
 	private Set<PrivateIdentity> _privateIdentities = new HashSet<PrivateIdentity>();
 	
+	private Boolean _defaultIdentity;
+	
 	public PublicUserIdentity()
 	{
 		setIdentityType(IdentityType.PUBLIC_USER_IDENTITY);
@@ -146,6 +148,17 @@ public class PublicUserIdentity extends PublicIdentity
 	public String toString()
 	{
 		return "Public user identity: " + getIdentity();
+	}
+
+	public boolean isDefaultIdentity()
+	{
+
+		return _defaultIdentity != null && _defaultIdentity;
+	}
+
+	public void setDefaultIdentity(boolean defaultIdentity)
+	{
+		_defaultIdentity = defaultIdentity;
 	}
 
 }

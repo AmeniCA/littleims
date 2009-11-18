@@ -15,12 +15,15 @@ package org.cipango.littleims.pcscf.oam.browser;
 
 import java.util.List;
 
+import javax.servlet.sip.Address;
+
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.oam.AorLink;
 import org.cipango.littleims.pcscf.oam.BasePage;
 import org.cipango.littleims.pcscf.subscription.debug.DebugConf;
@@ -42,21 +45,21 @@ public class UserPage extends BasePage
 	{		
 		_publicIdentity = pageParameters.getString("id");
 		
-		List<String> associated = _regEventService.getRegisteredUsers().get(_publicIdentity);
-		if (associated == null)
+		RegContext context = _regEventService.getRegisteredUsers().get(_publicIdentity);
+		if (context == null)
 		{
 			add(new WebMarkupContainer("associated").setVisible(false));
 			info("User is not registered");
 		}
 		else
 		{
-			add(new ListView("associated", associated)
+			add(new ListView("associated", context.getAssociatedUris())
 			{
 	
 				@Override
 				protected void populateItem(ListItem item)
 				{
-					item.add(new AorLink("aorLink", (String) item.getModelObject()));
+					item.add(new AorLink("aorLink", (Address) item.getModelObject()));
 				}
 				
 			});

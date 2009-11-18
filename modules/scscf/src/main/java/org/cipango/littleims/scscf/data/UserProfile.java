@@ -119,7 +119,8 @@ public class UserProfile
 	{
 		if (_listeners != null)
 		{
-			for (UserProfileListener l : _listeners)
+			// Create a new list to prevent concurrent ConcurrentModificationException
+			for (UserProfileListener l : new ArrayList<UserProfileListener>(_listeners))
 				l.userProfileUncached();
 		}
 	}

@@ -13,7 +13,6 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.subscription.reg;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +25,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.subscription.Subscription;
 import org.cipango.littleims.pcscf.subscription.SubscriptionServlet;
 import org.cipango.littleims.util.Headers;
@@ -40,7 +40,7 @@ public class RegEventService
 	private SipURI _pcscfUri;
 	
 	private Map<String, RegSubscription> _subscriptions = new HashMap<String, RegSubscription>();
-	private Map<String, List<String>> _registeredUsers = new HashMap<String, List<String>>();
+	private Map<String, RegContext> _registeredUsers = new HashMap<String, RegContext>();
 	
 	private String _userAgent;
 	
@@ -48,23 +48,34 @@ public class RegEventService
 	 * See 3GPP 24.229 §5.2.3A	Subscription to the user's debug event package 
 	 * @param aor
 	 */
-	public void subscribe(URI aor, int expires, String privateIdentity, Iterator<Address> associatedUris)
+	public void subscribe(URI aor, int expires, String privateIdentity, Iterator<Address> associatedUris, String associatedIp)
 	{
 		try
 		{
-			if (associatedUris != null)
+			RegContext regContext;
+			synchronized (_registeredUsers)
 			{
-				List<String> uris = new ArrayList<String>();
-				synchronized (_registeredUsers)
+				regContext = _registeredUsers.get(aor.toString());				
+				if (expires != 0)
 				{
-					while (associatedUris.hasNext())
+					if (regContext == null)
 					{
-						String uri = associatedUris.next().getURI().toString();
-						uris.add(uri);
-						_registeredUsers.put(uri, uris);
+						regContext = new RegContext(associatedUris, associatedIp);
+						Iterator<Address> it = regContext.getAssociatedUris().iterator();
+						while (it.hasNext())
+							_registeredUsers.put(it.next().getURI().toString(), regContext);
+					}
+					else
+					{
+						// TODO update
 					}
 				}
+				else if (regContext != null)
+				{
+					// TODO
+				}
 			}
+			
 			synchronized (_subscriptions)
 			{
 				RegSubscription subscription = _subscriptions.get(privateIdentity);
@@ -82,7 +93,7 @@ public class RegEventService
 					if (_userAgent != null)
 						request.setHeader(Headers.USER_AGENT, _userAgent);
 						
-					subscription = new RegSubscription(this, request.getSession(), aor.toString(), privateIdentity);
+					subscription = new RegSubscription(this, request.getSession(), regContext, privateIdentity);
 					_subscriptions.put(privateIdentity, subscription);
 					request.getApplicationSession().setAttribute(Subscription.class.getName(), 
 							subscription);
@@ -113,7 +124,7 @@ public class RegEventService
 		return _subscriptions;
 	}
 	
-	public Map<String, List<String>> getRegisteredUsers()
+	public Map<String, RegContext> getRegisteredUsers()
 	{
 		return _registeredUsers;
 	}
@@ -123,67 +134,27 @@ public class RegEventService
 		return _registeredUsers.containsKey(aor.toString());
 	}
 	
-	public List<String> getAssociatedUris(URI aor)
+	public RegContext getRegContext(URI aor)
 	{
 		synchronized (_registeredUsers)
 		{
 			return _registeredUsers.get(aor.toString());
 		}
 	}
-	
-	protected void removeIdentitie(List<String> identities)
-	{
-		if (identities.isEmpty())
-			return;
 		
+	protected void normalize(RegContext context, List<Address> toRemove)
+	{
 		synchronized (_registeredUsers)
 		{
-			Iterator<String> it = identities.iterator();
+			Iterator<Address> it = context.getAssociatedUris().iterator();
 			while (it.hasNext())
+				_registeredUsers.put(it.next().getURI().toString(), context);
+			if (toRemove != null)
 			{
-				String identity = (String) it.next();
-				List<String> l = _registeredUsers.remove(identity);
-				if (l != null)
-					l.remove(identity);
+				it = toRemove.iterator();
+				while (it.hasNext())
+					_registeredUsers.remove(it.next().getURI().toString());
 			}
-		}
-	}
-	
-	protected void addIdentitie(List<String> identities, boolean fullState)
-	{
-		if (identities.isEmpty())
-			return;
-		
-		synchronized (_registeredUsers)
-		{
-			Iterator<String> it = identities.iterator();
-			List<String> previous = fullState ? _registeredUsers.put(identities.get(0), identities) : null;
-			
-			while (it.hasNext())
-			{
-				String identity = (String) it.next();
-				
-				if (fullState)
-				{
-					_registeredUsers.put(identity, identities);
-					if (previous != null)
-						previous.remove(identity);
-				}
-				else
-				{
-					List<String> l = _registeredUsers.get(identity);
-					if (l == null)
-					{
-						l = new ArrayList<String>();
-						_registeredUsers.put(identity, l);
-					}
-					if (!l.contains(identity))
-						l.add(identity);
-				}
-			}
-			
-			if (previous != null)
-				removeIdentitie(previous);
 		}
 	}
 	

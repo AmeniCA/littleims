@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.sip.Address;
+
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
@@ -32,6 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.oam.util.AbstractListDataProvider;
+import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.oam.AorLink;
 import org.cipango.littleims.pcscf.oam.BasePage;
 import org.cipango.littleims.pcscf.subscription.reg.RegEventService;
@@ -67,14 +70,15 @@ public class RegistrationBrowserPage extends BasePage
 			{
 				item.add(new AorLink("aorLink", (String) item.getModelObject()));
 				
-				List l2 = _service.getRegisteredUsers().get(item.getModelObject().toString());
+				RegContext regContext = _service.getRegisteredUsers().get(item.getModelObject().toString());
+				List<Address> l2 = regContext.getAssociatedUris(); 
 				item.add(new ListView("associated", l2)
 				{
 
 					@Override
 					protected void populateItem(ListItem item)
 					{
-						item.add(new AorLink("aorLink", (String) item.getModelObject()));
+						item.add(new AorLink("aorLink", (Address) item.getModelObject()));
 					}
 					
 				});

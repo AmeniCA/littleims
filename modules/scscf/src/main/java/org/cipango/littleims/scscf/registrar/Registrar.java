@@ -772,7 +772,10 @@ public class Registrar
 				Context regContext = _regContexts.get(publicId); // FIXME case wilcard 
 				
 				if (regContext == null)
+				{
+					__log.warn("Unable deregister identity " + publicId + " after RTR: no context found");
 					continue;
+				}
 				
 				RegistrationInfo info = new RegistrationInfo();
 				info.setAssociatedUris(regContext.getAssociatedUris());
@@ -835,6 +838,8 @@ public class Registrar
 							if (context.getState() == RegState.TERMINATED)
 								contextsToRemove.add(publicID);
 						}
+						else
+							__log.warn("Unable deregister identity " + publicId + " after RTR: no context found");
 					}
 					notifyListeners(regEvent);
 
