@@ -160,7 +160,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 		out.add("IdentityType", getIdentityType());
 		if (_regex != null)
 			out.add("WildcardedPSI", _identity);
-		if (!Strings.isEmpty(_displayName) || !_debugSessions.isEmpty() || !Strings.isEmpty(getAliasGroupId()))
+		if (!Strings.isEmpty(_displayName) || hasDebugConfig() || !Strings.isEmpty(getAliasGroupId()))
 		{
 			out.open("Extension");
 			
@@ -170,7 +170,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 			if (!Strings.isEmpty(getAliasGroupId()))
 				out.add("AliasIdentityGroupID", getAliasGroupId());
 			
-			if (!_debugSessions.isEmpty())
+			if (hasDebugConfig())
 			{
 				out.open("Extension");
 				out.open("ServiceLevelTraceInfo");
@@ -179,15 +179,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 				out.open(/*"?xml version=\"1.0\"?>\n\t\t\t\t\t\t\t<"
 						+ */"debuginfo xmlns=\"urn:ietf:params:xml:ns:debuginfo\" "
 						+ "version=\"0\" state=\"full\"");
-							
-				out.open("debugconfig aor=\"" + (realImpu != null ? realImpu : _identity) + '"');
-				Map<String, String> attributes = new HashMap<String, String>();
-				for (DebugSession debugSession : _debugSessions)
-				{
-					attributes.put("id", String.valueOf(debugSession.getId()));
-					out.add("session", debugSession, attributes);
-				}
-				out.close("debugconfig");
+				printDebugConfigs(out);
 				out.close("debuginfo");
 				out.closeCdata();
 				out.close("ServiceLevelTraceInfo");
@@ -209,6 +201,31 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 				out.add("SharedIFCSetID", it.next().getId());
 			out.close("Extension");
 		}
+	}
+	
+	protected abstract void printDebugConfigs(Output out);
+	
+	protected abstract boolean hasDebugConfig();
+	
+	protected void printDebugConfig(Output out)
+	{
+		if (_debugSessions.isEmpty())
+			return;
+		
+		String realImpu = (String) out.getParameter("realImpu");
+		String aor = _identity;
+		if (realImpu != null && _regex != null 
+				&& realImpu.matches(RegexUtil.extendedRegexToJavaRegex(_identity)))
+			aor = realImpu;
+		
+		out.open("debugconfig aor=\"" + aor + '"');
+		Map<String, String> attributes = new HashMap<String, String>();
+		for (DebugSession debugSession : _debugSessions)
+		{
+			attributes.put("id", String.valueOf(debugSession.getId()));
+			out.add("session", debugSession, attributes);
+		}
+		out.close("debugconfig");
 	}
 	
 	public int compareTo(PublicIdentity o)

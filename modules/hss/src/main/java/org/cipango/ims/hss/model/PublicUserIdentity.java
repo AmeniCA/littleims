@@ -161,4 +161,24 @@ public class PublicUserIdentity extends PublicIdentity
 		_defaultIdentity = defaultIdentity;
 	}
 
+	@Override
+	protected void printDebugConfigs(Output out)
+	{
+		Iterator<PublicUserIdentity> it = _implicitRegistrationSet.getPublicIdentities().iterator();
+		while (it.hasNext())
+			it.next().printDebugConfig(out);
+	}
+
+	@Override
+	protected boolean hasDebugConfig()
+	{
+		Iterator<PublicUserIdentity> it = _implicitRegistrationSet.getPublicIdentities().iterator();
+		while (it.hasNext())
+		{
+			if (!it.next().getDebugSessions().isEmpty())
+				return true;
+		}
+		return false;
+	}
+
 }

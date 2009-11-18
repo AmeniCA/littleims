@@ -126,5 +126,17 @@ public class PSI extends PublicIdentity
 		return null;
 	}
 
+	@Override
+	protected void printDebugConfigs(Output out)
+	{
+		printDebugConfig(out);
+	}
+
+	@Override
+	protected boolean hasDebugConfig()
+	{
+		return !getDebugSessions().isEmpty();
+	}
+
 	
 }

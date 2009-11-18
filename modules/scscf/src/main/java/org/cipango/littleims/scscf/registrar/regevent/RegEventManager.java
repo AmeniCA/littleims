@@ -196,9 +196,12 @@ public class RegEventManager implements RegEventListener
 		synchronized (_subscriptions)
 		{
 			List<RegSubscription> l = _subscriptions.get(aor);
-			l.remove(subscription);
-			if (l.isEmpty())
-				_subscriptions.remove(aor);
+			if (l != null)
+			{
+				l.remove(subscription);
+				if (l.isEmpty())
+					_subscriptions.remove(aor);
+			}
 		}
 	}
 
