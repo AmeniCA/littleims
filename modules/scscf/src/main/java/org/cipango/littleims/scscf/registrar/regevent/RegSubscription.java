@@ -15,6 +15,7 @@ package org.cipango.littleims.scscf.registrar.regevent;
 
 import java.util.Iterator;
 
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
@@ -34,15 +35,18 @@ public class RegSubscription
 	private RegEvent _lastEvent;
 	private long _absoluteExpires;
 	private int _version;
-	private ExpiryTask _expiryTask;
+	private ServletTimer _expiryTimer;
 	private String _subscriberUri;
+	private String _aor;
 	
-	public RegSubscription(SipSession session, int expires, String subscriberUri)
+	public RegSubscription(String aor, SipSession session, int expires, String subscriberUri)
 	{
+		_aor = aor;
 		_session = session;
 		_absoluteExpires = System.currentTimeMillis() + expires * 1000;
 		_version = 0;
 		_subscriberUri = subscriberUri;
+		session.setAttribute(RegSubscription.class.getName(), this);
 	}
 	
 	public SipSession getSession()
@@ -70,10 +74,13 @@ public class RegSubscription
 			byte[] content = body.getBytes();
 			notify.setContent(content, REG_INFO_CONTENT_TYPE);
 			notify.send();			
+			__log.debug("Send NOTIFY No " + (_version - 1) + " for resource " 
+					+ _aor + " and to " + _subscriberUri + " for reg event");
 		}
 		catch (Exception ex)
 		{
-			__log.warn("Failed to send NOTIFY", ex);
+			__log.warn("Failed to send NOTIFY for resource " 
+					+ _aor + " and to " + _subscriberUri + " for reg event", ex);
 		}
 	}
 	
@@ -127,22 +134,38 @@ public class RegSubscription
 	
 	public int getExpires()
 	{
-		return (int) (_absoluteExpires - System.currentTimeMillis()) / 1000;
+		int expires = (int) (_absoluteExpires - System.currentTimeMillis()) / 1000;
+		if (expires <= 0)
+			return 0;
+		else
+			return expires;
+	}
+	
+	public void setExpires(int expires)
+	{
+		_absoluteExpires = System.currentTimeMillis() + expires * 1000;
+		_session.getApplicationSession().setExpires(expires / 60 + 30);
 	}
 
-	public ExpiryTask getExpiryTask()
-	{
-		return _expiryTask;
-	}
-
-	public void setExpiryTask(ExpiryTask expiryTask)
-	{
-		_expiryTask = expiryTask;
-	}
 
 	public String getSubscriberUri()
 	{
 		return _subscriberUri;
+	}
+
+	public String getAor()
+	{
+		return _aor;
+	}
+
+	public ServletTimer getExpiryTimer()
+	{
+		return _expiryTimer;
+	}
+
+	public void setExpiryTimer(ServletTimer expiryTimer)
+	{
+		_expiryTimer = expiryTimer;
 	}
 	
 }

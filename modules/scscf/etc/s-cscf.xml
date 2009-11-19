@@ -112,6 +112,7 @@
 	<bean id="regEventManager" 
 			class="org.cipango.littleims.scscf.registrar.regevent.RegEventManager">
 		<property name="registrar" ref="registrar" />
+		<property name="timerService" ref="timerService" />
 		<!-- 
 		S-CSCF policy for minimun reg event subscription time in seconds
 		-->

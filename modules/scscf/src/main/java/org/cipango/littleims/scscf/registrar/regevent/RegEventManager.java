@@ -19,13 +19,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
@@ -38,12 +39,11 @@ public class RegEventManager implements RegEventListener
 
 	private static final Logger __log = Logger.getLogger(RegEventManager.class);
 	public static final String REG_EVENT = "reg";
-	
-
-	private Timer _timer = new Timer("RegEventTimer");
-	
+		
 	private Map<String, List<RegSubscription>> _subscriptions = new HashMap<String, List<RegSubscription>>();
 	private Registrar _registrar;
+	
+	private TimerService _timerService;
 
 	private int _minExpires;
 	private int _maxExpires;
@@ -87,7 +87,7 @@ public class RegEventManager implements RegEventListener
 	}
 	
 	public void doSubscribe(SipServletRequest subscribe) throws IOException, ServletParseException
-	{
+	{	
 		Address subscriber = subscribe.getAddressHeader(Headers.P_ASSERTED_IDENTITY);
 		if (subscriber == null)
 			subscriber = subscribe.getFrom();
@@ -132,20 +132,31 @@ public class RegEventManager implements RegEventListener
 		catch (Exception e)
 		{
 		}
-
+	
 		URI aor = subscribe.getRequestURI();
-		SipSession session = subscribe.getSession();
+	
+		addSubscription(aor.toString(), subscribe, expires, subscriber.getURI());
 
-		addSubscription(aor.toString(), session, expires, subscriber.getURI());
 	}
 
-	private void addSubscription(String aor, SipSession session, int expires, URI subscriberUri)
+	private void addSubscription(String aor, SipServletRequest subscribe, int expires, URI subscriberUri)
 	{
+		
+		
+		SipSession session = subscribe.getSession();
+		RegSubscription subscription = (RegSubscription) session.getAttribute(RegSubscription.class.getName());
+
+		if (subscription == null)
+			subscription = new RegSubscription(aor, session, expires, subscriberUri.toString());
+		else
+			subscription.setExpires(expires);
+		
+		aor = subscription.getAor();
+		
 		RegEvent e = _registrar.getFullRegEvent(aor);
 		if (e.isTerminated())
 			expires = 0;
 		
-		RegSubscription subscription = new RegSubscription(session, expires, subscriberUri.toString());
 		synchronized (_subscriptions)
 		{
 			List<RegSubscription> l = _subscriptions.get(aor);
@@ -156,7 +167,8 @@ public class RegEventManager implements RegEventListener
 					l = new ArrayList<RegSubscription>();
 					_subscriptions.put(aor, l);
 				}
-				l.add(subscription);
+				if (!l.contains(subscription))
+					l.add(subscription);
 			}
 			else if (l != null)
 			{
@@ -174,33 +186,37 @@ public class RegEventManager implements RegEventListener
 		
 		subscription.sendNotification(e, "full");
 
-		ExpiryTask task = subscription.getExpiryTask();
+		ServletTimer expiryTimer = subscription.getExpiryTimer();
 
-		if (task != null)
-			task.cancel();
+		if (expiryTimer != null)
+			expiryTimer.cancel();
 
 		if (expires == 0)
 			session.getApplicationSession().invalidate();
 		else
 		{
-			task = new ExpiryTask(subscription, this);
-			_timer.schedule(task, expires * 1000);
-			subscription.setExpiryTask(task);
-			session.getApplicationSession().setExpires(expires / 60 + 2);
+			ExpiryTask task = new ExpiryTask(subscription, this);
+			expiryTimer = _timerService.createTimer(session.getApplicationSession(), (long) expires * 1000, false, task);
+			subscription.setExpiryTimer(expiryTimer);
+			session.getApplicationSession().setExpires(expires / 60 + 30);
 		}
 	}
 
 
-	protected void removeSubscription(String aor, RegSubscription subscription)
+	protected void removeSubscription(RegSubscription subscription)
 	{
 		synchronized (_subscriptions)
 		{
-			List<RegSubscription> l = _subscriptions.get(aor);
+			List<RegSubscription> l = _subscriptions.get(subscription.getAor());
 			if (l != null)
 			{
 				l.remove(subscription);
 				if (l.isEmpty())
-					_subscriptions.remove(aor);
+					_subscriptions.remove(subscription.getAor());
+			}
+			else
+			{
+				__log.warn("Could not remove subscription: no subscriptions found for resource: " + subscription.getAor());
 			}
 		}
 	}
@@ -234,5 +250,15 @@ public class RegEventManager implements RegEventListener
 	public void setMaxExpires(int maxExpires)
 	{
 		_maxExpires = maxExpires;
+	}
+
+	public TimerService getTimerService()
+	{
+		return _timerService;
+	}
+
+	public void setTimerService(TimerService timerService)
+	{
+		_timerService = timerService;
 	}
 }

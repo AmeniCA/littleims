@@ -129,7 +129,8 @@ public class UserProfile
 	{
 		if (_listeners == null)
 			_listeners = new ArrayList<UserProfileListener>();
-		_listeners.add(l);
+		if (!_listeners.contains(l))
+			_listeners.add(l);
 	}
 	
 	public void removeListener(UserProfileListener l)

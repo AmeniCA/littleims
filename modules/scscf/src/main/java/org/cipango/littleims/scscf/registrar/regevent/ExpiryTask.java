@@ -13,11 +13,11 @@
 // ========================================================================
 package org.cipango.littleims.scscf.registrar.regevent;
 
-import java.util.TimerTask;
+import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
-public class ExpiryTask extends TimerTask
+public class ExpiryTask implements Runnable, Serializable
 {
 	/**
 	 * Logger for this class
@@ -25,22 +25,21 @@ public class ExpiryTask extends TimerTask
 	private static final Logger log = Logger.getLogger(ExpiryTask.class);
 	
 	private RegSubscription _subscription;
-	private RegEventManager manager;
-	private String aor;
+	private RegEventManager _manager;
 
 	public ExpiryTask(RegSubscription subscription, RegEventManager manager)
 	{
 		_subscription = subscription;
-		this.manager = manager;
+		_manager = manager;
 	}
 
 	public void run()
 	{
 		try
 		{
-			log.info("Reg Subscription " + _subscription + " has expired");
+			log.info("Reg Subscription " + _subscription.getAor() + " has expired");
 			_subscription.sendNotification(_subscription.getLastEvent(), "full");
-			manager.removeSubscription(aor, _subscription);
+			_manager.removeSubscription(_subscription);
 		}
 		catch (Throwable e)
 		{

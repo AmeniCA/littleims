@@ -69,12 +69,13 @@ public class DebugSession implements UserProfileListener
 			notify.send();
 			if (expires == 0)
 			{
-				_userProfile.removeListener(this);
+				if (_userProfile != null)
+					_userProfile.removeListener(this);
 				_session.getApplicationSession().invalidate();
 			}
 			
-			__log.debug("Send NOTIFY No " + (_version - 1) + " to " 
-					+ _aor + " for debug event");
+			__log.debug("Send NOTIFY No " + (_version - 1) + " for resource " 
+					+ _aor + " and to " + _subscriberUri + " for debug event");
 		}
 		catch (Exception e)
 		{

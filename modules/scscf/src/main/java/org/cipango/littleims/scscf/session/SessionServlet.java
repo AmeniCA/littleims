@@ -55,7 +55,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 	
 	private Registrar _registrar;
 
-	private static final Logger __log = Logger.getLogger(SessionServlet.class);
+	private final Logger _log = Logger.getLogger(SessionServlet.class);
 
 	public void init() throws ServletException
 	{
@@ -112,7 +112,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Failed to handle request:\n" + request, e);
+			_log.warn("Failed to handle request:\n" + request, e);
 			if (!request.isCommitted() && request.isInitial())
 			{
 				_sessionManager.getMessageSender().sendResponse(request, SipServletResponse.SC_SERVICE_UNAVAILABLE);
@@ -129,7 +129,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Failed to handle response:\n" + response, e);
+			_log.warn("Failed to handle response:\n" + response, e);
 		}
 	}
 
@@ -147,7 +147,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 				else if (command == IMS.RTR)
 					_registrar.handleRtr(request);
 				else
-					__log.warn("No handler for diameter request with command " + message.getCommand());
+					_log.warn("No handler for diameter request with command " + message.getCommand());
 			}
 			else
 			{
@@ -165,20 +165,27 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 				}
 				else
 				{
-					__log.warn("No handler for diameter answer with command " + command);
+					_log.warn("No handler for diameter answer with command " + command);
 				}
 			}
 		}
 		catch (Throwable e) 
 		{
-			__log.warn("Received unexpected exception when handing Diameter " + 
+			_log.warn("Received unexpected exception when handing Diameter " + 
 					(message.isRequest() ? "request" : "answer") + ": " + command, e);
 		}
 	}
 
 	public void timeout(ServletTimer timer)
 	{
-		((Runnable) timer.getInfo()).run();
+		try
+		{
+			((Runnable) timer.getInfo()).run();
+		}
+		catch (Throwable e) 
+		{
+			_log.warn("Failed to handle timer " + timer, e);
+		}
 	}
 
 		

@@ -81,7 +81,7 @@ public class DebugIdService
 			session = new DebugSession(subscribe.getSession(), expires, subscriber.getURI().toString());
 			session.setAor(subscribe.getRequestURI().toString());
 			_timerService.createTimer(subscribe.getApplicationSession(), 
-					expires, false, new ExpirationTask(session, _timerService));
+					expires * 1000, false, new ExpirationTask(session, _timerService));
 		}
 		else
 		{
@@ -180,7 +180,7 @@ public class DebugIdService
 						null : _session.getUserProfile().getServiceLevelTraceInfo());
 			else
 				_timerService.createTimer(_session.getSipSession().getApplicationSession(), 
-						expires, false, this);
+						expires * 1000, false, this);
 		}
 		
 	}
