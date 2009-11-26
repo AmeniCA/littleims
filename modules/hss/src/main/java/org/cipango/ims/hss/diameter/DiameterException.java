@@ -4,36 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cipango.diameter.AVP;
+import org.cipango.diameter.AVPList;
+import org.cipango.diameter.ResultCode;
+import org.cipango.diameter.Type;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
 
 public class DiameterException extends Exception
 {
-	private int _vendorId;
-	private int _resultCode;
+	private ResultCode _resultCode;
 	private List<AVP> _avpsToAdd;
 	
-	public DiameterException(int vendorId, int resultCode) 
-	{ 
-		_vendorId = vendorId;
-		_resultCode = resultCode;
-	}
 	
-	public DiameterException(int vendorId, int resultCode, String message) 
+	public DiameterException(ResultCode resultCode, String message) 
 	{ 
 		super(message);
-		_vendorId = vendorId;
 		_resultCode = resultCode;
 	}
-	
-	public DiameterException(int resultCode, String message)
+
+	public DiameterException(ResultCode resultCode)
 	{
-		this(Base.IETF_VENDOR_ID, resultCode, message);
-	}
-	
-	public DiameterException(int resultCode)
-	{
-		this(Base.IETF_VENDOR_ID, resultCode);
+		_resultCode = resultCode;
 	}
 	
 	public DiameterException addAvp(AVP avp)
@@ -48,33 +38,20 @@ public class DiameterException extends Exception
 	{
 		return _avpsToAdd;
 	}
-	
-	public int getVendorId()
-	{
-		return _vendorId;
-	}
-	
-	public int getResultCode()
+		
+	public ResultCode getResultCode()
 	{
 		return _resultCode;
 	}
 	
-	public static DiameterException newMissingDiameterAvp(int vendorId, int code)
+	public static DiameterException newMissingDiameterAvp(Type type)
 	{
-		AVP failedAvp = AVP.ofAVPs(Base.FAILED_AVP, 
-				AVP.ofBytes(vendorId, code, new byte[10]));
+		AVP<AVPList> failedAvp = new AVP<AVPList>(Base.FAILED_AVP, new AVPList());
+		failedAvp.getValue().add(new AVP(type, new byte[10]));
+				
 		StringBuilder sb = new StringBuilder();
-		sb.append("Missing Mandatory AVP: ");
-		if (vendorId != Base.IETF_VENDOR_ID)
-		{
-			sb.append("vendor ID: ");
-			if (vendorId == IMS.IMS_VENDOR_ID)
-				sb.append("IMS vendor ID (").append(vendorId).append(") ");
-			else
-				sb.append(vendorId + " ");
-		}
-		sb.append("code ").append(code);
-		return new DiameterException(Base.IETF_VENDOR_ID, Base.DIAMETER_MISSING_AVP, sb.toString()).addAvp(failedAvp);
+		sb.append("Missing Mandatory AVP: ").append(type);
+		return new DiameterException(Base.DIAMETER_MISSING_AVP, sb.toString()).addAvp(failedAvp);
 
 	}
 }

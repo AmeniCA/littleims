@@ -39,7 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
-import org.cipango.ims.Cx;
+import org.cipango.diameter.ims.Cx.ReasonCode;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.model.PrivateIdentity;
@@ -120,17 +120,8 @@ public class DeregistrationPage extends SubscriptionPage
 				publicIds).setRequired(true));
 		
 		form.add(new DropDownChoice("reasonCode", 
-				new Model<Integer>(),
-				Arrays.asList(new Integer[]	{ 0, 1, 2, 3 }),
-				new ChoiceRenderer<Integer>()
-		{
-			@Override
-			public Object getDisplayValue(Integer id)
-			{
-				return Cx.ReasonCode.toString(id);
-			}
-
-		}).setRequired(true));
+				new Model<ReasonCode>(),
+				Arrays.asList(ReasonCode.values())).setRequired(true));
 
 		form.add(new TextField<String>("reasonPhrase", new Model<String>()));
 
@@ -142,7 +133,7 @@ public class DeregistrationPage extends SubscriptionPage
 			{
 				boolean deregisterPublic = (Boolean) getForm().get("deregistrationType").getDefaultModelObject();
 				String reasonPhrase = (String) getForm().get("reasonPhrase").getDefaultModelObject();
-				Integer reasonCode = (Integer) getForm().get("reasonCode").getDefaultModelObject();
+				ReasonCode reasonCode = (ReasonCode) getForm().get("reasonCode").getDefaultModelObject();
 
 				if (deregisterPublic)
 				{

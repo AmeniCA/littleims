@@ -28,10 +28,9 @@ import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.littleims.cx.UserAuthorizationType;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.diameter.ims.Cx.UserAuthorizationType;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.URIHelper;
@@ -78,7 +77,7 @@ public class IcscfService
 		SipServletRequest request = (SipServletRequest) uaa.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
 		{
-			if ( uaa.getResultCode() >= 3000)
+			if (!uaa.getResultCode().isSuccess())
 			{
 				_log.debug("Diameter UAA answer is not valid: " + uaa.getResultCode() + ". Sending 403 response");
 	
@@ -86,13 +85,12 @@ public class IcscfService
 				return;
 			}
 			
-			String scscfName = uaa.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString();
+			String scscfName = uaa.get(Cx.SERVER_NAME);
 			request.setRequestURI(_sipFactory.createURI(scscfName));
-			AVP avp = uaa.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
-			if (avp != null)
-			{
-				request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
-			}
+			String wilcard = uaa.get(Cx.WILCARDED_IMPU);
+			if (wilcard != null)
+				request.setHeader(Headers.P_PROFILE_KEY, wilcard);
+		
 			proxy(request);
 		}
 		catch (Throwable e) 
@@ -114,7 +112,7 @@ public class IcscfService
 		{
 			if (isOriginating(request))
 			{
-				if (lia.getResultCode() >= 3000)
+				if (!lia.getResultCode().isSuccess())
 				{
 					_log.debug("Diameter LIA answer from " + request.getFrom().getURI() + " is not valid: " + lia.getResultCode() 
 							+ ". Sending 404 response");
@@ -122,20 +120,21 @@ public class IcscfService
 					return;
 				}
 				
-				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString());
+				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.get(Cx.SERVER_NAME));
 				scscfUri.setLrParam(true);
 				scscfUri.setParameter(ORIG_PARAM, "");
 				request.pushRoute(scscfUri);
 				
-				AVP avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
-				if (avp != null)
-					request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+				String wilcard = lia.get(Cx.WILCARDED_IMPU);
+				if (wilcard != null)
+					request.setHeader(Headers.P_PROFILE_KEY, wilcard);
+				
 			}
 			else
 			{
 				URI requestUri = request.getRequestURI();
 				String scheme = requestUri.getScheme();
-				if (lia.getResultCode() == IMS.DIAMETER_ERROR_USER_UNKNOWN)
+				if (lia.getResultCode() == Cx.DIAMETER_ERROR_USER_UNKNOWN)
 				{
 					if (scheme.equals("tel"))
 					{
@@ -150,14 +149,14 @@ public class IcscfService
 					}
 					return;
 				}
-				else if (lia.getResultCode() == IMS.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED)
+				else if (lia.getResultCode() == Cx.DIAMETER_ERROR_IDENTITY_NOT_REGISTERED)
 				{
 					_log.debug("User " + requestUri + " is not registered. Sending '480 Temporarly unvailable' response for " 
 							+ request.getMethod());
 					sendResponse(request, SipServletResponse.SC_TEMPORARLY_UNAVAILABLE);
 					return;
 				}
-				else if (lia.getResultCode() >= 3000)
+				else if (!lia.getResultCode().isSuccess())
 				{
 					_log.debug("Diameter LIA answer to " + requestUri + " is not valid: " + lia.getResultCode() 
 							+ ". Sending 404 response");
@@ -165,17 +164,17 @@ public class IcscfService
 					return;
 				}
 					
-				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.getAVP(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME).getString());
+				SipURI scscfUri = (SipURI) _sipFactory.createURI(lia.get(Cx.SERVER_NAME));
 				scscfUri.setLrParam(true);
 				request.pushRoute(scscfUri);
-				AVP avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_IMPU);
-				if (avp != null)
-					request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+				String wildcard = lia.get(Cx.WILCARDED_IMPU);
+				if (wildcard != null)
+					request.setHeader(Headers.P_PROFILE_KEY, wildcard);
 				else
 				{
-					avp = lia.getAVP(IMS.IMS_VENDOR_ID, IMS.WILCARDED_PSI);
-					if (avp != null)
-						request.setHeader(Headers.P_PROFILE_KEY, avp.getString());
+					wildcard = lia.get(Cx.WILCARDED_PSI);
+					if (wildcard != null)
+						request.setHeader(Headers.P_PROFILE_KEY, wildcard);
 				}
 				
 			}
@@ -194,7 +193,7 @@ public class IcscfService
 		}
 	}
 	
-	private int getUserAuthorizationType(SipServletRequest request) throws ServletParseException
+	private UserAuthorizationType getUserAuthorizationType(SipServletRequest request) throws ServletParseException
 	{
 		Address contact = request.getAddressHeader(Headers.CONTACT);
 

@@ -29,12 +29,12 @@ import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.littleims.cx.ServerAssignmentType;
+import org.cipango.diameter.ims.Sh;
+import org.cipango.diameter.ims.Cx.ServerAssignmentType;
+import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.scscf.charging.CDF;
 import org.cipango.littleims.scscf.cx.CxManager;
@@ -143,7 +143,7 @@ public class SessionManagerImpl implements SessionManager
 							null, 
 							pProfileKey, 
 							ServerAssignmentType.UNREGISTERED_USER, 
-							false, 
+							UserDataAlreadyAvailable.USER_DATA_NOT_AVAILABLE, 
 							request);
 					return;
 				}
@@ -177,7 +177,7 @@ public class SessionManagerImpl implements SessionManager
 							null, 
 							pProfileKey, 
 							ServerAssignmentType.UNREGISTERED_USER, 
-							false, 
+							UserDataAlreadyAvailable.USER_DATA_NOT_AVAILABLE, 
 							request);
 					return;
 				}
@@ -305,18 +305,18 @@ public class SessionManagerImpl implements SessionManager
 		try
 		{
 			
-			if (saa.getResultCode() >= 3000)
+			if (!saa.getResultCode().isSuccess())
 			{
 				// FIXME what to do ????
 				_log.debug("Diameter SAA answer is not valid: " + saa.getResultCode());
 			}
 			else
 			{
-				AVP userData = saa.getAVP(IMS.IMS_VENDOR_ID, IMS.USER_DATA);
+				byte[] userData = saa.get(Sh.USER_DATA);
 				IMSSubscriptionDocument subscription = null;
 				if (userData != null)
 				{
-					subscription = IMSSubscriptionDocument.Factory.parse(userData.getString());
+					subscription = IMSSubscriptionDocument.Factory.parse(new String(userData));
 					_userProfileCache.cacheUserProfile(subscription);
 				}
 			}
@@ -334,17 +334,16 @@ public class SessionManagerImpl implements SessionManager
 	{
 		try
 		{
-			AVP userData = ppr.getAVP(IMS.IMS_VENDOR_ID, IMS.USER_DATA);
+			byte[] userData = ppr.get(Sh.USER_DATA);
 			IMSSubscriptionDocument subscription = null;
 			if (userData != null)
 			{
-				subscription = IMSSubscriptionDocument.Factory.parse(userData.getString());
+				subscription = IMSSubscriptionDocument.Factory.parse(new String(userData));
 				_userProfileCache.cacheUserProfile(subscription);
 				_log.info("Update user profile of " 
 						+ subscription.getIMSSubscription().getPrivateID()
 						+ " after PPR request");
 			}
-
 			ppr.createAnswer(Base.DIAMETER_SUCCESS).send();
 		}
 		catch (Exception e) 

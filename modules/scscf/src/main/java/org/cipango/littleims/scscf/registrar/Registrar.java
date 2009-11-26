@@ -35,12 +35,15 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
+import org.cipango.diameter.AVPList;
 import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.ims.Cx;
-import org.cipango.littleims.cx.ServerAssignmentType;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.diameter.ims.Sh;
+import org.cipango.diameter.ims.Cx.ReasonCode;
+import org.cipango.diameter.ims.Cx.ServerAssignmentType;
+import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.cx.data.userprofile.TPublicIdentity;
 import org.cipango.littleims.cx.data.userprofile.TServiceProfile;
@@ -165,8 +168,8 @@ public class Registrar
 			}
 		}
 		
-		int serverAssignmentType;
-		boolean userDataAlreadyAvailable = false;
+		ServerAssignmentType serverAssignmentType;
+		UserDataAlreadyAvailable userDataAlreadyAvailable =  UserDataAlreadyAvailable.USER_DATA_NOT_AVAILABLE;
 		if (expires == 0)
 		{
 			if (_permanentAssignation)
@@ -179,7 +182,7 @@ public class Registrar
 		else
 		{
 			serverAssignmentType = ServerAssignmentType.RE_REGISTRATION;
-			userDataAlreadyAvailable = true;
+			userDataAlreadyAvailable = UserDataAlreadyAvailable.USER_DATA_ALREADY_AVAILABLE;
 		}
 
 		// check that expires is shorter than minimum value
@@ -247,20 +250,20 @@ public class Registrar
 		SipServletRequest request = (SipServletRequest) saa.getRequest().getAttribute(SipServletRequest.class.getName());
 		if (request == null)
 		{
-			String publicIdentity = saa.getRequest().getAVP(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
+			String publicIdentity = saa.getRequest().get(Cx.PUBLIC_IDENTITY);
 			__log.debug("Received SAA answer for timeout registration of " + publicIdentity);
 			return;
 		}
 		try
 		{
-			if (saa.getResultCode() >= 3000)
+			if (!saa.getResultCode().isSuccess())
 			{
 				__log.debug("Diameter SAA answer is not valid: " + saa.getResultCode() + ". Sending 403 response");
 				_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 				return;
 			}
 			
-			String privateUserIdentity = saa.getRequest().getAVP(Base.USER_NAME).getString();
+			String privateUserIdentity = saa.getRequest().get(Base.USER_NAME);
 
 			URI aor = getAor(request);
 			RegistrationInfo regInfo;	
@@ -279,11 +282,11 @@ public class Registrar
 			
 			if (expires != 0)
 			{
-				AVP userData = saa.getAVP(IMS.IMS_VENDOR_ID, IMS.USER_DATA);
+				byte[] userData = saa.get(Sh.USER_DATA);
 				IMSSubscriptionDocument subscription = null;
 				if (userData != null)
 				{
-					subscription = IMSSubscriptionDocument.Factory.parse(userData.getString());
+					subscription = IMSSubscriptionDocument.Factory.parse(new String(userData));
 				}
 							
 				regInfo = register(aor, contact, privateUserIdentity, expires, getPath(request), subscription);
@@ -557,7 +560,7 @@ public class Registrar
 	{
 		unregister(uri, privateID, ContactEvent.EXPIRED);
 		__log.debug("Registration expired due to timeout for URI " + uri);
-		int serverAssignmentType;
+		ServerAssignmentType serverAssignmentType;
 		if (_permanentAssignation)
 			serverAssignmentType = ServerAssignmentType.TIMEOUT_DEREGISTRATION_STORE_SERVER_NAME;
 		else
@@ -570,7 +573,7 @@ public class Registrar
 					privateID, 
 					null, 
 					serverAssignmentType, 
-					true, 
+					UserDataAlreadyAvailable.USER_DATA_ALREADY_AVAILABLE, 
 					null);
 		} 
 		catch (IOException e)
@@ -742,24 +745,25 @@ public class Registrar
 	public void handleRtr(DiameterRequest rtr) throws IOException, ServletException
 	{
 		// Deregister + send NOTIFY + send third party register
-		Iterator<AVP> it = rtr.getAVPs(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY);
+		Iterator<AVP<String>> it = rtr.getAVPs().getAVPs(Cx.PUBLIC_IDENTITY);
 		
 		ContactEvent contactEvent;
-		int deregistrationReason = getDeregistrationReason(rtr);
+		ReasonCode deregistrationReason = getDeregistrationReason(rtr);
 		switch (deregistrationReason)
 		{
-		case Cx.ReasonCode.NEW_SERVER_ASSIGNED:
-		case Cx.ReasonCode.REMOVE_SCSCF:
-		case Cx.ReasonCode.SERVER_CHANGE:
+		case NEW_SERVER_ASSIGNED:
+		case REMOVE_SCSCF:
+		case SERVER_CHANGE:
 			contactEvent = ContactEvent.DEACTIVATED;
 			break;
-		case Cx.ReasonCode.PERMANENT_TERMINATION:
+		case PERMANENT_TERMINATION:
 			contactEvent = ContactEvent.REJECTED;
 			break;
 		default:
 			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
-			answer.add(AVP.ofAVPs(Base.FAILED_AVP, 
-					AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.DERISTRATION_REASON, new byte[10])));
+			AVPList l = new AVPList();
+			l.add(Cx.DERISTRATION_REASON, new AVPList());
+			answer.getAVPs().add(new AVP<AVPList>(Base.FAILED_AVP, l));
 			answer.send();
 			return;
 		}
@@ -768,7 +772,7 @@ public class Registrar
 		{
 			while (it.hasNext())
 			{
-				String publicId = it.next().getString();
+				String publicId = it.next().getValue();
 				Context regContext = _regContexts.get(publicId); // FIXME case wilcard 
 				
 				if (regContext == null)
@@ -868,37 +872,38 @@ public class Registrar
 	
 	private List<String> getPrivateIdentities(DiameterRequest rtr) throws IOException
 	{
-		String privateIdentity = rtr.getAVPs().getString(Base.USER_NAME);
+		String privateIdentity = rtr.get(Base.USER_NAME);
 		if (privateIdentity == null)
 		{
 			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
-			answer.add(AVP.ofAVPs(Base.FAILED_AVP, 
-					AVP.ofBytes(Base.USER_NAME, new byte[0])));
+			AVPList l = new AVPList();
+			l.add(Base.USER_NAME, "");
+			answer.add(Base.FAILED_AVP, l);
 			answer.send();
 			return null;
 		}
 
 		List<String> privateIds = new ArrayList<String>();
 		privateIds.add(privateIdentity);
-		AVP associatedIdentites = rtr.getAVP(IMS.IMS_VENDOR_ID, IMS.ASSOCIATED_IDENTITIES);
+		AVPList associatedIdentites = rtr.get(Cx.ASSOCIATED_IDENTITIES);
 		if (associatedIdentites != null)
 		{
-			Iterator<AVP> it = associatedIdentites.getGrouped().getAVPs(Base.USER_NAME);
+			Iterator<AVP<String>> it = associatedIdentites.getAVPs(Base.USER_NAME);
 			while (it.hasNext())
 				privateIds.add(it.next().toString());
 		}
 		return privateIds;
 	}
 	
-	private int getDeregistrationReason(DiameterRequest rtr)
+	private ReasonCode getDeregistrationReason(DiameterRequest rtr)
 	{
-		AVP avp = rtr.getAVP(IMS.IMS_VENDOR_ID, IMS.DERISTRATION_REASON);
-		if (avp == null)
+		AVPList avpList = rtr.get(Cx.DERISTRATION_REASON);
+		if (avpList == null)
 		{
-			__log.warn("Missing required AVP: Deregistration reason " + IMS.DERISTRATION_REASON);
-			return -1;
+			__log.warn("Missing required AVP: Deregistration reason " + Cx.DERISTRATION_REASON);
+			return null;
 		}	
-		return avp.getGrouped().getInt(IMS.IMS_VENDOR_ID, IMS.REASON_CODE);
+		return avpList.getValue(Cx.REASON_CODE);
 	}
 	
 	public UserProfileCache getUserProfileCache()

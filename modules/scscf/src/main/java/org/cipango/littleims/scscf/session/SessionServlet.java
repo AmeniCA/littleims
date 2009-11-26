@@ -25,10 +25,11 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.DiameterMessage;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.app.DiameterListener;
-import org.cipango.diameter.ims.IMS;
+import org.cipango.diameter.ims.Cx;
 import org.cipango.littleims.scscf.debug.DebugIdService;
 import org.cipango.littleims.scscf.registrar.Authenticator;
 import org.cipango.littleims.scscf.registrar.Registrar;
@@ -136,15 +137,15 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 	public void handle(DiameterMessage message) throws IOException
 	{
 
-		int command = message.getCommand();
+		DiameterCommand command = message.getCommand();
 		try
 		{
 			if (message.isRequest())
 			{
 				DiameterRequest request = (DiameterRequest) message;
-				if (command == IMS.PPR)
+				if (command == Cx.PPR)
 					_sessionManager.handlePpr(request);
-				else if (command == IMS.RTR)
+				else if (command == Cx.RTR)
 					_registrar.handleRtr(request);
 				else
 					_log.warn("No handler for diameter request with command " + message.getCommand());
@@ -152,9 +153,9 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 			else
 			{
 				DiameterAnswer answer = (DiameterAnswer) message;
-				if ( command == IMS.MAA)
+				if ( command == Cx.MAA)
 					_authenticator.handleMaa(answer);
-				else if (command == IMS.SAA)
+				else if (command == Cx.SAA)
 				{
 					SipServletRequest request =  
 						(SipServletRequest) answer.getRequest().getAttribute(SipServletRequest.class.getName());

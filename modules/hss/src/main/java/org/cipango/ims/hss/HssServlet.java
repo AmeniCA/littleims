@@ -21,11 +21,13 @@ import javax.servlet.sip.SipServlet;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.DiameterMessage;
 import org.cipango.diameter.DiameterRequest;
+import org.cipango.diameter.ResultCode;
 import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
+import org.cipango.diameter.ims.Cx;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.diameter.DiameterException;
 import org.springframework.context.ApplicationContext;
@@ -59,46 +61,39 @@ public class HssServlet extends SipServlet implements DiameterListener
 	
 	protected void doRequest(DiameterRequest request) throws IOException
 	{
-		int command = request.getCommand();
+		DiameterCommand command = request.getCommand();
 		try
 		{
-			switch (command) 
-			{
-			case IMS.LIR:
+			if (command == Cx.LIR)
 				_hss.doLir(request);
-				break;
-			case IMS.MAR:
+			else if (command == Cx.MAR)
 				_hss.doMar(request);
-				break;
-			case IMS.SAR:
+			else if (command == Cx.SAR)
 				_hss.doSar(request);
-				break;
-			case IMS.UAR:
+			else if (command == Cx.UAR)
 				_hss.doUar(request);
-				break;
-			default:
+			else
+			{
 				DiameterAnswer answer = request.createAnswer(Base.DIAMETER_COMMAND_UNSUPPORTED);
 				answer.send();
-				break;
 			}
 		}
 		catch (DiameterException e)
 		{
 			if (__log.isDebugEnabled())
 			{
-				int vendorId = e.getVendorId();
-				int resultCode = e.getResultCode();
-				if ((vendorId == IMS.IMS_VENDOR_ID && resultCode == IMS.DIAMETER_ERROR_USER_UNKNOWN))
+				ResultCode resultCode = e.getResultCode();
+				if ((resultCode == Cx.DIAMETER_ERROR_USER_UNKNOWN))
 					__log.debug("Unable to process request: " + command + ", Result code: " + e.getResultCode() 
 							+ " Reason: " + e.getMessage());
 				else
 					__log.debug("Unable to process request: " + command + ", Result code: " + e.getResultCode(), e);
 			}
-			DiameterAnswer answer = request.createAnswer(e.getVendorId(), e.getResultCode());
+			DiameterAnswer answer = request.createAnswer(e.getResultCode());
 			if (e.getAvps() != null)
 			{
 				for (AVP avp : e.getAvps())
-					answer.add(avp);
+					answer.getAVPs().add(avp);
 			}
 			answer.send();
 		}
@@ -112,21 +107,15 @@ public class HssServlet extends SipServlet implements DiameterListener
 	
 	protected void doAnswer(DiameterAnswer answer)
 	{
-		int command = answer.getCommand();
+		DiameterCommand command = answer.getCommand();
 		try
 		{
-			switch (command) 
-			{
-			case IMS.PPA:
+			if (command == Cx.PPA)
 				_hss.doPpa(answer);
-				break;
-			case IMS.RTA:
+			else if (command == Cx.RTA)
 				_hss.doRta(answer);
-				break;
-			default:
+			else
 				__log.warn("Received unknown answer: " + command);
-				break;
-			}
 		}
 		catch (Throwable e)
 		{

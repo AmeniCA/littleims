@@ -25,12 +25,11 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.ims.Cx.AuthenticationScheme;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.ims.AuthenticationScheme;
 import org.cipango.littleims.scscf.cx.CxManager;
 import org.cipango.littleims.scscf.registrar.AuthorizationException.Reason;
 import org.cipango.littleims.scscf.util.MessageSender;
@@ -156,30 +155,30 @@ public class ImsAuthenticator implements Authenticator
 		SipServletRequest request = (SipServletRequest) maa.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
 		{
-			if ( maa.getResultCode() >= 3000)
+			if (!maa.getResultCode().isSuccess())
 			{
 				__log.debug("Diameter MAA answer is not valid: " + maa.getResultCode() + ". Sending 403 response");
 	
 				_messageSender.sendResponse(request, SipServletResponse.SC_FORBIDDEN);
 				return;
 			}
-			String aor = maa.getRequest().getAVP(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY).getString();
-			AVP avp = maa.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTH_DATA_ITEM);
-			AVPList sadi = avp.getGrouped();
+			String aor = maa.getRequest().get(Cx.PUBLIC_IDENTITY);
+
+			AVPList sadi =  maa.get(Cx.SIP_AUTH_DATA_ITEM);
 			
-			String scheme = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATION_SCHEME).getString();
+			String scheme = sadi.getValue(Cx.SIP_AUTHENTICATION_SCHEME);
 	
 			if (AuthenticationScheme.SIP_DIGEST.getName().equals(scheme))
 			{
-				AVPList digestAuthenticate = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_DIGEST_AUTHENTICATE).getGrouped();
+				AVPList digestAuthenticate = sadi.getValue(Cx.SIP_DIGEST_AUTHENTICATE);
 				String realm = 
-					digestAuthenticate.getAVP(Base.DIGEST_REALM) == null ? _realm :  digestAuthenticate.getAVP(Base.DIGEST_REALM).getString();
+					digestAuthenticate.getValue(Base.DIGEST_REALM) == null ? _realm :  digestAuthenticate.getValue(Base.DIGEST_REALM);
 				String algorithm =
-					digestAuthenticate.getAVP(Base.DIGEST_ALGORITHM) == null ? AuthenticationScheme.SIP_DIGEST.getAlgorithm() :  digestAuthenticate.getAVP(Base.DIGEST_ALGORITHM).getString();
+					digestAuthenticate.getValue(Base.DIGEST_ALGORITHM) == null ? AuthenticationScheme.SIP_DIGEST.getAlgorithm() :  digestAuthenticate.getValue(Base.DIGEST_ALGORITHM);
 				
 	
 				// Start Reg-await-auth timer
-				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, digestAuthenticate.getAVP(Base.DIGEST_HA1).getString());
+				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, digestAuthenticate.getValue(Base.DIGEST_HA1));
 				_timer.schedule(authTimer, _authTimeout);
 	
 				synchronized (_secContexts)
@@ -195,9 +194,9 @@ public class ImsAuthenticator implements Authenticator
 			else if (AuthenticationScheme.DIGEST_AKA_MD5.getName().equals(scheme))
 			{
 				// TODO ik ck
-				byte[] bNonce = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATE).getBytes();
+				byte[] bNonce = sadi.getValue(Cx.SIP_AUTHENTICATE);
 				String nonce = Base64.encode(bNonce);
-				byte[] xres = sadi.getAVP(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHORIZATION).getBytes();
+				byte[] xres = sadi.getValue(Cx.SIP_AUTHORIZATION);
 				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, xres);
 				_timer.schedule(authTimer, _authTimeout);
 	

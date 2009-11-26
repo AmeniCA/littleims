@@ -23,9 +23,10 @@ import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.DiameterMessage;
 import org.cipango.diameter.app.DiameterListener;
-import org.cipango.diameter.ims.IMS;
+import org.cipango.diameter.ims.Cx;
 import org.cipango.littleims.util.Methods;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -86,10 +87,10 @@ public class IcscfServlet extends SipServlet implements DiameterListener
 			else
 			{
 				DiameterAnswer answer = (DiameterAnswer) message;
-				int command = message.getCommand();
-				if ( command == IMS.UAA)
+				DiameterCommand command = message.getCommand();
+				if ( command == Cx.UAA)
 					_service.handleUAA(answer);
-				else if (command == IMS.LIA)
+				else if (command == Cx.LIA)
 				{
 					_service.handleLIA(answer);
 				}

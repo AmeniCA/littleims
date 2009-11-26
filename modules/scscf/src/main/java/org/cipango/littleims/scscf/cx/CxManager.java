@@ -20,12 +20,15 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
-import org.cipango.diameter.ApplicationId;
+import org.cipango.diameter.AVPList;
+import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.DiameterFactory;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.ims.Cx.AuthenticationScheme;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.diameter.ims.Cx.ServerAssignmentType;
+import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
+import org.cipango.ims.AuthenticationScheme;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Digest;
 import org.cipango.littleims.util.HexString;
@@ -81,15 +84,14 @@ public class CxManager
 		_scscfName = scscfName;
 	}
 
-	private DiameterRequest newRequest(int command, String publicUserIdentity, 
+	private DiameterRequest newRequest(DiameterCommand command, String publicUserIdentity, 
 			String privateUserId)
 	{
-		ApplicationId appId = new ApplicationId(ApplicationId.Type.Auth, IMS.CX_APPLICATION_ID, IMS.IMS_VENDOR_ID);
-		DiameterRequest request =  _diameterFactory.createRequest(appId, command, _hssRealm, _hssHost);
+		DiameterRequest request =  _diameterFactory.createRequest(Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
 		if (privateUserId != null)
-			request.add(AVP.ofString(Base.USER_NAME, privateUserId));
-		request.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY, publicUserIdentity));
-		request.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, _scscfName));
+			request.add(Base.USER_NAME, privateUserId);
+		request.add(Cx.PUBLIC_IDENTITY, publicUserIdentity);
+		request.add(Cx.SERVER_NAME, _scscfName);
 		return request;
 	}
 	
@@ -122,9 +124,9 @@ public class CxManager
 			privateId = authorization.getUsername();
 		else
 			privateId = URIHelper.extractPrivateIdentity(publicUserIdentity);
-		DiameterRequest mar = newRequest(IMS.MAR, publicUserIdentity.toString(), privateId);
-		mar.add(getSipAuthDataItem(authorization));
-		mar.add(AVP.ofInt(IMS.IMS_VENDOR_ID,IMS.SIP_NUMBER_AUTH_ITEMS, 1));
+		DiameterRequest mar = newRequest(Cx.MAR, publicUserIdentity.toString(), privateId);
+		mar.getAVPs().add(getSipAuthDataItem(authorization));
+		mar.add(Cx.SIP_NUMBER_AUTH_ITEMS, 1);
 		mar.setAttribute(SipServletRequest.class.getName(), request);
 		mar.send();
 	}
@@ -156,17 +158,17 @@ public class CxManager
 	public void sendSAR(String publicUserIdentity, 
 			String privateUserId, 
 			String wilcardPublicId,
-			int serverAssignmentType, 
-			boolean userDataAlreadyAvailable,
+			ServerAssignmentType serverAssignmentType, 
+			UserDataAlreadyAvailable userDataAlreadyAvailable,
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest sar = newRequest(IMS.SAR, publicUserIdentity, privateUserId);
+		DiameterRequest sar = newRequest(Cx.SAR, publicUserIdentity, privateUserId);
 
 		// FIXME how detect if it is a wilcarded PSI or a wilcarded IMPU ?
 		if (wilcardPublicId != null)
-			sar.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.WILCARDED_PSI, wilcardPublicId));
-		sar.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.SERVER_ASSIGNMENT_TYPE, serverAssignmentType));
-		sar.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.USER_DATA_ALREADY_AVAILABLE, userDataAlreadyAvailable ? 1 : 0));
+			sar.add(Cx.WILCARDED_PSI, wilcardPublicId);
+		sar.add(Cx.SERVER_ASSIGNMENT_TYPE, serverAssignmentType);
+		sar.add(Cx.USER_DATA_ALREADY_AVAILABLE, userDataAlreadyAvailable);
 		if (request != null)
 			sar.setAttribute(SipServletRequest.class.getName(), request);
 		sar.send();
@@ -191,7 +193,7 @@ public class CxManager
 	 * 	  * [AVP]
 	 * </pre>
 	 */
-	private AVP getSipAuthDataItem(AuthorizationHeader authorizationHeader)
+	private AVP<AVPList> getSipAuthDataItem(AuthorizationHeader authorizationHeader)
 	{
 		String scheme = null;
 		String algorithm = authorizationHeader == null ? null : authorizationHeader.getAlgorithm();
@@ -212,23 +214,20 @@ public class CxManager
 		}
 		
 		String auts = authorizationHeader == null ? null : authorizationHeader.getAuts();
+
+		AVPList avpList = new AVPList();
+		avpList.add(Cx.SIP_AUTHENTICATION_SCHEME, scheme);
 		if (auts != null)
 		{
 			__log.debug("Detect auts parameter in authorization header, try to resynchronized");
 			byte[] rand = getRand(authorizationHeader.getNonce());
 			byte[] bAuts = HexString.hexToBuffer(auts);
-			
 			byte[] sipAuthorization = Digest.concat(rand, bAuts);
 			
-			return AVP.ofAVPs(IMS.IMS_VENDOR_ID, 
-					IMS.SIP_AUTH_DATA_ITEM, 
-					AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATION_SCHEME, scheme),
-					AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHORIZATION, sipAuthorization));
+			avpList.add(Cx.SIP_AUTHORIZATION, sipAuthorization);
 		}
-		else
-			return AVP.ofAVPs(IMS.IMS_VENDOR_ID, 
-				IMS.SIP_AUTH_DATA_ITEM, 
-				AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATION_SCHEME, scheme));
+		
+		return new AVP<AVPList>(Cx.SIP_AUTH_DATA_ITEM, avpList);
 	}
 	
 	private byte[] getRand(String nonce)

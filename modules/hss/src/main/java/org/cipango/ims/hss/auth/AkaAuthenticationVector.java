@@ -19,8 +19,8 @@ import java.security.InvalidKeyException;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.ims.IMS;
-import org.cipango.ims.Cx;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.ims.AuthenticationScheme;
 import org.cipango.littleims.util.HexString;
 
 
@@ -105,15 +105,15 @@ public class AkaAuthenticationVector implements AuthenticationVector {
 		return __amf;
 	}
 
-	public AVPList asAuthItem() {
+	public AVP<AVPList> asAuthItem() {
 		AVPList avps = new AVPList();
 		
-		avps.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATION_SCHEME, Cx.AuthenticationScheme.DIGEST_AKA_MD5.getName()));
-		avps.add(AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHENTICATE, _sipAuthenticate));
-		avps.add(AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.SIP_AUTHORIZATION, _xres));
-		avps.add(AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.CONFIDENTIALITY_KEY, _ck));
-		avps.add(AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.INTEGRITY_KEY, _ik));
-		return avps;
+		avps.add(Cx.SIP_AUTHENTICATION_SCHEME, AuthenticationScheme.DIGEST_AKA_MD5.getName());
+		avps.add(Cx.SIP_AUTHENTICATE, _sipAuthenticate);
+		avps.add(Cx.SIP_AUTHORIZATION, _xres);
+		avps.add(Cx.CONFIDENTIALITY_KEY, _ck);
+		avps.add(Cx.INTEGRITY_KEY, _ik);
+		return new AVP<AVPList>(Cx.SIP_AUTH_DATA_ITEM, avps);
 	}
 	
 }

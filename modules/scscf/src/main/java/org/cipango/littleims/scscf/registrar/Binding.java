@@ -96,6 +96,7 @@ public class Binding
 
 	public Address getContact()
 	{
+		_contact.setExpires(getExpires());
 		return _contact;
 	}
 

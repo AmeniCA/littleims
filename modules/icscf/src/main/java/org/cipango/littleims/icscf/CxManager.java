@@ -18,12 +18,13 @@ import java.io.IOException;
 import javax.servlet.sip.SipServletRequest;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.AVP;
-import org.cipango.diameter.ApplicationId;
+import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.DiameterFactory;
 import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.IMS;
+import org.cipango.diameter.ims.Cx;
+import org.cipango.diameter.ims.Cx.OriginatingRequest;
+import org.cipango.diameter.ims.Cx.UserAuthorizationType;
 
 public class CxManager
 {
@@ -63,15 +64,14 @@ public class CxManager
 		_hssHost = hssHost;
 	}
 
-	private DiameterRequest newRequest(int command, String publicUserIdentity, 
+	private DiameterRequest newRequest(DiameterCommand command, String publicUserIdentity, 
 			String privateUserId)
 	{
-		ApplicationId appId = new ApplicationId(ApplicationId.Type.Auth, IMS.CX_APPLICATION_ID, IMS.IMS_VENDOR_ID);
-		DiameterRequest request =  _diameterFactory.createRequest(appId, command, _hssRealm, _hssHost);
+		DiameterRequest request =  _diameterFactory.createRequest(Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
 		if (privateUserId != null)
-			request.add(AVP.ofString(Base.USER_NAME, privateUserId));
-		request.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.PUBLIC_IDENTITY, publicUserIdentity));
-		request.add(AVP.ofString(IMS.IMS_VENDOR_ID, IMS.SERVER_NAME, _icscfName));
+			request.add(Base.USER_NAME, privateUserId);
+		request.add(Cx.PUBLIC_IDENTITY, publicUserIdentity);
+		request.add(Cx.SERVER_NAME, _icscfName);
 		return request;
 	}
 	
@@ -100,13 +100,13 @@ public class CxManager
 	public void sendUAR(String publicUserIdentity, 
 			String privateUserId, 
 			String visitednetworkId, 
-			int userAuthorizationType, 
+			UserAuthorizationType userAuthorizationType, 
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest uar = newRequest(IMS.UAR, publicUserIdentity, privateUserId);
-		uar.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.USER_AUTHORIZATION_TYPE, userAuthorizationType));
+		DiameterRequest uar = newRequest(Cx.UAR, publicUserIdentity, privateUserId);
+		uar.add(Cx.USER_AUTHORIZATION_TYPE, userAuthorizationType);
 		if (visitednetworkId != null)
-			uar.add(AVP.ofBytes(IMS.IMS_VENDOR_ID, IMS.VISITED_NETWORK_IDENTIFIER, visitednetworkId.getBytes()));
+			uar.add(Cx.VISITED_NETWORK_IDENTIFIER, visitednetworkId.getBytes());
 		uar.setAttribute(SipServletRequest.class.getName(), request);
 		uar.send();
 	}
@@ -134,14 +134,14 @@ public class CxManager
 	 */
 	public void sendLIR(String publicUserIdentity,
 			boolean originatingRequest,
-			Integer userAuthorizationType,
+			UserAuthorizationType userAuthorizationType,
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest lir = newRequest(IMS.LIR, publicUserIdentity, null);
+		DiameterRequest lir = newRequest(Cx.LIR, publicUserIdentity, null);
 		if (originatingRequest)
-			lir.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.ORIGININATING_REQUEST, 0));
+			lir.add(Cx.ORIGININATING_REQUEST, OriginatingRequest.ORIGINATING);
 		if (userAuthorizationType != null)
-			lir.add(AVP.ofInt(IMS.IMS_VENDOR_ID, IMS.USER_AUTHORIZATION_TYPE, userAuthorizationType));
+			lir.add(Cx.USER_AUTHORIZATION_TYPE, userAuthorizationType);
 		lir.setAttribute(SipServletRequest.class.getName(), request);
 		lir.send();
 	}

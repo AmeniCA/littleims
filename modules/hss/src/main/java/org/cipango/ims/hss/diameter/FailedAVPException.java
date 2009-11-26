@@ -14,15 +14,13 @@
 
 package org.cipango.ims.hss.diameter;
 
+import org.cipango.diameter.ResultCode;
+
 public class FailedAVPException extends DiameterException
 {
-	public FailedAVPException(int resultCode) 
+	public FailedAVPException(ResultCode resultCode) 
 	{
 		super(resultCode);
 	}
 	
-	public FailedAVPException(int resultCode, int vendorId, int code)
-	{
-		super(resultCode);
-	}
 }
