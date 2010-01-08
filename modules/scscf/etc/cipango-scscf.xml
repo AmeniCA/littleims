@@ -194,13 +194,18 @@
         </Call>
         <Set name="identity"><SystemProperty default="s-cscf.cipango.voip" name="scscf.host"/></Set>
         <Set name="server"><Ref id="Server"/></Set>
-        <Call name="addPeer">
-          <Arg>
-            <New class="org.cipango.diameter.Peer">
-              <Arg><SystemProperty default="hss.cipango.voip" name="hss.host"/></Arg>
-            </New>
-          </Arg>
-        </Call>
+        <Set name="router">
+          <New class="org.cipango.diameter.Router">
+            <Set name="node"><Ref id="node"/></Set>
+            <Call name="addPeer">
+              <Arg>
+                <New class="org.cipango.diameter.Peer">
+                  <Arg><SystemProperty default="hss.cipango.voip" name="hss.host"/></Arg>
+                </New>
+              </Arg>
+            </Call>
+          </New>
+        </Set>
       </New>
     </Arg>
   </Call>
