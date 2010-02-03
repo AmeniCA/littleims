@@ -77,7 +77,7 @@
     </Arg>
   </Call>
 
-  <Get name="transportManager">
+  <Get name="connectorManager">
     <Set name="connectors">
       <Array type="org.cipango.sip.SipConnector"/>
     </Set>

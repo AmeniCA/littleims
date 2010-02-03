@@ -26,6 +26,7 @@ import javax.servlet.sip.SipServletResponse;
 import org.cipango.SipMessage;
 import org.cipango.SipResponse;
 import org.cipango.log.AbstractMessageLog;
+import org.cipango.sip.SipConnection;
 import org.mortbay.io.Buffer;
 import org.mortbay.util.StringUtil;
 
@@ -39,7 +40,8 @@ public class DebugIdMessageLog extends AbstractMessageLog
 	
 	private File _logDirectory;
 	
-	public void doLog(SipMessage message, int direction, String transport, String localAddr, int localPort, String remoteAddr, int remotePort) throws IOException
+	@Override
+	public void doLog(SipMessage message, int direction, SipConnection connection) throws IOException
 	{
 		String debugId = message.getHeader(P_DEBUG_ID);
 		if (debugId == null && message instanceof SipServletResponse)
@@ -53,7 +55,7 @@ public class DebugIdMessageLog extends AbstractMessageLog
 		OutputStream os = getOutputStream(debugId);
 		synchronized (os)
 		{
-			os.write(generateInfoLine(direction, transport, localAddr, localPort, remoteAddr, remotePort, System.currentTimeMillis()).getBytes()); 
+			os.write(generateInfoLine(direction, connection, System.currentTimeMillis()).getBytes()); 
             Buffer buffer = generateMessage(message);
     		os.write(buffer.array(), 0, buffer.length());
     		os.write(StringUtil.__LINE_SEPARATOR.getBytes());
@@ -110,7 +112,5 @@ public class DebugIdMessageLog extends AbstractMessageLog
 	{
 		_logDirectory = logDirectory;
 	}
-
-
 
 }

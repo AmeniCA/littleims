@@ -77,7 +77,7 @@
     </Arg>
   </Call>
 
-  <Get name="transportManager">
+  <Get name="connectorManager">
     <Call name="addConnector">
       <Arg>
         <New class="org.cipango.sip.UdpConnector">
@@ -94,21 +94,26 @@
         </New>
       </Arg>
     </Call>
-    <Set name="accessLogs">
-      <Array type="org.cipango.log.AccessLog">
-        <Item>
-          <New class="org.cipango.ims.DebugIdMessageLog">
-           <Set name="logDirectory"><SystemProperty default="." name="jetty.home"/>/logs</Set>
-          </New>
-        </Item>
-        <Item>
-          <New class="org.cipango.log.FileMessageLog">
-            <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.message.log</Set>
-            <Set name="append">true</Set>
-            <Set name="retainDays">31</Set>
-          </New>
-        </Item>
-      </Array>
+    <Set name="accessLog">
+      <New class="org.cipango.log.AccessLogCollection">
+        <Set name="server"><Ref id="Server"/></Set>
+        <Set name="loggers">
+          <Array type="org.cipango.log.AccessLog">
+            <Item>
+              <New class="org.cipango.ims.DebugIdMessageLog">
+               <Set name="logDirectory"><SystemProperty default="." name="jetty.home"/>/logs</Set>
+              </New>
+            </Item>
+            <Item>
+              <New class="org.cipango.log.FileMessageLog">
+                <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.message.log</Set>
+                <Set name="append">true</Set>
+                <Set name="retainDays">31</Set>
+              </New>
+            </Item>
+          </Array>
+        </Set>
+      </New>
     </Set>
   </Get>
 
