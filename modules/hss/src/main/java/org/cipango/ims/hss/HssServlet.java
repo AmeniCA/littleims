@@ -28,6 +28,7 @@ import org.cipango.diameter.ResultCode;
 import org.cipango.diameter.app.DiameterListener;
 import org.cipango.diameter.base.Base;
 import org.cipango.diameter.ims.Cx;
+import org.cipango.diameter.ims.Zh;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.diameter.DiameterException;
 import org.springframework.context.ApplicationContext;
@@ -41,11 +42,13 @@ public class HssServlet extends SipServlet implements DiameterListener
 	private static final Logger __log = Logger.getLogger(HssServlet.class);
 	
 	private Hss _hss;
+	private ZhHandler _zhHandler;
 
 	public void init()
 	{
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		_hss = (Hss) context.getBean("hss");
+		_zhHandler = (ZhHandler) context.getBean("zhHandler");
 		
 		AdminUserDao dao = (AdminUserDao) context.getBean("adminUserDao");
 		dao.insertDefaultUserIfNone();
@@ -67,7 +70,15 @@ public class HssServlet extends SipServlet implements DiameterListener
 			if (command == Cx.LIR)
 				_hss.doLir(request);
 			else if (command == Cx.MAR)
-				_hss.doMar(request);
+			{
+				if (request.getApplicationId() == Cx.CX_APPLICATION)
+					_hss.doMar(request);
+				else if (request.getApplicationId() == Zh.ZH_APPLICATION)
+					_zhHandler.doMar(request);
+				else
+					throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+							"Unsupported application ID: " + request.getApplicationId());
+			}
 			else if (command == Cx.SAR)
 				_hss.doSar(request);
 			else if (command == Cx.UAR)

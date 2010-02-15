@@ -104,7 +104,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 		};
 		DaoDataProvider daoDataProvider = new DaoDataProvider("identity", serviceProfile, applicationServer, scscf, search);
 
-		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, getItemByPage());
 		add(table);
 		
 		serviceProfile = daoDataProvider.getServiceProfile();

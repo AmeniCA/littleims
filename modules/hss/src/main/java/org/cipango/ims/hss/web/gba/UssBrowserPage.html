@@ -1,0 +1,28 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1 wicket:id="title"></h1>
+    <a href="#" wicket:id="createLink"><wicket:message key="uss.new.link"/></a>
+  	<table class="filteredTable">
+        <tr>
+            <th><wicket:message key="uss.id"/></th>
+            <th><wicket:message key="uss.type"/></th>
+            <th><wicket:message key="uss.nafGroup"/></th>
+            <th><wicket:message key="uss.flag"/></th>
+        </tr>
+        <tr wicket:id="uss">
+            <td><A wicket:id="editLink"><span wicket:id="id"/></A></td>
+            <td><span wicket:id="type"/></td>
+            <td><span wicket:id="nafGroup"/></td>
+            <td><span wicket:id="flagAsString"/></td>
+        </tr>
+    </table>
+    
+    <h2><wicket:message key="uss.guss"/></h2>
+    <pre wicket:id="guss"></pre>
+    
+  </div>
+</wicket:extend>
+</body>
+</html>

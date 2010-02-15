@@ -96,7 +96,7 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 		
 		DaoDataProvider daoDataProvider = new DaoDataProvider("name", ifcName);
 
-		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, getItemByPage());
 		add(table);
 		
 		ifcName = daoDataProvider.getIfc();

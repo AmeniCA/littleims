@@ -76,7 +76,7 @@ public class IfcBrowserPage extends IfcPage
 		};
 
 		DaoDataProvider daoDataProvider = new DaoDataProvider("name", asName);
-		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, 15);
+		DefaultDataTable table = new DefaultDataTable("browser", columns, daoDataProvider, getItemByPage());
 		table.setOutputMarkupId(true);
 		add(table);
 		

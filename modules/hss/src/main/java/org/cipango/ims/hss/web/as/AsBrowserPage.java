@@ -71,7 +71,7 @@ public class AsBrowserPage extends AsPage
 		};
 
 		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"name"), 15);
+				"name"), getItemByPage());
 		table.setOutputMarkupId(true);
 		add(table);
 	}

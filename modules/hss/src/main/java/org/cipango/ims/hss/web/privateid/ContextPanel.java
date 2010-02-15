@@ -29,6 +29,7 @@ import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cipango.ims.hss.model.PrivateIdentity;
+import org.cipango.ims.hss.web.gba.UssBrowserPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.subscription.DeregistrationPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
@@ -53,7 +54,8 @@ public class ContextPanel extends Panel {
 		}
 		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
 		add(new BookmarkablePageLink("deleteLink", DeletePrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-				
+		add(new BookmarkablePageLink("gbaLink", UssBrowserPage.class,
+				new PageParameters("privateId=" + privateIdentity.getIdentity())));		
 		add(new RefreshingView("publicIds", new Model((Serializable) privateIdentity.getPublicIds())){
 
 			@Override

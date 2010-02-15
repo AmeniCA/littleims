@@ -22,7 +22,6 @@ import org.apache.wicket.Page;
 import org.apache.wicket.Request;
 import org.apache.wicket.Response;
 import org.apache.wicket.request.target.coding.MixedParamUrlCodingStrategy;
-import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.ISecuritySettings;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.ConverterLocator;
@@ -37,6 +36,9 @@ import org.cipango.ims.hss.web.as.AsBrowserPage;
 import org.cipango.ims.hss.web.as.DeleteAsPage;
 import org.cipango.ims.hss.web.as.EditAsPage;
 import org.cipango.ims.hss.web.debugsession.EditDebugSessionPage;
+import org.cipango.ims.hss.web.gba.EditUssPage;
+import org.cipango.ims.hss.web.gba.NafGroupBrowserPage;
+import org.cipango.ims.hss.web.gba.UssBrowserPage;
 import org.cipango.ims.hss.web.ifc.DeleteIfcPage;
 import org.cipango.ims.hss.web.ifc.EditIfcPage;
 import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
@@ -139,6 +141,11 @@ public class ImsApplication extends SpringApplication {
 		mount(new MixedParamUrlCodingStrategy("/implicit-registration-state/edit", EditImplicitSetPage.class, id));
 			
 		mount(new MixedParamUrlCodingStrategy("/debug-session/edit", EditDebugSessionPage.class, id));
+		
+		mount(new MixedParamUrlCodingStrategy("/uss/edit", EditUssPage.class, id));
+		mount(new MixedParamUrlCodingStrategy("/uss/browser", UssBrowserPage.class, new String[] {"privateId"}));
+		mountBookmarkablePage("/naf-group/browser", NafGroupBrowserPage.class);
+		
 		mountBookmarkablePage("/signin", SigninPage.class);
 		mountBookmarkablePage("/signout", SignOutPage.class);
 		

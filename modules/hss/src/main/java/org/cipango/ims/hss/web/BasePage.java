@@ -105,4 +105,9 @@ public abstract class BasePage extends WebPage
 		else
 			return copy + name;
 	}
+	
+	public int getItemByPage()
+	{
+		return 20;
+	}
 }

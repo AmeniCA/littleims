@@ -29,7 +29,7 @@
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
-		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt"/>
+		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt,org.cipango.ims.hss.model.uss"/>
 	
 		<property name="hibernateProperties">
 			<util:properties location="file:${jetty.home}/etc/hss-db.properties"/>
@@ -90,6 +90,14 @@
 		<constructor-arg ref="sessionFactory"/>
 	</bean>
 	
+	<bean id="nafGroupDao" class="org.cipango.ims.hss.db.hibernate.NafGroupDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="UssDao" class="org.cipango.ims.hss.db.hibernate.UssDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
 	<bean id="cxManager" class="org.cipango.ims.hss.CxManager">
 		<property name="diameterFactory" ref="diameterFactory" />
 		<property name="publicIdentityDao" ref="publicIdentityDao" />
@@ -98,6 +106,9 @@
 	</bean>
 	
 	<bean id="hss" class="org.cipango.ims.hss.Hss" autowire="byName" >
+	</bean>
+	
+	<bean id="zhHandler" class="org.cipango.ims.hss.ZhHandler" autowire="byName" >
 	</bean>
 		
 	<bean id="webApplication" 

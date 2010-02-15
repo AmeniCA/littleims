@@ -50,7 +50,7 @@ public class AdminUserBrowserPage extends AdminUserPage
 		};
 
 		DefaultDataTable table = new DefaultDataTable("browser", columns, new DaoDataProvider(
-				"login"), 15);
+				"login"), getItemByPage());
 		table.setOutputMarkupId(true);
 		add(table);
 	}

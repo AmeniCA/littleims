@@ -14,11 +14,13 @@
 
 package org.cipango.ims.hss.model;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,7 +29,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.cipango.ims.hss.model.uss.Uss;
+import org.cipango.ims.hss.util.XML;
+import org.cipango.ims.hss.util.XML.Output;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
@@ -67,6 +73,9 @@ public class PrivateIdentity
 	@Sort (type = SortType.NATURAL)
 	private SortedSet<PublicUserIdentity> _publicIdentities = new TreeSet<PublicUserIdentity>();
 		
+	@OneToMany (mappedBy = "_privateIdentity", cascade = { CascadeType.ALL })
+	private Set<Uss> _ussSet = new HashSet<Uss>();
+	
 	public Long getId()
 	{
 		return _id;
@@ -185,6 +194,36 @@ public class PrivateIdentity
 	{
 		getPublicIdentities().remove(publicIdentity);
 		publicIdentity.getPrivateIdentities().remove(this);
+	}
+	
+	public String getGuss(long keyLifetime, Output output)
+	{
+		output.open("guss id=\"" + getIdentity() + "\"");
+		output.open("bsfInfo");
+		output.add("lifeTime", keyLifetime);
+		output.close("bsfInfo");
+		output.open("ussList");
+		Iterator<Uss> it = _ussSet.iterator();
+		while (it.hasNext())
+		{
+			Uss uss = (Uss) it.next();
+			output.add("uss", uss, uss.getXmlAttributes());
+		}
+		
+		output.close("ussList");
+		output.close("guss");
+		
+		return output.toString();
+	}
+
+	public Set<Uss> getUssSet()
+	{
+		return _ussSet;
+	}
+
+	public void setUssSet(Set<Uss> ussSet)
+	{
+		_ussSet = ussSet;
 	}
 	
 }

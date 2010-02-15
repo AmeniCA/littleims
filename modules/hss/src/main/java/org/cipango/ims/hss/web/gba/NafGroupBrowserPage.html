@@ -1,0 +1,25 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1><wicket:message key="nafGroup.browser.title"/></h1>
+  	<form wicket:id="form">
+  	     <input wicket:id="name" type="text" />
+  	     <input type="submit" wicket:id="submit" wicket:message="value:button.add" />
+  	</form>
+  	<span wicket:id="browser">
+      	<table class="filteredTable">
+            <tr>
+                <th><wicket:message key="nafGroup.name"/></th>
+                <th><wicket:message key="nafGroup.nbUss"/></th>
+            </tr>
+            <tr wicket:id="nafGroup">
+                <td><span wicket:id="name"/></td>
+                <td><span wicket:id="nbUss"/></td>
+            </tr>
+        </table>
+     </span>
+  </div>
+</wicket:extend>
+</body>
+</html>
