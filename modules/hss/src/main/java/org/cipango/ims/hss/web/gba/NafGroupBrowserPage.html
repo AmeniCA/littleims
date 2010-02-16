@@ -7,18 +7,26 @@
   	     <input wicket:id="name" type="text" />
   	     <input type="submit" wicket:id="submit" wicket:message="value:button.add" />
   	</form>
-  	<span wicket:id="browser">
-      	<table class="filteredTable">
-            <tr>
-                <th><wicket:message key="nafGroup.name"/></th>
-                <th><wicket:message key="nafGroup.nbUss"/></th>
-            </tr>
-            <tr wicket:id="nafGroup">
-                <td><span wicket:id="name"/></td>
-                <td><span wicket:id="nbUss"/></td>
-            </tr>
-        </table>
-     </span>
+  	<table wicket:id="browser" class="filteredTable">
+        <tr>
+            <th><wicket:message key="nafGroup.name"/></th>
+            <th><wicket:message key="nafGroup.nbUss"/></th>
+            <th><wicket:message key="actions"/></th>
+        </tr>
+        <tr wicket:id="nafGroup">
+            <td>
+                <form wicket:id="form">
+                    <span wicket:id="name"/>
+                    <input type="submit" wicket:id="apply" wicket:message="value:button.apply" />
+                </form>
+            </td>
+            <td><span wicket:id="nbUss"/></td>
+            <td>
+                <a href="#" wicket:id="editLink"><wicket:message key="button.edit"/></a>   
+                | <a href="#" wicket:id="deleteLink"><wicket:message key="button.delete"/></a>                 
+            </td>
+        </tr>
+    </table>
   </div>
 </wicket:extend>
 </body>

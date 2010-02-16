@@ -16,9 +16,10 @@ package org.cipango.ims.hss.web.gba;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -26,7 +27,6 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -36,6 +36,8 @@ import org.cipango.ims.hss.model.NafGroup;
 import org.cipango.ims.hss.web.BasePage;
 import org.cipango.ims.oam.util.AbstractListDataProvider;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.cipango.ims.oam.util.EditableLabel;
+import org.cipango.ims.oam.util.OddEvenAttrModifier;
 
 public class NafGroupBrowserPage extends BasePage
 {
@@ -59,7 +61,16 @@ public class NafGroupBrowserPage extends BasePage
 
 			public IModel<NafGroup> model(NafGroup nafGroup)
 			{
-				return new CompoundPropertyModel<NafGroup>(new DaoDetachableModel(nafGroup));
+				return new CompoundPropertyModel<NafGroup>(new DaoDetachableModel(nafGroup))
+				{
+					@Override
+					protected String propertyExpression(Component component)
+					{
+						if (component.getParent() instanceof EditableLabel)
+							return component.getParent().getId();
+						return component.getId();
+					}
+				};
 			}
 			
 		};
@@ -75,17 +86,59 @@ public class NafGroupBrowserPage extends BasePage
 			protected void populateItem(final Item<NafGroup> item)
 			{
 				NafGroup nafGroup = item.getModelObject();
-				item.add(new Label("name"));
-				item.add(new Label("nbUss", String.valueOf(nafGroup.getUssSet().size())));
-				
-				item.add(new AttributeModifier("class", true, new AbstractReadOnlyModel<String>()
+				Form form = new Form("form", item.getModel());
+				item.add(form);
+				form.add(new EditableLabel("name"));
+				form.add(new AjaxFallbackButton("apply", form)
 				{
+
 					@Override
-					public String getObject()
+					protected void doSubmit(AjaxRequestTarget target,
+							Form<?> form) throws Exception
 					{
-						return (item.getIndex() % 2 == 1) ? "even" : "odd";
+						NafGroup nafGroup = (NafGroup) form.getDefaultModelObject();
+						_dao.save(nafGroup);
+						EditableLabel name = (EditableLabel) form.get("name");
+						name.setEditable(false);
+						setVisible(false);
+						if (target != null)
+							target.addComponent(item);
+						
 					}
-				}));
+					
+				}.setVisible(false));
+				
+				item.add(new Label("nbUss", String.valueOf(nafGroup.getUssSet().size())));
+				item.add(new AjaxFallbackLink("editLink")
+				{
+
+					@Override
+					public void onClick(AjaxRequestTarget target)
+					{
+						EditableLabel name = (EditableLabel) item.get("form:name");
+						item.get("form:apply").setVisible(true);
+						name.setEditable(true);
+						if (target != null)
+							target.addComponent(item);
+					}
+					
+				});
+				
+				item.add(new AjaxFallbackLink("deleteLink")
+				{
+
+					@Override
+					public void onClick(AjaxRequestTarget target)
+					{
+						NafGroup nafGroup = (NafGroup) getParent().getDefaultModelObject();
+						_dao.delete(nafGroup);
+						if (target != null)
+							target.addComponent(getPage().get("browser"));
+					}
+					
+				});
+				item.setOutputMarkupId(true);
+				item.add(new OddEvenAttrModifier(item.getIndex()));
 			}
 			
 		});
@@ -142,6 +195,15 @@ public class NafGroupBrowserPage extends BasePage
 				return new NafGroup();
 			else
 				return _dao.findById(_key);
+		}
+
+		@Override
+		public void detach()
+		{
+			NafGroup nafGroup = getObject();
+			if (nafGroup != null)
+				_key = nafGroup.getName();
+			super.detach();
 		}
 	}
 }

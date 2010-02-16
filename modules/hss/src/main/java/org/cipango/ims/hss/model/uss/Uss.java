@@ -42,7 +42,7 @@ public class Uss implements Convertible
 	private Integer _flag;
 	
 	@ManyToOne
-	@JoinColumn (nullable = false)
+	@JoinColumn (nullable = true)
 	private NafGroup _nafGroup;
 	
 	public void print(Output out)
