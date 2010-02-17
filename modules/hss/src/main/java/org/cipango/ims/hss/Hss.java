@@ -642,7 +642,7 @@ public class Hss
 		
 		byte[] rand = new byte[16];
 		byte[] auts = new byte[sqn.length + macs.length];
-		for (int i = 0; i < rand.length; i++)
+		for (int i = 0; i < sipAuthorization.length; i++)
 		{
 			if (i < rand.length)
 				rand[i] = sipAuthorization[i];
