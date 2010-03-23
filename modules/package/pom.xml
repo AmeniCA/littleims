@@ -63,10 +63,11 @@
                          </patternset>
                        </fileset>
                      </copy>
-                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${scscf.home}/bin/scscf.sh"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="cipango.xml" value="cipango-scscf.xml"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="cipango.pid" value="littleims-scscf.pid"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="CIPANGO_HOME" value="SCSCF_HOME"/>
+                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${scscf.home}/bin/scscf.sh"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty.xml" value="cipango-scscf.xml"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty.pid" value="littleims-scscf.pid"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty_HOME" value="SCSCF_HOME"/>
                     
                     <!--  P-CSCF -->
                     <copy todir="${pcscf.home}">
@@ -74,10 +75,11 @@
                          <patternset refid="jetty"/>
                        </fileset>
                      </copy>
-                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="cipango.xml" value="cipango-pcscf.xml"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="cipango.pid" value="littleims-pcscf.pid"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="CIPANGO_HOME" value="PCSCF_HOME"/>
+                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.xml" value="cipango-pcscf.xml"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.pid" value="littleims-pcscf.pid"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty_HOME" value="PCSCF_HOME"/>
                     
                     <!--  I-CSCF -->
                     <copy todir="${icscf.home}">
@@ -85,10 +87,11 @@
                          <patternset refid="jetty"/>
                        </fileset>
                      </copy>
-                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${icscf.home}/bin/icscf.sh"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="cipango.xml" value="cipango-icscf.xml"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="cipango.pid" value="littleims-icscf.pid"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="CIPANGO_HOME" value="ICSCF_HOME"/>
+                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${icscf.home}/bin/icscf.sh"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty.xml" value="cipango-icscf.xml"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty.pid" value="littleims-icscf.pid"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty_HOME" value="ICSCF_HOME"/>
                     
                     <!--  HSS -->
                     <copy todir="${hss.home}">
@@ -96,10 +99,11 @@
                          <patternset refid="jetty"/>
                        </fileset>
                      </copy>
-                     <copy file="${jetty.home}/bin/cipango.sh" toFile="${hss.home}/bin/hss.sh"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="cipango.xml" value="cipango-hss.xml"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="cipango.pid" value="littleims-hss.pid"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="CIPANGO_HOME" value="HSS_HOME"/>
+                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${hss.home}/bin/hss.sh"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                     <replace file="${hss.home}/bin/hss.sh" token="jetty.xml" value="cipango-hss.xml"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="jetty.pid" value="littleims-hss.pid"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="jetty_HOME" value="HSS_HOME"/>
                      
                      <copy todir="${littleims.home}">
                         <fileset dir="${basedir}/bin"/>
