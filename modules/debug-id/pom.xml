@@ -38,7 +38,7 @@
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete>
+                    <delete failonerror="false">
                       <fileset dir="${hss.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
                       <fileset dir="${scscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
                       <fileset dir="${pcscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
