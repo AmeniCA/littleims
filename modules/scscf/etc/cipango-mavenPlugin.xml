@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<Configure class="org.cipango.Server" id="Server">
+
+  <!-- =========================================================== -->
+  <!-- Server Thread Pool                                          -->
+  <!-- =========================================================== -->
+  <Set name="ThreadPool">
+    <New class="org.mortbay.thread.BoundedThreadPool">
+      <Set name="minThreads">10</Set>
+      <Set name="lowThreads">50</Set>
+      <Set name="maxThreads">250</Set>
+    </New>
+  </Set>
+
+  <!-- =========================================================== -->
+  <!-- Connectors.                                                 -->
+  <!-- =========================================================== -->
+  <Call name="addConnector">
+    <Arg>
+        <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+          <Set name="port"><SystemProperty default="8080" name="scscf.http.port"/></Set>
+          <Set name="maxIdleTime">30000</Set>
+          <Set name="Acceptors">2</Set>
+          <Set name="confidentialPort">8443</Set>
+        </New>
+    </Arg>
+  </Call>
+
+  <!-- Call name="addConnector">
+      <Arg>
+          <New class="org.mortbay.jetty.ajp.Ajp13SocketConnector">
+              <Set name="port">8009</Set>
+          </New>
+      </Arg>
+  </Call -->
+  
+  <Set name="handler">
+     <New class="org.cipango.handler.SipContextHandlerCollection" id="Contexts"/>
+  </Set>
+ 
+  
+  <!-- =========================================================== -->
+  <!-- Configure the context deployer                              -->
+  <!-- A context deployer will deploy contexts described in        -->
+  <!-- configuration files discovered in a directory.              -->
+  <!-- The configuration directory can be scanned for hot          -->
+  <!-- deployments at the configured scanInterval.                 -->
+  <!--                                                             -->
+  <!-- This deployer is configured to deploy contexts configured   -->
+  <!-- in the $CIPANGO_HOME/contexts directory                       -->
+  <!--                                                             -->
+  <!-- =========================================================== -->
+  <Call name="addLifeCycle">
+    <Arg>
+      <New class="org.mortbay.jetty.deployer.ContextDeployer">
+        <Set name="contexts"><Ref id="Contexts"/></Set>
+        <Set name="configurationDir"><SystemProperty default="." name="jetty.home"/>/contexts</Set>
+        <Set name="scanInterval">1</Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <Get name="connectorManager">
+    <Call name="addConnector">
+      <Arg>
+        <New class="org.cipango.sip.UdpConnector">
+          <Set name="port"><SystemProperty default="5060" name="scscf.sip.port"/></Set>
+          <Set name="host"><SystemProperty name="scscf.host"/></Set>
+        </New>
+      </Arg>
+    </Call>
+    <Call name="addConnector">
+      <Arg>
+        <New class="org.cipango.sip.TcpConnector">
+          <Set name="port"><SystemProperty default="5060" name="scscf.sip.port"/></Set>
+          <Set name="host"><SystemProperty name="scscf.host"/></Set>
+        </New>
+      </Arg>
+    </Call>
+    <Set name="accessLog">
+      <New class="org.cipango.log.AccessLogCollection">
+        <Set name="server"><Ref id="Server"/></Set>
+        <Set name="loggers">
+          <Array type="org.cipango.log.AccessLog">
+            <Item>
+              <New class="org.cipango.ims.DebugIdMessageLog">
+               <Set name="logDirectory"><SystemProperty default="." name="jetty.home"/>/logs</Set>
+              </New>
+            </Item>
+            <Item>
+              <New class="org.cipango.log.FileMessageLog">
+                <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.message.log</Set>
+                <Set name="append">true</Set>
+                <Set name="retainDays">31</Set>
+              </New>
+            </Item>
+          </Array>
+        </Set>
+      </New>
+    </Set>
+  </Get>
+
+  <!-- Set name="applicationRouter">
+    <New class="org.cipango.ar.DefaultApplicationRouter">
+      <Set name="configuration"><SystemProperty default="." name="jetty.home"/>/etc/dar.properties</Set>
+    </New>
+  </Set -->
+
+  <Call class="org.cipango.log.EventLog" name="setLog">
+    <Arg><New class="org.cipango.log.DefaultEventLogger"/></Arg>
+  </Call>
+
+  <Get name="transactionManager">
+    <Set name="t1">500</Set>
+    <Set name="t2">4000</Set>
+    <Set name="t4">5000</Set>
+    <Set name="tD">32000</Set>
+    <Set name="timerC">180</Set>
+  </Get>
+      
+  
+  <Set name="SipThreadPool">
+    <New class="org.mortbay.thread.BoundedThreadPool">
+      <Set name="minThreads">10</Set>
+      <Set name="lowThreads">50</Set>
+      <Set name="maxThreads">250</Set>
+    </New>
+  </Set>
+  
+  <!-- =========================================================== -->
+  <!-- extra options                                               -->
+  <!-- =========================================================== -->
+  <Set name="stopAtShutdown">true</Set>
+  
+
+  <Call name="addLifeCycle">
+    <Arg>
+      <New id="node" class="org.cipango.diameter.Node">
+        <Call name="addConnector">
+          <Arg>
+            <New class="org.cipango.diameter.bio.DiameterSocketConnector">
+              <Set name="port"><SystemProperty default="3878" name="scscf.diameter.port"/></Set>
+            </New>
+          </Arg>
+        </Call>
+        <Set name="identity"><SystemProperty default="s-cscf.cipango.voip" name="scscf.host"/></Set>
+        <Set name="server"><Ref id="Server"/></Set>
+        <Set name="router">
+          <New class="org.cipango.diameter.Router">
+            <Set name="node"><Ref id="node"/></Set>
+            <Call name="addPeer">
+              <Arg>
+                <New class="org.cipango.diameter.Peer">
+                  <Arg><SystemProperty default="hss.cipango.voip" name="hss.host"/></Arg>
+                </New>
+              </Arg>
+            </Call>
+          </New>
+        </Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <Call name="setAttribute">
+    <Arg>org.cipango.diameter.Node</Arg>
+    <Arg><Ref id="node"/></Arg>
+  </Call>
+  
+</Configure>

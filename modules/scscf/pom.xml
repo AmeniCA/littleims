@@ -54,48 +54,44 @@
               <value>file:resources/log4j.xml</value>
             </systemProperty>
             <systemProperty>
-              <name>sip.port</name>
-              <value>5070</value>
-            </systemProperty>
-            <systemProperty>
-              <name>sip.host</name>
-              <value>s-cscf.${domain}</value>
-            </systemProperty>
-            <systemProperty>
-              <name>jetty.port</name>
-              <value>8090</value>
-            </systemProperty>
-            <systemProperty>
               <name>jetty.home</name>
               <value>.</value>
             </systemProperty>
-            <systemProperty>
-              <name>org.cipango.dar.matchOnNewOutgoingRequests</name>
-              <value>false</value>
-            </systemProperty>
           </systemProperties>
-          <diameterNode implementation="org.cipango.diameter.Node">
-            <connectors>
-              <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
-                <port>3878</port>
-                <host>s-cscf.${domain}</host>
-              </connector>
-            </connectors>
-            <identity>s-cscf.${domain}</identity>
-            <peers>
-              <peer implementation="org.cipango.diameter.Peer">
-                <host>hss.${domain}</host>
-              </peer>
-            </peers>
-          </diameterNode>
-
           <scanIntervalSeconds>0</scanIntervalSeconds>
           <stopKey>foo</stopKey>
           <stopPort>9999</stopPort>
+          <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
           <webAppConfig>
+            <configurationClasses>
+              <configurationClasse>org.mortbay.jetty.webapp.WebInfConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.plus.webapp.EnvConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.WebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.plugin.CipangoMavenConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.TagLibConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.diameter.app.DiameterConfiguration</configurationClasse>
+            </configurationClasses>
             <contextPath>/</contextPath>
           </webAppConfig>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.cipango</groupId>
+            <artifactId>cipango-diameter</artifactId>
+            <version>${cipango-version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.cipango.littleims</groupId>
+            <artifactId>littleims-p-debug-id</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       
       <plugin>

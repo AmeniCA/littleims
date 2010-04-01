@@ -60,20 +60,34 @@
               <value>5050</value>
             </systemProperty>
           </systemProperties>
-          <diameterNode implementation="org.cipango.diameter.Node">
-            <connectors>
-              <connector implementation="org.cipango.diameter.bio.DiameterSocketConnector">
-                <port>3868</port>
-              </connector>
-            </connectors>
-            <identity>hss.${domain}</identity>
-          </diameterNode>
+          <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
           <stopKey>foo</stopKey>
           <stopPort>9998</stopPort>
           <webAppConfig>
+            <configurationClasses>
+              <configurationClasse>org.mortbay.jetty.webapp.WebInfConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.plus.webapp.EnvConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.WebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.plugin.CipangoMavenConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.webapp.TagLibConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.diameter.app.DiameterConfiguration</configurationClasse>
+            </configurationClasses>
             <contextPath>/</contextPath>
           </webAppConfig>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.cipango</groupId>
+            <artifactId>cipango-diameter</artifactId>
+            <version>${cipango-version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
 
