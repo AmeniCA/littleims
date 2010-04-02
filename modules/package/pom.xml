@@ -67,7 +67,7 @@
                      <replace file="${scscf.home}/bin/scscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
                      <replace file="${scscf.home}/bin/scscf.sh" token="jetty.xml" value="cipango-scscf.xml"/>
                      <replace file="${scscf.home}/bin/scscf.sh" token="jetty.pid" value="littleims-scscf.pid"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty_HOME" value="SCSCF_HOME"/>
+                     <replace file="${scscf.home}/bin/scscf.sh" token="JETTY_HOME" value="SCSCF_HOME"/>
                     
                     <!--  P-CSCF -->
                     <copy todir="${pcscf.home}">
@@ -79,7 +79,7 @@
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.xml" value="cipango-pcscf.xml"/>
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.pid" value="littleims-pcscf.pid"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty_HOME" value="PCSCF_HOME"/>
+                     <replace file="${pcscf.home}/bin/pcscf.sh" token="JETTY_HOME" value="PCSCF_HOME"/>
                     
                     <!--  I-CSCF -->
                     <copy todir="${icscf.home}">
@@ -91,7 +91,7 @@
                      <replace file="${icscf.home}/bin/icscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
                      <replace file="${icscf.home}/bin/icscf.sh" token="jetty.xml" value="cipango-icscf.xml"/>
                      <replace file="${icscf.home}/bin/icscf.sh" token="jetty.pid" value="littleims-icscf.pid"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty_HOME" value="ICSCF_HOME"/>
+                     <replace file="${icscf.home}/bin/icscf.sh" token="JETTY_HOME" value="ICSCF_HOME"/>
                     
                     <!--  HSS -->
                     <copy todir="${hss.home}">
@@ -103,7 +103,7 @@
                      <replace file="${hss.home}/bin/hss.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
                      <replace file="${hss.home}/bin/hss.sh" token="jetty.xml" value="cipango-hss.xml"/>
                      <replace file="${hss.home}/bin/hss.sh" token="jetty.pid" value="littleims-hss.pid"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="jetty_HOME" value="HSS_HOME"/>
+                     <replace file="${hss.home}/bin/hss.sh" token="JETTY_HOME" value="HSS_HOME"/>
                      
                      <copy todir="${littleims.home}">
                         <fileset dir="${basedir}/bin"/>
