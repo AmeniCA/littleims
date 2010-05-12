@@ -106,8 +106,8 @@
     </New>
   </Set -->
 
-  <Call class="org.cipango.log.EventLog" name="setLog">
-    <Arg><New class="org.cipango.log.DefaultEventLogger"/></Arg>
+  <Call class="org.cipango.log.event.Events" name="setDispatcher">
+    <Arg><New class="org.cipango.log.event.LogEventDispatcher"/></Arg>
   </Call>
 
   <Get name="transactionManager">
