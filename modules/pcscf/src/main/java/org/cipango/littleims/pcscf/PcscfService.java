@@ -67,7 +67,7 @@ public class PcscfService
 		request.addAddressHeader(Headers.PATH, _sipFactory.createAddress(_pcscfUri), true);
 		processHeaders(request, _registerHeadersToRemove, _registerHeadersToAdd);
 		Proxy proxy = request.getProxy();
-		proxy.setRecordRoute(true);
+		proxy.setRecordRoute(false);
 		proxy.setSupervised(true);
 		if (_icscfUri != null)
 			request.pushRoute(_icscfUri);
