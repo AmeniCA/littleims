@@ -47,72 +47,87 @@
 
 	
 	<xsl:template match="name">
-		<text class='elem'>
-			<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION"/></xsl:attribute>
-			<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
-			Subscription
-		</text>
-		<text class='host-text'>
-			<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION"/></xsl:attribute>
-			<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
-			<xsl:value-of select="text()"/>
-		</text>
-		<rect class="rect">
-			<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION - $RECT_WIDTH div 2"/></xsl:attribute>
-			<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION - $RECT_HEIGHT div 2"/></xsl:attribute>
-			<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
-			<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
-		</rect>
+		<a target="_parent">
+			<xsl:attribute name="xlink:href">../subscription/<xsl:value-of select="text()"/></xsl:attribute>
+			
+			<text class='elem'>
+				<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION"/></xsl:attribute>
+				<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
+				Subscription
+			</text>
+			<text class='host-text'>
+				<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION"/></xsl:attribute>
+				<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
+				<xsl:value-of select="text()"/>
+			</text>
+			<rect class="rect">
+				<xsl:attribute name="x"><xsl:value-of select="$X_SUBSCRIPTION - $RECT_WIDTH div 2"/></xsl:attribute>
+				<xsl:attribute name="y"><xsl:value-of select="$Y_SUBSCRIPTION - $RECT_HEIGHT div 2"/></xsl:attribute>
+				<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
+				<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
+			</rect>
+		</a>
 	</xsl:template>
 	
 	<xsl:template match="PrivateIDs">
 		<xsl:for-each select="PrivateID">
 			<xsl:variable name="y" select='position() * $DELTA_Y_PRIVATE + $BASE_Y' />
-			<text class='elem'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
-				Private Identity
-			</text>
-			<text class='host-text'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
-				<xsl:value-of select="text()"/>
-			</text>
-			<rect class="rect">
-				<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE - $RECT_WIDTH div 2"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
-				<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
-				<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
-			</rect>
 			
+			<a target="_parent">
+				<xsl:attribute name="xlink:href">../private-identity/edit/<xsl:value-of select="text()"/></xsl:attribute>
+			
+				<text class='elem'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
+					Private Identity
+				</text>
+				<text class='host-text'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
+					<xsl:value-of select="text()"/>
+				</text>
+				<rect class="rect">
+					<xsl:attribute name="x"><xsl:value-of select="$X_PRIVATE - $RECT_WIDTH div 2"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
+					<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
+					<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
+				</rect>
+			</a>
+				
 			<line class='message-line'>
 				<xsl:attribute name="x1"><xsl:value-of select="$X_PRIVATE - $RECT_WIDTH div 2"/></xsl:attribute>
 				<xsl:attribute name="x2"><xsl:value-of select="$X_SUBSCRIPTION + $RECT_WIDTH div 2"/></xsl:attribute>
 				<xsl:attribute name="y1"><xsl:value-of select="$y"/></xsl:attribute>
 				<xsl:attribute name="y2"><xsl:value-of select="$Y_SUBSCRIPTION"/></xsl:attribute>
 			</line>
+			
 		</xsl:for-each>
 	</xsl:template>
 	
 	<xsl:template match="PublicIdentities">
 		<xsl:for-each select="PublicIdentity">
 			<xsl:variable name="y" select='position() * $DELTA_Y + $BASE_Y' />
-			<text class='elem'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
-				Public Identity
-			</text>
-			<text class='host-text'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
-				<xsl:value-of select="Identity/text()"/>
-			</text>
-			<rect class="rect">
-				<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC - $RECT_WIDTH div 2"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
-				<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
-				<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
-			</rect>
+			
+			<a target="_parent">
+				<xsl:attribute name="xlink:href">../public-user-identity/edit/<xsl:value-of select="Identity/text()"/></xsl:attribute>
+				<text class='elem'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
+					Public Identity
+				</text>
+				<text class='host-text'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
+					<xsl:value-of select="Identity/text()"/>
+				</text>
+				<rect class="rect">
+					<xsl:attribute name="x"><xsl:value-of select="$X_PUBLIC - $RECT_WIDTH div 2"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
+					<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
+					<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
+				</rect>
+			</a>
+			
 			<xsl:for-each select="Privates/Id">
 				<xsl:variable name="yPrivate" select='text() * $DELTA_Y_PRIVATE + $BASE_Y' />
 				<line class='message-line'>
@@ -155,22 +170,26 @@
 	<xsl:template match="ServiceProfiles">
 		<xsl:for-each select="ServiceProfile">
 			<xsl:variable name="y" select='position() * $DELTA_Y_SERVICE_PROFILE + $BASE_Y' />
-			<text class='elem'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
-				Service Profile
-			</text>
-			<text class='host-text'>
-				<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
-				<xsl:value-of select="text()"/>
-			</text>
-			<rect class="rect">
-				<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE - $RECT_WIDTH div 2"/></xsl:attribute>
-				<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
-				<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
-				<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
-			</rect>
+			
+			<a target="_parent">
+				<xsl:attribute name="xlink:href">../service-profile/<xsl:value-of select="text()"/></xsl:attribute>
+				<text class='elem'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_TYPE"/></xsl:attribute>
+					Service Profile
+				</text>
+				<text class='host-text'>
+					<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y + $DELTA_Y_TEXT_NAME"/></xsl:attribute>
+					<xsl:value-of select="text()"/>
+				</text>
+				<rect class="rect">
+					<xsl:attribute name="x"><xsl:value-of select="$X_SERVICE_PROFILE - $RECT_WIDTH div 2"/></xsl:attribute>
+					<xsl:attribute name="y"><xsl:value-of select="$y - $RECT_HEIGHT div 2"/></xsl:attribute>
+					<xsl:attribute name="width"><xsl:value-of select="$RECT_WIDTH"/></xsl:attribute>
+					<xsl:attribute name="height"><xsl:value-of select="$RECT_HEIGHT"/></xsl:attribute>
+				</rect>
+			</a>
 			
 		</xsl:for-each>
 	</xsl:template>
