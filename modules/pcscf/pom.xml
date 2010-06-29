@@ -59,6 +59,7 @@
           </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9996</stopPort>
+          <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
           <scanIntervalSeconds>5</scanIntervalSeconds>
           <webAppConfig>
             <contextPath>/</contextPath>
@@ -69,6 +70,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.cipango.littleims</groupId>
+            <artifactId>littleims-p-debug-id</artifactId>
+            <version>${project.version}</version>
           </dependency>
         </dependencies>
       </plugin>
