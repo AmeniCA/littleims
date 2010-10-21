@@ -85,7 +85,10 @@ public class EnumClient
 
 				String ere = st.nextToken();
 				String repl = st.nextToken();
-
+				
+				for (int j = 0; j < 10; j++)
+					repl = repl.replace("\\" + j, "$" + j);
+				
 				if (telURL.isGlobal())
 				{
 					number = "+" + number;
@@ -160,14 +163,16 @@ public class EnumClient
 				+ l.getResult() + " and got "
 				+ (records == null ? 0 : records.length) + " records.");
 */
-		String number = "+1002";
-		String naptr = "!^\\+1002$sip:carol@cipango.org!";
+		String number = "+332029";
+		String naptr = "!^\\+3([0-9]?)20([0-9]*)$!sip:dest\\1-\\2@cipango.voip!";
 		char sep = naptr.charAt(0);
 
 		StringTokenizer st = new StringTokenizer(naptr, "" + sep);
 
 		String ere = st.nextToken();
 		String repl = st.nextToken();
+		for (int i = 0; i < 10; i++)
+			repl = repl.replace("\\" + i, "$" + i);
 		System.out.println("ere: " + ere + " / repl " + repl);
 
 		ere = ere.replaceAll("\\\\\\\\", "\\\\");
