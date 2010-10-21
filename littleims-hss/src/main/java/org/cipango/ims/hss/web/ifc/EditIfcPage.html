@@ -1,0 +1,59 @@
+<html>
+<body>        
+<wicket:extend>
+	<form wicket:id="form">
+		<table class="dataDetails">
+		  <tr class="title">
+                <th colspan="2">
+                    <wicket:message key="view.ifc.title"></wicket:message>
+                    <b wicket:id="title"></b>
+                </th>
+            </tr>
+			<tr>
+				<th><wicket:message key="ifc.name"></wicket:message></th>
+				<td>
+					<input wicket:id="name" type="text"/>
+				</td>
+			</tr>
+			<tr>
+				<th><wicket:message key="ifc.priority"/></th>
+				<td>
+					<input wicket:id="priority" type="text"/>
+				</td>
+			</tr>
+			<tr>
+				<th><wicket:message key="ifc.profilePartIndicator"></wicket:message></th>
+				<td>
+					<span wicket:id="profilePartIndicator">
+						<input type="radio"></input>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<th><wicket:message key="ifc.conditionType"/></th>
+				<td>
+					<span wicket:id="conditionTypeCnf">
+						<input type="radio">CNF</input>
+					</span>
+					<div class="description"><wicket:message key="ifc.conditionType.descr"/></div>
+				</td>
+			</tr>
+			<tr>
+	            <th><wicket:message key="ifc.applicationServer"/></th>
+	            <td>
+	            	<select wicket:id="applicationServer">
+	            	</select>
+	            </td>
+	        </tr>
+			<tr>
+				<th>&nbsp;</th>
+				<td>
+					<input type="submit" wicket:id="ok" wicket:message="value:button.ok" />
+					<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</wicket:extend>
+</body>
+</html>

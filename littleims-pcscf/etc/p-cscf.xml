@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.springframework.org/schema/util 
+			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
+
+	<bean id="sipFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
+	</bean>
+
+	<bean id="customEditorConfigurator" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="javax.servlet.sip.SipURI">
+					<bean id="SipUriEditor" class="org.cipango.littleims.util.SipUriEditor">
+						<property name="sipFactory" ref="sipFactory" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+		
+	<bean id="debugIdService" class="org.cipango.littleims.pcscf.subscription.debug.DebugIdService">
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+	
+	<bean id="regEventService" class="org.cipango.littleims.pcscf.subscription.reg.RegEventService">
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+		<property name="sipFactory" ref="sipFactory" />
+	</bean>
+
+	<bean id="pcscfService" 
+			class="org.cipango.littleims.pcscf.PcscfService"
+			init-method="init">
+		<!--
+		This URI is used to set own route on path header
+		Must match with IP address and port on which P-SCF is listening.
+		
+		Default: sip:pcscf@${pcscf.host}:${pcscf.port}
+		-->
+		<property name="pcscfUri" value="sip:pcscf@${pcscf.host}:${pcscf.sip.port}" />
+
+		<!--
+		This URI is used to push the I-CSCF route on REGISTER request. 
+		If not defined, route is done using DNS A request.
+		This parameter is mandatory when I-CSCF is not on default port 5060
+		<property name="icscfUri" value="sip:icscf@{icscf.host}:${icscf.sip.port};lr" />
+		Default: not set
+		-->
+		
+		<!--
+		List of headers to process when receiving a REGISTER request.
+		Headers set in remove list are removed then headers in add list are added to the request.
+		
+		Note: path, route and record-route headers are added separately and must not be set in the add list
+			- Path is set with the "pcscf-uri" value
+			- Route is set with the "icscf-uri" value
+			- Record-Route is set by the SIP stack
+		-->
+		<property name="registerHeadersToAdd">
+			<map>
+				<entry key="Require" value="path" />
+				<entry key="P-Visited-Network-ID" value="${domain}"/>
+				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso023551024" />
+			</map>
+		</property>
+		<property name="registerHeadersToRemove">
+			<list>
+				<value>P-Charging-Function-Addresses</value>
+				<value>P-Visited-Network-ID</value>
+				<value>P-Charging-Vector</value>
+				<value>P-Access-Network-Info</value>
+				<value>P-Media-Authorization</value>
+			</list>
+		</property>
+		<!--
+		List of headers to process when receiving a non-REGISTER request from a phone.
+		Headers set in remove list are removed then headers in add list are added to the request.
+		
+		Note: P-Asserted-Identity header is added separately and must not be set in the add list
+		If the P-Preferred-Identity header is present, then this value is used else the from 
+		header is choosen.
+		-->
+		<property name="requestHeadersToAdd">
+			<map>
+				<entry key="P-Charging-Vector" value="icid-value=AyretyU0dm+6O2IrT5tAFrbHLso023551024" />
+			</map>
+		</property>
+		<property name="requestHeadersToRemove">
+			<list>
+				<value>P-Preferred-Identity</value>
+			</list>
+		</property>
+		<property name="sipFactory" ref="sipFactory" />
+		<property name="debugIdService" ref="debugIdService" />
+		<property name="regEventService" ref="regEventService" />
+	</bean>
+	
+	<bean id="webApplication" 
+			class="org.cipango.littleims.pcscf.oam.OamApplication" 
+			factory-method="getInstance"
+			init-method="springStart"
+			destroy-method="springStop">
+	</bean>
+
+</beans>
+

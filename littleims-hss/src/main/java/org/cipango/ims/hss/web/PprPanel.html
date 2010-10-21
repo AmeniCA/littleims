@@ -1,0 +1,14 @@
+<wicket:panel>
+    <form wicket:id="form" class="pprPanel" >
+        <b wicket:id="title"></b>
+        <input type="submit" wicket:id="submit" wicket:message="value:button.apply" />
+        <div wicket:id="details" class="details">
+            <wicket:message key="pprPanel.identitiesToUpdate"/>
+            <ul>
+                <li wicket:id="publicIdentities">
+                    <a href="#" wicket:id="identity"><span wicket:id="name"></span></a>
+                </li>
+             </ul>
+        </div>
+    </form>
+</wicket:panel>  

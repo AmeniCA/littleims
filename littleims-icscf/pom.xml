@@ -1,0 +1,137 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.cipango.littleims</groupId>
+    <artifactId>littleims-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>littleims-icscf</artifactId>
+  <packaging>war</packaging>
+  <name>littleIMS :: I-CSCF</name>
+  
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.cipango</groupId>
+        <artifactId>cipango-maven-plugin</artifactId>
+        <configuration>
+          <systemPropertiesFile>../littleims.properties</systemPropertiesFile>
+          <systemProperties>
+            <systemProperty>
+              <name>log4j.configuration</name>
+              <value>file:resources/log4j.xml</value>
+            </systemProperty>
+            <systemProperty>
+              <name>jetty.home</name>
+              <value>.</value>
+            </systemProperty>
+          </systemProperties>
+          <stopKey>foo</stopKey>
+          <stopPort>9997</stopPort>
+          <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
+          <webAppConfig>
+            <configurationClasses>
+              <configurationClasse>org.mortbay.jetty.plugin.MavenWebInfConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.sipapp.SipXmlConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.diameter.app.DiameterConfiguration</configurationClasse>
+            </configurationClasses>
+            <contextPath>/</contextPath>
+          </webAppConfig>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.cipango</groupId>
+            <artifactId>cipango-diameter</artifactId>
+            <version>${cipango-version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.cipango.littleims</groupId>
+            <artifactId>littleims-p-debug-id</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+       <groupId>org.cipango.littleims</groupId>
+       <artifactId>littleims-common</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+     <dependency>
+       <groupId>org.springframework</groupId>
+       <artifactId>spring</artifactId>
+     </dependency>
+     <dependency>
+      <groupId>org.cipango</groupId>
+      <artifactId>cipango-diameter</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>copy-jetty</id>
+      <activation>
+        <property>
+          <name>jetty</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean</id>
+                <phase>clean</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete includeemptydirs="true" failonerror="false">
+                      <fileset dir="${icscf.home}/sipapps" includes="ROOT.war"/>
+                      <fileset dir="${icscf.home}/etc" includes="i-cscf.xml,cipango-icscf.xml"/>
+                      <fileset dir="${icscf.home}/resources" includes="log4j.xml"/>
+                    </delete>
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <phase>install</phase>
+                <configuration>
+                  <tasks>
+                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" tofile="${icscf.home}/sipapps/ROOT.war"/>
+                    <copy todir="${icscf.home}">
+                      <fileset dir="${basedir}" includes="etc/,resources/"/>
+                    </copy>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles> 
+
+</project>

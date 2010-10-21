@@ -1,0 +1,31 @@
+<html>
+<body>        
+<wicket:extend>
+	<form wicket:id="form">
+		<table class="dataDetails">
+			<tr class="title">
+				<th colspan="2">
+					<wicket:message key="view.subscription.title"></wicket:message>
+					<b wicket:id="title"></b>
+				</th>
+			</tr>
+			<tr>
+				<th><wicket:message key="subscription.name"></wicket:message></th>
+				<td><input wicket:id="name" type="text"/></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="subscription.scscf"/></th>
+				<td wicket:id="scscf"></td>
+			</tr>
+			<tr>
+				<th>&nbsp;</th>
+				<td>
+					<input type="submit" wicket:id="submit" wicket:message="value:button.apply" />
+					<input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</wicket:extend>
+</body>
+</html>

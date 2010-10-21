@@ -8,14 +8,13 @@
   <url>http://www.cipango.org</url>
 
   <modules>
-    <module>modules/package</module>
-    <module>modules/debug-id</module>
-    <module>modules/util</module>
-    <module>modules/hss</module>
-    <module>modules/pcscf</module>
-    <module>modules/scscf</module>
-    <module>modules/icscf</module>
-    <!-- module>modules/application-router</module -->
+    <module>littleims-distribution</module>
+    <module>littleims-debug-id</module>
+    <module>littleims-common</module>
+    <module>littleims-hss</module>
+    <module>littleims-pcscf</module>
+    <module>littleims-scscf</module>
+    <module>littleims-icscf</module>
   </modules>
   
   <build>

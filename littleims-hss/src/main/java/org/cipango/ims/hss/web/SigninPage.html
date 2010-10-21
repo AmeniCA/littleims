@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/">
+<head>
+    <title wicket:id="title"></title>
+</head>   
+<body>
+    <div id="container">
+        <div align="center">
+            <div id="loginPanel">
+                <div class="title"><wicket:message key="signin.title"></wicket:message></div>
+                <div wicket:id="feedback" class="feedback"></div>
+                 
+                <form wicket:id="signInForm">
+                    <div>
+                        <span class="label"><wicket:message key="signin.login"/></span>
+                        <input wicket:id="login" type="text" value="" size="30">
+                    </div>
+                    <div>
+                        <span class="label"><wicket:message key="signin.password"/></span>
+                       <input wicket:id="password" type="password" value="" hidden="1" size="30" />
+                    </div>
+                    <div class="button">
+                        <input type="submit" wicket:message="value:button.login" style="width:100px;" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

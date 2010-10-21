@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sip-app  xmlns="http://www.jcp.org/xml/ns/sipservlet"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+          version="1.1">
+  <app-name>org.cipango.littleims.scscf</app-name>
+
+  <servlet-selection>
+    <main-servlet>session</main-servlet>
+  </servlet-selection>
+  <display-name>littleIMS: S-CSCF</display-name>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			file:${jetty.home}/etc/s-cscf.xml
+		</param-value>
+	</context-param>
+		
+	<listener>
+		<listener-class>org.cipango.littleims.scscf.session.SessionServlet</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+
+  <servlet>
+    <servlet-name>register</servlet-name>
+    <servlet-class>org.cipango.littleims.scscf.registrar.RegistrarServlet</servlet-class>
+    <load-on-startup/>
+  </servlet>
+
+  <servlet>
+    <servlet-name>session</servlet-name>
+    <servlet-class>org.cipango.littleims.scscf.session.SessionServlet</servlet-class>
+    <load-on-startup/>
+  </servlet>
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+
+</sip-app>

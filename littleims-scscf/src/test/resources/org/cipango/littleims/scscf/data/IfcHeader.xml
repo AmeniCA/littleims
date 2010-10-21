@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InitialFilterCriteria>
+    <Priority>1</Priority>
+    <TriggerPoint>
+        <ConditionTypeCNF>0</ConditionTypeCNF>
+        <SPT>
+            <Group>0</Group>
+            <ConditionNegated>0</ConditionNegated>
+            <SIPHeader>
+                <Header>Via</Header>
+                <Content>!.*5060.*!</Content>
+            </SIPHeader>
+        </SPT>
+        <SPT>
+            <Group>0</Group>
+            <ConditionNegated>0</ConditionNegated>
+            <Method>INVITE</Method>
+        </SPT>
+    </TriggerPoint>
+    <ApplicationServer>
+        <ServerName>sip:tispan@cipango.org;lr</ServerName>
+        <DefaultHandling>0</DefaultHandling>
+        <ServiceInfo></ServiceInfo>
+        <Extension>
+            <IncludeRegisterRequest/>
+        </Extension>
+    </ApplicationServer>
+    <ProfilePartIndicator/>
+</InitialFilterCriteria>

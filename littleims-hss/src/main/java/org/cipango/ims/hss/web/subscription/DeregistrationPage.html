@@ -1,0 +1,45 @@
+<wicket:extend>
+    <form wicket:id="form">
+        <table class="dataDetails">
+            <tr class="title">
+                <th colspan="2">
+                    <wicket:message key="subscription.deregistration.title"></wicket:message>
+                    <b wicket:id="title"></b>
+                </th>
+            </tr>
+            <tr>
+                <th><wicket:message key="subscription.deregistration.type"/></th>
+                <td>
+                    <span wicket:id="deregistrationType">
+                        <input type="radio">CNF</input>
+                    </span>
+                </td>
+            </tr>
+            <tr wicket:id="privateIdTr">
+                <th><wicket:message key="contextPanel.privateIdentity"/></th>
+                <td><select wicket:id="privateIds"/></td>
+            </tr>
+            <tr wicket:id="publicIdsTr">
+                <th><wicket:message key="contextPanel.publicIdentities"/></th>
+                <td><select wicket:id="publicIds"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="subscription.deregistration.reasonCode"/></th>
+                <td><select wicket:id="reasonCode"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="subscription.deregistration.reasonPhrase"/></th>
+                <td>
+                    <input wicket:id="reasonPhrase" type="text"/>
+                </td>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <td>
+                    <input type="submit" wicket:id="submit" wicket:message="value:button.deregister" />
+                    <input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+</wicket:extend>

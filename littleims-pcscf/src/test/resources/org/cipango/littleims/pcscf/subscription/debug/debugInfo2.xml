@@ -1,0 +1,15 @@
+<di:debuginfo xmlns:di="urn:ietf:params:xml:ns:debuginfo" version="0" state="full">
+    <di:debugconfig aor="sip:alice@cipango.org">
+        <di:session id="4">
+            <di:start-trigger>
+                <di:time>2009-06-30 00:00:00.0</di:time>
+            </di:start-trigger>
+            <di:stop-trigger>
+            </di:stop-trigger>
+            <di:control>
+                <di:depth>maximum</di:depth>
+                <di:debug-id>43aa55</di:debug-id>
+            </di:control>
+        </di:session>
+    </di:debugconfig>
+</di:debuginfo>

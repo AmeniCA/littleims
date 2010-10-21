@@ -1,0 +1,83 @@
+<html>
+<body>        
+<wicket:extend>
+	<form wicket:id="form">
+		<table class="dataDetails">
+			<tr class="title">
+				<th colspan="2">
+					<b><wicket:message key="debugSession.startTrigger"></wicket:message></b>
+				</th>
+			</tr>
+			<tr>
+				<th><wicket:message key="debugSession.from"/></th>
+				<td><input wicket:id="from" type="text" class="longText"/></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="debugSession.to"/></th>
+				<td><input wicket:id="to" type="text" class="longText"/></td>
+			</tr>
+			<tr>
+                <th><wicket:message key="debugSession.method"/></th>
+                <td><input wicket:id="method" type="text"/></td>
+            </tr>
+			<tr>
+				<th><wicket:message key="debugSession.time"/></th>
+				<td><span wicket:id="startDate"/></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="debugSession.icsi"/></th>
+				<td><input wicket:id="icsi" type="text"/></td>
+			</tr>
+			<tr>
+				<th><wicket:message key="debugSession.iari"/></th>
+				<td><input wicket:id="iari" type="text"/></td>
+			</tr>
+		</table>
+		
+		<table class="dataDetails">
+            <tr class="title">
+                <th colspan="2">
+                    <b><wicket:message key="debugSession.stopTrigger"/></b>
+                </th>
+            </tr>
+            <tr>
+                <th><wicket:message key="debugSession.duration"/></th>
+                <td><input wicket:id="duration" type="text"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="debugSession.reason"/></th>
+                <td><select wicket:id="reason"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="debugSession.time"/></th>
+                <td><span wicket:id="stopDate"/></td>
+            </tr>
+        </table>
+        
+        <table class="dataDetails">
+            <tr class="title">
+                <th colspan="2">
+                    <b><wicket:message key="debugSession.control"/></b>
+                </th>
+            </tr>
+            <tr>
+                <th><wicket:message key="debugSession.debugId"/></th>
+                <td><input wicket:id="debugId" type="text"/></td>
+            </tr>
+            <tr>
+                <th><wicket:message key="debugSession.traceDepth"/></th>
+                <td><select wicket:id="traceDepth"/></td>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <td>
+                    <input type="submit" wicket:id="submit" wicket:message="value:button.apply" />
+                    <input type="submit" wicket:id="cancel" wicket:message="value:button.cancel"/>
+                    <input type="submit" wicket:id="delete" wicket:message="value:button.delete"/>
+                </td>
+            </tr>
+        </table>
+	</form>
+</wicket:extend>
+</body>
+</html>

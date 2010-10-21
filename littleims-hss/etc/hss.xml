@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+			http://www.springframework.org/schema/util 
+			http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
+	
+	<bean id="sipFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="javax.servlet.sip.SipFactory" />
+	</bean>
+	
+	<bean id="diameterFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
+		<property name="attributeName" value="org.cipango.diameter.api.DiameterFactory" />
+	</bean>
+	
+	<bean id="namingStrategy" class="org.cipango.ims.hss.util.CustomNamingStrategy"/>
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+
+		<property name="packagesToScan" value="org.cipango.ims.hss.model,org.cipango.ims.hss.model.spt,org.cipango.ims.hss.model.uss"/>
+	
+		<property name="hibernateProperties">
+			<util:properties location="file:${jetty.home}/etc/hss-db.properties"/>
+		</property>
+		<property name="namingStrategy"><ref bean="namingStrategy"/></property>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	
+	<bean 
+			id="adminUserDao" class="org.cipango.ims.hss.db.hibernate.AdminUserDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="subscriptionDao" class="org.cipango.ims.hss.db.hibernate.SubscriptionDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="privateIdentityDao" class="org.cipango.ims.hss.db.hibernate.PrivateIdentityDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="publicIdentityDao" class="org.cipango.ims.hss.db.hibernate.PublicIdentityDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="scscfDao" class="org.cipango.ims.hss.db.hibernate.ScscfDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="applicationServerDao" class="org.cipango.ims.hss.db.hibernate.ApplicationServerDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="ifcDao" class="org.cipango.ims.hss.db.hibernate.IfcDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="sptDao" class="org.cipango.ims.hss.db.hibernate.SptDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="serviceProfileDao" class="org.cipango.ims.hss.db.hibernate.ServiceProfileDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="implicitRegistrationSetDao" class="org.cipango.ims.hss.db.hibernate.ImplicitRegistrationSetDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="debugSessionDao" class="org.cipango.ims.hss.db.hibernate.DebugSessionDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="nafGroupDao" class="org.cipango.ims.hss.db.hibernate.NafGroupDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="UssDao" class="org.cipango.ims.hss.db.hibernate.UssDaoImpl">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="cxManager" class="org.cipango.ims.hss.CxManager">
+		<property name="diameterFactory" ref="diameterFactory" />
+		<property name="publicIdentityDao" ref="publicIdentityDao" />
+		<property name="subscriptionDao" ref="subscriptionDao" />
+		<property name="scscfRealm" value="cipango.org" />
+	</bean>
+	
+	<bean id="hss" class="org.cipango.ims.hss.Hss" autowire="byName" >
+	</bean>
+	
+	<bean id="zhHandler" class="org.cipango.ims.hss.ZhHandler" autowire="byName" >
+	</bean>
+		
+	<bean id="webApplication" 
+			class="org.cipango.ims.hss.web.ImsApplication" 
+			factory-method="getInstance"
+			init-method="springStart"
+			destroy-method="springStop">
+		<property name="adminUserDao" ref="adminUserDao" />
+		<property name="sipFactory" ref="sipFactory" />
+		<property name="webAuthentication" value="${hss.webAuthentication.enabled}" />
+	</bean>
+	
+</beans>

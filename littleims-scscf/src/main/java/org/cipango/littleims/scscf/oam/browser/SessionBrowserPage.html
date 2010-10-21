@@ -1,0 +1,25 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+  	<h1 wicket:id="title"></h1>
+  	
+  	<table class="filteredTable" >
+        <tr>
+            <th>AOR</th>
+            <th>Barred</th>
+            <th>Session case</th>
+            <th>current iFC</th>
+        </tr>
+        <tr wicket:id="sessions">
+            <td><A wicket:id="aorLink"><span wicket:id="aor"/></A></td>
+            <td><span wicket:id="barred"/></td>
+            <td><span wicket:id="sessionCase"/></td>
+            <td><span wicket:id="currentIfc"/></td>
+        </tr>
+    </table>
+  	
+  </div>
+</wicket:extend>
+</body>
+</html>

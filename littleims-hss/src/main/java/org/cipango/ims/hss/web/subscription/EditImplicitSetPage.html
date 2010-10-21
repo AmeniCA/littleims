@@ -1,0 +1,40 @@
+<html>
+<body>        
+<wicket:extend>
+	<h2 wicket:id="title"></h2>
+	<embed width="750" height="300" type="image/svg+xml" 
+        pluginspage="http://www.adobe.com/svg/viewer/install/" wicket:id="svg"/>
+	<form class="editUserGroup" wicket:id="form">
+		<select wicket:id="publicIds" size="6">
+			<option>sip:alice@cipango.org</option>
+			<option>tel:+331234</option>
+		</select>
+		<ul>
+			<li wicket:id="actions">
+				<input type="submit" wicket:id="button"/>
+			</li>
+			<li>
+				<input type="submit" wicket:id="addButton" wicket:message="value:button.implicitSet.addToNew" />
+			</li>
+		</ul>
+		<span wicket:id="container">
+          <span wicket:id="implicitSet">
+            <h2><wicket:message key="susbcription.implicititRegistrationSet.title"/><b wicket:id="id"></b></h2>
+            <ul>
+                <li wicket:id="publicIds">
+                    <a href="#" wicket:id="identity"><span wicket:id="name"></span></a> 
+                    (<span wicket:id="default">
+                        <wicket:message key="susbcription.implicititRegistrationSet.defaultIdentity"/>
+                    </span>
+                    <a href="#" wicket:id="makeDefault">
+                        <wicket:message key="susbcription.implicititRegistrationSet.setAsDefaultIdentity"/>
+                    </a>)
+                </li>
+            </ul>
+          </span>
+        </span>
+	</form>
+
+</wicket:extend>
+</body>
+</html>

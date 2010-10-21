@@ -1,0 +1,93 @@
+<html>
+<body>        
+<wicket:extend>
+  <div class="section">
+    <h1 wicket:id="title"></h1>
+  	
+  	<h2>Registration</h2>
+  	<div class="elementPanel" wicket:id="registration">
+        <div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            Registration: <b wicket:id="aor"></b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>State: <span wicket:id="state"/></li>
+                <li>Associated identities: 
+                    <ul>
+                        <li wicket:id="associated"><A wicket:id="aorLink"><span wicket:id="aor"/></A></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>      
+    </div>
+     
+    <h3>Bindings</h3>
+    <div class="elementPanel" wicket:id="bindings">
+        <div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            Private identity: <b wicket:id="privateUserIdentity"></b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>Contact: <span wicket:id="contact"/></li>
+                <li>Path: <span wicket:id="path"/></li>
+                <li>Expires: <span wicket:id="expires"/></li>
+                <li>State: <span wicket:id="state"/></li>
+                <li>Last event: <span wicket:id="event"/></li>
+                <li><A wicket:id="reAuthLink">Network-initiated reauthentication</A></li>
+            </ul>
+        </div>      
+    </div>
+     
+  	<h2>User profile</h2>
+  	<div class="elementPanel" wicket:id="userProfile">
+      	<div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            UserProfile: <b wicket:id="aor"></b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>Profile URI: <span wicket:id="uri"/></li>
+                <li>Display name: <span wicket:id="displayName"/></li>
+                <li>Aliases: <span wicket:id="aliases"><A wicket:id="aorLink"><span wicket:id="aor"/></A>&nbsp;</span></li>
+                <li>Barred: <span wicket:id="barred"/></li>
+                <li>Service level trace info: <pre wicket:id="serviceLevelTraceInfo"/></li> 
+                <li>Initial filter criterias: <div wicket:id="serviceProfile"/></li>
+            </ul>
+        </div>    	
+     </div>
+  	
+  	<h2>Subscriptions</h2>
+  	<div class="elementPanel" wicket:id="regSubscription">
+        <div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            event: <b>reg</b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>Subscriber URI: <span wicket:id="subscriberUri"/></li>
+                <li>Version: <span wicket:id="version"/></li>
+                <li>Expires: <span wicket:id="expires"/></li>
+            </ul>
+        </div>      
+    </div>
+    
+    <div class="elementPanel" wicket:id="debugSubscription">
+        <div class="title">
+            <a href="#" class="hideLink" wicket:id="hideLink">[hide]</a>
+            event: <b>debug</b>
+        </div>
+        <div class="body">
+            <ul>
+                <li>Subscriber URI: <span wicket:id="subscriberUri"/></li>
+                <li>Version: <span wicket:id="version"/></li>
+                <li>Expires: <span wicket:id="expires"/></li>
+            </ul>
+        </div>      
+    </div>
+
+  </div>
+</wicket:extend>
+</body>
+</html>
