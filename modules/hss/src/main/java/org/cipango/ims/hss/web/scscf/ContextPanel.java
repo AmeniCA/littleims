@@ -15,11 +15,11 @@ package org.cipango.ims.hss.web.scscf;
 
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
 import org.cipango.ims.hss.web.subscription.SubscriptionBrowserPage;
+import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -27,10 +27,10 @@ public class ContextPanel extends Panel {
 	
 	public ContextPanel(Scscf scscf) {
 		super("contextMenu");
-		add(new BookmarkablePageLink("editLink", EditScscfPage.class, new PageParameters("id=" + scscf.getName())));
-		add(new BookmarkablePageLink("deleteLink", DeleteScscfPage.class, new PageParameters("id=" + scscf.getName())));
-		add(new BookmarkablePageLink("psiLink", PublicIdBrowserPage.class, new PageParameters("scscf=" + scscf.getName())));
-		add(new BookmarkablePageLink("subscriptionLink", SubscriptionBrowserPage.class, new PageParameters("scscf=" + scscf.getName())));
+		add(new AutolinkBookmarkablePageLink("editLink", EditScscfPage.class, new PageParameters("id=" + scscf.getName())));
+		add(new AutolinkBookmarkablePageLink("deleteLink", DeleteScscfPage.class, new PageParameters("id=" + scscf.getName())));
+		add(new AutolinkBookmarkablePageLink("psiLink", PublicIdBrowserPage.class, new PageParameters("scscf=" + scscf.getName())));
+		add(new AutolinkBookmarkablePageLink("subscriptionLink", SubscriptionBrowserPage.class, new PageParameters("scscf=" + scscf.getName())));
 	}
 
 

@@ -35,6 +35,7 @@ public class EditScscfPage extends ScscfPage
 	@SuppressWarnings("unchecked")
 	public EditScscfPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		Scscf scscf = null;
 		if (_key != null)

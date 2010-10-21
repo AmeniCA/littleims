@@ -16,7 +16,7 @@ package org.cipango.ims.hss.auth;
 
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.ims.AuthenticationScheme;
 
@@ -57,9 +57,9 @@ public class DigestAuthenticationVector implements AuthenticationVector
 		list.add(Cx.SIP_AUTHENTICATION_SCHEME, AuthenticationScheme.SIP_DIGEST.getName());
 		
 		AVP<AVPList> authenticate = new AVP<AVPList>(Cx.SIP_DIGEST_AUTHENTICATE, new AVPList());
-		authenticate.getValue().add(Base.DIGEST_REALM, getRealm());
-		authenticate.getValue().add(Base.DIGEST_QOP, "auth");
-		authenticate.getValue().add(Base.DIGEST_HA1, getHA1());
+		authenticate.getValue().add(Common.DIGEST_REALM, getRealm());
+		authenticate.getValue().add(Common.DIGEST_QOP, "auth");
+		authenticate.getValue().add(Common.DIGEST_HA1, getHA1());
 			
 		list.add(authenticate);
 		return new AVP<AVPList>(Cx.SIP_AUTH_DATA_ITEM, list);

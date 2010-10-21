@@ -32,6 +32,7 @@ import org.apache.wicket.model.StringResourceModel;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.web.ifc.IfcBrowserPage;
 import org.cipango.ims.hss.web.publicid.PublicIdBrowserPage;
+import org.cipango.ims.hss.web.serviceprofile.ServicesContextPanel;
 
 public class AsBrowserPage extends AsPage
 {
@@ -39,6 +40,7 @@ public class AsBrowserPage extends AsPage
 	@SuppressWarnings("unchecked")
 	public AsBrowserPage()
 	{		
+		super(null);
 		add(new BookmarkablePageLink("createLink", EditAsPage.class));
 		
 		IColumn[] columns = new IColumn[5];
@@ -74,6 +76,7 @@ public class AsBrowserPage extends AsPage
 				"name"), getItemByPage());
 		table.setOutputMarkupId(true);
 		add(table);
+		setContextMenu(new ServicesContextPanel());
 	}
 
 	@Override

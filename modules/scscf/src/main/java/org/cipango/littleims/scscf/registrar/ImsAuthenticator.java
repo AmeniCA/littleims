@@ -26,8 +26,8 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.ims.AuthenticationScheme;
 import org.cipango.littleims.scscf.cx.CxManager;
@@ -150,7 +150,7 @@ public class ImsAuthenticator implements Authenticator
 		_cxManager = cxManager;
 	}
 
-	public void handleMaa(DiameterAnswer maa)
+	public void handleMaa(DiameterServletAnswer maa)
 	{	
 		SipServletRequest request = (SipServletRequest) maa.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
@@ -171,14 +171,13 @@ public class ImsAuthenticator implements Authenticator
 			if (AuthenticationScheme.SIP_DIGEST.getName().equals(scheme))
 			{
 				AVPList digestAuthenticate = sadi.getValue(Cx.SIP_DIGEST_AUTHENTICATE);
-				String realm = 
-					digestAuthenticate.getValue(Base.DIGEST_REALM) == null ? _realm :  digestAuthenticate.getValue(Base.DIGEST_REALM);
-				String algorithm =
-					digestAuthenticate.getValue(Base.DIGEST_ALGORITHM) == null ? AuthenticationScheme.SIP_DIGEST.getAlgorithm() :  digestAuthenticate.getValue(Base.DIGEST_ALGORITHM);
-				
+				String realm = digestAuthenticate.getValue(Common.DIGEST_REALM) == null ? _realm
+						: digestAuthenticate.getValue(Common.DIGEST_REALM);
+				String algorithm = digestAuthenticate.getValue(Common.DIGEST_ALGORITHM) == null ? AuthenticationScheme.SIP_DIGEST
+						.getAlgorithm() : digestAuthenticate.getValue(Common.DIGEST_ALGORITHM);
 	
 				// Start Reg-await-auth timer
-				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, digestAuthenticate.getValue(Base.DIGEST_HA1));
+				AuthWaitTimerTask authTimer = new AuthWaitTimerTask(aor, digestAuthenticate.getValue(Common.DIGEST_HA1));
 				_timer.schedule(authTimer, _authTimeout);
 	
 				synchronized (_secContexts)

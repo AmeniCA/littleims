@@ -32,22 +32,24 @@ import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 
+public class DeleteSubscriptionPage extends SubscriptionPage
+{
 
-public class DeleteSubscriptionPage extends SubscriptionPage {
-	
 	@SpringBean
 	PrivateIdentityDao _privateIdentityDao;
-	
+
 	@SpringBean
 	PublicIdentityDao _publicIdentityDao;
-	
+
 	@SuppressWarnings("unchecked")
-	public DeleteSubscriptionPage(PageParameters pageParameters) {
+	public DeleteSubscriptionPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		Subscription subscription = getSubscription(pageParameters);
 		final String key = subscription == null ? null : subscription.getName();
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(subscription))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				subscription))));
 
 		/*
 		 * Use a form to hold the buttons, but set the default form processing
@@ -55,71 +57,64 @@ public class DeleteSubscriptionPage extends SubscriptionPage {
 		 * interested in are the button clicks.
 		 */
 		Form form = new Form("confirmForm");
-		
-		List<String> privateIds = subscription  == null ? Collections.EMPTY_LIST : new ArrayList(subscription.getPrivateIds());
-		
+
+		List<String> privateIds = subscription == null ? Collections.EMPTY_LIST : new ArrayList(subscription
+				.getPrivateIds());
+
 		CheckGroup privateIdsGroup = new CheckGroup("privateIdsGroup", new ArrayList(privateIds));
 		form.add(privateIdsGroup);
-		privateIdsGroup.add(new ListView("list", privateIds){
+		privateIdsGroup.add(new ListView("list", privateIds)
+		{
 			@Override
 			protected void populateItem(ListItem item)
 			{
-				//item.add(new Check("delete", item.getModel()));
+				// item.add(new Check("delete", item.getModel()));
 				item.add(new Label("identity", item.getModel()));
 			}
 		}.setReuseItems(true));
-		//privateIdsGroup.add(new CheckGroupSelector("groupSelector"));
-		
-		List<String> publicIds = subscription  == null ? Collections.EMPTY_LIST : new ArrayList(subscription.getPublicIds());
+		// privateIdsGroup.add(new CheckGroupSelector("groupSelector"));
+
+		List<String> publicIds = subscription == null ? Collections.EMPTY_LIST : new ArrayList(subscription
+				.getPublicIds());
 		CheckGroup publicIdsGroup = new CheckGroup("publicIdsGroup", new ArrayList(publicIds));
 		form.add(publicIdsGroup);
-		publicIdsGroup.add(new ListView("list", publicIds){
+		publicIdsGroup.add(new ListView("list", publicIds)
+		{
 			@Override
 			protected void populateItem(ListItem item)
 			{
-				//item.add(new Check("delete", item.getModel()));
+				// item.add(new Check("delete", item.getModel()));
 				item.add(new Label("identity", item.getModel()));
 			}
 		}.setReuseItems(true));
-		//publicIdsGroup.add(new CheckGroupSelector("groupSelector"));
-		
+		// publicIdsGroup.add(new CheckGroupSelector("groupSelector"));
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
-				/*CheckGroup publicIdsGroup = (CheckGroup) getForm().get("privateIdsGroup");
-				Iterator<String> it = ((Collection<String>) publicIdsGroup.getModelObject()).iterator();
-				while (it.hasNext())
-				{
-					String id = it.next();
-					PublicIdentity publicIdentity = _publicIdentityDao.findById(id);
-					if (publicIdentity != null)
-					{
-						_publicIdentityDao.delete(publicIdentity);
-						getSession().info(getString("publicId.delete.done", new LoadableDetachableModel(publicIdentity) {
-							protected Object load()
-							{
-								return null;
-							}								
-						}));
-					}
-				}
-				CheckGroup privateIdsGroup = (CheckGroup) getForm().get("privateIdsGroup");
-				it = ((Collection) privateIdsGroup.getModelObject()).iterator();
-				while (it.hasNext())
-				{
-					String id = it.next();
-					PrivateIdentity privateIdentity = _privateIdentityDao.findById(id);
-					if (privateIdentity != null)
-					{
-						_privateIdentityDao.delete(privateIdentity);
-						getSession().info(getString("privateId.delete.done", new LoadableDetachableModel(privateIdentity) {
-							protected Object load()
-							{
-								return null;
-							}								
-						}));
-					}
-				}*/
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
+				/*
+				 * CheckGroup publicIdsGroup = (CheckGroup)
+				 * getForm().get("privateIdsGroup"); Iterator<String> it =
+				 * ((Collection<String>)
+				 * publicIdsGroup.getModelObject()).iterator(); while
+				 * (it.hasNext()) { String id = it.next(); PublicIdentity
+				 * publicIdentity = _publicIdentityDao.findById(id); if
+				 * (publicIdentity != null) {
+				 * _publicIdentityDao.delete(publicIdentity);
+				 * getSession().info(getString("publicId.delete.done", new
+				 * LoadableDetachableModel(publicIdentity) { protected Object
+				 * load() { return null; } })); } } CheckGroup privateIdsGroup =
+				 * (CheckGroup) getForm().get("privateIdsGroup"); it =
+				 * ((Collection) privateIdsGroup.getModelObject()).iterator();
+				 * while (it.hasNext()) { String id = it.next(); PrivateIdentity
+				 * privateIdentity = _privateIdentityDao.findById(id); if
+				 * (privateIdentity != null) {
+				 * _privateIdentityDao.delete(privateIdentity);
+				 * getSession().info(getString("privateId.delete.done", new
+				 * LoadableDetachableModel(privateIdentity) { protected Object
+				 * load() { return null; } })); } }
+				 */
 
 				Subscription id = _dao.findById(key);
 				Iterator<PrivateIdentity> it2 = id.getPrivateIdentities().iterator();
@@ -129,20 +124,22 @@ public class DeleteSubscriptionPage extends SubscriptionPage {
 					Iterator<PublicUserIdentity> it3 = privateIdentity.getPublicIdentities().iterator();
 					while (it3.hasNext())
 					{
-						_publicIdentityDao.delete(it3.next());	
+						_publicIdentityDao.delete(it3.next());
 					}
 					_privateIdentityDao.delete(privateIdentity);
-					
+
 				}
 				_dao.delete(id);
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(SubscriptionBrowserPage.class);
 			}
 		});
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(SubscriptionBrowserPage.class);
 			}
@@ -154,7 +151,8 @@ public class DeleteSubscriptionPage extends SubscriptionPage {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

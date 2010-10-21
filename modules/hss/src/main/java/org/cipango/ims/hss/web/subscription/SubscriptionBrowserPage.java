@@ -57,6 +57,7 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public SubscriptionBrowserPage(PageParameters pageParameters)
 	{		
+		super(pageParameters);
 		String scscf = pageParameters.getString("scscf");
 		add(new BookmarkablePageLink("createLink", AddSubscriptionPage.class));
 		
@@ -112,6 +113,7 @@ public class SubscriptionBrowserPage extends SubscriptionPage
 			_title = getString(getPrefix() + ".browser.title");
 		
 		add(new Label("title", _title));
+		setContextMenu(new IdentitiesContextPanel());
 	}
 
 	@Override

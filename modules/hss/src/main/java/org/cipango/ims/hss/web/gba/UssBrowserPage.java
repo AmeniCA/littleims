@@ -57,6 +57,7 @@ public class UssBrowserPage extends UssPage
 	@SuppressWarnings("unchecked")
 	public UssBrowserPage(PageParameters pageParameters)
 	{				
+		super(pageParameters);
 		_privateIdKey = pageParameters.getString("privateId");
 
 		add(new BookmarkablePageLink("createLink", EditUssPage.class,

@@ -24,11 +24,11 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterCommand;
-import org.cipango.diameter.DiameterMessage;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.app.DiameterListener;
+import org.cipango.diameter.api.DiameterListener;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletMessage;
+import org.cipango.diameter.api.DiameterServletRequest;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.littleims.scscf.debug.DebugIdService;
 import org.cipango.littleims.scscf.registrar.Authenticator;
@@ -134,7 +134,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 		}
 	}
 
-	public void handle(DiameterMessage message) throws IOException
+	public void handle(DiameterServletMessage message) throws IOException
 	{
 
 		DiameterCommand command = message.getCommand();
@@ -142,7 +142,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 		{
 			if (message.isRequest())
 			{
-				DiameterRequest request = (DiameterRequest) message;
+				DiameterServletRequest request = (DiameterServletRequest) message;
 				if (command == Cx.PPR)
 					_sessionManager.handlePpr(request);
 				else if (command == Cx.RTR)
@@ -152,7 +152,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 			}
 			else
 			{
-				DiameterAnswer answer = (DiameterAnswer) message;
+				DiameterServletAnswer answer = (DiameterServletAnswer) message;
 				if ( command == Cx.MAA)
 					_authenticator.handleMaa(answer);
 				else if (command == Cx.SAA)

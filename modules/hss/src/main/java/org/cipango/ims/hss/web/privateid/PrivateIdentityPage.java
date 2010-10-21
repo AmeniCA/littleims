@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.privateid;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
@@ -24,6 +25,11 @@ public abstract class PrivateIdentityPage extends BasePage
 
 	@SpringBean
 	protected PrivateIdentityDao _dao;
+	
+	public PrivateIdentityPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
 	
 	protected String getPrefix()
 	{

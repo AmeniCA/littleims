@@ -41,6 +41,7 @@ public class EditAsPage extends AsPage
 	@SuppressWarnings("unchecked")
 	public EditAsPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		ApplicationServer applicationServer = null;
 		if (_key != null)

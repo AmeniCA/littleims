@@ -81,6 +81,7 @@ public class EditSptsPage extends BasePage
 	
 	public EditSptsPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		String ifcKey = pageParameters.getString("id");
 		InitialFilterCriteria ifc = null;
 		if (ifcKey != null)

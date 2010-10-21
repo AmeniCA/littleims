@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.debugsession;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.DebugSessionDao;
@@ -25,6 +26,11 @@ public abstract class DebugSessionPage extends BasePage
 
 	@SpringBean
 	protected DebugSessionDao _dao;
+	
+	public DebugSessionPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
 	
 	protected String getPrefix()
 	{

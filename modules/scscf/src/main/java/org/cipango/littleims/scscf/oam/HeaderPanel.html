@@ -5,33 +5,32 @@
 <body>
 <wicket:panel>
     <div id="header">
-    	<div id="logo">LittleIMS</div>
-        <wicket:link>
-    	<div id="nav-container">
-	    	<ul>
-    			<li>
-					<a href="/org/cipango/littleims/scscf/oam/browser/ProfileBrowserPage.html">
-						User profiles
-					</a>
-                </li>
-                <li>
-                    <a href="/org/cipango/littleims/scscf/oam/browser/SessionBrowserPage.html">
-                        Sessions
-                    </a>
-                </li>
-                <li>
-                    <a href="/org/cipango/littleims/scscf/oam/browser/RegistrationBrowserPage.html">
-                        Registrations
-                    </a>
-                </li>
-                <li>
-                    <a href="/org/cipango/littleims/scscf/oam/browser/SharedIfcBrowserPage.html">
-                        Shared iFCs
-                    </a>
-                </li>
-			</ul>
-	    </div>
-    	</wicket:link>
+    	<h1><A href="#">LittleIMS :: S-CSCF</A></h1>
+    </div>
+    
+	<div id="menu">
+    	<ul>
+			<li>
+				<a wicket:id="ProfileBrowserPage">
+					<span>User profiles</span>
+				</a>
+            </li>
+            <li>
+                <a wicket:id="SessionBrowserPage">
+                    <span>Sessions</span>
+                </a>
+            </li>
+            <li>
+                <a wicket:id="RegistrationBrowserPage">
+                    <span>Registrations</span>
+                </a>
+            </li>
+            <li>
+                <a wicket:id="SharedIfcBrowserPage">
+                    <span>Shared iFCs</span>
+                </a>
+            </li>
+		</ul>
     </div>
 </wicket:panel>     
 </body>

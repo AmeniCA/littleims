@@ -9,7 +9,6 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -22,6 +21,7 @@ import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.privateid.EditPrivateIdPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.scscf.EditScscfPage;
+import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -30,19 +30,19 @@ public class ContextPanel extends Panel {
 	public ContextPanel(Subscription subscription) {
 		super("contextMenu");
 		setOutputMarkupId(true);
-		add(new BookmarkablePageLink("viewLink", ViewSubscriptionPage.class, 
+		add(new AutolinkBookmarkablePageLink("viewLink", ViewSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
-		add(new BookmarkablePageLink("editLink", EditSubscriptionPage.class, 
+		add(new AutolinkBookmarkablePageLink("editLink", EditSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
-		add(new BookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
+		add(new AutolinkBookmarkablePageLink("deleteLink", DeleteSubscriptionPage.class, 
 				new PageParameters("id=" + subscription.getName())));
-		add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
+		add(new AutolinkBookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
 				new PageParameters("id=" + subscription.getName())).setVisible(subscription.getScscf() != null));
-		add(new BookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
+		add(new AutolinkBookmarkablePageLink("implicitSetLink", EditImplicitSetPage.class, 
 				new PageParameters("id=" + subscription.getName())));
 		
 		if (subscription.getScscf() != null)
-			add(new BookmarkablePageLink("scscfLink", EditScscfPage.class, 
+			add(new AutolinkBookmarkablePageLink("scscfLink", EditScscfPage.class, 
 					new PageParameters("id=" + subscription.getScscf().getName())));
 		else
 			add(new WebMarkupContainer("scscfLink").setVisible(false));
@@ -68,14 +68,14 @@ public class ContextPanel extends Panel {
 			@Override
 			protected void populateItem(Item item)
 			{
-				MarkupContainer link = new BookmarkablePageLink("identity", 
+				MarkupContainer link = new AutolinkBookmarkablePageLink("identity", 
 						EditPrivateIdPage.class, 
 						new PageParameters("id=" + item.getModelObject()));
 				item.add(link);
 				link.add(new Label("name", item.getModel()));
 			}
 		});
-		add(new BookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, new PageParameters("subscription=" + subscription.getName())));
+		add(new AutolinkBookmarkablePageLink("newPrivateIdLink", EditPrivateIdPage.class, new PageParameters("subscription=" + subscription.getName())));
 		
 			
 		add(new ListView("publicIds", new ArrayList(subscription.getPublicIds())) {
@@ -83,7 +83,7 @@ public class ContextPanel extends Panel {
 			@Override
 			protected void populateItem(ListItem item)
 			{
-				MarkupContainer link = new BookmarkablePageLink("identity", 
+				MarkupContainer link = new AutolinkBookmarkablePageLink("identity", 
 						EditPublicUserIdPage.class, 
 						new PageParameters("id=" + item.getModelObject()));
 				item.add(link);

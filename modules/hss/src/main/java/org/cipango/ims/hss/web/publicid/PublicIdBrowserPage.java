@@ -51,6 +51,7 @@ import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.web.serviceprofile.ContextPanel;
+import org.cipango.ims.hss.web.subscription.IdentitiesContextPanel;
 
 public class PublicIdBrowserPage extends PublicIdentityPage
 {
@@ -68,6 +69,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 	@SuppressWarnings("unchecked")
 	public PublicIdBrowserPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		String serviceProfile = pageParameters.getString("serviceProfile");
 		String applicationServer = pageParameters.getString("applicationServer");
 		String scscf = pageParameters.getString("scscf");
@@ -133,6 +135,7 @@ public class PublicIdBrowserPage extends PublicIdentityPage
 			_title = getString(getPrefix() + ".browser.title");
 		
 		add(new Label("title", _title));
+		setContextMenu(new IdentitiesContextPanel());
 	}
 	
 	@SuppressWarnings("unchecked")

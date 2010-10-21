@@ -7,7 +7,7 @@ import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.ResultCode;
 import org.cipango.diameter.Type;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.base.Common;
 
 public class DiameterException extends Exception
 {
@@ -46,12 +46,12 @@ public class DiameterException extends Exception
 	
 	public static DiameterException newMissingDiameterAvp(Type type)
 	{
-		AVP<AVPList> failedAvp = new AVP<AVPList>(Base.FAILED_AVP, new AVPList());
+		AVP<AVPList> failedAvp = new AVP<AVPList>(Common.FAILED_AVP, new AVPList());
 		failedAvp.getValue().add(new AVP(type, new byte[10]));
 				
 		StringBuilder sb = new StringBuilder();
 		sb.append("Missing Mandatory AVP: ").append(type);
-		return new DiameterException(Base.DIAMETER_MISSING_AVP, sb.toString()).addAvp(failedAvp);
+		return new DiameterException(Common.DIAMETER_MISSING_AVP, sb.toString()).addAvp(failedAvp);
 
 	}
 }

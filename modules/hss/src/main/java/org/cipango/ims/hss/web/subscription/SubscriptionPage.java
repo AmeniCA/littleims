@@ -28,6 +28,11 @@ public abstract class SubscriptionPage extends BasePage
 	@SpringBean
 	protected SubscriptionDao _dao;
 	
+	public SubscriptionPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected Subscription getSubscription(PageParameters pageParameters)
 	{

@@ -36,6 +36,7 @@ public class AdminUserBrowserPage extends AdminUserPage
 	@SuppressWarnings("unchecked")
 	public AdminUserBrowserPage()
 	{		
+		super(null);
 		add(new BookmarkablePageLink("createLink", EditAdminUserPage.class));
 		
 		IColumn[] columns = new IColumn[2];

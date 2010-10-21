@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.publicid;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.PublicIdentityDao;
@@ -26,6 +27,11 @@ public abstract class PublicIdentityPage extends BasePage
 
 	@SpringBean
 	protected PublicIdentityDao _dao;
+	
+	public PublicIdentityPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
 	
 	protected String getPrefix()
 	{

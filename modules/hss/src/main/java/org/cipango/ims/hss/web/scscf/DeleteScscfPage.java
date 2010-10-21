@@ -19,25 +19,27 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
-import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.Scscf;
 
+public class DeleteScscfPage extends ScscfPage
+{
 
-public class DeleteScscfPage extends ScscfPage {
-	
 	@SuppressWarnings("unchecked")
-	public DeleteScscfPage(PageParameters pageParameters) {
+	public DeleteScscfPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		Scscf scscf = _dao.findById(key);
-		if (scscf == null) {
+		if (scscf == null)
+		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
 					new MicroMap("name", key)));
 			goToBackPage(ScscfBrowserPage.class);
 			return;
 		}
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(scscf))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				scscf))));
 
 		/*
 		 * Use a form to hold the buttons, but set the default form processing
@@ -46,20 +48,24 @@ public class DeleteScscfPage extends ScscfPage {
 		 */
 		Form form = new Form("confirmForm");
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
 				Scscf id = _dao.findById(key);
 
 				_dao.delete(id);
 
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(ScscfBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(ScscfBrowserPage.class);
 			}
@@ -71,7 +77,8 @@ public class DeleteScscfPage extends ScscfPage {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

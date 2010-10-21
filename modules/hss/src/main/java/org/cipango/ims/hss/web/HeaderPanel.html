@@ -3,10 +3,10 @@
 </head>   
 <body>
 <wicket:panel>
+    <wicket:link>
     <div id="header">
-    	<div id="logo">LittleIMS</div>
-        <wicket:link>
-		<div id="statusBar">
+    	<h1><a href="#">LittleIMS :: HSS</a></h1>
+		<div class="login">
 			<span wicket:id="user.current">User: none</span>	
             <wicket:enclosure child="profileLink">
 			<span class="link-delimiter">|</span>
@@ -17,57 +17,32 @@
 			<a href="#" wicket:id="profileLink"><wicket:message key="headerPanel.profile"/></a>
             </wicket:enclosure>
 		</div>
-    	<div id="nav-container">
-	    	<ul>
-    			<li>
-					<a href="/org/cipango/ims/hss/web/subscription/SubscriptionBrowserPage.html">
-						<wicket:message key="headerPanel.subscriptions">Subscriptions</wicket:message>
-					</a>
-				</li>
-				<li>
-					<a href="/org/cipango/ims/hss/web/privateid/PrivateIdBrowserPage.html">
-						<wicket:message key="headerPanel.privateIds">Private identities</wicket:message>
-					</a>
-				</li>
-				<li>
-					<a href="/org/cipango/ims/hss/web/publicid/PublicIdBrowserPage.html">
-						<wicket:message key="headerPanel.publicIds">Public identities</wicket:message>
-					</a>
-				</li>
-				<li>
-					<a href="/org/cipango/ims/hss/web/scscf/ScscfBrowserPage.html">
-						<wicket:message key="headerPanel.scscf">S-CSCF</wicket:message>
-					</a>
-				</li>
-                <li>
-	                <a href="/org/cipango/ims/hss/web/ifc/IfcBrowserPage.html">
-	                    <wicket:message key="headerPanel.ifc">IFC</wicket:message>
-	                </a>
-	            </li>
-		        <li>
-		            <a href="/org/cipango/ims/hss/web/serviceprofile/ServiceProfileBrowserPage.html">
-		                <wicket:message key="headerPanel.serviceProfiles">Service profiles</wicket:message>
-		            </a>
-		        </li>
-				<li>
-                    <a href="/org/cipango/ims/hss/web/as/AsBrowserPage.html">
-                        <wicket:message key="headerPanel.as">AS</wicket:message>
-                    </a>
-                </li>
-                <li>
-                    <a href="/org/cipango/ims/hss/web/adminuser/AdminUserBrowserPage.html">
-                        <wicket:message key="headerPanel.adminUsers">Admin users</wicket:message>
-                    </a>
-                </li>
-                <li>
-                    <a href="/org/cipango/ims/hss/web/gba/NafGroupBrowserPage.html">
-                        <wicket:message key="headerPanel.nafGroups">NAF groups</wicket:message>
-                    </a>
-                </li>
-			</ul>
-	    </div>
-    	</wicket:link>
     </div>
+	<div id="menu">
+    	<ul>
+			<li>
+				<a wicket:id="SubscriptionBrowserPage">
+					<span><wicket:message key="headerPanel.identities">Identities</wicket:message></span>
+				</a>
+			</li>
+			<li>
+				<a wicket:id="ScscfBrowserPage">
+					<span><wicket:message key="headerPanel.network">Network</wicket:message></span>
+				</a>
+			</li>
+	        <li>
+	            <a wicket:id="ServiceProfileBrowserPage">
+	                <span><wicket:message key="headerPanel.services">Services</wicket:message></span>
+	            </a>
+	        </li>
+            <li>
+                <a wicket:id="AdminUserBrowserPage">
+                    <span><wicket:message key="headerPanel.adminUsers">Admin users</wicket:message></span>
+                </a>
+            </li>
+		</ul>
+    </div>
+    </wicket:link>
 </wicket:panel>     
 </body>
 </html>

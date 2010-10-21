@@ -32,7 +32,7 @@
     <plugins>
       <plugin>
         <groupId>org.cipango</groupId>
-        <artifactId>maven-cipango-plugin</artifactId>
+        <artifactId>cipango-maven-plugin</artifactId>
         <configuration>
           <systemPropertiesFile>../../littleims.properties</systemPropertiesFile>
           <systemProperties>
@@ -61,6 +61,7 @@
           <stopPort>9996</stopPort>
           <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
           <scanIntervalSeconds>5</scanIntervalSeconds>
+          <annotationsEnabled>false</annotationsEnabled>
           <webAppConfig>
             <contextPath>/</contextPath>
           </webAppConfig>

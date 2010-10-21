@@ -23,22 +23,25 @@ import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 
+public class DeletePublicIdPage extends PublicIdentityPage
+{
 
-public class DeletePublicIdPage extends PublicIdentityPage {
-	
 	@SuppressWarnings("unchecked")
-	public DeletePublicIdPage(PageParameters pageParameters) {
+	public DeletePublicIdPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		PublicIdentity publicIdentity = _dao.findById(key);
-		if (publicIdentity == null) {
+		if (publicIdentity == null)
+		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
 					new MicroMap("name", key)));
 			goToBackPage(PublicIdBrowserPage.class);
 			return;
 		}
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(publicIdentity))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				publicIdentity))));
 
 		/*
 		 * Use a form to hold the buttons, but set the default form processing
@@ -47,27 +50,31 @@ public class DeletePublicIdPage extends PublicIdentityPage {
 		 */
 		Form form = new Form("confirmForm");
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
 				PublicIdentity id = _dao.findById(key);
 
 				_dao.delete(id);
 
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(PublicIdBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(PublicIdBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
 		add(form);
-		
+
 		if (publicIdentity != null)
 		{
 			if (publicIdentity instanceof PublicUserIdentity)
@@ -78,7 +85,8 @@ public class DeletePublicIdPage extends PublicIdentityPage {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

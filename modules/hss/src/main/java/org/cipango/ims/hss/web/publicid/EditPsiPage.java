@@ -63,6 +63,7 @@ public class EditPsiPage extends PublicIdentityPage
 	@SuppressWarnings("unchecked")
 	public EditPsiPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		PublicIdentity publicIdentity = null;
 		if (_key != null)

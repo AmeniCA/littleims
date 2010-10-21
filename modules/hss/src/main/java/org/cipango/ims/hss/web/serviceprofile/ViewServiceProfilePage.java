@@ -40,6 +40,7 @@ public class ViewServiceProfilePage extends ServiceProfilePage
 	@SuppressWarnings("unchecked")
 	public ViewServiceProfilePage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		ServiceProfile serviceProfile = null;
 		if (_key != null)

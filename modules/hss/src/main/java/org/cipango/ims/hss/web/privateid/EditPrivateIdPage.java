@@ -53,6 +53,7 @@ public class EditPrivateIdPage extends PrivateIdentityPage
 	@SuppressWarnings("unchecked")
 	public EditPrivateIdPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		_subscriptionId = pageParameters.getString("subscription");
 		PrivateIdentity privateIdentity = null;

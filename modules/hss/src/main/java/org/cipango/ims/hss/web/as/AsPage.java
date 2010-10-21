@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.as;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.ApplicationServerDao;
@@ -25,6 +26,11 @@ public abstract class AsPage extends BasePage
 	@SpringBean
 	protected ApplicationServerDao _dao;
 		
+	public AsPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
+	
 	protected String getPrefix()
 	{
 		return "as";

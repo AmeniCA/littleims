@@ -23,12 +23,12 @@ import java.util.Map;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.cipango.SipMessage;
-import org.cipango.SipResponse;
-import org.cipango.log.AbstractMessageLog;
-import org.cipango.sip.SipConnection;
-import org.mortbay.io.Buffer;
-import org.mortbay.util.StringUtil;
+import org.cipango.server.SipConnection;
+import org.cipango.server.SipMessage;
+import org.cipango.server.SipResponse;
+import org.cipango.server.log.AbstractMessageLog;
+import org.eclipse.jetty.io.Buffer;
+import org.eclipse.jetty.util.StringUtil;
 
 public class DebugIdMessageLog extends AbstractMessageLog
 {

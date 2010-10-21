@@ -55,6 +55,7 @@ public class EditDebugSessionPage extends DebugSessionPage
 	@SuppressWarnings("unchecked")
 	public EditDebugSessionPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		String sKey = pageParameters.getString("id");
 		PublicIdentity publicIdentity = null;
 		if (sKey != null)

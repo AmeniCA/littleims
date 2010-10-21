@@ -29,12 +29,12 @@ import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
-import org.cipango.diameter.ims.Sh;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx.ServerAssignmentType;
 import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
+import org.cipango.diameter.ims.Sh;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.scscf.charging.CDF;
 import org.cipango.littleims.scscf.cx.CxManager;
@@ -299,7 +299,7 @@ public class SessionManagerImpl implements SessionManager
 		}
 	}
 	
-	public void handleSaa(DiameterAnswer saa)
+	public void handleSaa(DiameterServletAnswer saa)
 	{
 		SipServletRequest request = (SipServletRequest) saa.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
@@ -330,7 +330,7 @@ public class SessionManagerImpl implements SessionManager
 
 	}
 	
-	public void handlePpr(DiameterRequest ppr)
+	public void handlePpr(DiameterServletRequest ppr)
 	{
 		try
 		{
@@ -344,12 +344,12 @@ public class SessionManagerImpl implements SessionManager
 						+ subscription.getIMSSubscription().getPrivateID()
 						+ " after PPR request");
 			}
-			ppr.createAnswer(Base.DIAMETER_SUCCESS).send();
+			ppr.createAnswer(Common.DIAMETER_SUCCESS).send();
 		}
 		catch (Exception e) 
 		{
 			_log.warn("Unable to process PPR request", e);
-			try { ppr.createAnswer(Base.DIAMETER_UNABLE_TO_COMPLY).send(); } catch (Exception e1) { }
+			try { ppr.createAnswer(Common.DIAMETER_UNABLE_TO_COMPLY).send(); } catch (Exception e1) { }
 		}
 	}
 

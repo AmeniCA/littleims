@@ -65,6 +65,7 @@ public class EditIfcPage extends IfcPage
 	@SuppressWarnings("unchecked")
 	public EditIfcPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		_copy = pageParameters.getBoolean("copy");
 		_serviceProfileKey = pageParameters.getString("serviceProfile");

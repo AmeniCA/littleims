@@ -34,6 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.NafGroupDao;
 import org.cipango.ims.hss.model.NafGroup;
 import org.cipango.ims.hss.web.BasePage;
+import org.cipango.ims.hss.web.serviceprofile.ServicesContextPanel;
 import org.cipango.ims.oam.util.AbstractListDataProvider;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
 import org.cipango.ims.oam.util.EditableLabel;
@@ -169,6 +170,7 @@ public class NafGroupBrowserPage extends BasePage
 			}
 			
 		});
+		setContextMenu(new ServicesContextPanel());
 	}
 
 	@Override

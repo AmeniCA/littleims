@@ -14,6 +14,7 @@
 package org.cipango.littleims.scscf.oam;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -22,10 +23,17 @@ public abstract class BasePage extends WebPage
 {
 	public BasePage()
 	{
+		this(null);
+	}
+
+	public BasePage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		add(new HeaderPanel().setRenderBodyOnly(true));
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
 	}
 
+	
 	public void setContextMenu(Component panel)
 	{
 		panel.setOutputMarkupId(true);

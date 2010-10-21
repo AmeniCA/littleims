@@ -15,6 +15,7 @@ package org.cipango.ims.hss.web;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -30,6 +31,12 @@ public abstract class BasePage extends WebPage
 
 	public BasePage()
 	{
+		this(null);
+	}
+	
+	public BasePage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		add(new HeaderPanel().setRenderBodyOnly(true));
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
 		add(new WebMarkupContainer("contextMenu"));

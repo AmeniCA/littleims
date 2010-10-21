@@ -20,13 +20,13 @@ import javax.servlet.sip.SipServlet;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
-import org.cipango.diameter.DiameterAnswer;
 import org.cipango.diameter.DiameterCommand;
-import org.cipango.diameter.DiameterMessage;
-import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.ResultCode;
-import org.cipango.diameter.app.DiameterListener;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterListener;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletMessage;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Zh;
 import org.cipango.ims.hss.db.AdminUserDao;
@@ -54,15 +54,15 @@ public class HssServlet extends SipServlet implements DiameterListener
 		dao.insertDefaultUserIfNone();
 	}
 	
-	public void handle(DiameterMessage message) throws IOException
+	public void handle(DiameterServletMessage message) throws IOException
 	{
 		if (message.isRequest())
-			doRequest((DiameterRequest) message);
+			doRequest((DiameterServletRequest) message);
 		else 
-			doAnswer((DiameterAnswer) message);
+			doAnswer((DiameterServletAnswer) message);
 	}
 	
-	protected void doRequest(DiameterRequest request) throws IOException
+	protected void doRequest(DiameterServletRequest request) throws IOException
 	{
 		DiameterCommand command = request.getCommand();
 		try
@@ -76,7 +76,7 @@ public class HssServlet extends SipServlet implements DiameterListener
 				else if (request.getApplicationId() == Zh.ZH_APPLICATION)
 					_zhHandler.doMar(request);
 				else
-					throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+					throw new DiameterException(Common.DIAMETER_UNABLE_TO_COMPLY, 
 							"Unsupported application ID: " + request.getApplicationId());
 			}
 			else if (command == Cx.SAR)
@@ -85,7 +85,7 @@ public class HssServlet extends SipServlet implements DiameterListener
 				_hss.doUar(request);
 			else
 			{
-				DiameterAnswer answer = request.createAnswer(Base.DIAMETER_COMMAND_UNSUPPORTED);
+				DiameterServletAnswer answer = request.createAnswer(Common.DIAMETER_COMMAND_UNSUPPORTED);
 				answer.send();
 			}
 		}
@@ -100,7 +100,7 @@ public class HssServlet extends SipServlet implements DiameterListener
 				else
 					__log.debug("Unable to process request: " + command + ", Result code: " + e.getResultCode(), e);
 			}
-			DiameterAnswer answer = request.createAnswer(e.getResultCode());
+			DiameterServletAnswer answer = request.createAnswer(e.getResultCode());
 			if (e.getAvps() != null)
 			{
 				for (AVP avp : e.getAvps())
@@ -111,12 +111,12 @@ public class HssServlet extends SipServlet implements DiameterListener
 		catch (Throwable e)
 		{
 			__log.warn("Unable to process request: " + command, e);
-			DiameterAnswer answer = request.createAnswer(Base.DIAMETER_UNABLE_TO_COMPLY);
+			DiameterServletAnswer answer = request.createAnswer(Common.DIAMETER_UNABLE_TO_COMPLY);
 			answer.send();
 		}
 	}
 	
-	protected void doAnswer(DiameterAnswer answer)
+	protected void doAnswer(DiameterServletAnswer answer)
 	{
 		DiameterCommand command = answer.getCommand();
 		try

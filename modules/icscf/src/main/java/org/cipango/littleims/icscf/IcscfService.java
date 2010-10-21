@@ -28,7 +28,7 @@ import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.api.DiameterServletAnswer;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Cx.UserAuthorizationType;
 import org.cipango.littleims.util.AuthorizationHeader;
@@ -72,7 +72,7 @@ public class IcscfService
 				getUserAuthorizationType(request), request);
 	}
 	
-	public void handleUAA(DiameterAnswer uaa)
+	public void handleUAA(DiameterServletAnswer uaa)
 	{
 		SipServletRequest request = (SipServletRequest) uaa.getRequest().getAttribute(SipServletRequest.class.getName());
 		try
@@ -105,7 +105,7 @@ public class IcscfService
 		}
 	}
 	
-	public void handleLIA(DiameterAnswer lia)
+	public void handleLIA(DiameterServletAnswer lia)
 	{
 		SipServletRequest request = (SipServletRequest) lia.getRequest().getAttribute(SipServletRequest.class.getName());
 		try

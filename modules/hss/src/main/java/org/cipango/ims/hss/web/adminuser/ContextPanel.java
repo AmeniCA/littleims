@@ -14,9 +14,9 @@
 package org.cipango.ims.hss.web.adminuser;
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.AdminUser;
+import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel
@@ -26,11 +26,11 @@ public class ContextPanel extends Panel
 	{
 		super("contextMenu");
 		setOutputMarkupId(true);
-		add(new BookmarkablePageLink("editLink", EditAdminUserPage.class,
+		add(new AutolinkBookmarkablePageLink("editLink", EditAdminUserPage.class,
 				new PageParameters("id=" + adminUser.getLogin())));
-		add(new BookmarkablePageLink("deleteLink", DeleteAdminUserPage.class,
+		add(new AutolinkBookmarkablePageLink("deleteLink", DeleteAdminUserPage.class,
 				new PageParameters("id=" + adminUser.getLogin())));
-		add(new BookmarkablePageLink("setPwdLink", SetPasswordPage.class,
+		add(new AutolinkBookmarkablePageLink("setPwdLink", SetPasswordPage.class,
 				new PageParameters("id=" + adminUser.getLogin())));
 	}
 

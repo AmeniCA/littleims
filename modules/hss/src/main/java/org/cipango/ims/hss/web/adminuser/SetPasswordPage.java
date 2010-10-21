@@ -36,6 +36,7 @@ public class SetPasswordPage extends AdminUserPage
 	@SuppressWarnings("unchecked")
 	public SetPasswordPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		AdminUser adminUser = null;
 		if (_key != null)

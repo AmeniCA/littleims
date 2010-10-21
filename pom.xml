@@ -92,13 +92,14 @@
       </dependency>
       <dependency>
         <groupId>org.cipango</groupId>
-        <artifactId>cipango</artifactId>
+        <artifactId>cipango-server</artifactId>
         <version>${cipango-version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>6.1.14</version>
+        <groupId>org.cipango</groupId>
+        <artifactId>cipango-console</artifactId>
+        <version>${cipango-version}</version>
+        <classifier>jar</classifier>
       </dependency>
       <dependency>
         <groupId>c3p0</groupId>
@@ -169,8 +170,8 @@
     <log4j-version>1.2.14</log4j-version>
     <junit-version>3.8.1</junit-version>
     <sip-api-version>1.1</sip-api-version>
-    <cipango-version>1.0.0</cipango-version>
-    <wicket.version>1.4.6</wicket.version>
+    <cipango-version>2.0-SNAPSHOT</cipango-version>
+    <wicket.version>1.4.12</wicket.version>
     <slf4j.version>1.4.0</slf4j.version>
     <scscf.home>${littleims.home}/S-CSCF</scscf.home>
     <pcscf.home>${littleims.home}/P-CSCF</pcscf.home>

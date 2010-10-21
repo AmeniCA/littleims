@@ -54,6 +54,7 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 	@SuppressWarnings("unchecked")
 	public ServiceProfileBrowserPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		String ifcName = pageParameters.getString("ifc");
 		
 		add(new BookmarkablePageLink("createLink", EditServiceProfilePage.class));
@@ -110,6 +111,7 @@ public class ServiceProfileBrowserPage extends ServiceProfilePage
 			_title = getString(getPrefix() + ".browser.title");
 		
 		add(new Label("title", _title));
+		setContextMenu(new ServicesContextPanel());
 	}
 	
 

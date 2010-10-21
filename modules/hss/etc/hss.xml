@@ -21,7 +21,7 @@
 	</bean>
 	
 	<bean id="diameterFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
-		<property name="attributeName" value="org.cipango.diameter.DiameterFactory" />
+		<property name="attributeName" value="org.cipango.diameter.api.DiameterFactory" />
 	</bean>
 	
 	<bean id="namingStrategy" class="org.cipango.ims.hss.util.CustomNamingStrategy"/>

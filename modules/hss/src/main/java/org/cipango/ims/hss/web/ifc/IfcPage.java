@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.ifc;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.IfcDao;
@@ -25,6 +26,11 @@ public abstract class IfcPage extends BasePage
 	@SpringBean
 	protected IfcDao _dao;
 		
+	public IfcPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
+	
 	protected String getPrefix()
 	{
 		return "ifc";

@@ -21,52 +21,60 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.ServiceProfile;
 
+public class DeleteServiceProfilePage extends ServiceProfilePage
+{
 
-public class DeleteServiceProfilePage extends ServiceProfilePage {
-	
 	@SuppressWarnings("unchecked")
-	public DeleteServiceProfilePage(PageParameters pageParameters) {
+	public DeleteServiceProfilePage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		ServiceProfile serviceProfile = _dao.findById(key);
-		if (serviceProfile == null) {
+		if (serviceProfile == null)
+		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
 					new MicroMap("name", key)));
 			goToBackPage(ServiceProfileBrowserPage.class);
 			return;
 		}
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(serviceProfile))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				serviceProfile))));
 
 		Form form = new Form("confirmForm");
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
 				ServiceProfile id = _dao.findById(key);
 
 				_dao.delete(id);
 
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(ServiceProfileBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(ServiceProfileBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
 		add(form);
-		
+
 		if (serviceProfile != null)
 			setContextMenu(new ContextPanel(serviceProfile));
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

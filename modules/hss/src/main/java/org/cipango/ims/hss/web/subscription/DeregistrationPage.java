@@ -63,6 +63,7 @@ public class DeregistrationPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public DeregistrationPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		Subscription subscription = getSubscription(pageParameters);
 		_key = subscription == null ? null : subscription.getName();
 

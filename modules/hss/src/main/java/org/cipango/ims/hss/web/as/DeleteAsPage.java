@@ -21,22 +21,25 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.ApplicationServer;
 
+public class DeleteAsPage extends AsPage
+{
 
-public class DeleteAsPage extends AsPage {
-	
 	@SuppressWarnings("unchecked")
-	public DeleteAsPage(PageParameters pageParameters) {
+	public DeleteAsPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		ApplicationServer applicationServer = _dao.findById(key);
-		if (applicationServer == null) {
+		if (applicationServer == null)
+		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
 					new MicroMap("name", key)));
 			goToBackPage(AsBrowserPage.class);
 			return;
 		}
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(applicationServer))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				applicationServer))));
 
 		/*
 		 * Use a form to hold the buttons, but set the default form processing
@@ -45,20 +48,24 @@ public class DeleteAsPage extends AsPage {
 		 */
 		Form form = new Form("confirmForm");
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
 				ApplicationServer id = _dao.findById(key);
 
 				_dao.delete(id);
 
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(AsBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(AsBrowserPage.class);
 			}
@@ -70,7 +77,8 @@ public class DeleteAsPage extends AsPage {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

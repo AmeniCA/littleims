@@ -15,6 +15,7 @@ package org.cipango.littleims.scscf.cx;
 
 import java.io.IOException;
 
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.URI;
 
@@ -22,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.DiameterCommand;
-import org.cipango.diameter.DiameterFactory;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterFactory;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Cx.ServerAssignmentType;
 import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
@@ -84,12 +85,13 @@ public class CxManager
 		_scscfName = scscfName;
 	}
 
-	private DiameterRequest newRequest(DiameterCommand command, String publicUserIdentity, 
+	private DiameterServletRequest newRequest(SipServletRequest sipRequest, DiameterCommand command, String publicUserIdentity, 
 			String privateUserId)
 	{
-		DiameterRequest request =  _diameterFactory.createRequest(Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
+		SipApplicationSession session = sipRequest == null ? null : sipRequest.getApplicationSession();
+		DiameterServletRequest request =  _diameterFactory.createRequest(session, Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
 		if (privateUserId != null)
-			request.add(Base.USER_NAME, privateUserId);
+			request.add(Common.USER_NAME, privateUserId);
 		request.add(Cx.PUBLIC_IDENTITY, publicUserIdentity);
 		request.add(Cx.SERVER_NAME, _scscfName);
 		return request;
@@ -124,7 +126,7 @@ public class CxManager
 			privateId = authorization.getUsername();
 		else
 			privateId = URIHelper.extractPrivateIdentity(publicUserIdentity);
-		DiameterRequest mar = newRequest(Cx.MAR, publicUserIdentity.toString(), privateId);
+		DiameterServletRequest mar = newRequest(request, Cx.MAR, publicUserIdentity.toString(), privateId);
 		mar.getAVPs().add(getSipAuthDataItem(authorization));
 		mar.add(Cx.SIP_NUMBER_AUTH_ITEMS, 1);
 		mar.setAttribute(SipServletRequest.class.getName(), request);
@@ -162,7 +164,7 @@ public class CxManager
 			UserDataAlreadyAvailable userDataAlreadyAvailable,
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest sar = newRequest(Cx.SAR, publicUserIdentity, privateUserId);
+		DiameterServletRequest sar = newRequest(request, Cx.SAR, publicUserIdentity, privateUserId);
 
 		// FIXME how detect if it is a wilcarded PSI or a wilcarded IMPU ?
 		if (wilcardPublicId != null)

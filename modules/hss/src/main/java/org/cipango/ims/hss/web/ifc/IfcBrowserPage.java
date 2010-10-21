@@ -38,6 +38,7 @@ import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.web.as.ContextPanel;
 import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
+import org.cipango.ims.hss.web.serviceprofile.ServicesContextPanel;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 
 public class IfcBrowserPage extends IfcPage
@@ -50,6 +51,7 @@ public class IfcBrowserPage extends IfcPage
 	@SuppressWarnings("unchecked")
 	public IfcBrowserPage(PageParameters pageParameters)
 	{		
+		super(pageParameters);
 		String asName = pageParameters.getString("applicationServer");
 		add(new BookmarkablePageLink("createLink", EditIfcPage.class));
 		
@@ -91,6 +93,7 @@ public class IfcBrowserPage extends IfcPage
 			_title = getString(getPrefix() + ".browser.title");
 		
 		add(new Label("title", _title));
+		setContextMenu(new ServicesContextPanel());
 	}
 
 	@Override

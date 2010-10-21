@@ -43,7 +43,7 @@
       
       <plugin>
         <groupId>org.cipango</groupId>
-        <artifactId>maven-cipango-plugin</artifactId>
+        <artifactId>cipango-maven-plugin</artifactId>
         <configuration>
           <systemPropertiesFile>../../littleims.properties</systemPropertiesFile>
           <systemProperties>
@@ -63,14 +63,16 @@
           <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
           <stopKey>foo</stopKey>
           <stopPort>9998</stopPort>
+          <annotationsEnabled>false</annotationsEnabled>
           <webAppConfig>
             <configurationClasses>
-              <configurationClasse>org.mortbay.jetty.webapp.WebInfConfiguration</configurationClasse>
-              <configurationClasse>org.mortbay.jetty.plus.webapp.EnvConfiguration</configurationClasse>
-              <configurationClasse>org.mortbay.jetty.webapp.WebXmlConfiguration</configurationClasse>
-              <configurationClasse>org.cipango.plugin.CipangoMavenConfiguration</configurationClasse>
-              <configurationClasse>org.mortbay.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
-              <configurationClasse>org.mortbay.jetty.webapp.TagLibConfiguration</configurationClasse>
+              <configurationClasse>org.mortbay.jetty.plugin.MavenWebInfConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
+              <configurationClasse>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClasse>
+              <configurationClasse>org.cipango.sipapp.SipXmlConfiguration</configurationClasse>
               <configurationClasse>org.cipango.diameter.app.DiameterConfiguration</configurationClasse>
             </configurationClasses>
             <contextPath>/</contextPath>
@@ -103,6 +105,11 @@
       <groupId>org.cipango</groupId>
       <artifactId>cipango-diameter</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango</groupId>
+      <artifactId>cipango-console</artifactId>
+      <classifier>jar</classifier>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

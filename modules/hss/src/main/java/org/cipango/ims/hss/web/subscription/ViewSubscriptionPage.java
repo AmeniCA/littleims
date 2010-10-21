@@ -49,6 +49,7 @@ public class ViewSubscriptionPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public ViewSubscriptionPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		Subscription subscription = getSubscription(pageParameters);
 		_key = (subscription == null) ? null : subscription.getName();
 		

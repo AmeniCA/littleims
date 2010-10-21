@@ -21,7 +21,6 @@ import java.util.Iterator;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RefreshingView;
@@ -33,6 +32,7 @@ import org.cipango.ims.hss.web.gba.UssBrowserPage;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.subscription.DeregistrationPage;
 import org.cipango.ims.hss.web.subscription.ViewSubscriptionPage;
+import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -43,18 +43,18 @@ public class ContextPanel extends Panel {
 		setOutputMarkupId(true);
 		if (privateIdentity.getSubscription() != null)
 		{
-			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getName())));
-			add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
+			add(new AutolinkBookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class, new PageParameters("id=" + privateIdentity.getSubscription().getName())));
+			add(new AutolinkBookmarkablePageLink("deregistrationLink", DeregistrationPage.class, 
 					new PageParameters("id=" + privateIdentity.getSubscription().getName())));
 		}
 		else
 		{
-			add(new BookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class).setVisible(false));
-			add(new BookmarkablePageLink("deregistrationLink", DeregistrationPage.class)).setVisible(false);
+			add(new AutolinkBookmarkablePageLink("subscriptionLink", ViewSubscriptionPage.class).setVisible(false));
+			add(new AutolinkBookmarkablePageLink("deregistrationLink", DeregistrationPage.class)).setVisible(false);
 		}
-		add(new BookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-		add(new BookmarkablePageLink("deleteLink", DeletePrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-		add(new BookmarkablePageLink("gbaLink", UssBrowserPage.class,
+		add(new AutolinkBookmarkablePageLink("editLink", EditPrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
+		add(new AutolinkBookmarkablePageLink("deleteLink", DeletePrivateIdPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
+		add(new AutolinkBookmarkablePageLink("gbaLink", UssBrowserPage.class,
 				new PageParameters("privateId=" + privateIdentity.getIdentity())));		
 		add(new RefreshingView("publicIds", new Model((Serializable) privateIdentity.getPublicIds())){
 
@@ -75,15 +75,15 @@ public class ContextPanel extends Panel {
 			@Override
 			protected void populateItem(Item item)
 			{
-				MarkupContainer link = new BookmarkablePageLink("identity", 
+				MarkupContainer link = new AutolinkBookmarkablePageLink("identity", 
 						EditPublicUserIdPage.class, 
 						new PageParameters("id=" + item.getModelObject()));
 				item.add(link);
 				link.add(new Label("name", item.getModel()));
 			}
 		});
-		add(new BookmarkablePageLink("editPublicIdsLink", EditPublicIdsPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
-		add(new BookmarkablePageLink("newPublicIdLink", EditPublicUserIdPage.class, new PageParameters("privateId=" + privateIdentity.getIdentity())));
+		add(new AutolinkBookmarkablePageLink("editPublicIdsLink", EditPublicIdsPage.class, new PageParameters("id=" + privateIdentity.getIdentity())));
+		add(new AutolinkBookmarkablePageLink("newPublicIdLink", EditPublicUserIdPage.class, new PageParameters("privateId=" + privateIdentity.getIdentity())));
 	}
 
 

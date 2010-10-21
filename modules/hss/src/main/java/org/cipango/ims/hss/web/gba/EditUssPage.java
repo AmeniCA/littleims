@@ -58,6 +58,7 @@ public class EditUssPage extends UssPage
 	@SuppressWarnings("unchecked")
 	public EditUssPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		String sKey = pageParameters.getString("id");
 		PrivateIdentity privateIdentity = null;
 		if (sKey != null)

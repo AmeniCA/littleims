@@ -15,7 +15,6 @@ package org.cipango.littleims.scscf.session;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipFactory;
@@ -23,8 +22,8 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.DiameterRequest;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletRequest;
 import org.cipango.littleims.scscf.charging.CDF;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.Registrar;
@@ -60,9 +59,9 @@ public interface SessionManager
 	
 	public Session getSession(String odi);
 	
-	public void handleSaa(DiameterAnswer saa);
+	public void handleSaa(DiameterServletAnswer saa);
 	
-	public void handlePpr(DiameterRequest ppr);
+	public void handlePpr(DiameterServletRequest ppr);
 	
 	public MessageSender getMessageSender();
 

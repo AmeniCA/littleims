@@ -66,6 +66,7 @@ public class EditPublicUserIdPage extends PublicIdentityPage
 	@SuppressWarnings("unchecked")
 	public EditPublicUserIdPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		_privateIdKey = pageParameters.getString("privateId");
 		PublicIdentity publicIdentity = null;

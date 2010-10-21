@@ -36,27 +36,22 @@ import org.cipango.ims.hss.db.IfcDao;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.ServiceProfile;
 
-
 public class EditIfcsPage extends ServiceProfilePage
 {
-
 
 	private String _key;
 	@SpringBean
 	private IfcDao _ifcDao;
-	
-	private enum Action 
+
+	private enum Action
 	{
-		REMOVE_FROM_IFC,
-		REMOVE_FROM_SHARED,
-		ADD_TO_IFC,
-		ADD_TO_SHARED,
-		MOVE_TO_IFC,
-		MOVE_TO_SHARED;
+		REMOVE_FROM_IFC, REMOVE_FROM_SHARED, ADD_TO_IFC, ADD_TO_SHARED, MOVE_TO_IFC, MOVE_TO_SHARED;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public EditIfcsPage(PageParameters pageParameters) {
+	public EditIfcsPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		ServiceProfile serviceProfile = _dao.findById(_key);
 
@@ -68,9 +63,9 @@ public class EditIfcsPage extends ServiceProfilePage
 		}
 		else
 			setContextMenu(new ContextPanel(serviceProfile));
-					
+
 		add(new Label("title", getTitle()));
-		
+
 		Form form = new Form("form");
 		form.setOutputMarkupId(true);
 		add(form);
@@ -78,90 +73,94 @@ public class EditIfcsPage extends ServiceProfilePage
 		addAvailable(form, serviceProfile);
 		addUsed(form, serviceProfile);
 		addShared(form, serviceProfile);
-		
+
 	}
-	
-	@SuppressWarnings({"unchecked" })
+
+	@SuppressWarnings(
+	{ "unchecked" })
 	private void addAvailable(Form form, ServiceProfile serviceProfile)
 	{
-		form.add(new AjaxFallbackButton("useAsIFC", form) {
+		form.add(new AjaxFallbackButton("useAsIFC", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, Action.ADD_TO_IFC);
 			}
 		});
-		form.add(new AjaxFallbackButton("useAsShared", form) {
+		form.add(new AjaxFallbackButton("useAsShared", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, Action.ADD_TO_SHARED);
 			}
 		});
-		form.add(new ListMultipleChoice(
-				"available",  
-				new Model(new ArrayList()),
-				new Model((Serializable) _dao.getAvailableIfc(serviceProfile))));
+		form.add(new ListMultipleChoice("available", new Model(new ArrayList()), new Model(
+				(Serializable) _dao.getAvailableIfc(serviceProfile))));
 	}
-	
-	@SuppressWarnings({"unchecked" })
+
+	@SuppressWarnings(
+	{ "unchecked" })
 	private void addUsed(Form form, ServiceProfile serviceProfile)
 	{
-		form.add(new AjaxFallbackButton("leave", form) {
+		form.add(new AjaxFallbackButton("leave", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
-				apply(target, form1, Action.REMOVE_FROM_IFC);			
+				apply(target, form1, Action.REMOVE_FROM_IFC);
 			}
 		});
-		
-		form.add(new AjaxFallbackButton("moveToShared", form) {
+
+		form.add(new AjaxFallbackButton("moveToShared", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
-				apply(target, form1, Action.MOVE_TO_SHARED);			
+				apply(target, form1, Action.MOVE_TO_SHARED);
 			}
 		});
-		
+
 		List used = new ArrayList();
 		if (serviceProfile != null)
 		{
 			Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs(false).iterator();
-			while (it.hasNext()) {
+			while (it.hasNext())
+			{
 				used.add(it.next().getName());
-			}	
+			}
 		}
-		form.add(new ListMultipleChoice(
-				"used", 
-				new Model(new ArrayList()),
-				new Model((Serializable) used)));
+		form.add(new ListMultipleChoice("used", new Model(new ArrayList()), new Model((Serializable) used)));
 	}
-	
-	@SuppressWarnings({"unchecked" })
+
+	@SuppressWarnings(
+	{ "unchecked" })
 	private void addShared(Form form, ServiceProfile serviceProfile)
 	{
 		List shared = new ArrayList();
 		if (serviceProfile != null)
 		{
 			Iterator<InitialFilterCriteria> it = serviceProfile.getIfcs(true).iterator();
-			while (it.hasNext()) {
+			while (it.hasNext())
+			{
 				shared.add(it.next().getName());
-			}	
+			}
 		}
-		form.add(new ListMultipleChoice(
-				"shared", 
-				new Model(new ArrayList()),
+		form.add(new ListMultipleChoice("shared", new Model(new ArrayList()),
 				new Model((Serializable) shared)));
-		
-		form.add(new AjaxFallbackButton("moveToIFC", form) {
+
+		form.add(new AjaxFallbackButton("moveToIFC", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
 				apply(target, form1, Action.MOVE_TO_IFC);
 			}
 		});
-		
-		form.add(new AjaxFallbackButton("sharedLeave", form) {
+
+		form.add(new AjaxFallbackButton("sharedLeave", form)
+		{
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form1)
 			{
@@ -169,15 +168,15 @@ public class EditIfcsPage extends ServiceProfilePage
 			}
 		});
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void apply(AjaxRequestTarget target, Form<?> form1, Action action)
 	{
 		AbstractChoice available = (AbstractChoice) form1.get("available");
 		AbstractChoice used = (AbstractChoice) form1.get("used");
 		AbstractChoice shared = (AbstractChoice) form1.get("shared");
-		
-		Iterator it; 
+
+		Iterator it;
 		List choosen;
 		switch (action)
 		{
@@ -199,12 +198,13 @@ public class EditIfcsPage extends ServiceProfilePage
 		default:
 			throw new IllegalStateException("Unknown action " + action);
 		}
-		
+
 		ServiceProfile profile = _dao.findById(_key);
 
 		ListView ifcs = (ListView) getPage().get("contextMenu:ifcs");
 		Collection<String> contextModel = (Collection<String>) ifcs.getDefaultModelObject();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			String ifcName = (String) it.next();
 			InitialFilterCriteria ifc = _ifcDao.findById(ifcName);
 			try
@@ -240,16 +240,16 @@ public class EditIfcsPage extends ServiceProfilePage
 				}
 				choosen.remove(ifcName);
 			}
-			catch (HssException e) 
+			catch (HssException e)
 			{
 				error(e.getMessage());
 			}
 			it.remove();
 		}
 		_dao.save(profile);
-		
+
 		getCxManager().profileUpdated(profile);
-				
+
 		if (target != null)
 		{
 			target.addComponent(form1);
@@ -258,10 +258,10 @@ public class EditIfcsPage extends ServiceProfilePage
 			target.addComponent(getPage().get("pprPanel").setVisible(true));
 		}
 	}
-	
-	
+
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".ifcs.title", new DaoDetachableModel(_key));
 	}
 }

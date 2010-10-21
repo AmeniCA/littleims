@@ -13,12 +13,11 @@
 // ========================================================================
 package org.cipango.ims.hss.web.scscf;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.cipango.diameter.ims.SCSCF;
 import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.model.Scscf;
-import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.hss.web.BasePage;
 
 public abstract class ScscfPage extends BasePage
@@ -27,6 +26,11 @@ public abstract class ScscfPage extends BasePage
 	@SpringBean
 	protected ScscfDao _dao;
 		
+	public ScscfPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
+	
 	protected String getPrefix()
 	{
 		return "scscf";

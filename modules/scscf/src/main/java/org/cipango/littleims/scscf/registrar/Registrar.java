@@ -36,14 +36,14 @@ import javax.servlet.sip.URI;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
-import org.cipango.diameter.ims.Sh;
 import org.cipango.diameter.ims.Cx.ReasonCode;
 import org.cipango.diameter.ims.Cx.ServerAssignmentType;
 import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
+import org.cipango.diameter.ims.Sh;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.cx.data.userprofile.TPublicIdentity;
 import org.cipango.littleims.cx.data.userprofile.TServiceProfile;
@@ -245,7 +245,7 @@ public class Registrar
 	 * </pre>
 	 * @param saa
 	 */
-	public void handleSaa(DiameterAnswer saa)
+	public void handleSaa(DiameterServletAnswer saa)
 	{
 		SipServletRequest request = (SipServletRequest) saa.getRequest().getAttribute(SipServletRequest.class.getName());
 		if (request == null)
@@ -263,7 +263,7 @@ public class Registrar
 				return;
 			}
 			
-			String privateUserIdentity = saa.getRequest().get(Base.USER_NAME);
+			String privateUserIdentity = saa.getRequest().get(Common.USER_NAME);
 
 			URI aor = getAor(request);
 			RegistrationInfo regInfo;	
@@ -742,7 +742,7 @@ public class Registrar
 	}
 	
 	
-	public void handleRtr(DiameterRequest rtr) throws IOException, ServletException
+	public void handleRtr(DiameterServletRequest rtr) throws IOException, ServletException
 	{
 		// Deregister + send NOTIFY + send third party register
 		Iterator<AVP<String>> it = rtr.getAVPs().getAVPs(Cx.PUBLIC_IDENTITY);
@@ -760,10 +760,10 @@ public class Registrar
 			contactEvent = ContactEvent.REJECTED;
 			break;
 		default:
-			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
+			DiameterServletAnswer answer = rtr.createAnswer(Common.DIAMETER_MISSING_AVP);
 			AVPList l = new AVPList();
 			l.add(Cx.DERISTRATION_REASON, new AVPList());
-			answer.getAVPs().add(new AVP<AVPList>(Base.FAILED_AVP, l));
+			answer.getAVPs().add(new AVP<AVPList>(Common.FAILED_AVP, l));
 			answer.send();
 			return;
 		}
@@ -866,19 +866,19 @@ public class Registrar
 				_regContexts.remove(publicId);
 			}
 		}
-		DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_SUCCESS);
+		DiameterServletAnswer answer = rtr.createAnswer(Common.DIAMETER_SUCCESS);
 		answer.send();
 	}
 	
-	private List<String> getPrivateIdentities(DiameterRequest rtr) throws IOException
+	private List<String> getPrivateIdentities(DiameterServletRequest rtr) throws IOException
 	{
-		String privateIdentity = rtr.get(Base.USER_NAME);
+		String privateIdentity = rtr.get(Common.USER_NAME);
 		if (privateIdentity == null)
 		{
-			DiameterAnswer answer = rtr.createAnswer(Base.DIAMETER_MISSING_AVP);
+			DiameterServletAnswer answer = rtr.createAnswer(Common.DIAMETER_MISSING_AVP);
 			AVPList l = new AVPList();
-			l.add(Base.USER_NAME, "");
-			answer.add(Base.FAILED_AVP, l);
+			l.add(Common.USER_NAME, "");
+			answer.add(Common.FAILED_AVP, l);
 			answer.send();
 			return null;
 		}
@@ -888,14 +888,14 @@ public class Registrar
 		AVPList associatedIdentites = rtr.get(Cx.ASSOCIATED_IDENTITIES);
 		if (associatedIdentites != null)
 		{
-			Iterator<AVP<String>> it = associatedIdentites.getAVPs(Base.USER_NAME);
+			Iterator<AVP<String>> it = associatedIdentites.getAVPs(Common.USER_NAME);
 			while (it.hasNext())
 				privateIds.add(it.next().toString());
 		}
 		return privateIds;
 	}
 	
-	private ReasonCode getDeregistrationReason(DiameterRequest rtr)
+	private ReasonCode getDeregistrationReason(DiameterServletRequest rtr)
 	{
 		AVPList avpList = rtr.get(Cx.DERISTRATION_REASON);
 		if (avpList == null)

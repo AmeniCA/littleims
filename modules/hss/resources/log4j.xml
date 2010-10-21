@@ -25,19 +25,16 @@
 
 
   <category name="org.cipango.ims">
-    <param name="additivity" value="false"/>
     <priority value="debug"/>
-    <appender-ref ref="console"/>
-    <appender-ref ref="littleims"/>
   </category>
   
-  <category name="org.mortbay.log">
-    <param name="additivity" value="false"/>
+  <category name="org.eclipse.jetty.util.log">
     <priority value="info"/>
-    <appender-ref ref="console"/>
-    <appender-ref ref="littleims"/>
   </category>
   
+  <category name="console">
+    <priority value="info"/>
+  </category>
   
   <root>
     <priority value="warn"/>

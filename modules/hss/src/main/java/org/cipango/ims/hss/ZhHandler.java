@@ -16,9 +16,9 @@ package org.cipango.ims.hss;
 import java.util.Iterator;
 
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Sh;
 import org.cipango.diameter.ims.Zh;
@@ -40,12 +40,12 @@ public class ZhHandler
 	private Hss _hss;
 
 	@Transactional
-	public void doMar(DiameterRequest mar) throws Exception
+	public void doMar(DiameterServletRequest mar) throws Exception
 	{
 		AVPList avps = mar.getAVPs();
 
 		PrivateIdentity privateIdentity;
-		String impi = mar.get(Base.USER_NAME);
+		String impi = mar.get(Common.USER_NAME);
 		String impu = mar.get(Cx.PUBLIC_IDENTITY);
 		if (impi == null)
 		{
@@ -75,8 +75,8 @@ public class ZhHandler
 		
 		AVPList sadi =  avps.getValue(Cx.SIP_AUTH_DATA_ITEM);
 		
-		DiameterAnswer answer = mar.createAnswer(Base.DIAMETER_SUCCESS);
-		answer.add(Base.USER_NAME, impi);
+		DiameterServletAnswer answer = mar.createAnswer(Common.DIAMETER_SUCCESS);
+		answer.add(Common.USER_NAME, impi);
 		if (impu != null)
 			answer.add(Cx.PUBLIC_IDENTITY, impu);
 		

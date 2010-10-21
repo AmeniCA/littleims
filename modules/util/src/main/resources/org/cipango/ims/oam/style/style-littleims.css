@@ -1,0 +1,64 @@
+
+
+#loginPanel { width:400px; font-size:16px; padding: 4px; background:#ECF2F6; margin:20px 0 0; text-align:left;}
+#loginPanel div {padding: 4px; }
+#loginPanel .label { width:150px; text-align:right; float:left; margin:0 4px 0 0;}
+#loginPanel .title { font-size:20px; text-align:center;}
+#loginPanel .button { text-align:center; padding: 10px; }
+
+.feedbackPanelERROR { color:#FF0000; }
+.feedbackPanelWARNING { color:#FF0000; }
+.feedbackPanelINFO { }
+.feedback li {list-style: none;}
+
+table.filteredTable tr th a { padding-right: 15px; background-position: right; background-repeat:no-repeat; }
+table.filteredTable tr th.wicket_orderDown a { background-image: url(../images/arrow_down.png);}
+table.filteredTable tr th.wicket_orderUp a { background-image: url(../images/arrow_up.png);}
+table.filteredTable tr th.wicket_orderNone a { background-image: url(../images/arrow_off.png);}
+table.filteredTable tr th a span { margin-right:10px;}
+
+.filter { background-color:#fffff0; border:1px solid #BBBBBB; padding:5px 30px;}
+.filter li {list-style: none; display: inline; padding: 30px;}
+
+.editUserGroup div { display:inline; padding:10px 40px; float:left;}
+.editUserGroup div li {list-style: none; padding:5px; text-align:center;}
+
+
+.longInput {width:20em; }
+
+#bysy_indicator {
+  display: none;
+  background: rgb(255,241,168);
+  margin-top: 5px;
+  z-index: 1000;
+  width: 200;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
+.elementPanel { 
+    width:700px;
+    border-color:#BBBBBB;
+    border-style:dashed;
+    border-width:0pt 1px 1px;
+    margin:10px 0px 0pt 0pt;
+}
+.elementPanel .title { background-color: #CCCCCC; padding:4px;}
+.elementPanel .title .hideLink { float:right; text-decoration:underline; color:#003399;}
+.elementPanel .title a { float:none; text-decoration:none; color:#000000;}
+.elementPanel .body {padding:4px;}
+.elementPanel .body a { float:none;}
+.elementPanel .body ul {padding:0px 10px;}
+.elementPanel .body ul li {list-style-type:none; }
+
+/* Autocomplete field */
+div.wicket-aa { font-family: "Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; font-size: 12px;
+                 background-color: white; border-width: 1px; border-color: #cccccc; border-style: solid;
+                 padding: 2px; margin: 1px 0 0 0; text-align:left; }
+div.wicket-aa ul { list-style:none; padding: 2px; margin:0; }
+div.wicket-aa ul li.selected { background-color: #FFFF00; padding: 2px; margin:0; }
+
+.pprPanel .details { background:#FFFFFF; position: absolute; left: -999em; padding: 5px;}
+.pprPanel:hover .details{ left: auto; }
+.pprPanel:sfhover .details{ left: auto; }

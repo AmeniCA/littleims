@@ -26,6 +26,7 @@ public class DeletePrivateIdPage extends PrivateIdentityPage {
 	
 	@SuppressWarnings("unchecked")
 	public DeletePrivateIdPage(PageParameters pageParameters) {
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		PrivateIdentity privateIdentity = _dao.findById(key);
 		if (privateIdentity == null) {

@@ -21,22 +21,25 @@ import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.model.AdminUser;
 
+public class DeleteAdminUserPage extends AdminUserPage
+{
 
-public class DeleteAdminUserPage extends AdminUserPage {
-	
 	@SuppressWarnings("unchecked")
-	public DeleteAdminUserPage(PageParameters pageParameters) {
+	public DeleteAdminUserPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
 		final String key = pageParameters.getString("id");
 		AdminUser adminUser = _dao.findById(key);
-		if (adminUser == null) {
+		if (adminUser == null)
+		{
 			error(MapVariableInterpolator.interpolate(getString(getPrefix() + ".error.notFound"),
 					new MicroMap("name", key)));
 			goToBackPage(AdminUserBrowserPage.class);
 			return;
 		}
 
-		add(new Label("delete.confirm", 
-				getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(adminUser))));
+		add(new Label("delete.confirm", getString(getPrefix() + ".delete.confirm", new DaoDetachableModel(
+				adminUser))));
 
 		/*
 		 * Use a form to hold the buttons, but set the default form processing
@@ -45,20 +48,24 @@ public class DeleteAdminUserPage extends AdminUserPage {
 		 */
 		Form form = new Form("confirmForm");
 
-		form.add(new Button("delete") {
-			public void onSubmit() {
+		form.add(new Button("delete")
+		{
+			public void onSubmit()
+			{
 				AdminUser id = _dao.findById(key);
 
 				_dao.delete(id);
 
 				getSession().info(getString(getPrefix() + ".delete.done", new DaoDetachableModel(id)));
-				
+
 				goToBackPage(AdminUserBrowserPage.class);
 			}
 		}.setDefaultFormProcessing(false));
 
-		form.add(new Button("cancel") {
-			public void onSubmit() {
+		form.add(new Button("cancel")
+		{
+			public void onSubmit()
+			{
 				getSession().info(getString(getPrefix() + ".delete.canceled", new DaoDetachableModel(key)));
 				goToBackPage(AdminUserBrowserPage.class);
 			}
@@ -70,7 +77,8 @@ public class DeleteAdminUserPage extends AdminUserPage {
 	}
 
 	@Override
-	public String getTitle() {
+	public String getTitle()
+	{
 		return getString(getPrefix() + ".delete.title");
 	}
 }

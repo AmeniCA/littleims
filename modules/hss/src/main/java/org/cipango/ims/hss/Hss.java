@@ -22,16 +22,16 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
-import org.cipango.diameter.DiameterAnswer;
-import org.cipango.diameter.DiameterRequest;
 import org.cipango.diameter.ResultCode;
 import org.cipango.diameter.Type;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterServletAnswer;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
-import org.cipango.diameter.ims.Sh;
 import org.cipango.diameter.ims.Cx.ServerAssignmentType;
 import org.cipango.diameter.ims.Cx.UserAuthorizationType;
 import org.cipango.diameter.ims.Cx.UserDataAlreadyAvailable;
+import org.cipango.diameter.ims.Sh;
 import org.cipango.ims.AuthenticationScheme;
 import org.cipango.ims.hss.auth.AkaAuthenticationVector;
 import org.cipango.ims.hss.auth.AuthenticationVector;
@@ -42,15 +42,15 @@ import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.diameter.DiameterException;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.RegistrationState;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
-import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.littleims.util.HexString;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +72,7 @@ public class Hss
 	}
 	
 	@Transactional
-	public void doLir(DiameterRequest lir) throws Exception
+	public void doLir(DiameterServletRequest lir) throws Exception
 	{
 		AVPList avps = lir.getAVPs();
 		String impu = getMandatoryAVP(avps, Cx.PUBLIC_IDENTITY);
@@ -90,7 +90,7 @@ public class Hss
 			if (psi.getApplicationServer() != null
 					&& avps.get(Cx.ORIGININATING_REQUEST) == null)
 			{
-				DiameterAnswer lia = lir.createAnswer(Base.DIAMETER_SUCCESS);
+				DiameterServletAnswer lia = lir.createAnswer(Common.DIAMETER_SUCCESS);
 				lia.add(Cx.SERVER_NAME, psi.getApplicationServer().getServerName());
 				lia.send();
 				return;
@@ -114,7 +114,7 @@ public class Hss
 				{
 					scscf = _scscfDao.findAvailableScscf();
 					if (scscf == null)
-						throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+						throw new DiameterException(Common.DIAMETER_UNABLE_TO_COMPLY, 
 								"Coud not found any available SCSCF for public identity: " 
 								+ publicIdentity.getIdentity());
 					publicIdentity.setScscf(scscf);
@@ -126,7 +126,7 @@ public class Hss
 				return;
 			}
 		}
-		DiameterAnswer lia = lir.createAnswer(Base.DIAMETER_SUCCESS);
+		DiameterServletAnswer lia = lir.createAnswer(Common.DIAMETER_SUCCESS);
 		lia.add(Cx.SERVER_NAME, scscf.getUri());
 		if (publicIdentity.getIdentityType() == IdentityType.WILDCARDED_IMPU)
 			lia.add(Cx.WILCARDED_IMPU, publicIdentity.getIdentity());
@@ -139,13 +139,13 @@ public class Hss
 	
 	
 	@Transactional
-	public void doUar(DiameterRequest uar) throws Exception
+	public void doUar(DiameterServletRequest uar) throws Exception
 	{
 		AVPList avps = uar.getAVPs();
 		
 		String impu = getMandatoryAVP(avps, Cx.PUBLIC_IDENTITY);
 
-		String impi = getMandatoryAVP(avps, Base.USER_NAME);
+		String impi = getMandatoryAVP(avps, Common.USER_NAME);
 		PrivateIdentity privateIdentity = _privateIdentityDao.findById(impi);
 		
 		if (privateIdentity == null)
@@ -177,7 +177,7 @@ public class Hss
 					__log.debug("LIR: publicIdentity " + publicIdentity.getIdentity() 
 							+ " is barred, emergency flag is not set and all associated " +
 									"public identities are barred, so send DIAMETER_AUTHORIZATION_REJECTED.");
-					throw new DiameterException(Base.DIAMETER_AUTHORIZATION_REJECTED);
+					throw new DiameterException(Common.DIAMETER_AUTHORIZATION_REJECTED);
 				}
 			}
 		}
@@ -197,7 +197,7 @@ public class Hss
 		}
 		
 		Subscription subscription = privateIdentity.getSubscription();
-		DiameterAnswer answer;
+		DiameterServletAnswer answer;
 		Short state = publicIdentity.getState();	
 		if (State.REGISTERED == state)
 		{
@@ -208,7 +208,7 @@ public class Hss
 			else
 			{
 				// case UserAuthorizationType.DE_REGISTRATION
-				answer = uar.createAnswer(Base.DIAMETER_SUCCESS);
+				answer = uar.createAnswer(Common.DIAMETER_SUCCESS);
 			}
 			answer.add(Cx.SERVER_NAME, subscription.getScscf().getUri());
 		}
@@ -221,7 +221,7 @@ public class Hss
 			else
 			{
 				// case UserAuthorizationType.DE_REGISTRATION
-				answer = uar.createAnswer(Base.DIAMETER_SUCCESS);
+				answer = uar.createAnswer(Common.DIAMETER_SUCCESS);
 			}
 			answer.add(Cx.SERVER_NAME, subscription.getScscf().getUri());
 		}
@@ -241,7 +241,7 @@ public class Hss
 				{
 					Scscf scscf = _scscfDao.findAvailableScscf();
 					if (scscf == null)
-						throw new DiameterException(Base.DIAMETER_UNABLE_TO_COMPLY, 
+						throw new DiameterException(Common.DIAMETER_UNABLE_TO_COMPLY, 
 								"Coud not found any available SCSCF for public identity: " 
 								+ publicIdentity.getIdentity());
 
@@ -258,11 +258,11 @@ public class Hss
 	
 	
 	@Transactional
-	public void doMar(DiameterRequest mar) throws Exception
+	public void doMar(DiameterServletRequest mar) throws Exception
 	{
 		AVPList avps = mar.getAVPs();
 		
-		String impi = getMandatoryAVP(avps, Base.USER_NAME);
+		String impi = getMandatoryAVP(avps, Common.USER_NAME);
 		
 		String impu = getMandatoryAVP(avps, Cx.PUBLIC_IDENTITY);
 
@@ -284,8 +284,8 @@ public class Hss
 			throw new DiameterException(Cx.DIAMETER_ERROR_AUTH_SCHEME_NOT_SUPPORTED, 
 					"Unknown scheme: " + s);
 
-		DiameterAnswer answer = mar.createAnswer(Base.DIAMETER_SUCCESS);
-		answer.getAVPs().add(Base.USER_NAME, impi);
+		DiameterServletAnswer answer = mar.createAnswer(Common.DIAMETER_SUCCESS);
+		answer.getAVPs().add(Common.USER_NAME, impi);
 		
 		if (publicIdentity.getIdentityType() == IdentityType.WILDCARDED_IMPU)
 			answer.add(Cx.WILCARDED_IMPU, publicIdentity.getIdentity());
@@ -344,12 +344,12 @@ public class Hss
 	}
 	
 	@Transactional
-	public void doSar(DiameterRequest sar) throws Exception 
+	public void doSar(DiameterServletRequest sar) throws Exception 
 	{
 		// See 3GPP TS 29-228 §6.1.2.1
 		AVPList avps = sar.getAVPs();
 		
-		String impi = avps.getValue(Base.USER_NAME);
+		String impi = avps.getValue(Common.USER_NAME);
 		
 		String impu = getMandatoryAVP(avps, Cx.PUBLIC_IDENTITY);
 		
@@ -412,7 +412,7 @@ public class Hss
 			throw DiameterException.newMissingDiameterAvp(Cx.PUBLIC_IDENTITY);
 		
 		if (impi == null && serverAssignmentType != ServerAssignmentType.UNREGISTERED_USER)
-			throw DiameterException.newMissingDiameterAvp(Base.USER_NAME);
+			throw DiameterException.newMissingDiameterAvp(Common.USER_NAME);
 		
 			
 		String serverName = getMandatoryAVP(avps, Cx.SERVER_NAME);
@@ -425,7 +425,7 @@ public class Hss
 			throw new DiameterException(Cx.DIAMETER_ERROR_USER_UNKNOWN, 
 					"The PSI: " + publicIdentity.getIdentity() + " has PSI activation state set to inactive");
 		
-		DiameterAnswer answer = sar.createAnswer(Base.DIAMETER_SUCCESS);
+		DiameterServletAnswer answer = sar.createAnswer(Common.DIAMETER_SUCCESS);
 		Short state = publicIdentity.getState();
 		Scscf scscf = publicIdentity.getScscf();
 		switch (serverAssignmentType)
@@ -441,7 +441,7 @@ public class Hss
 			}
 
 			publicIdentity.updateState(impi, State.REGISTERED);
-			answer.getAVPs().add(Base.USER_NAME, impi);
+			answer.getAVPs().add(Common.USER_NAME, impi);
 			if (!userDataAlreadyAvailable)
 			{
 				String serviceProfile = publicIdentity.getImsSubscriptionAsXml(impi, impu, false);
@@ -469,7 +469,7 @@ public class Hss
 			if (State.NOT_REGISTERED == state || State.REGISTERED == state)
 				publicIdentity.updateState(impi, State.UNREGISTERED);
 			
-			answer.getAVPs().add(Base.USER_NAME, impi);
+			answer.getAVPs().add(Common.USER_NAME, impi);
 			
 			if (!userDataAlreadyAvailable)
 			{
@@ -542,7 +542,7 @@ public class Hss
 		for (String identity : privateIdentity.getSubscription().getPrivateIds())
 		{
 			if (!privateIdentity.getIdentity().equals(identity))
-				associatedIds.add(Base.USER_NAME, identity);
+				associatedIds.add(Common.USER_NAME, identity);
 		}
 		return associatedIds;
 	}
@@ -678,7 +678,7 @@ public class Hss
 		}
 	}
 	
-	public void doPpa(DiameterAnswer ppa)
+	public void doPpa(DiameterServletAnswer ppa)
 	{
 		ResultCode resultCode = ppa.getResultCode();
 		if (!resultCode.isSuccess())
@@ -688,7 +688,7 @@ public class Hss
 		}
 	}
 	
-	public void doRta(DiameterAnswer rta)
+	public void doRta(DiameterServletAnswer rta)
 	{
 		ResultCode resultCode = rta.getResultCode();
 		if (!resultCode.isSuccess())

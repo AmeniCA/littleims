@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.gba;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.UssDao;
@@ -24,6 +25,11 @@ public abstract class UssPage extends BasePage
 
 	@SpringBean
 	protected UssDao _dao;
+	
+	public UssPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
 	
 	protected String getPrefix()
 	{

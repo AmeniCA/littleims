@@ -37,6 +37,7 @@ public class EditServiceProfilePage extends ServiceProfilePage
 	@SuppressWarnings("unchecked")
 	public EditServiceProfilePage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		_copy = pageParameters.getBoolean("copy");
 		ServiceProfile serviceProfile = null;

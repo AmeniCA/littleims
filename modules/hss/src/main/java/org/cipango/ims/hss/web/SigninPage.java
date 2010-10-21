@@ -1,6 +1,9 @@
 package org.cipango.ims.hss.web;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.CSSPackageResource;
@@ -12,6 +15,7 @@ import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.db.AdminUserDao;
@@ -22,6 +26,8 @@ import org.cipango.ims.oam.SpringApplication;
 public class SigninPage extends WebPage
 {
 	private static final Logger __log = Logger.getLogger(SigninPage.class);
+	
+	public static final String REDIRECT_PAGE = "redirectPage";
 	
 	@SpringBean
 	private AdminUserDao _dao;
@@ -54,6 +60,21 @@ public class SigninPage extends WebPage
 		{
 			if (signIn(_login, _password))
 			{
+				HttpSession sesssion = ((WebRequest) getRequest()).getHttpServletRequest().getSession();
+				String redirect = (String) sesssion.getAttribute(REDIRECT_PAGE);
+				if (redirect != null)
+				{
+					sesssion.removeAttribute(REDIRECT_PAGE);
+					try
+					{
+						((WebResponse) getResponse()).getHttpServletResponse().sendRedirect(redirect);
+						setRedirect(false);
+					}
+					catch (IOException e)
+					{
+						__log.warn(e.getMessage(), e);
+					}
+				}
 				if (!continueToOriginalDestination())
 					setResponsePage(getApplication().getHomePage());
 			}

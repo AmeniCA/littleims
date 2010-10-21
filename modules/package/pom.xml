@@ -57,9 +57,6 @@
                            <include name="etc/sipdefault.xml"/>
                            <include name="etc/webdefault.xml"/>
                            <include name="LICENSES/"/>
-                           <exclude name="lib/jsp-2.0/"/>
-                           <exclude name="lib/jsp-2.1/"/>
-                           <exclude name="lib/management/mx4j/"/>
                          </patternset>
                        </fileset>
                      </copy>
@@ -68,6 +65,7 @@
                      <replace file="${scscf.home}/bin/scscf.sh" token="jetty.xml" value="cipango-scscf.xml"/>
                      <replace file="${scscf.home}/bin/scscf.sh" token="jetty.pid" value="littleims-scscf.pid"/>
                      <replace file="${scscf.home}/bin/scscf.sh" token="JETTY_HOME" value="SCSCF_HOME"/>
+                     <echo file="${scscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-scscf.xml</echo>
                     
                     <!--  P-CSCF -->
                     <copy todir="${pcscf.home}">
@@ -80,6 +78,7 @@
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.xml" value="cipango-pcscf.xml"/>
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.pid" value="littleims-pcscf.pid"/>
                      <replace file="${pcscf.home}/bin/pcscf.sh" token="JETTY_HOME" value="PCSCF_HOME"/>
+                     <echo file="${pcscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-pcscf.xml</echo>
                     
                     <!--  I-CSCF -->
                     <copy todir="${icscf.home}">
@@ -92,6 +91,7 @@
                      <replace file="${icscf.home}/bin/icscf.sh" token="jetty.xml" value="cipango-icscf.xml"/>
                      <replace file="${icscf.home}/bin/icscf.sh" token="jetty.pid" value="littleims-icscf.pid"/>
                      <replace file="${icscf.home}/bin/icscf.sh" token="JETTY_HOME" value="ICSCF_HOME"/>
+                     <echo file="${icscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-icscf.xml</echo>
                     
                     <!--  HSS -->
                     <copy todir="${hss.home}">
@@ -104,6 +104,7 @@
                      <replace file="${hss.home}/bin/hss.sh" token="jetty.xml" value="cipango-hss.xml"/>
                      <replace file="${hss.home}/bin/hss.sh" token="jetty.pid" value="littleims-hss.pid"/>
                      <replace file="${hss.home}/bin/hss.sh" token="JETTY_HOME" value="HSS_HOME"/>
+                     <echo file="${hss.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-hss.xml</echo>
                      
                      <copy todir="${littleims.home}">
                         <fileset dir="${basedir}/bin"/>

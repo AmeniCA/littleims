@@ -33,6 +33,7 @@ public class EditSubscriptionPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public EditSubscriptionPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		Subscription subscription = getSubscription(pageParameters);
 		_key = subscription == null ? null : subscription.getName();
 		

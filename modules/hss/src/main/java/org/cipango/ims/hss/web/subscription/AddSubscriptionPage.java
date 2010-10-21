@@ -55,6 +55,7 @@ public class AddSubscriptionPage extends SubscriptionPage
 	@SuppressWarnings("unchecked")
 	public AddSubscriptionPage()
 	{
+		super(null);
 		add(new Label("title", getTitle()));
 		Form form = new Form("form");
 		add(form);

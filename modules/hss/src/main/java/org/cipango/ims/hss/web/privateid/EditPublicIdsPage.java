@@ -50,7 +50,9 @@ public class EditPublicIdsPage extends PrivateIdentityPage
 	private PublicIdentityDao _publicIdentityDao;
 	
 	@SuppressWarnings("unchecked")
-	public EditPublicIdsPage(PageParameters pageParameters) {
+	public EditPublicIdsPage(PageParameters pageParameters) 
+	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		PrivateIdentity privateIdentity = _dao.findById(_key);
 

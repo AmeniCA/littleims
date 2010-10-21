@@ -37,6 +37,7 @@ public class EditAdminUserPage extends AdminUserPage
 	@SuppressWarnings("unchecked")
 	public EditAdminUserPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		AdminUser adminUser = null;
 		if (_key != null)

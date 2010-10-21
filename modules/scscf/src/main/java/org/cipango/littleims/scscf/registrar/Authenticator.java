@@ -17,13 +17,13 @@ import java.io.IOException;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.cipango.diameter.DiameterAnswer;
+import org.cipango.diameter.api.DiameterServletAnswer;
 
 public interface Authenticator
 {
 
 	public String authenticate(boolean proxy, SipServletRequest request) throws IOException;
 	
-	public void handleMaa(DiameterAnswer maa);
+	public void handleMaa(DiameterServletAnswer maa);
 
 }

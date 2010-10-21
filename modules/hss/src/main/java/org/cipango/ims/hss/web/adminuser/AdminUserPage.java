@@ -13,6 +13,7 @@
 // ========================================================================
 package org.cipango.ims.hss.web.adminuser;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.cipango.ims.hss.db.AdminUserDao;
@@ -25,6 +26,11 @@ public abstract class AdminUserPage extends BasePage
 	@SpringBean
 	protected AdminUserDao _dao;
 		
+	public AdminUserPage(PageParameters pageParameters)
+	{
+		super(pageParameters);
+	}
+	
 	protected String getPrefix()
 	{
 		return "adminUser";

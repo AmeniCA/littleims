@@ -39,6 +39,7 @@ public class ScscfBrowserPage extends ScscfPage
 	@SuppressWarnings("unchecked")
 	public ScscfBrowserPage()
 	{		
+		super(null);
 		add(new BookmarkablePageLink("createLink", EditScscfPage.class));
 		
 		IColumn[] columns = new IColumn[6];
@@ -76,6 +77,8 @@ public class ScscfBrowserPage extends ScscfPage
 				"name"), getItemByPage());
 		table.setOutputMarkupId(true);
 		add(table);
+		
+		setContextMenu(new NetworkContextPanel());
 	}
 
 	@Override

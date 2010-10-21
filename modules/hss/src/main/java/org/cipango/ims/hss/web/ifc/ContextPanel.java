@@ -15,11 +15,11 @@ package org.cipango.ims.hss.web.ifc;
 
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.web.serviceprofile.ServiceProfileBrowserPage;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
+import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 @SuppressWarnings("unchecked")
 public class ContextPanel extends Panel {
@@ -28,19 +28,19 @@ public class ContextPanel extends Panel {
 	public ContextPanel(InitialFilterCriteria ifc) {
 		super("contextMenu");
 		setOutputMarkupId(true);
-		add(new BookmarkablePageLink("editLink", EditIfcPage.class, 
+		add(new AutolinkBookmarkablePageLink("editLink", EditIfcPage.class, 
 				new PageParameters("id=" + ifc.getName())));
 		
-		add(new BookmarkablePageLink("deleteLink", DeleteIfcPage.class, 
+		add(new AutolinkBookmarkablePageLink("deleteLink", DeleteIfcPage.class, 
 				new PageParameters("id=" + ifc.getName())));
 		
-		add(new BookmarkablePageLink("editSptsLink", EditSptsPage.class, 
+		add(new AutolinkBookmarkablePageLink("editSptsLink", EditSptsPage.class, 
 				new PageParameters("id=" + ifc.getName())));
 		
-		add(new BookmarkablePageLink("viewLink", ViewIfcPage.class, 
+		add(new AutolinkBookmarkablePageLink("viewLink", ViewIfcPage.class, 
 				new PageParameters("id=" + ifc.getName())));
 		
-		add(new BookmarkablePageLink("serviceProfileLink", ServiceProfileBrowserPage.class, 
+		add(new AutolinkBookmarkablePageLink("serviceProfileLink", ServiceProfileBrowserPage.class, 
 				new PageParameters("ifc=" + ifc.getName())));
 	}
 

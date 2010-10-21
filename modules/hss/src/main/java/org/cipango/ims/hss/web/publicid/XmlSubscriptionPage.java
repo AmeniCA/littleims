@@ -15,6 +15,7 @@ public class XmlSubscriptionPage extends PublicIdentityPage
 	
 	public XmlSubscriptionPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		PublicIdentity publicIdentity = null;
 		if (_key != null)

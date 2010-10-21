@@ -29,6 +29,7 @@ public class ViewIfcPage extends IfcPage
 	@SuppressWarnings("unchecked")
 	public ViewIfcPage(PageParameters pageParameters)
 	{
+		super(pageParameters);
 		_key = pageParameters.getString("id");
 		InitialFilterCriteria ifc = null;
 		if (_key != null)

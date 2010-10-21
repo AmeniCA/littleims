@@ -22,7 +22,7 @@
 	</bean>
 	
 	<bean id="diameterFactory" class="org.springframework.web.context.support.ServletContextAttributeFactoryBean">
-		<property name="attributeName" value="org.cipango.diameter.DiameterFactory" />
+		<property name="attributeName" value="org.cipango.diameter.api.DiameterFactory" />
 	</bean>
 	
 	<bean id="messageSender" class="org.cipango.littleims.scscf.util.MessageSender">

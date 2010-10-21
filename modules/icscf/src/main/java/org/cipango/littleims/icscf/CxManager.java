@@ -19,9 +19,9 @@ import javax.servlet.sip.SipServletRequest;
 
 import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterCommand;
-import org.cipango.diameter.DiameterFactory;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterFactory;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Cx.OriginatingRequest;
 import org.cipango.diameter.ims.Cx.UserAuthorizationType;
@@ -64,12 +64,13 @@ public class CxManager
 		_hssHost = hssHost;
 	}
 
-	private DiameterRequest newRequest(DiameterCommand command, String publicUserIdentity, 
+	private DiameterServletRequest newRequest(SipServletRequest sipRequest, DiameterCommand command, String publicUserIdentity, 
 			String privateUserId)
 	{
-		DiameterRequest request =  _diameterFactory.createRequest(Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
+		DiameterServletRequest request =  _diameterFactory.createRequest(sipRequest.getApplicationSession(),
+				Cx.CX_APPLICATION_ID, command, _hssRealm, _hssHost);
 		if (privateUserId != null)
-			request.add(Base.USER_NAME, privateUserId);
+			request.add(Common.USER_NAME, privateUserId);
 		request.add(Cx.PUBLIC_IDENTITY, publicUserIdentity);
 		request.add(Cx.SERVER_NAME, _icscfName);
 		return request;
@@ -103,7 +104,7 @@ public class CxManager
 			UserAuthorizationType userAuthorizationType, 
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest uar = newRequest(Cx.UAR, publicUserIdentity, privateUserId);
+		DiameterServletRequest uar = newRequest(request, Cx.UAR, publicUserIdentity, privateUserId);
 		uar.add(Cx.USER_AUTHORIZATION_TYPE, userAuthorizationType);
 		if (visitednetworkId != null)
 			uar.add(Cx.VISITED_NETWORK_IDENTIFIER, visitednetworkId.getBytes());
@@ -137,7 +138,7 @@ public class CxManager
 			UserAuthorizationType userAuthorizationType,
 			SipServletRequest request) throws IOException
 	{
-		DiameterRequest lir = newRequest(Cx.LIR, publicUserIdentity, null);
+		DiameterServletRequest lir = newRequest(request, Cx.LIR, publicUserIdentity, null);
 		if (originatingRequest)
 			lir.add(Cx.ORIGININATING_REQUEST, OriginatingRequest.ORIGINATING);
 		if (userAuthorizationType != null)

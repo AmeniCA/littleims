@@ -13,7 +13,7 @@
   <dependencies>
   	<dependency>
 			<groupId>org.cipango</groupId>
-			<artifactId>cipango</artifactId>
+			<artifactId>cipango-server</artifactId>
 		</dependency>
 	</dependencies>
 	

@@ -1,0 +1,28 @@
+<html>
+<head>
+    <wicket:link>
+    	<link rel="stylesheet" href="style.css" />
+    </wicket:link>
+</head>   
+<body>
+<wicket:panel>
+	<ul>
+		<li>
+            <a wicket:id="SubscriptionBrowserPage">
+                <span><wicket:message key="headerPanel.subscriptions">Subscriptions</wicket:message></span>
+            </a>
+        </li>
+        <li>
+            <a wicket:id="PrivateIdBrowserPage">
+                <span><wicket:message key="headerPanel.privateIds">Private identities</wicket:message></span>
+            </a>
+        </li>
+        <li>
+            <a wicket:id="PublicIdBrowserPage">
+                <span><wicket:message key="headerPanel.publicIds">Public identities</wicket:message></span>
+            </a>
+        </li>
+	</ul>
+</wicket:panel>     
+</body>
+</html>

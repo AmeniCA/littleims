@@ -24,16 +24,17 @@ import org.apache.wicket.util.string.Strings;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.DiameterCommand;
-import org.cipango.diameter.DiameterFactory;
-import org.cipango.diameter.DiameterRequest;
-import org.cipango.diameter.base.Base;
+import org.cipango.diameter.api.DiameterFactory;
+import org.cipango.diameter.api.DiameterServletRequest;
+import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
-import org.cipango.diameter.ims.Sh;
 import org.cipango.diameter.ims.Cx.ReasonCode;
+import org.cipango.diameter.ims.Sh;
 import org.cipango.ims.hss.db.PublicIdentityDao;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
+import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PrivateIdentity;
@@ -43,7 +44,6 @@ import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.SpIfc;
 import org.cipango.ims.hss.model.Subscription;
-import org.cipango.ims.hss.model.ImplicitRegistrationSet.State;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,9 +95,9 @@ public class CxManager
 		}
 			
 		
-		DiameterRequest request = newRequest(Cx.PPR, scscf);
+		DiameterServletRequest request = newRequest(Cx.PPR, scscf);
 		String privateIdentity = getPrivateIdentity(publicIdentity);		
-		request.add(Base.USER_NAME, privateIdentity);
+		request.add(Common.USER_NAME, privateIdentity);
 		String serviceProfile = publicIdentity.getImsSubscriptionAsXml(privateIdentity, null, false);
 		request.getAVPs().add(Sh.USER_DATA, serviceProfile.getBytes());
 		request.send();
@@ -145,12 +145,12 @@ public class CxManager
 		if (scscf == null)
 			throw new IOException("No S-CSCF assigned to " + publicIdentities);
 		
-		DiameterRequest request = newRequest(Cx.RTR, scscf);
+		DiameterServletRequest request = newRequest(Cx.RTR, scscf);
 		for (PublicIdentity publicIdentity : publicIdentities)
 			request.add(Cx.PUBLIC_IDENTITY, publicIdentity.getIdentity());
 		
 		String privateIdentity = getPrivateIdentity(publicIdentities.iterator().next());		
-		request.add(Base.USER_NAME, privateIdentity);
+		request.add(Common.USER_NAME, privateIdentity);
 		request.getAVPs().add(getDeregistrationReason(reasonCode, reasonPhrase));
 		
 		request.send();
@@ -189,17 +189,17 @@ public class CxManager
 		if (scscf == null)
 			throw new IOException("No S-CSCF assigned to the subscription " + privateIdentity.getSubscription().getName());
 		
-		DiameterRequest request = newRequest(Cx.RTR, scscf);
+		DiameterServletRequest request = newRequest(Cx.RTR, scscf);
 			
 		
-		request.add(Base.USER_NAME, privateIdentity.getIdentity());
+		request.add(Common.USER_NAME, privateIdentity.getIdentity());
 		request.getAVPs().add(getDeregistrationReason(reasonCode, reasonPhrase));
 		
 		if (it.hasNext())
 		{
 			AVPList l = new AVPList();
 			while (it.hasNext())
-				l.add(Base.USER_NAME, it.next().getIdentity());
+				l.add(Common.USER_NAME, it.next().getIdentity());
 			request.add(Cx.ASSOCIATED_IDENTITIES, l);
 		}
 		
@@ -246,9 +246,9 @@ public class CxManager
 		}
 	}
 	
-	private DiameterRequest newRequest(DiameterCommand command, Scscf scscf)
+	private DiameterServletRequest newRequest(DiameterCommand command, Scscf scscf)
 	{
-		DiameterRequest request =  _diameterFactory.createRequest(Cx.CX_APPLICATION_ID, 
+		DiameterServletRequest request =  _diameterFactory.createRequest(null, Cx.CX_APPLICATION_ID, 
 				command, _scscfRealm, scscf.getDiameterHost());
 		return request;
 	}
