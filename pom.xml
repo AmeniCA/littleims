@@ -8,13 +8,13 @@
   <url>http://www.cipango.org</url>
 
   <modules>
-    <module>littleims-distribution</module>
     <module>littleims-debug-id</module>
     <module>littleims-common</module>
     <module>littleims-hss</module>
     <module>littleims-pcscf</module>
     <module>littleims-scscf</module>
     <module>littleims-icscf</module>
+    <module>littleims-distribution</module>
   </modules>
   
   <build>
@@ -27,6 +27,23 @@
         </configuration>
       </plugin>
     </plugins>
+    
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2-beta-5</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.jetty.toolchain</groupId>
+              <artifactId>jetty-assembly-descriptors</artifactId>
+              <version>1.0</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   
   <dependencyManagement>
@@ -101,6 +118,11 @@
         <classifier>jar</classifier>
       </dependency>
       <dependency>
+        <groupId>org.cipango</groupId>
+        <artifactId>cipango-distribution</artifactId>
+        <version>${cipango-version}</version>
+      </dependency>
+      <dependency>
         <groupId>c3p0</groupId>
         <artifactId>c3p0</artifactId>
         <version>0.9.1.2</version>
@@ -172,11 +194,6 @@
     <cipango-version>2.0-SNAPSHOT</cipango-version>
     <wicket.version>1.4.12</wicket.version>
     <slf4j.version>1.4.0</slf4j.version>
-    <scscf.home>${littleims.home}/S-CSCF</scscf.home>
-    <pcscf.home>${littleims.home}/P-CSCF</pcscf.home>
-    <icscf.home>${littleims.home}/I-CSCF</icscf.home>
-    <hss.home>${littleims.home}/HSS</hss.home>
-    <domain>cipango.voip</domain>
   </properties>
 
 

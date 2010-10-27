@@ -6,154 +6,262 @@
     <version>1.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-  <artifactId>littleims-package</artifactId>
+  <artifactId>littleims-distribution</artifactId>
   <packaging>pom</packaging>
-  <name>littleIMS :: Package</name>
+  <name>littleIMS :: Distribution</name>
 
-  <profiles>
-    <profile>
-      <id>copy-jetty</id>
-      <activation>
-        <property>
-          <name>jetty</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>clean</id>
-                <phase>clean</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${littleims.home}" includes="littleims.properties, README.txt"/>
-                      <fileset dir="${scscf.home}"/>
-                      <fileset dir="${pcscf.home}"/>
-                      <fileset dir="${icscf.home}"/>
-                      <fileset dir="${hss.home}" excludes="db/"/>
-                    </delete>
-                  </tasks>
-                </configuration>
-              </execution>
-              <execution>
-                <phase>install</phase>
-                <configuration>
-                  <tasks>
-                    
-                    
-                    <!--  S-CSCF -->
-                    <copy todir="${scscf.home}">
-                       <fileset dir="${jetty.home}">
-                         <patternset id="jetty">
-                           <include name="start.jar"/>
-                           <include name="lib/"/>
-                           <include name="sipapps"/>
-                           <include name="etc/sipdefault.xml"/>
-                           <include name="etc/webdefault.xml"/>
-                           <include name="LICENSES/"/>
-                         </patternset>
-                       </fileset>
-                     </copy>
-                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${scscf.home}/bin/scscf.sh"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty.xml" value="cipango-scscf.xml"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="jetty.pid" value="littleims-scscf.pid"/>
-                     <replace file="${scscf.home}/bin/scscf.sh" token="JETTY_HOME" value="SCSCF_HOME"/>
-                     <echo file="${scscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-scscf.xml</echo>
-                    
-                    <!--  P-CSCF -->
-                    <copy todir="${pcscf.home}">
-                       <fileset dir="${jetty.home}">
-                         <patternset refid="jetty"/>
-                       </fileset>
-                     </copy>
-                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.xml" value="cipango-pcscf.xml"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.pid" value="littleims-pcscf.pid"/>
-                     <replace file="${pcscf.home}/bin/pcscf.sh" token="JETTY_HOME" value="PCSCF_HOME"/>
-                     <echo file="${pcscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-pcscf.xml</echo>
-                    
-                    <!--  I-CSCF -->
-                    <copy todir="${icscf.home}">
-                       <fileset dir="${jetty.home}">
-                         <patternset refid="jetty"/>
-                       </fileset>
-                     </copy>
-                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${icscf.home}/bin/icscf.sh"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty.xml" value="cipango-icscf.xml"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="jetty.pid" value="littleims-icscf.pid"/>
-                     <replace file="${icscf.home}/bin/icscf.sh" token="JETTY_HOME" value="ICSCF_HOME"/>
-                     <echo file="${icscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-icscf.xml</echo>
-                    
-                    <!--  HSS -->
-                    <copy todir="${hss.home}">
-                       <fileset dir="${jetty.home}">
-                         <patternset refid="jetty"/>
-                       </fileset>
-                     </copy>
-                     <copy file="${jetty.home}/bin/jetty.sh" toFile="${hss.home}/bin/hss.sh"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
-                     <replace file="${hss.home}/bin/hss.sh" token="jetty.xml" value="cipango-hss.xml"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="jetty.pid" value="littleims-hss.pid"/>
-                     <replace file="${hss.home}/bin/hss.sh" token="JETTY_HOME" value="HSS_HOME"/>
-                     <echo file="${hss.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-hss.xml</echo>
-                     
-                     <copy todir="${littleims.home}">
-                        <fileset dir="${basedir}/bin"/>
-                        <fileset dir="${basedir}/../.." includes="littleims.properties, README.txt"/>
-                     </copy>
-                     <chmod dir="${littleims.home}" perm="ugo+rx" includes="*.sh,**/*.sh"/>
-                     <fixcrlf srcdir="${littleims.home}" includes="*.sh,**/*.sh" eol="lf" eof="remove" />
-                  </tasks>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.0</version>
-            <executions>
-              <execution>
-                <id>copy log4j</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>copy</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>log4j</groupId>
-                      <artifactId>log4j</artifactId>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-api</artifactId>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-log4j12</artifactId>
-                    </artifactItem>
-                  </artifactItems>
-                  <outputDirectory>${jetty.home}/lib/ext</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles> 
+  <properties>
+    <cipango.home>target/cipango/cipango-distribution-${cipango-version}</cipango.home>
+    <assembly-directory>target/distribution</assembly-directory>
+    <scscf.home>${assembly-directory}/S-CSCF</scscf.home>
+    <pcscf.home>${assembly-directory}/P-CSCF</pcscf.home>
+    <icscf.home>${assembly-directory}/I-CSCF</icscf.home>
+    <hss.home>${assembly-directory}/HSS</hss.home>
+  </properties>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                
+                <!--  S-CSCF -->
+                <copy todir="${scscf.home}">
+                   <fileset dir="${cipango.home}">
+                     <patternset id="cipango">
+                       <include name="start.jar"/>
+                       <include name="lib/"/>
+                       <include name="sipapps"/>
+                       <include name="etc/sipdefault.xml"/>
+                       <include name="etc/webdefault.xml"/>
+                       <include name="*.txt"/>
+                       <include name="*.html"/>
+                       <exclude name="lib/annotations"/>
+                     </patternset>
+                   </fileset>
+                 </copy>
+                 <copy file="${cipango.home}/bin/jetty.sh" toFile="${scscf.home}/bin/scscf.sh"/>
+                 <replace file="${scscf.home}/bin/scscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                 <replace file="${scscf.home}/bin/scscf.sh" token="jetty.xml" value="cipango-scscf.xml"/>
+                 <replace file="${scscf.home}/bin/scscf.sh" token="jetty.pid" value="littleims-scscf.pid"/>
+                 <replace file="${scscf.home}/bin/scscf.sh" token="JETTY_HOME" value="SCSCF_HOME"/>
+                 <echo file="${scscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-scscf.xml</echo>
+                
+                <!--  P-CSCF -->
+                <copy todir="${pcscf.home}">
+                   <fileset dir="${cipango.home}">
+                     <patternset refid="cipango"/>
+                   </fileset>
+                 </copy>
+                 <copy file="${cipango.home}/bin/jetty.sh" toFile="${pcscf.home}/bin/pcscf.sh"/>
+                 <replace file="${pcscf.home}/bin/pcscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                 <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.xml" value="cipango-pcscf.xml"/>
+                 <replace file="${pcscf.home}/bin/pcscf.sh" token="jetty.pid" value="littleims-pcscf.pid"/>
+                 <replace file="${pcscf.home}/bin/pcscf.sh" token="JETTY_HOME" value="PCSCF_HOME"/>
+                 <echo file="${pcscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-pcscf.xml</echo>
+                
+                <!--  I-CSCF -->
+                <copy todir="${icscf.home}">
+                   <fileset dir="${cipango.home}">
+                     <patternset refid="cipango"/>
+                   </fileset>
+                 </copy>
+                 <copy file="${cipango.home}/bin/jetty.sh" toFile="${icscf.home}/bin/icscf.sh"/>
+                 <replace file="${icscf.home}/bin/icscf.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                 <replace file="${icscf.home}/bin/icscf.sh" token="jetty.xml" value="cipango-icscf.xml"/>
+                 <replace file="${icscf.home}/bin/icscf.sh" token="jetty.pid" value="littleims-icscf.pid"/>
+                 <replace file="${icscf.home}/bin/icscf.sh" token="JETTY_HOME" value="ICSCF_HOME"/>
+                 <echo file="${icscf.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-icscf.xml</echo>
+                
+                <!--  HSS -->
+                <copy todir="${hss.home}">
+                   <fileset dir="${cipango.home}">
+                     <patternset refid="cipango"/>
+                   </fileset>
+                 </copy>
+                 <copy file="${cipango.home}/bin/jetty.sh" toFile="${hss.home}/bin/hss.sh"/>
+                 <replace file="${hss.home}/bin/hss.sh" token="${JETTY_HOME}/etc/jetty-logging.xml " value=""/>
+                 <replace file="${hss.home}/bin/hss.sh" token="jetty.xml" value="cipango-hss.xml"/>
+                 <replace file="${hss.home}/bin/hss.sh" token="jetty.pid" value="littleims-hss.pid"/>
+                 <replace file="${hss.home}/bin/hss.sh" token="JETTY_HOME" value="HSS_HOME"/>
+                 <echo file="${hss.home}/start.ini">OPTIONS=All${line.separator}etc/cipango-hss.xml</echo>
+                 
+                 <copy todir="${assembly-directory}">
+                    <fileset dir="${basedir}/src/main/resources"/>
+                    <fileset dir="${basedir}/.." includes="littleims.properties, README.txt"/>
+                 </copy>
+                 <chmod dir="${assembly-directory}" perm="ugo+rx" includes="*.sh,**/*.sh"/>
+                 <fixcrlf srcdir="${assembly-directory}" includes="*.sh,**/*.sh" eol="lf" eof="remove" />
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.cipango</groupId>
+                  <artifactId>cipango-distribution</artifactId>
+                  <overWrite>false</overWrite>
+                  <type>tar.gz</type>
+                  <outputDirectory>target/cipango</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-hss</artifactId>
+                  <classifier>config</classifier>
+                  <outputDirectory>${hss.home}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-icscf</artifactId>
+                  <classifier>config</classifier>
+                  <outputDirectory>${icscf.home}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-pcscf</artifactId>
+                  <classifier>config</classifier>
+                  <outputDirectory>${pcscf.home}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-scscf</artifactId>
+                  <classifier>config</classifier>
+                  <outputDirectory>${scscf.home}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy log4j</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>log4j</groupId>
+                  <artifactId>log4j</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-log4j12</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-debug-id</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-hss</artifactId>
+                  <type>war</type>
+                  <destFileName>ROOT.war</destFileName>
+                  <outputDirectory>${hss.home}/sipapps</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-icscf</artifactId>
+                  <type>war</type>
+                  <destFileName>ROOT.war</destFileName>
+                  <outputDirectory>${icscf.home}/sipapps</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-pcscf</artifactId>
+                  <type>war</type>
+                  <destFileName>ROOT.war</destFileName>
+                  <outputDirectory>${pcscf.home}/sipapps</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.cipango.littleims</groupId>
+                  <artifactId>littleims-scscf</artifactId>
+                  <type>war</type>
+                  <destFileName>ROOT.war</destFileName>
+                  <outputDirectory>${scscf.home}/sipapps</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${cipango.home}/lib/ext</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
+          </descriptors>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-hss</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-icscf</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-pcscf</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-scscf</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.cipango.littleims</groupId>
+      <artifactId>littleims-debug-id</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>

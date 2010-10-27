@@ -38,28 +38,16 @@
           <systemProperties>
             <systemProperty>
               <name>jetty.home</name>
-              <value>.</value>
-            </systemProperty>
-            <systemProperty>
-              <name>sip.host</name>
-              <value>p-cscf.${domain}</value>
-            </systemProperty>
-            <systemProperty>
-              <name>sip.port</name>
-              <value>5080</value>
-            </systemProperty>
-            <systemProperty>
-              <name>jetty.port</name>
-              <value>8070</value>
+              <value>${project.build.directory}</value>
             </systemProperty>
             <systemProperty>
               <name>log4j.configuration</name>
-              <value>file:resources/log4j.xml</value>
+              <value>file:${project.build.directory}/resources/log4j.xml</value>
             </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9996</stopPort>
-          <jettyConfig>etc/cipango-mavenPlugin.xml</jettyConfig>
+          <jettyConfig>${basedir}/src/main/cipango-maven-plugin/cipango-pcscf.xml</jettyConfig>
           <scanIntervalSeconds>5</scanIntervalSeconds>
           <annotationsEnabled>false</annotationsEnabled>
           <webAppConfig>
@@ -105,6 +93,43 @@
         </configuration>
       </plugin>
       
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                <!-- For mvn cipango:run -->
+                <copy todir="${project.build.directory}">
+                  <fileset dir="${basedir}/src/main/config"/>
+                </copy>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>config.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   
@@ -137,54 +162,4 @@
     </dependency>
   </dependencies>
   
-  <profiles>
-    <profile>
-      <id>copy-jetty</id>
-      <activation>
-        <property>
-          <name>jetty</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>clean</id>
-                <phase>clean</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <delete includeemptydirs="true" failonerror="false">
-                      <fileset dir="${pcscf.home}/sipapps" includes="ROOT.war"/>
-                      <fileset dir="${pcscf.home}/etc" includes="p-cscf.xml,cipango-pcscf.xml"/>
-                      <fileset dir="${pcscf.home}/resources" includes="log4j.xml"/>
-                    </delete>
-                  </tasks>
-                </configuration>
-              </execution>
-              <execution>
-                <phase>install</phase>
-                <configuration>
-                  <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" tofile="${pcscf.home}/sipapps/ROOT.war"/>
-                    <copy todir="${pcscf.home}">
-                      <fileset dir="${basedir}" includes="etc/,resources/"/>
-                    </copy>
-                  </tasks>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles> 
-
 </project>

@@ -16,55 +16,5 @@
       <artifactId>cipango-server</artifactId>
     </dependency>
   </dependencies>
-  
-  <profiles>
-    <profile>
-      <id>copy-jetty</id>
-      <activation>
-        <property>
-          <name>jetty</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>clean</id>
-                <phase>clean</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <delete failonerror="false">
-                      <fileset dir="${hss.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
-                      <fileset dir="${scscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
-                      <fileset dir="${pcscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
-                      <fileset dir="${icscf.home}/lib/ext" includes="${project.build.finalName}.${project.packaging}"/>
-                    </delete>
-                  </tasks>
-                </configuration>
-              </execution>
-              <execution>
-                <phase>install</phase>
-                <configuration>
-                  <tasks>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${hss.home}/lib/ext"/>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${scscf.home}/lib/ext"/>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${pcscf.home}/lib/ext"/>
-                    <copy file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${icscf.home}/lib/ext"/>
-                  </tasks>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles> 
+
 </project>
