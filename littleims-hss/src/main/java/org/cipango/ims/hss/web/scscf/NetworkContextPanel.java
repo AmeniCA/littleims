@@ -26,8 +26,9 @@ public class NetworkContextPanel extends Panel
 	{
 		super("contextMenu");
 		add(new AutolinkBookmarkablePageLink("ScscfBrowserPage", ScscfBrowserPage.class));
-		add(new ExternalLink("sipConfig", "../" + MenuPrinter.CONFIG_SIP.getName()));
+		add(new ExternalLink("httpConfig", "../" + MenuPrinter.CONFIG_HTTP.getName()));
 		add(new ExternalLink("diameterConfig", "../" + MenuPrinter.CONFIG_DIAMETER.getName()));
+		add(new ExternalLink("diameterStatistics", "../" + MenuPrinter.STATISTICS_DIAMETER.getName()));
 	}
 
 }
