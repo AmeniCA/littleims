@@ -28,5 +28,9 @@
     <filter-name>console</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-	
+
+  <listener>
+    <listener-class>org.cipango.littleims.scscf.oam.ConsoleAdapter</listener-class>
+  </listener>
+  
 </web-app>

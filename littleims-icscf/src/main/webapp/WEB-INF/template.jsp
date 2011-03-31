@@ -18,7 +18,7 @@
 <body>
 	<div id="container">
 		<div id="header">
-			<h1><a href="#" title="cipango console / back to home">LittleIMS::S-CSCF</a></h1>
+			<h1><a href="#" title="cipango console / back to home">LittleIMS::I-CSCF</a></h1>
 			<div class="login">
 				<% 
 				if (request.getUserPrincipal() != null) {

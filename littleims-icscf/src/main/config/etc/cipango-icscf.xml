@@ -103,6 +103,9 @@
                 <Set name="retainDays">31</Set>
               </New>
             </Item>
+            <Item>
+              <New class="org.cipango.callflow.JmxMessageLog"/>
+            </Item>
           </Array>
         </Set>
       </New>
@@ -201,10 +204,22 @@
               <Set name="host"><SystemProperty default="i-cscf.cipango.voip" name="icscf.host"/></Set>
               <Set name="port"><SystemProperty default="3878" name="icscf.diameter.port"/></Set>
               <Set name="messageListener">
-                <New class="org.cipango.diameter.log.FileMessageLogger">
-                  <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.diameter.log</Set>
-                  <Set name="append">true</Set>
-                  <Set name="retainDays">31</Set>
+                <New class="org.cipango.diameter.log.MessageListenerCollection">
+                  <Set name="server"><Ref id="Server"/></Set>
+                  <Set name="messageListeners">
+                    <Array type="org.cipango.diameter.log.DiameterMessageListener">
+                      <Item>
+                        <New class="org.cipango.callflow.diameter.JmxMessageLogger"/>
+                      </Item>
+                      <Item>
+                        <New class="org.cipango.diameter.log.FileMessageLogger">
+                          <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.diameter.log</Set>
+                          <Set name="append">true</Set>
+                          <Set name="retainDays">31</Set>
+                        </New>
+                      </Item>
+                    </Array>
+                  </Set>
                 </New>
               </Set>
             </New>
@@ -212,6 +227,7 @@
         </Call>
         <Set name="identity"><SystemProperty default="i-cscf.cipango.voip" name="icscf.host"/></Set>
         <Set name="server"><Ref id="Server"/></Set>
+        <Set name="statsOn">true</Set>
         <Call name="addSupportedApplication">
           <Arg>
             <Get name="CX_APPLICATION_ID" class="org.cipango.diameter.ims.Cx"/>
@@ -239,5 +255,11 @@
       <Arg><Ref id="node"/></Arg>
     </Call>
   </Get>
+  
+  <Set name="sessionManager">
+    <New class="org.cipango.server.session.SessionManager"/>
+  </Set>
+  
+  <Set name="allStatsOn">true</Set>
   
 </Configure>

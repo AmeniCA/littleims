@@ -85,6 +85,11 @@
             <version>${cipango-version}</version>
           </dependency>
           <dependency>
+            <groupId>org.cipango</groupId>
+            <artifactId>cipango-callflow</artifactId>
+            <version>${cipango-version}</version>
+          </dependency>
+          <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>

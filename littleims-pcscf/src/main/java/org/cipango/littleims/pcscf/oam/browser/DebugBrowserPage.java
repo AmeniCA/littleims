@@ -55,6 +55,7 @@ public class DebugBrowserPage extends BasePage
 		addDebugConfs();
 		addSubscriptions();	
 		add(new Label("title", getTitle()));
+		setContextMenu(new LogsContextPanel());
 	}
 	
 	@SuppressWarnings("unchecked")

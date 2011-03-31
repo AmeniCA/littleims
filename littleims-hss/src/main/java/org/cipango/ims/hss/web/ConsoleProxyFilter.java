@@ -118,6 +118,7 @@ public class ConsoleProxyFilter implements Filter
 
 		public static final PageImpl 
 			IDENTITIES = PAGES.add(new PageImpl("subscriptions/browser", "Identities")),
+			
 			NETWORK = PAGES.add(new PageImpl("Network")),
 			SCSCF = NETWORK.add(new PageImpl("s-cscf/browser", "S-CSCF")),
 			CONFIG_HTTP = NETWORK.add(new PageImpl("configuration-http", "HSS :: HTTP Configuration", "HTTP Configuration")),
@@ -131,6 +132,8 @@ public class ConsoleProxyFilter implements Filter
 				}
 			}),
 			STATISTICS_DIAMETER = NETWORK.add(new PageImpl("statistics-diameter", "HSS :: Diameter Statistics", "Diameter Statistics")),
+			LOGS_DIAMETER = NETWORK.add(new PageImpl("logs-diameter", "HSS :: Diameter Logs", "Diameter Logs")),
+			
 			SERVICES = PAGES.add(new PageImpl("service-profiles/browser", "Services")),
 			ADMIN_USERS = PAGES.add(new PageImpl("admin/user/browser", "Admin users"));
 		

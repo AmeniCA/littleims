@@ -87,10 +87,22 @@
               <Set name="host"><SystemProperty default="hss.cipango.voip" name="hss.host"/></Set>
               <Set name="port"><SystemProperty default="3868" name="hss.diameter.port"/></Set>
               <Set name="messageListener">
-                <New class="org.cipango.diameter.log.FileMessageLogger">
-                  <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.diameter.log</Set>
-                  <Set name="append">true</Set>
-                  <Set name="retainDays">31</Set>
+                <New class="org.cipango.diameter.log.MessageListenerCollection">
+                  <Set name="server"><Ref id="Server"/></Set>
+                  <Set name="messageListeners">
+                    <Array type="org.cipango.diameter.log.DiameterMessageListener">
+                      <Item>
+                        <New class="org.cipango.callflow.diameter.JmxMessageLogger"/>
+                      </Item>
+                      <Item>
+                        <New class="org.cipango.diameter.log.FileMessageLogger">
+                          <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.diameter.log</Set>
+                          <Set name="append">true</Set>
+                          <Set name="retainDays">31</Set>
+                        </New>
+                      </Item>
+                    </Array>
+                  </Set>
                 </New>
               </Set>
             </New>
@@ -98,6 +110,7 @@
         </Call>
         <Set name="identity"><SystemProperty default="hss.cipango.voip" name="hss.host"/></Set>
         <Set name="server"><Ref id="Server"/></Set>
+        <Set name="statsOn">true</Set>
         <Call name="addSupportedApplication">
           <Arg>
             <Get name="CX_APPLICATION_ID" class="org.cipango.diameter.ims.Cx"/>

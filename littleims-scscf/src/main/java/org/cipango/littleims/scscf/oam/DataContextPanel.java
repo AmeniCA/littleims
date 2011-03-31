@@ -11,25 +11,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ========================================================================
-package org.cipango.ims.hss.web.scscf;
+package org.cipango.littleims.scscf.oam;
 
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.console.printer.MenuPrinter;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
+import org.cipango.littleims.scscf.oam.browser.ProfileBrowserPage;
+import org.cipango.littleims.scscf.oam.browser.RegistrationBrowserPage;
+import org.cipango.littleims.scscf.oam.browser.SessionBrowserPage;
+import org.cipango.littleims.scscf.oam.browser.SharedIfcBrowserPage;
 
-public class NetworkContextPanel extends Panel
+public class DataContextPanel extends Panel
 {
 
-	@SuppressWarnings("unchecked")
-	public NetworkContextPanel()
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public DataContextPanel()
 	{
 		super("contextMenu");
-		add(new AutolinkBookmarkablePageLink("ScscfBrowserPage", ScscfBrowserPage.class));
-		add(new ExternalLink("httpConfig", "../" + MenuPrinter.CONFIG_HTTP.getName()));
-		add(new ExternalLink("diameterConfig", "../" + MenuPrinter.CONFIG_DIAMETER.getName()));
-		add(new ExternalLink("diameterStatistics", "../" + MenuPrinter.STATISTICS_DIAMETER.getName()));
-		add(new ExternalLink("diameterLogs", "../" + MenuPrinter.DIAMETER_LOGS.getName()));
+		add(new AutolinkBookmarkablePageLink("ProfileBrowserPage", ProfileBrowserPage.class));
+		add(new AutolinkBookmarkablePageLink("SessionBrowserPage", SessionBrowserPage.class));
+		add(new AutolinkBookmarkablePageLink("RegistrationBrowserPage", RegistrationBrowserPage.class));
+		add(new AutolinkBookmarkablePageLink("SharedIfcBrowserPage", SharedIfcBrowserPage.class));
 	}
 
 }

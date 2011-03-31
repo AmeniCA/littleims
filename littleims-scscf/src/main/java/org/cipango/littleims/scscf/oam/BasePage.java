@@ -31,6 +31,7 @@ public abstract class BasePage extends WebPage
 		super(pageParameters);
 		add(new HeaderPanel().setRenderBodyOnly(true));
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+		add(new DataContextPanel());
 	}
 
 	

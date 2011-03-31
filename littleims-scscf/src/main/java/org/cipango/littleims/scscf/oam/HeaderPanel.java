@@ -15,25 +15,26 @@ package org.cipango.littleims.scscf.oam;
 
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.cipango.console.printer.MenuPrinter;
 import org.cipango.ims.oam.SpringApplication;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 import org.cipango.littleims.scscf.oam.browser.ProfileBrowserPage;
-import org.cipango.littleims.scscf.oam.browser.RegistrationBrowserPage;
-import org.cipango.littleims.scscf.oam.browser.SessionBrowserPage;
-import org.cipango.littleims.scscf.oam.browser.SharedIfcBrowserPage;
 
 public class HeaderPanel extends Panel
 {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HeaderPanel()
 	{
 		super("header");
 		add(new AutolinkBookmarkablePageLink("ProfileBrowserPage", ProfileBrowserPage.class));
-		add(new AutolinkBookmarkablePageLink("SessionBrowserPage", SessionBrowserPage.class));
-		add(new AutolinkBookmarkablePageLink("RegistrationBrowserPage", RegistrationBrowserPage.class));
-		add(new AutolinkBookmarkablePageLink("SharedIfcBrowserPage", SharedIfcBrowserPage.class));
+		add(new ExternalLink("configuration", "../" + MenuPrinter.CONFIG_SIP.getName()));
+		add(new ExternalLink("statistics", "../" + MenuPrinter.STATISTICS_SIP.getName()));
+		add(new ExternalLink("logs", "../" + MenuPrinter.SIP_LOGS.getName()));
+		
+		
 		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style/style.css"));
 		add(CSSPackageResource.getHeaderContribution(SpringApplication.class, "style/style-littleims.css"));
 		add(JavascriptPackageResource.getHeaderContribution(SpringApplication.class, "common-util.js"));

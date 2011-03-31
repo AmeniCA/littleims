@@ -14,6 +14,7 @@
 package org.cipango.littleims.pcscf.oam;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -24,6 +25,7 @@ public abstract class BasePage extends WebPage
 	{
 		add(new HeaderPanel().setRenderBodyOnly(true));
 		add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+		add(new WebMarkupContainer("contextMenu"));
 	}
 
 	public void setContextMenu(Component panel)

@@ -15,16 +15,17 @@ package org.cipango.littleims.pcscf.oam;
 
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.cipango.console.printer.MenuPrinter;
 import org.cipango.ims.oam.SpringApplication;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
-import org.cipango.littleims.pcscf.oam.browser.DebugBrowserPage;
 import org.cipango.littleims.pcscf.oam.browser.RegistrationBrowserPage;
 
 public class HeaderPanel extends Panel
 {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HeaderPanel()
 	{
 		super("header");
@@ -32,7 +33,10 @@ public class HeaderPanel extends Panel
 		add(JavascriptPackageResource.getHeaderContribution(SpringApplication.class, "common-util.js"));
 		
 		add(new AutolinkBookmarkablePageLink("RegistrationBrowserPage", RegistrationBrowserPage.class));
-		add(new AutolinkBookmarkablePageLink("DebugBrowserPage", DebugBrowserPage.class));
+		add(new ExternalLink("configuration", "../" + MenuPrinter.CONFIG_SIP.getName()));
+		add(new ExternalLink("statistics", "../" + MenuPrinter.STATISTICS_SIP.getName()));
+		add(new ExternalLink("logs", "../" + MenuPrinter.SIP_LOGS.getName()));
+		
 	}
 	
 

@@ -86,6 +86,9 @@
                 <Set name="retainDays">31</Set>
               </New>
             </Item>
+            <Item>
+              <New class="org.cipango.callflow.JmxMessageLog"/>
+            </Item>
           </Array>
         </Set>
       </New>
@@ -117,4 +120,9 @@
   <!-- =========================================================== -->
   <Set name="stopAtShutdown">true</Set>
   
+  <Set name="sessionManager">
+    <New class="org.cipango.server.session.SessionManager"/>
+  </Set>
+  
+  <Set name="allStatsOn">true</Set>
 </Configure>

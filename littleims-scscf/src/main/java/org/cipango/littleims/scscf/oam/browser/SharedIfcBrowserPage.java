@@ -14,6 +14,7 @@
 package org.cipango.littleims.scscf.oam.browser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
@@ -74,6 +75,8 @@ public class SharedIfcBrowserPage extends BasePage
 			@Override
 			public List load()
 			{
+				if (_userProfileCache.getSharedIFCs() == null)
+					return Collections.EMPTY_LIST;
 				return new ArrayList(_userProfileCache.getSharedIFCs().keySet());
 			}		
 		};
