@@ -104,7 +104,7 @@
               </New>
             </Item>
             <Item>
-              <New class="org.cipango.callflow.JmxMessageLog"/>
+              <New class="org.cipango.ims.JmxMessageLog"/>
             </Item>
           </Array>
         </Set>

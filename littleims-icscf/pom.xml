@@ -63,7 +63,7 @@
           </dependency>
           <dependency>
             <groupId>org.cipango.littleims</groupId>
-            <artifactId>littleims-p-debug-id</artifactId>
+            <artifactId>littleims-debug-id</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
