@@ -121,7 +121,6 @@
         <groupId>org.cipango</groupId>
         <artifactId>cipango-callflow</artifactId>
         <version>${cipango-version}</version>
-        <classifier>jar</classifier>
       </dependency>
       <dependency>
         <groupId>org.cipango</groupId>
