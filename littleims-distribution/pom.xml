@@ -161,16 +161,16 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
+                  <groupId>ch.qos.logback</groupId>
+                  <artifactId>logback-core</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ch.qos.logback</groupId>
+                  <artifactId>logback-classic</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.slf4j</groupId>
                   <artifactId>slf4j-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-log4j12</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.cipango.littleims</groupId>

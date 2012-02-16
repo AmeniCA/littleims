@@ -14,25 +14,31 @@
 package org.cipango.littleims.scscf.session;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.sip.*;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
-import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
+import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.registrar.Binding;
 import org.cipango.littleims.scscf.registrar.Context;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class TerminatingSession extends Session
 {
 	public static final String PRIVACY_ID = "id";
 	
-	private static final Logger __log = Logger.getLogger(TerminatingSession.class);
+	private static final Logger __log = LoggerFactory.getLogger(TerminatingSession.class);
 	private URI _originalURI;
 	private List<Binding> _contacts;
 

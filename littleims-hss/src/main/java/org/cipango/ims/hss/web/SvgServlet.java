@@ -33,13 +33,14 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
 import org.cipango.ims.hss.db.SubscriptionDao;
 import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Node;
@@ -48,7 +49,7 @@ public class SvgServlet extends HttpServlet
 {
 
 	private SubscriptionDao _dao;
-	private static final Logger __log = Logger.getLogger(SvgServlet.class);
+	private static final Logger __log = LoggerFactory.getLogger(SvgServlet.class);
 	private boolean _webAuthentication = true;
 	
 	public void init()

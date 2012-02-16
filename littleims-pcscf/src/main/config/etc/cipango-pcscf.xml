@@ -184,7 +184,5 @@
   <Set name="sessionManager">
     <New class="org.cipango.server.session.SessionManager"/>
   </Set>
-  
-  <Set name="allStatsOn">true</Set>
-  
+    
 </Configure>

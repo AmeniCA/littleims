@@ -15,7 +15,6 @@ package org.cipango.ims.hss.web.debugsession;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.yui.calendar.DateTimeField;
 import org.apache.wicket.markup.html.form.Button;
@@ -39,11 +38,13 @@ import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
 import org.cipango.ims.hss.web.publicid.PsiContextPanel;
 import org.cipango.ims.oam.util.ID;
 import org.cipango.ims.oam.util.MethodField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EditDebugSessionPage extends DebugSessionPage
 {
 
-	private static final Logger __log = Logger.getLogger(EditDebugSessionPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditDebugSessionPage.class);
 	
 	private Long _key;
 	private String _publicIdKey;

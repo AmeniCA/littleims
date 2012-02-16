@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -47,10 +46,12 @@ import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeregistrationPage extends SubscriptionPage
 {
-	private static final Logger __log = Logger.getLogger(DeregistrationPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(DeregistrationPage.class);
 	
 	@SpringBean
 	private PrivateIdentityDao _privateIdentityDao;

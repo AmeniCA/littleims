@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.util.string.Strings;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
@@ -44,12 +43,14 @@ import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.SpIfc;
 import org.cipango.ims.hss.model.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class CxManager
 {
-	private static final Logger __log = Logger.getLogger(CxManager.class);
+	private static final Logger __log = LoggerFactory.getLogger(CxManager.class);
 	private DiameterFactory _diameterFactory;
 	private String _scscfRealm;
 	private Set<String> _publicIdsToUpdate = new HashSet<String>();

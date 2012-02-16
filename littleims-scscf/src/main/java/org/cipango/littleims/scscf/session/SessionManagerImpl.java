@@ -28,7 +28,6 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.api.DiameterServletAnswer;
 import org.cipango.diameter.api.DiameterServletRequest;
 import org.cipango.diameter.base.Common;
@@ -48,6 +47,8 @@ import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SessionManagerImpl implements SessionManager
 {
@@ -55,7 +56,7 @@ public class SessionManagerImpl implements SessionManager
 	public static final String TERM_PARAM = "term";
 	private static final String ODI = "odi";
 	
-	private final Logger _log = Logger.getLogger(SessionManagerImpl.class);
+	private static final Logger _log = LoggerFactory.getLogger(SessionManagerImpl.class);
 
 	
 	private boolean _terminatingDefault;

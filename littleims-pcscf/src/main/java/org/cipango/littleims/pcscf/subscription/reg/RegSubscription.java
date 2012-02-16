@@ -20,18 +20,19 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.log4j.Logger;
 import org.cipango.ims.pcscf.reg.data.ReginfoDocument;
 import org.cipango.ims.pcscf.reg.data.ReginfoDocument.Reginfo;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration;
 import org.cipango.ims.pcscf.reg.data.RegistrationDocument.Registration.State;
 import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.subscription.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegSubscription implements Subscription
 {
 	
-	private static final Logger __log = Logger.getLogger(RegSubscription.class);
+	private static final Logger __log = LoggerFactory.getLogger(RegSubscription.class);
 	
 	private int _version = -1;
 	private RegEventService _regService;

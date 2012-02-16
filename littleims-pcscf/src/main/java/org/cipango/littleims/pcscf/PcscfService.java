@@ -28,17 +28,18 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
 import org.cipango.littleims.pcscf.subscription.reg.RegEventService;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PcscfService
 {
 
-	private final Logger _log = Logger.getLogger(PcscfServlet.class);
+	private static final Logger _log = LoggerFactory.getLogger(PcscfServlet.class);
 	
 	private SipFactory _sipFactory;
 	private SipURI _pcscfUri;

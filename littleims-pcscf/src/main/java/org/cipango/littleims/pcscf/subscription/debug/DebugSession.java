@@ -23,7 +23,6 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.GDuration;
 import org.cipango.ims.pcscf.debug.data.ReasonDocument.Reason;
 import org.cipango.ims.pcscf.debug.data.SessionDocument.Session;
@@ -31,10 +30,12 @@ import org.cipango.ims.pcscf.debug.data.StartTriggerDocument.StartTrigger;
 import org.cipango.ims.pcscf.debug.data.StopTriggerDocument.StopTrigger;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebugSession implements Serializable
 {
-	private static final Logger __log = Logger.getLogger(DebugSession.class);
+	private static final Logger __log = LoggerFactory.getLogger(DebugSession.class);
 	private String _id;
 	private List<Trigger> _startTriggers = new ArrayList<Trigger>();
 	private List<Trigger> _stopTriggers = new ArrayList<Trigger>();

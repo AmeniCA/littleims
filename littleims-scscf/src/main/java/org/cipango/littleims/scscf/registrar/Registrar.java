@@ -33,7 +33,6 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.api.DiameterServletAnswer;
@@ -62,6 +61,8 @@ import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.LittleimsException;
 import org.cipango.littleims.util.Methods;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Registrar
@@ -71,7 +72,7 @@ public class Registrar
 	private static final String MSG_SIP_CONTENT_TYPE = "message/sip";
 	private static final String SERVICE_INFO_TYPE = "application/3gpp-ims+xml";
 	
-	private static final Logger __log = Logger.getLogger(Registrar.class);
+	private static final Logger __log = LoggerFactory.getLogger(Registrar.class);
 	
 	private Map<String, Context> _regContexts = new HashMap<String, Context>();
 	private Timer _timer;

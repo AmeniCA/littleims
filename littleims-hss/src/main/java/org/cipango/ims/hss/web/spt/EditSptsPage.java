@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -59,12 +58,14 @@ import org.cipango.ims.hss.web.BasePage;
 import org.cipango.ims.hss.web.ifc.ContextPanel;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
 import org.cipango.ims.oam.util.HideableLink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("unchecked")
 public class EditSptsPage extends BasePage
 {
-	private static final Logger __log = Logger.getLogger(EditSptsPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditSptsPage.class);
 	public static final List<Class<? extends SPT>> SPT_CLASSES = 
 		Arrays.asList(HeaderSpt.class, RequestUriSpt.class, MethodSpt.class, SessionCaseSpt.class, SessionDescriptionSpt.class);
 	

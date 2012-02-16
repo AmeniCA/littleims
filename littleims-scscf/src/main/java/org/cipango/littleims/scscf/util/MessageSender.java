@@ -16,12 +16,13 @@ package org.cipango.littleims.scscf.util;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageSender
 {
-	private final Logger _log = Logger.getLogger(MessageSender.class);
+	private static final Logger _log = LoggerFactory.getLogger(MessageSender.class);
 	private String _userAgent = "littleIMS :: S-CSCF";
 	
 	public void sendResponse(SipServletRequest request, int statusCode)

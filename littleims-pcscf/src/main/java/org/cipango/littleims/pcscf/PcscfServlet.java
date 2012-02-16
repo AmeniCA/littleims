@@ -21,9 +21,10 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.pcscf.subscription.debug.DebugIdService;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -32,7 +33,7 @@ public class PcscfServlet extends SipServlet
 {
 	private PcscfService _pcscfService;
 	private DebugIdService _debugIdService;
-	private final Logger _log = Logger.getLogger(PcscfServlet.class);
+	private static final Logger _log = LoggerFactory.getLogger(PcscfServlet.class);
 	
 	@Override
 	public void init() throws ServletException

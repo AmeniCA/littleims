@@ -42,6 +42,38 @@
             </dependency>
           </dependencies>
         </plugin>
+        <plugin>
+          <groupId>org.cipango</groupId>
+          <artifactId>cipango-maven-plugin</artifactId>
+          <version>${cipango-version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.cipango</groupId>
+              <artifactId>cipango-diameter</artifactId>
+              <version>${cipango-version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.cipango</groupId>
+              <artifactId>cipango-callflow</artifactId>
+              <version>${cipango-version}</version>
+            </dependency>
+            <dependency>
+              <groupId>ch.qos.logback</groupId>
+              <artifactId>logback-core</artifactId>
+              <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>ch.qos.logback</groupId>
+              <artifactId>logback-classic</artifactId>
+              <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.cipango.littleims</groupId>
+              <artifactId>littleims-debug-id</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -70,11 +102,6 @@
          <artifactId>junit</artifactId>
          <version>${junit-version}</version>
           <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>log4j</groupId>
-         <artifactId>log4j</artifactId>
-         <version>${log4j-version}</version>
       </dependency>
       <dependency>
          <groupId>dnsjava</groupId>
@@ -144,8 +171,18 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
+        <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.wicket</groupId>
@@ -181,24 +218,25 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-     </dependency>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
   </dependencies>
 
  
   <properties>
-    <log4j-version>1.2.14</log4j-version>
     <junit-version>3.8.1</junit-version>
     <sip-api-version>1.1</sip-api-version>
-    <cipango-version>2.1-SNAPSHOT</cipango-version>
+    <cipango-version>2.1</cipango-version>
     <wicket.version>1.4.12</wicket.version>
-    <slf4j.version>1.4.0</slf4j.version>
+    <slf4j.version>1.6.1</slf4j.version>
+    <logback.version>1.0.0</logback.version>
   </properties>
 
 

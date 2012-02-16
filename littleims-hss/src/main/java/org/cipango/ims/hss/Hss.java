@@ -19,7 +19,6 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.ResultCode;
@@ -52,12 +51,14 @@ import org.cipango.ims.hss.model.RegistrationState;
 import org.cipango.ims.hss.model.Scscf;
 import org.cipango.ims.hss.model.Subscription;
 import org.cipango.littleims.util.HexString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 public class Hss
 {
 	public static final String __ISO_8859_1 = "ISO-8859-1";
-	private static final Logger __log = Logger.getLogger(Hss.class);
+	private static final Logger __log = LoggerFactory.getLogger(Hss.class);
 	
 	private PrivateIdentityDao _privateIdentityDao;
 	private PublicIdentityDao _publicIdentityDao;

@@ -20,16 +20,17 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
-import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
+import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class OriginatingSession extends Session
 {
-	private static final Logger __log = Logger.getLogger(OriginatingSession.class);
+	private static final Logger __log = LoggerFactory.getLogger(OriginatingSession.class);
 	private SessionCase _sessionCase;
 	
 	public OriginatingSession(UserProfile profile, boolean registered)

@@ -41,8 +41,8 @@
               <value>${project.build.directory}</value>
             </systemProperty>
             <systemProperty>
-              <name>log4j.configuration</name>
-              <value>file:${project.build.directory}/resources/log4j.xml</value>
+              <name>logback.configurationFile</name>
+              <value>file:${project.build.directory}/resources/logback.xml</value>
             </systemProperty>
           </systemProperties>
           <stopKey>foo</stopKey>
@@ -54,23 +54,6 @@
             <contextPath>/</contextPath>
           </webAppConfig>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.cipango</groupId>
-            <artifactId>cipango-callflow</artifactId>
-            <version>${cipango-version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.cipango.littleims</groupId>
-            <artifactId>littleims-debug-id</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       
       <plugin>

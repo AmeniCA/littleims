@@ -22,18 +22,19 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.TimerService;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileCache;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
 import org.cipango.littleims.scscf.util.MessageSender;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebugIdService
 {
 	private static final int DEFAULT_EXPIRES = 43200;
 	public static final String DEBUG_EVENT = "debug";
-	private final Logger _log = Logger.getLogger(RegEventManager.class);
+	private static final Logger _log = LoggerFactory.getLogger(RegEventManager.class);
 	
 	private int _minExpires;
 	private int _maxExpires;

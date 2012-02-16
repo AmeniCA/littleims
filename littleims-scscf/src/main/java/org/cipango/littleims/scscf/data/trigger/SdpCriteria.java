@@ -17,15 +17,16 @@ import java.util.Iterator;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.cx.data.userprofile.TSessionDescription;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
 import org.cipango.littleims.scscf.util.SessionDescription;
 import org.cipango.littleims.util.RegexUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SdpCriteria implements CriteriaMatch
 {
-	private static final Logger __log = Logger.getLogger(SdpCriteria.class);
+	private static final Logger __log = LoggerFactory.getLogger(SdpCriteria.class);
 	private String _line;
 	private boolean _lineRegex;
 	private String _content;

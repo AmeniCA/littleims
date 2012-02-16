@@ -23,14 +23,15 @@ import java.util.Map;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipURI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar.RegTimerTask;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Context
 {
-	private static final Logger __log = Logger.getLogger(Context.class);
+	private static final Logger __log = LoggerFactory.getLogger(Context.class);
 	
 	private String _publicUserIdentity;
 	private Map<String, Binding> _bindings = new HashMap<String, Binding>();

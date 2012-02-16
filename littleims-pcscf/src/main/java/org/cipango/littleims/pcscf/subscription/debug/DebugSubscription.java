@@ -20,16 +20,17 @@ import java.util.List;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.log4j.Logger;
-import org.cipango.ims.pcscf.debug.data.DebuginfoDocument;
 import org.cipango.ims.pcscf.debug.data.DebugconfigDocument.Debugconfig;
+import org.cipango.ims.pcscf.debug.data.DebuginfoDocument;
 import org.cipango.ims.pcscf.debug.data.DebuginfoDocument.Debuginfo;
 import org.cipango.littleims.pcscf.subscription.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebugSubscription implements Subscription
 {
 	
-	private static final Logger __log = Logger.getLogger(DebugSubscription.class);
+	private static final Logger __log = LoggerFactory.getLogger(DebugSubscription.class);
 	
 	private int _version = -1;
 	private List<DebugConf> _configs = new ArrayList<DebugConf>();

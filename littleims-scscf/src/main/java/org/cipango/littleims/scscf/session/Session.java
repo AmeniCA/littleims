@@ -23,11 +23,12 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria;
-import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.InitialFilterCriteria.SessionCase;
+import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class Session
@@ -40,7 +41,7 @@ public abstract class Session
 	private SipURI _ownURI;
 	private InitialFilterCriteria _currentIFc;
 	
-	private static final Logger __log = Logger.getLogger(Session.class);
+	private static final Logger __log = LoggerFactory.getLogger(Session.class);
 
 	public static final String ORIGINAL_DIALOG_IDENTIFIER_PARAM = "nxid";
 

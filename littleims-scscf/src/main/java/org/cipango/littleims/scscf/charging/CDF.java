@@ -24,13 +24,14 @@ import java.util.TimeZone;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.util.IDGenerator;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CDF
@@ -40,7 +41,7 @@ public class CDF
 	public static final int ROLE_NODE_TERMINATING = 1;
 	public static final int ROLE_NODE_PROXY = 2;
 	
-	private static final Logger log = Logger.getLogger(CDF.class);
+	private static final Logger log = LoggerFactory.getLogger(CDF.class);
 
 	private Map<String, Document> cdrs = new HashMap<String, Document>();
 	private File _chargingDirectory;

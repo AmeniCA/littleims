@@ -16,7 +16,6 @@ package org.cipango.ims.hss.web.publicid;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -39,11 +38,13 @@ import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
-import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.web.UriValidator;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EditPsiPage extends PublicIdentityPage
 {
@@ -51,7 +52,7 @@ public class EditPsiPage extends PublicIdentityPage
 	private String _key;
 	private String _title;
 	
-	private static final Logger __log = Logger.getLogger(EditPsiPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditPsiPage.class);
 		
 	@SpringBean
 	private ServiceProfileDao _serviceProfileDao;

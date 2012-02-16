@@ -2,8 +2,6 @@ package org.cipango.ims.hss.util;
 
 import java.util.Arrays;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.PropertyConfigurator;
 import org.cipango.ims.hss.db.PrivateIdentityDao;
 import org.cipango.ims.hss.db.ScscfDao;
 import org.cipango.ims.hss.db.SubscriptionDao;

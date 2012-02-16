@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -21,11 +20,13 @@ import org.apache.wicket.util.string.Strings;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.model.AdminUser;
 import org.cipango.ims.oam.SpringApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unused")
 public class SigninPage extends WebPage
 {
-	private static final Logger __log = Logger.getLogger(SigninPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(SigninPage.class);
 	
 	public static final String REDIRECT_PAGE = "redirectPage";
 	

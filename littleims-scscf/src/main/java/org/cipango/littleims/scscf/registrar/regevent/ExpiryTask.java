@@ -15,14 +15,15 @@ package org.cipango.littleims.scscf.registrar.regevent;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExpiryTask implements Runnable, Serializable
 {
 	/**
 	 * Logger for this class
 	 */
-	private static final Logger log = Logger.getLogger(ExpiryTask.class);
+	private static final Logger log = LoggerFactory.getLogger(ExpiryTask.class);
 	
 	private RegSubscription _subscription;
 	private RegEventManager _manager;

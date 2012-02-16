@@ -20,8 +20,9 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.util.LittleimsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.NAPTRRecord;
 import org.xbill.DNS.Record;
@@ -34,7 +35,7 @@ public class EnumClient
 	private String _domain;
 	private SipFactory _sipFactory;
 
-	private static final Logger __log = Logger.getLogger(EnumClient.class);
+	private static final Logger __log = LoggerFactory.getLogger(EnumClient.class);
 
 	public SipURI translate(TelURL telURL) throws LittleimsException
 	{

@@ -21,8 +21,9 @@ import javax.servlet.UnavailableException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -35,7 +36,7 @@ public class RegistrarServlet extends SipServlet
 
 	
 
-	public static final Logger __log = Logger.getLogger(RegistrarServlet.class);
+	private static final Logger __log = LoggerFactory.getLogger(RegistrarServlet.class);
 
 	private RegEventManager _regEventManager;
 	private Registrar _registrar;

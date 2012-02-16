@@ -16,11 +16,12 @@ package org.cipango.littleims.scscf.debug;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.data.UserProfile;
 import org.cipango.littleims.scscf.data.UserProfileListener;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DebugSession implements UserProfileListener
 {
@@ -28,7 +29,7 @@ public class DebugSession implements UserProfileListener
 	private static final String DEBUG_INFO_CONTENT_TYPE = "application/debuginfo+xml";
 	private static final String EMPTY_SERVICE_LEVEL_TRACE_INFO = 
 		"<debuginfo xmlns=\"urn:ietf:params:xml:ns:debuginfo\" version=\"0\" state=\"full\"/>";
-	private static final Logger __log = Logger.getLogger(DebugSession.class);
+	private static final Logger __log = LoggerFactory.getLogger(DebugSession.class);
 	
 	private int _version;
 	private SipSession _session;

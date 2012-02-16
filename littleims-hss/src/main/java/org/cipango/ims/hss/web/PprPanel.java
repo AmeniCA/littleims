@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -37,11 +36,13 @@ import org.apache.wicket.util.string.interpolator.MapVariableInterpolator;
 import org.cipango.ims.hss.CxManager;
 import org.cipango.ims.hss.model.PublicIdentity;
 import org.cipango.ims.hss.web.publicid.EditPublicUserIdPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PprPanel extends Panel
 {
 
-	private static final Logger __log = Logger.getLogger(PprPanel.class);
+	private static final Logger __log = LoggerFactory.getLogger(PprPanel.class);
 	private int _nbPublicsToUpdate;
 	
 	public PprPanel(String id, final CxManager cxManager)

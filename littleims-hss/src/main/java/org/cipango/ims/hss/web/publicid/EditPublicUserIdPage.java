@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -40,15 +39,17 @@ import org.cipango.ims.hss.model.ImplicitRegistrationSet;
 import org.cipango.ims.hss.model.PSI;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.PublicIdentity;
+import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.model.PublicUserIdentity;
 import org.cipango.ims.hss.model.ServiceProfile;
-import org.cipango.ims.hss.model.PublicIdentity.IdentityType;
 import org.cipango.ims.hss.web.UriValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EditPublicUserIdPage extends PublicIdentityPage
 {
 
-	private static final Logger __log = Logger.getLogger(EditPublicUserIdPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditPublicUserIdPage.class);
 	
 	private String _key;
 	private String _title;

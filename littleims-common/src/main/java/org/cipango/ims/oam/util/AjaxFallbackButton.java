@@ -13,16 +13,17 @@
 // ========================================================================
 package org.cipango.ims.oam.util;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class AjaxFallbackButton extends org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton
 {
 
-	private static final Logger __log = Logger.getLogger(AjaxFallbackButton.class);
+	private static final Logger __log = LoggerFactory.getLogger(AjaxFallbackButton.class);
 	
 	public AjaxFallbackButton(String id, Form<?> form)
 	{

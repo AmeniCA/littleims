@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
@@ -41,11 +40,13 @@ import org.cipango.ims.hss.db.ApplicationServerDao;
 import org.cipango.ims.hss.db.ServiceProfileDao;
 import org.cipango.ims.hss.model.ApplicationServer;
 import org.cipango.ims.hss.model.InitialFilterCriteria;
-import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.InitialFilterCriteria.ProfilePartIndicator;
+import org.cipango.ims.hss.model.ServiceProfile;
 import org.cipango.ims.hss.model.spt.SPT;
 import org.cipango.ims.hss.web.spt.EditSptsPage;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EditIfcPage extends IfcPage
 {
@@ -60,7 +61,7 @@ public class EditIfcPage extends IfcPage
 	
 	private String _serviceProfileKey;
 	
-	private static final Logger __log = Logger.getLogger(EditIfcPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditIfcPage.class);
 	
 	@SuppressWarnings("unchecked")
 	public EditIfcPage(PageParameters pageParameters)

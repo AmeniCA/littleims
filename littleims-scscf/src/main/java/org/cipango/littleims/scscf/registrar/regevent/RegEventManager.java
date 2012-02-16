@@ -29,15 +29,16 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class RegEventManager implements RegEventListener
 {
 
-	private static final Logger __log = Logger.getLogger(RegEventManager.class);
+	private static final Logger __log = LoggerFactory.getLogger(RegEventManager.class);
 	public static final String REG_EVENT = "reg";
 		
 	private Map<String, List<RegSubscription>> _subscriptions = new HashMap<String, List<RegSubscription>>();

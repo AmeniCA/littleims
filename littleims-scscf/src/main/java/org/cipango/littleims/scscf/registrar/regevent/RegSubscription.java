@@ -19,15 +19,16 @@ import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.scscf.registrar.Context.RegState;
 import org.cipango.littleims.scscf.registrar.regevent.RegInfo.ContactInfo;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegSubscription
 {
-	private static final Logger __log = Logger.getLogger(RegEventManager.class);
+	private static final Logger __log = LoggerFactory.getLogger(RegEventManager.class);
 
 	private static final String REG_INFO_CONTENT_TYPE = "application/reginfo+xml";
 	

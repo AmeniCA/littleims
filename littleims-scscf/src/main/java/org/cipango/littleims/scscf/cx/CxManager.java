@@ -19,7 +19,6 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.DiameterCommand;
@@ -34,12 +33,14 @@ import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Digest;
 import org.cipango.littleims.util.HexString;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 public class CxManager
 {
-	private static final Logger __log = Logger.getLogger(CxManager.class);
+	private static final Logger __log = LoggerFactory.getLogger(CxManager.class);
 	private DiameterFactory _diameterFactory;
 	private String _hssRealm;
 	private String _hssHost;

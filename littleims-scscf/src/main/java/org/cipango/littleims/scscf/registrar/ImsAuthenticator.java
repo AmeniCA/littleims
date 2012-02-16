@@ -24,7 +24,6 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.api.DiameterServletAnswer;
 import org.cipango.diameter.base.Common;
@@ -39,11 +38,13 @@ import org.cipango.littleims.util.Base64;
 import org.cipango.littleims.util.Digest;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImsAuthenticator implements Authenticator
 {
 
-	public static final Logger __log = Logger.getLogger(ImsAuthenticator.class);
+	private static final Logger __log = LoggerFactory.getLogger(ImsAuthenticator.class);
 	private static final int DEFAULT_AUTH_TIMEOUT = 5000; // 5s
 	
 	private Timer _timer;

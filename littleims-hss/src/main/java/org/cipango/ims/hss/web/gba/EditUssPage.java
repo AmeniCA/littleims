@@ -16,7 +16,6 @@ package org.cipango.ims.hss.web.gba;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -39,11 +38,13 @@ import org.cipango.ims.hss.model.NafGroup;
 import org.cipango.ims.hss.model.PrivateIdentity;
 import org.cipango.ims.hss.model.uss.Uss;
 import org.cipango.ims.hss.web.privateid.ContextPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EditUssPage extends UssPage
 {
 
-	private static final Logger __log = Logger.getLogger(EditUssPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(EditUssPage.class);
 	
 	private Long _key;
 	private String _privateIdKey;

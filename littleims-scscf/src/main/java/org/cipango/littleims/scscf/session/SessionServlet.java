@@ -23,7 +23,6 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.TimerListener;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.api.DiameterListener;
 import org.cipango.diameter.api.DiameterServletAnswer;
@@ -36,6 +35,8 @@ import org.cipango.littleims.scscf.registrar.Registrar;
 import org.cipango.littleims.scscf.registrar.regevent.RegEventManager;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -56,7 +57,7 @@ public class SessionServlet extends SipServlet implements DiameterListener, Time
 	
 	private Registrar _registrar;
 
-	private final Logger _log = Logger.getLogger(SessionServlet.class);
+	private static final Logger _log = LoggerFactory.getLogger(SessionServlet.class);
 
 	public void init() throws ServletException
 	{

@@ -27,18 +27,19 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.api.DiameterServletAnswer;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Cx.UserAuthorizationType;
 import org.cipango.littleims.util.AuthorizationHeader;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.URIHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IcscfService
 {
 
-	private final Logger _log = Logger.getLogger(IcscfService.class);
+	private static final Logger _log = LoggerFactory.getLogger(IcscfService.class);
 
 	private static final String ORIG_PARAM = "orig";
 	private static final String TERM_PARAM = "term";	

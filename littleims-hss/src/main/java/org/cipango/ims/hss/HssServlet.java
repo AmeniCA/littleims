@@ -18,7 +18,6 @@ import java.io.IOException;
 
 import javax.servlet.sip.SipServlet;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.ResultCode;
@@ -31,6 +30,8 @@ import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Zh;
 import org.cipango.ims.hss.db.AdminUserDao;
 import org.cipango.ims.hss.diameter.DiameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -39,7 +40,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class HssServlet extends SipServlet implements DiameterListener
 {
-	private static final Logger __log = Logger.getLogger(HssServlet.class);
+	private static final Logger __log = LoggerFactory.getLogger(HssServlet.class);
 	
 	private Hss _hss;
 	private ZhHandler _zhHandler;

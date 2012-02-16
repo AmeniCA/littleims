@@ -16,18 +16,19 @@ package org.cipango.ims.hss.auth;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.AVP;
 import org.cipango.diameter.AVPList;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.ims.AuthenticationScheme;
 import org.cipango.littleims.util.HexString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class AkaAuthenticationVector implements AuthenticationVector {
 
-	private static final Logger __log = Logger.getLogger(AkaAuthenticationVector.class);
+	private static final Logger __log = LoggerFactory.getLogger(AkaAuthenticationVector.class);
 	
 	protected static byte[] __amf = { 0, 0};
 

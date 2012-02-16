@@ -24,16 +24,17 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.pcscf.RegContext;
 import org.cipango.littleims.pcscf.subscription.Subscription;
 import org.cipango.littleims.pcscf.subscription.SubscriptionServlet;
 import org.cipango.littleims.util.Headers;
 import org.cipango.littleims.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegEventService
 {
-	private final Logger _log = Logger.getLogger(RegEventService.class);
+	private static final Logger _log = LoggerFactory.getLogger(RegEventService.class);
 	public static final String EVENT_REG = "reg";
 	
 	private SipFactory _sipFactory;

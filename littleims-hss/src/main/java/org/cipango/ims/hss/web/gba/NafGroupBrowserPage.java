@@ -15,7 +15,6 @@ package org.cipango.ims.hss.web.gba;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -39,10 +38,12 @@ import org.cipango.ims.oam.util.AbstractListDataProvider;
 import org.cipango.ims.oam.util.AjaxFallbackButton;
 import org.cipango.ims.oam.util.EditableLabel;
 import org.cipango.ims.oam.util.OddEvenAttrModifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NafGroupBrowserPage extends BasePage
 {
-	private static final Logger __log = Logger.getLogger(NafGroupBrowserPage.class);
+	private static final Logger __log = LoggerFactory.getLogger(NafGroupBrowserPage.class);
 	
 	@SpringBean
 	private NafGroupDao _dao;

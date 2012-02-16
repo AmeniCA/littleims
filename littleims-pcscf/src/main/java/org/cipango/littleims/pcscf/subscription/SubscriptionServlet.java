@@ -20,13 +20,14 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.apache.log4j.Logger;
 import org.cipango.littleims.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SubscriptionServlet extends SipServlet
 {
 	
-	private final Logger _log = Logger.getLogger(SubscriptionServlet.class);
+	private static final Logger _log = LoggerFactory.getLogger(SubscriptionServlet.class);
 
 	@Override
 	protected void doNotify(SipServletRequest request) throws ServletException,

@@ -52,8 +52,8 @@
               <value>${project.build.directory}</value>
             </systemProperty>
             <systemProperty>
-              <name>log4j.configuration</name>
-              <value>file:${project.build.directory}/resources/log4j.xml</value>
+              <name>logback.configurationFile</name>
+              <value>file:${project.build.directory}/resources/logback.xml</value>
             </systemProperty>
             <systemProperty>
               <name>sip.port</name>
@@ -78,23 +78,6 @@
             <contextPath>/</contextPath>
           </webAppConfig>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.cipango</groupId>
-            <artifactId>cipango-diameter</artifactId>
-            <version>${cipango-version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.cipango</groupId>
-            <artifactId>cipango-callflow</artifactId>
-            <version>${cipango-version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       
       <plugin>
@@ -208,16 +191,6 @@
       <artifactId>wicket-datetime</artifactId>
       <version>${wicket.version}</version>
     </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-    </dependency>
-    
   </dependencies>
 
 </project>

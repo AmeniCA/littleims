@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.cipango.littleims.cx.data.userprofile.IMSSubscriptionDocument;
 import org.cipango.littleims.cx.data.userprofile.SharedIFCsDocument;
@@ -36,6 +35,8 @@ import org.cipango.littleims.scscf.data.trigger.CriteriaMatch;
 import org.cipango.littleims.scscf.data.trigger.TriggerPointCompiler;
 import org.cipango.littleims.util.LittleimsException;
 import org.cipango.littleims.util.RegexUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UserProfileCache
@@ -48,7 +49,7 @@ public class UserProfileCache
 	private TriggerPointCompiler _tpCompiler = new TriggerPointCompiler();
 	private Map<Integer, InitialFilterCriteria> _sharedIFCs;
 
-	private static final Logger __log = Logger.getLogger(UserProfileCache.class);
+	private static final Logger __log = LoggerFactory.getLogger(UserProfileCache.class);
 
 
 	public void init() throws XmlException, IOException

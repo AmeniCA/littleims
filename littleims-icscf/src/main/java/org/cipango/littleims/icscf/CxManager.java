@@ -17,7 +17,6 @@ import java.io.IOException;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.log4j.Logger;
 import org.cipango.diameter.DiameterCommand;
 import org.cipango.diameter.api.DiameterFactory;
 import org.cipango.diameter.api.DiameterServletRequest;
@@ -25,10 +24,12 @@ import org.cipango.diameter.base.Common;
 import org.cipango.diameter.ims.Cx;
 import org.cipango.diameter.ims.Cx.OriginatingRequest;
 import org.cipango.diameter.ims.Cx.UserAuthorizationType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CxManager
 {
-	private static final Logger __log = Logger.getLogger(CxManager.class);
+	private static final Logger __log = LoggerFactory.getLogger(CxManager.class);
 	private DiameterFactory _diameterFactory;
 	private String _hssRealm;
 	private String _hssHost;
