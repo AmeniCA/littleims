@@ -305,7 +305,7 @@ public class ImsAuthenticator implements Authenticator
 		{
 			__log.debug("Sending 401 response");
 			String wwwAuthenticate = "Digest realm=\"" + realm + "\", qop=\"auth\", nonce=\"" + nonce
-					+ "\", algorithm=\"" + algorithm + "\"";
+					+ "\", algorithm=" + algorithm;
 			if (stale)
 			{
 				wwwAuthenticate += ", stale=TRUE";
