@@ -229,6 +229,12 @@
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>repository.cipango.org</id>
+      <url>http://repository.cipango.org/</url>
+    </repository>
+  </repositories>
  
   <properties>
     <junit-version>3.8.1</junit-version>
