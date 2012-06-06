@@ -234,6 +234,18 @@
       <id>repository.cipango.org</id>
       <url>http://repository.cipango.org/</url>
     </repository>
+    <repository>
+      <id>java.net</id>
+      <url>http://download.java.net/maven/2/</url>
+    </repository>
+    <repository>
+      <id>opennms-repo</id>
+      <name>OpenNMS Repository</name>
+      <url>http://repo.opennms.org/content/repositories/opennms-repo</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
  
   <properties>
@@ -245,5 +257,11 @@
     <logback.version>1.0.0</logback.version>
   </properties>
 
-
+  <pluginRepositories>
+    <pluginRepository>
+      <id>cipango.org</id>
+      <name>Cipango Plugin Repository</name>
+      <url>http://repository.cipango.org</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
