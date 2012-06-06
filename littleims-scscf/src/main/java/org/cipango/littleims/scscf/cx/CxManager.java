@@ -224,7 +224,7 @@ public class CxManager
 		{
 			__log.debug("Detect auts parameter in authorization header, try to resynchronized");
 			byte[] rand = getRand(authorizationHeader.getNonce());
-			byte[] bAuts = HexString.hexToBuffer(auts);
+			byte[] bAuts = Base64.decode(auts);
 			byte[] sipAuthorization = Digest.concat(rand, bAuts);
 			
 			avpList.add(Cx.SIP_AUTHORIZATION, sipAuthorization);
