@@ -27,7 +27,7 @@
   </appender>
 
   <!-- if you need more traces, change this logger level to DEBUG -->
-  <logger name="org.cipango.ims">
+  <logger name="org.cipango.littleims">
     <level value="DEBUG"/>
   </logger>
 

@@ -24,7 +24,7 @@
   <!-- categories -->
 
 
-  <category name="org.cipango.ims">
+  <category name="org.cipango.littleims">
     <priority value="debug"/>
   </category>
   
