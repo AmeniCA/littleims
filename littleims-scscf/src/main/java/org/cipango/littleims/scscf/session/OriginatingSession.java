@@ -16,6 +16,7 @@ package org.cipango.littleims.scscf.session;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
@@ -66,7 +67,7 @@ public class OriginatingSession extends Session
 		while ((ifc = nextIFC()) != null)
 		{
 			__log.trace("Evaluating filter criteria with priority: " + ifc.getPriority());
-			ifcMatched = ifc.matches(request, _sessionCase);
+			ifcMatched = ifc.matches(request, getSessionCase());
 			if (ifcMatched)
 			{
 				SipURI asURI = (SipURI) getSessionManager().getSipFactory().createURI(ifc.getAs().getURI());
@@ -75,7 +76,10 @@ public class OriginatingSession extends Session
 				request.pushRoute(getOwnURI());
 				request.pushRoute(asURI);
 				request.getProxy().setRecordRoute(false);
-				request.setHeader(Headers.P_SERVED_USER, getProfile().getUri());
+				Address served = getSessionManager().getSipFactory().createAddress(getProfile().getUri());
+				served.setParameter(InitialFilterCriteria.SE_CASE_PARAM, getSessionCase().getSeCaseParam());
+				served.setParameter(InitialFilterCriteria.REG_STATE_PARAM, getSessionCase().getRegStateParam());
+				request.setAddressHeader(Headers.P_SERVED_USER, served);
 				
 				request.getProxy().proxyTo(request.getRequestURI());
 				return false;

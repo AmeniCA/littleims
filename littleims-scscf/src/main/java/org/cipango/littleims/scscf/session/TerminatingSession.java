@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
@@ -125,6 +126,12 @@ public class TerminatingSession extends Session
 					{
 						request.setRequestURI(asURI);
 					}
+					
+					Address served = getSessionManager().getSipFactory().createAddress(getProfile().getUri());
+					served.setParameter(InitialFilterCriteria.SE_CASE_PARAM, getSessionCase().getSeCaseParam());
+					served.setParameter(InitialFilterCriteria.REG_STATE_PARAM, getSessionCase().getRegStateParam());
+					request.setAddressHeader(Headers.P_SERVED_USER, served);
+					
 					// TODO confirm if should be record route.
 					// may be something configurable
 					request.getProxy().setRecordRoute(true);

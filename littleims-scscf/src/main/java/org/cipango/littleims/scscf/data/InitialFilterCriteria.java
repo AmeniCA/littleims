@@ -22,27 +22,44 @@ import org.cipango.littleims.scscf.data.trigger.CriteriaMatch;
 
 public class InitialFilterCriteria implements Serializable
 {
-
+	public static final String SE_CASE_PARAM = "sescase";
+	public static final String REG_STATE_PARAM = "regstate";
+	
 	private int _priority;
 	private CriteriaMatch _trigger;
 	private AS _as;
 	
 	public enum SessionCase
 	{
-		ORIGINATING_SESSION(0),
-		TERMINATING_REGISTERED(1),
-		TERMINATING_UNREGISTERED(2),
-		ORIGINATING_UNREGISTERED(3);
+		ORIGINATING_SESSION(0, "orig", "reg"),
+		TERMINATING_REGISTERED(1, "term", "reg"),
+		TERMINATING_UNREGISTERED(2, "term", "unreg"),
+		ORIGINATING_UNREGISTERED(3, "orig", "unreg");
 		
 		private short _value;
-		private SessionCase(int value)
+		private String _seCaseParam;
+		private String _regStateParam;
+		
+		private SessionCase(int value, String seCaseParam, String regStateParam)
 		{
 			_value = (short) value;
+			_seCaseParam = seCaseParam;
+			_regStateParam = regStateParam;
 		}
 		
 		public short getValue()
 		{
 			return _value;
+		}
+
+		public String getSeCaseParam()
+		{
+			return _seCaseParam;
+		}
+
+		public String getRegStateParam()
+		{
+			return _regStateParam;
 		}
 	}
 
