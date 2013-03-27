@@ -137,7 +137,6 @@
             </New>
           </Arg>
         </Call>
-        <Call name="addDictionary"><Arg>org.cipango.diameter.ims.Zh</Arg></Call>
       </New>
     </Arg>
   </Call>

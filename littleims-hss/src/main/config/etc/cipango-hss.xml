@@ -185,7 +185,6 @@
             <Get name="ZH_APPLICATION_ID" class="org.cipango.diameter.ims.Zh"/>
           </Arg>
         </Call>
-        <Call name="addDictionary"><Arg>org.cipango.diameter.ims.Zh</Arg></Call>
         <Call name="addPeer">
           <Arg>
             <New class="org.cipango.diameter.node.Peer">
