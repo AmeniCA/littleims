@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ import org.cipango.server.SipConnection;
 import org.cipango.server.SipMessage;
 import org.cipango.server.SipResponse;
 import org.cipango.server.log.AbstractMessageLog;
-import org.eclipse.jetty.io.Buffer;
 import org.eclipse.jetty.util.StringUtil;
 
 public class DebugIdMessageLog extends AbstractMessageLog
@@ -56,8 +56,8 @@ public class DebugIdMessageLog extends AbstractMessageLog
 		synchronized (os)
 		{
 			os.write(generateInfoLine(direction, connection, System.currentTimeMillis()).getBytes()); 
-            Buffer buffer = generateMessage(message);
-    		os.write(buffer.array(), 0, buffer.length());
+            ByteBuffer buffer = generateMessage(message);
+    		os.write(buffer.array(), 0, buffer.position());
     		os.write(StringUtil.__LINE_SEPARATOR.getBytes());
     		os.flush();
 		}

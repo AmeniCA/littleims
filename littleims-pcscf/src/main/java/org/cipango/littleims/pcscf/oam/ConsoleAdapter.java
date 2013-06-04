@@ -13,20 +13,16 @@
 // ========================================================================
 package org.cipango.littleims.pcscf.oam;
 
-import java.util.Iterator;
 import java.util.List;
 
-import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerFactory;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.cipango.console.ConsoleFilter;
-import org.cipango.console.Menu;
-import org.cipango.console.MenuFactory;
-import org.cipango.console.PageImpl;
-import org.cipango.console.printer.MenuPrinter;
+import org.cipango.console.menu.Menu;
+import org.cipango.console.menu.MenuFactory;
+import org.cipango.console.menu.MenuImpl;
+import org.cipango.console.menu.PageImpl;
 
 public class ConsoleAdapter implements ServletContextListener
 {		
@@ -34,48 +30,21 @@ public class ConsoleAdapter implements ServletContextListener
 	{
 		HssMenuFactory menuFactory = new HssMenuFactory();
 		sce.getServletContext().setAttribute(MenuFactory.class.getName(), menuFactory);
-		menuFactory.setMBeanServer(getMBeanServer());
 	}
 	
-	@SuppressWarnings("unchecked")
-	public MBeanServer getMBeanServer()
-	{
-		List<MBeanServer> l = MBeanServerFactory.findMBeanServer(null);
-		Iterator<MBeanServer> it = l.iterator();
-		while (it.hasNext())
-		{
-			MBeanServer server = it.next();
-			for (int j = 0; j < server.getDomains().length; j++)
-			{
-				if (server.isRegistered(ConsoleFilter.SERVER))
-				{
-					return server;
-				}
-			}
-		}
-		return null;
-	}
-
 	public void contextDestroyed(ServletContextEvent sce)
 	{	
 	}
 	
 	public static class HssMenuFactory implements MenuFactory
-	{	
-		private MBeanServerConnection _c;
-		
-		public Menu getMenu(String command, String contextPath)
+	{			
+		public Menu getMenu(String command, MBeanServerConnection c)
 		{
-			return new HssMenu(_c, command, contextPath);
-		}
-		
-		public void setMBeanServer(MBeanServerConnection c)
-		{
-			_c = c;
-		}
+			return new HssMenu(c, command);
+		}		
 	}
 	
-	public static class HssMenu extends MenuPrinter
+	public static class HssMenu extends MenuImpl
 	{
 		private static final PageImpl PAGES = new PageImpl("");
 
@@ -83,24 +52,24 @@ public class ConsoleAdapter implements ServletContextListener
 			REGISTRATIONS = PAGES.add(new PageImpl("registrations", "Registrations")),
 			
 			CONFIGURATION = PAGES.add(new PageImpl("Configuration")),
-			CONFIG_SIP = CONFIGURATION.add(new PageImpl("configuration-sip", "P-CSCF :: SIP Configuration", "SIP")),
-			CONFIG_HTTP = CONFIGURATION.add(new PageImpl("configuration-http", "P-CSCF :: HTTP Configuration", "HTTP")),
+			CONFIG_SIP = CONFIGURATION.add(new PageImpl(MenuImpl.CONFIG_SIP.getName(), "P-CSCF :: SIP Configuration", "SIP")),
+			CONFIG_HTTP = CONFIGURATION.add(new PageImpl(MenuImpl.CONFIG_HTTP.getName(), "P-CSCF :: HTTP Configuration", "HTTP")),
 			
 			STATISTICS = PAGES.add(new PageImpl("Statistics")),
-			STATISTICS_SIP = STATISTICS.add(new PageImpl("statistics-sip", "P-CSCF :: SIP Statistics", "SIP")),
-			STATISTICS_HTTP = STATISTICS.add(new PageImpl("statistics-http", "P-CSCF :: HTTP Statistics", "HTTP")),
+			STATISTICS_SIP = STATISTICS.add(new PageImpl(MenuImpl.STATISTICS_SIP.getName(), "P-CSCF :: SIP Statistics", "SIP")),
+			STATISTICS_HTTP = STATISTICS.add(new PageImpl(MenuImpl.CONFIG_HTTP.getName(), "P-CSCF :: HTTP Statistics", "HTTP")),
 
 			LOGS = PAGES.add(new PageImpl("Logs")),
-			SIP_LOGS = LOGS.add(new PageImpl("logs-sip", "P-CSCF :: SIP Logs", "SIP")),
+			SIP_LOGS = LOGS.add(new PageImpl(MenuImpl.SIP_LOGS.getName(), "P-CSCF :: SIP Logs", "SIP")),
 			DEBUG_ID = LOGS.add(new PageImpl("debug-id", "Debug ID"));
 		
-		public HssMenu(MBeanServerConnection c, String command, String contextPath)
+		public HssMenu(MBeanServerConnection c, String command)
 		{
-			super(c, command, contextPath);
+			super(c, command);
 		}
 
 		@Override
-		protected List<PageImpl> getPages()
+		public List<PageImpl> getPages()
 		{
 			return PAGES.getPages();
 		}

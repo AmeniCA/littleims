@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+    
+    <!-- *********************************************************** -->
+    <!-- Jetty.xml                                                   -->
+    <!-- *********************************************************** -->
+    <Arg name="threadpool">
+      <New id="threadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+        <Arg name="minThreads" type="int"><Property name="threads.min" default="10"/></Arg>
+        <Arg name="maxThreads" type="int"><Property name="threads.max" default="200"/></Arg>
+        <Arg name="idleTimeout" type="int"><Property name="threads.timeout" default="60000"/></Arg>
+        <Set name="detailedDump">false</Set>
+      </New>
+    </Arg>
+ 
+ 
+ 
+ 
+ 
+  <Call class="java.lang.System" name="setProperties">
+    <Arg>
+      <New class="java.util.Properties">
+        <Call name="load">
+          <Arg>
+            <New class="java.io.FileInputStream">
+              <Arg><SystemProperty default="." name="jetty.home"/>/../littleims.properties</Arg>
+            </New>
+          </Arg>
+        </Call>
+        <Call name="putAll">
+          <Arg><Call class="java.lang.System" name="getProperties"/></Arg>
+        </Call>
+      </New>
+    </Arg>
+  </Call>
+  
+</Configure>

@@ -264,7 +264,7 @@
   <properties>
     <junit-version>3.8.1</junit-version>
     <sip-api-version>1.1</sip-api-version>
-    <cipango-version>2.1</cipango-version>
+    <cipango-version>3.0.0-SNAPSHOT</cipango-version>
     <wicket.version>1.4.12</wicket.version>
     <slf4j.version>1.6.1</slf4j.version>
     <logback.version>1.0.0</logback.version>

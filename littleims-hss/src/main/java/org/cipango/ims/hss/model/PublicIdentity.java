@@ -53,7 +53,7 @@ public abstract class PublicIdentity implements Convertible, Comparable<PublicId
 	private Long _id;
 	
 	@Column (unique = true)
-	@Index (name = "IDX_IDENTITY")
+	@Index (name = "IDX_PUBLIC_ID")
 	private String _identity;
 	
 	private boolean _barred;

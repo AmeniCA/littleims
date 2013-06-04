@@ -31,23 +31,39 @@
     </resources>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>jetty.home</name>
+                  <value>${project.build.directory}</value>
+                </property>
+                <property>
+                  <name>logback.configurationFile</name>
+                  <value>file:${project.build.directory}/resources/logback.xml</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
         <groupId>org.cipango</groupId>
         <artifactId>cipango-maven-plugin</artifactId>
         <configuration>
           <systemPropertiesFile>../littleims.properties</systemPropertiesFile>
-          <systemProperties>
-            <systemProperty>
-              <name>jetty.home</name>
-              <value>${project.build.directory}</value>
-            </systemProperty>
-            <systemProperty>
-              <name>logback.configurationFile</name>
-              <value>file:${project.build.directory}/resources/logback.xml</value>
-            </systemProperty>
-          </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9996</stopPort>
-          <jettyConfig>${basedir}/src/main/cipango-maven-plugin/cipango-pcscf.xml</jettyConfig>
+          <jettyConfig>${basedir}/src/main/config/etc/cipango-pcscf.xml</jettyConfig>
           <scanIntervalSeconds>5</scanIntervalSeconds>
           <annotationsEnabled>false</annotationsEnabled>
           <webAppConfig>

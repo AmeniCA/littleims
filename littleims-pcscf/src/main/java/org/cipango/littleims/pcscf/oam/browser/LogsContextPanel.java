@@ -15,7 +15,7 @@ package org.cipango.littleims.pcscf.oam.browser;
 
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.console.printer.MenuPrinter;
+import org.cipango.console.menu.MenuImpl;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 public class LogsContextPanel extends Panel
@@ -26,7 +26,7 @@ public class LogsContextPanel extends Panel
 	{
 		super("contextMenu");
 		add(new AutolinkBookmarkablePageLink("DebugBrowserPage", DebugBrowserPage.class));
-		add(new ExternalLink("sipLogs", "../" + MenuPrinter.SIP_LOGS.getName()));
+		add(new ExternalLink("sipLogs", "../" + MenuImpl.SIP_LOGS.getName()));
 	}
 
 }

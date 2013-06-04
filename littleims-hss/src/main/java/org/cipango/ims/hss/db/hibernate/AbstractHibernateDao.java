@@ -74,7 +74,7 @@ public abstract class AbstractHibernateDao<T>
     
     public int count() 
     {
-    	return (Integer) criteria().setProjection(Projections.rowCount()).uniqueResult();
+    	return ((Long) criteria().setProjection(Projections.rowCount()).uniqueResult()).intValue();
 	}
     
     @SuppressWarnings("unchecked")

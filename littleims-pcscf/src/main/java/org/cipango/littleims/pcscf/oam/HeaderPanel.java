@@ -17,7 +17,7 @@ import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.console.printer.MenuPrinter;
+import org.cipango.console.menu.MenuImpl;
 import org.cipango.ims.oam.SpringApplication;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 import org.cipango.littleims.pcscf.oam.browser.RegistrationBrowserPage;
@@ -33,9 +33,9 @@ public class HeaderPanel extends Panel
 		add(JavascriptPackageResource.getHeaderContribution(SpringApplication.class, "common-util.js"));
 		
 		add(new AutolinkBookmarkablePageLink("RegistrationBrowserPage", RegistrationBrowserPage.class));
-		add(new ExternalLink("configuration", "../" + MenuPrinter.CONFIG_SIP.getName()));
-		add(new ExternalLink("statistics", "../" + MenuPrinter.STATISTICS_SIP.getName()));
-		add(new ExternalLink("logs", "../" + MenuPrinter.SIP_LOGS.getName()));
+		add(new ExternalLink("configuration", "../" + MenuImpl.CONFIG_SIP.getName()));
+		add(new ExternalLink("statistics", "../" + MenuImpl.STATISTICS_SIP.getName()));
+		add(new ExternalLink("logs", "../" + MenuImpl.SIP_LOGS.getName()));
 		
 	}
 	

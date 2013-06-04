@@ -1,188 +1,195 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
-<Configure class="org.cipango.server.Server" id="Server">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-  <!-- =========================================================== -->
-  <!-- Initialize mbean server                                     -->
-  <!-- =========================================================== -->
-  <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer"/>
-  
-  <!-- =========================================================== -->
-  <!-- Initialize the Cipango MBean container                      -->
-  <!-- =========================================================== -->
-  <Get id="Container" name="container">
-    <Call name="addEventListener">
+    <!-- *********************************************************** -->
+    <!-- Jetty.xml                                                   -->
+    <!-- *********************************************************** -->
+
+    <!-- =========================================================== -->
+    <!-- Add shared Scheduler instance                               -->
+    <!-- =========================================================== -->
+    <Call name="addBean">
       <Arg>
-        <New class="org.eclipse.jetty.jmx.MBeanContainer">
-          <Arg><Ref id="MBeanServer"/></Arg>
-          <Call name="start" />
+        <New class="org.eclipse.jetty.util.thread.ScheduledExecutorScheduler"/>
+      </Arg>
+    </Call>
+
+    <!-- =========================================================== -->
+    <!-- Http Configuration.                                         -->
+    <!-- This is a common configuration instance used by all         -->
+    <!-- connectors that can carry HTTP semantics (HTTP, HTTPS, SPDY)-->
+    <!-- It configures the non wire protocol aspects of the HTTP     -->
+    <!-- semantic.                                                   -->
+    <!--                                                             -->
+    <!-- This configuration is only defined here and is used by      -->
+    <!-- reference from the jetty-http.xml, jetty-https.xml and      -->
+    <!-- jetty-spdy.xml configuration files which instantiate the    -->
+    <!-- connectors.                                                 -->
+    <!--                                                             -->
+    <!-- Consult the javadoc of o.e.j.server.HttpConfiguration       -->
+    <!-- for all configuration that may be set here.                 -->
+    <!-- =========================================================== -->
+    <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+      <Set name="secureScheme">https</Set>
+      <Set name="securePort"><Property name="jetty.secure.port" default="8443" /></Set>
+      <Set name="outputBufferSize">32768</Set>
+      <Set name="requestHeaderSize">8192</Set>
+      <Set name="responseHeaderSize">8192</Set>
+      <Set name="sendServerVersion">true</Set>
+      <Set name="sendDateHeader">false</Set>
+      <Set name="headerCacheSize">512</Set>
+
+      <!-- Uncomment to enable handling of X-Forwarded- style headers
+      <Call name="addCustomizer">
+        <Arg><New class="org.eclipse.jetty.server.ForwardedRequestCustomizer"/></Arg>
+      </Call>
+      -->
+    </New>
+
+
+    <!-- =========================================================== -->
+    <!-- Set the default handler structure for the Server            -->
+    <!-- A handler collection is used to pass received requests to   -->
+    <!-- both the ContextHandlerCollection, which selects the next   -->
+    <!-- handler by context path and virtual host, and the           -->
+    <!-- DefaultHandler, which handles any requests not handled by   -->
+    <!-- the context handlers.                                       -->
+    <!-- Other handlers may be added to the "Handlers" collection,   -->
+    <!-- for example the jetty-requestlog.xml file adds the          -->
+    <!-- RequestLogHandler after the default handler                 -->
+    <!-- =========================================================== -->
+    <Set name="handler">
+      <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+        <Set name="handlers">
+         <Array type="org.eclipse.jetty.server.Handler">
+           <Item>
+             <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+           </Item>
+           <Item>
+             <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+           </Item>
+         </Array>
+        </Set>
+      </New>
+    </Set>
+
+    <!-- =========================================================== -->
+    <!-- extra server options                                        -->
+    <!-- =========================================================== -->
+    <Set name="stopAtShutdown">true</Set>
+    <Set name="stopTimeout">5000</Set>
+    <Set name="dumpAfterStart"><Property name="jetty.dump.start" default="false"/></Set>
+    <Set name="dumpBeforeStop"><Property name="jetty.dump.stop" default="false"/></Set>
+
+    
+    
+    <!-- *********************************************************** -->
+    <!-- Jetty-jmx.xml                                               -->
+    <!-- *********************************************************** -->
+    <Call id="MBeanServer" class="java.lang.management.ManagementFactory"
+      name="getPlatformMBeanServer" />
+
+    <!-- =========================================================== -->
+    <!-- Initialize the Jetty MBean container -->
+    <!-- =========================================================== -->
+    <Call name="addBean">
+      <Arg>
+        <New id="MBeanContainer" class="org.eclipse.jetty.jmx.MBeanContainer">
+          <Arg>
+            <Ref refid="MBeanServer" />
+          </Arg>
         </New>
       </Arg>
     </Call>
-  </Get>
 
-  <Call class="java.lang.System" name="setProperties">
+    <!-- Add the static log -->
+    <Call name="addBean">
+      <Arg>
+        <New class="org.eclipse.jetty.util.log.Log" />
+      </Arg>
+    </Call>
+    
+    
+    
+    
+    <!-- *********************************************************** -->
+    <!-- Jetty-http.xml                                              -->
+    <!-- *********************************************************** -->
+    <Call name="addConnector">
     <Arg>
-      <New class="java.util.Properties">
-        <Call name="load">
-          <Arg>
-            <New class="java.io.FileInputStream">
-              <Arg><SystemProperty default="." name="jetty.home"/>/../littleims.properties</Arg>
-            </New>
-          </Arg>
-        </Call>
-        <Call name="putAll">
-          <Arg><Call class="java.lang.System" name="getProperties"/></Arg>
-        </Call>
+      <New class="org.eclipse.jetty.server.ServerConnector">
+        <Arg name="server"><Ref refid="Server" /></Arg>
+        <Arg name="factories">
+          <Array type="org.eclipse.jetty.server.ConnectionFactory">
+            <Item>
+              <New class="org.eclipse.jetty.server.HttpConnectionFactory">
+                <Arg name="config"><Ref refid="httpConfig" /></Arg>
+              </New>
+            </Item>
+          </Array>
+        </Arg>
+        <Set name="host"><SystemProperty name="pcscf.host" /></Set>
+        <Set name="port"><SystemProperty name="pcscf.http.port" default="8080" /></Set>
+        <Set name="idleTimeout"><Property name="http.timeout" default="30000"/></Set>
       </New>
     </Arg>
   </Call>
-
-  <!-- =========================================================== -->
-  <!-- Server Thread Pool                                          -->
-  <!-- =========================================================== -->
-  <Set name="ThreadPool">
-    <!-- Default queued blocking threadpool -->
-    <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-      <Set name="minThreads">5</Set>
-      <Set name="maxThreads">100</Set>
-    </New>
-  </Set>
-
-  <!-- =========================================================== -->
-  <!-- Connectors.                                                 -->
-  <!-- =========================================================== -->
-  <Call name="addConnector">
-      <Arg>
-          <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
-          <Set name="port"><SystemProperty default="8080" name="pcscf.http.port"/></Set>
-          <Set name="maxIdleTime">30000</Set>
-          <Set name="Acceptors">2</Set>
-          <Set name="confidentialPort">8443</Set>
-        </New>
-    </Arg>
-  </Call>
   
-  <Set name="handler">
-     <New class="org.cipango.server.handler.SipContextHandlerCollection" id="Contexts"/>
-  </Set>
- 
-  <Get name="connectorManager">
+  
+  <!-- *********************************************************** -->
+  <!-- cipango.xml                                                 -->
+  <!-- *********************************************************** -->
+  <New id="SipServer" class="org.cipango.server.SipServer">
+    <Arg name="threadpool">
+      <New id="sipThreadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+        <Set name="minThreads">10</Set>
+        <Set name="maxThreads">50</Set>
+        <Set name="detailedDump">false</Set>
+        <Set name="name">qtp-sip</Set>
+      </New>
+    </Arg>
+    
+    <Arg name="transactionManager">
+      <New class="org.cipango.server.transaction.RetryableTransactionManager">
+      </New>
+    </Arg>
+    
+    <Set name="server"><Ref id="Server" /></Set>
+    
     <Call name="addConnector">
       <Arg>
-        <New class="org.cipango.server.bio.UdpConnector">
+        <New class="org.cipango.server.nio.UdpConnector">
+          <Arg name="sipServer"><Ref id="SipServer" /></Arg>
           <Set name="port"><SystemProperty default="5060" name="pcscf.sip.port"/></Set>
           <Set name="host"><SystemProperty name="pcscf.host"/></Set>
+          <Set name="mtu"><Property name="sip.mtu" default="65536"/></Set>
         </New>
       </Arg>
     </Call>
     <Call name="addConnector">
       <Arg>
-        <New class="org.cipango.server.bio.TcpConnector">
+        <New class="org.cipango.server.nio.SelectChannelConnector">
+          <Arg name="sipServer"><Ref id="SipServer" /></Arg>
           <Set name="port"><SystemProperty default="5060" name="pcscf.sip.port"/></Set>
           <Set name="host"><SystemProperty name="pcscf.host"/></Set>
-          <Set name="acceptors">2</Set>
         </New>
       </Arg>
     </Call>
     <Set name="accessLog">
-      <New class="org.cipango.server.log.AccessLogCollection">
-        <Set name="server"><Ref id="Server"/></Set>
-        <Set name="loggers">
-          <Array type="org.cipango.server.log.AccessLog">
-            <Item>
-              <New class="org.cipango.ims.DebugIdMessageLog">
-               <Set name="logDirectory"><SystemProperty default="." name="jetty.home"/>/logs</Set>
-              </New>
-            </Item>
-            <Item>
-              <New class="org.cipango.server.log.FileMessageLog">
-                <Set name="filename"><SystemProperty default="." name="jetty.home"/>/logs/yyyy_mm_dd.message.log</Set>
-                <Set name="append">true</Set>
-                <Set name="retainDays">31</Set>
-              </New>
-            </Item>
-            <Item>
-              <New class="org.cipango.ims.JmxMessageLog"/>
-            </Item>
-          </Array>
-        </Set>
+      <New class="org.cipango.server.log.FileMessageLog" id="FileMessageLog">
+        <Set name="filename"><Property default="." name="jetty.home"/>/logs/yyyy_mm_dd.message.log</Set>
+        <Set name="append">true</Set>
+        <Set name="retainDays">31</Set>
       </New>
     </Set>
-  </Get>
 
-  <Call class="org.cipango.log.event.Events" name="setDispatcher">
-    <Arg><New class="org.cipango.log.event.LogEventDispatcher"/></Arg>
-  </Call>
-
-  <Get name="transactionManager">
-    <Set name="t1">500</Set>
-    <Set name="t2">4000</Set>
-    <Set name="t4">5000</Set>
-    <Set name="tD">32000</Set>
-    <Set name="timerC">180</Set>
-  </Get>
-      
-  
-  <Set name="SipThreadPool">
-    <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-      <Set name="minThreads">5</Set>
-      <Set name="maxThreads">100</Set>
-    </New>
-  </Set>
-  
-  <!-- =========================================================== -->
-  <!-- Configure the deployment manager                            -->
-  <!--                                                             -->
-  <!-- Sets up 2 monitored dir app providers that are configured   -->
-  <!-- to behave in a similaraly to the legacy ContextDeployer     -->
-  <!-- and WebAppDeployer from previous versions of Jetty.         -->
-  <!-- =========================================================== -->
-  <Call name="addBean">
-    <Arg>
-      <New id="DeploymentManager" class="org.eclipse.jetty.deploy.DeploymentManager">
-        <Set name="contexts">
-          <Ref id="Contexts" />
-        </Set>
-        <Call name="setContextAttribute">
-          <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
-          <Arg>.*/jsp-api-[^/]*\.jar$|.*/jsp-[^/]*\.jar$</Arg>
-        </Call>
-        <!-- Providers of Apps via Context XML files.
-             Configured to behave similar to the legacy ContextDeployer -->
-        <Call name="addAppProvider">
-          <Arg>
-            <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
-              <Set name="monitoredDirName"><Property name="jetty.home" default="." />/contexts</Set>
-              <Set name="scanInterval">5</Set>
-            </New>
-          </Arg>
-        </Call>
-        <!-- Providers of Apps via WAR file existence.
-             Configured to behave similar to the legacy WebAppDeployer -->
-        <Call name="addAppProvider">
-          <Arg>
-            <New class="org.cipango.deploy.providers.SipAppProvider" id="SipAppProvider">
-              <Set name="monitoredDirName"><Property name="jetty.home" default="." />/sipapps</Set>
-              <Set name="defaultsDescriptor"><Property name="jetty.home" default="."/>/etc/webdefault.xml</Set>
-              <Set name="scanInterval">5</Set>
-              <Set name="contextXmlDir"><Property name="jetty.home" default="." />/contexts</Set>
-              <Set name="extractWars">true</Set>
-            </New>
-          </Arg>
-        </Call>
+    <Set name="handler">
+      <New class="org.cipango.server.handler.SipContextHandlerCollection">
+        <Arg name="contexts"><Ref id="Contexts" /></Arg>
       </New>
-    </Arg>
-  </Call>
-  
-  <!-- =========================================================== -->
-  <!-- extra options                                               -->
-  <!-- =========================================================== -->
-  <Set name="stopAtShutdown">true</Set>
-  
-  <Set name="sessionManager">
-    <New class="org.cipango.server.session.SessionManager"/>
-  </Set>
+    </Set>
+  </New>
     
 </Configure>

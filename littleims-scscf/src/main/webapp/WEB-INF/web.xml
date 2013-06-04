@@ -13,21 +13,58 @@
       <param-value>org.apache.wicket.spring.SpringWebApplicationFactory</param-value>
     </init-param>
   </filter>
-  
-  <filter>
-    <filter-name>console</filter-name>
-    <filter-class>org.cipango.console.ConsoleFilter</filter-class>
-   </filter>
-    
+      
   <filter-mapping>
     <filter-name>wicket</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  
+	<servlet>
+		<servlet-name>velocity</servlet-name>
+		<servlet-class>org.cipango.console.VelocityConsoleServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>StatisticGraphServlet</servlet-name>
+		<servlet-class>org.cipango.console.StatisticGraphServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>SvgServlet</servlet-name>
+		<servlet-class>org.cipango.console.SvgServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	  <servlet-name>velocity</servlet-name>
+	  <url-pattern>*.vm</url-pattern>
+	</servlet-mapping>
 
-  <filter-mapping>
-    <filter-name>console</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
+	<servlet-mapping>
+	  <servlet-name>StatisticGraphServlet</servlet-name>
+	  <url-pattern>statistics/sessions.png</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>StatisticGraphServlet</servlet-name>
+	  <url-pattern>statistics/messages.png</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>StatisticGraphServlet</servlet-name>
+	  <url-pattern>statistics/memory.png</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>StatisticGraphServlet</servlet-name>
+	  <url-pattern>statistics/cpu.png</url-pattern>
+	</servlet-mapping>
+		<servlet-mapping>
+	  <servlet-name>StatisticGraphServlet</servlet-name>
+	  <url-pattern>statistics/threads.png</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	  <servlet-name>SvgServlet</servlet-name>
+	  <url-pattern>message.svg</url-pattern>
+	</servlet-mapping>
 
   <listener>
     <listener-class>org.cipango.littleims.scscf.oam.ConsoleAdapter</listener-class>

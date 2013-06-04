@@ -28,11 +28,6 @@
     </init-param>
   </filter>
   
-  <filter>
-    <filter-name>cipango-console</filter-name> 
-    <filter-class>org.cipango.ims.hss.web.ConsoleProxyFilter</filter-class>
-  </filter>
-  
   <filter-mapping>
     <filter-name>osiv</filter-name>
     <url-pattern>/*</url-pattern>
@@ -42,17 +37,18 @@
     <filter-name>wicket</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
-  <filter-mapping>
-    <filter-name>cipango-console</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-    
+      
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   
-   <servlet>
+  <servlet>
+    <servlet-name>cipango-console</servlet-name>
+    <servlet-class>org.cipango.ims.hss.web.ConsoleProxyServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet>
     <servlet-name>SvgServlet</servlet-name>
     <servlet-class>org.cipango.ims.hss.web.SvgServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -63,6 +59,12 @@
     <servlet-class>org.cipango.ims.hss.web.SharedIfcServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
+  
+  
+  <servlet-mapping>
+    <servlet-name>cipango-console</servlet-name>
+    <url-pattern>*.vm</url-pattern>
+  </servlet-mapping>
   
 
   <servlet-mapping>

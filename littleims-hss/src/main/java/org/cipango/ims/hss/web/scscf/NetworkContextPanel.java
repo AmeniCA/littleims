@@ -15,7 +15,7 @@ package org.cipango.ims.hss.web.scscf;
 
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.cipango.console.printer.MenuPrinter;
+import org.cipango.console.menu.MenuImpl;
 import org.cipango.ims.oam.util.AutolinkBookmarkablePageLink;
 
 public class NetworkContextPanel extends Panel
@@ -26,10 +26,10 @@ public class NetworkContextPanel extends Panel
 	{
 		super("contextMenu");
 		add(new AutolinkBookmarkablePageLink("ScscfBrowserPage", ScscfBrowserPage.class));
-		add(new ExternalLink("httpConfig", "../" + MenuPrinter.CONFIG_HTTP.getName()));
-		add(new ExternalLink("diameterConfig", "../" + MenuPrinter.CONFIG_DIAMETER.getName()));
-		add(new ExternalLink("diameterStatistics", "../" + MenuPrinter.STATISTICS_DIAMETER.getName()));
-		add(new ExternalLink("diameterLogs", "../" + MenuPrinter.DIAMETER_LOGS.getName()));
+		add(new ExternalLink("httpConfig", "../" + MenuImpl.CONFIG_HTTP.getName()));
+		add(new ExternalLink("diameterConfig", "../" + MenuImpl.CONFIG_DIAMETER.getName()));
+		add(new ExternalLink("diameterStatistics", "../" + MenuImpl.STATISTICS_DIAMETER.getName()));
+		add(new ExternalLink("diameterLogs", "../" + MenuImpl.DIAMETER_LOGS.getName()));
 	}
 
 }

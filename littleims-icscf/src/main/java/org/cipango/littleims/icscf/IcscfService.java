@@ -52,7 +52,7 @@ public class IcscfService
 	
 	public void doRegister(SipServletRequest request) throws ServletException, IOException
 	{
-		// TS 22229 §5.3.
+		// TS 22229 ï¿½5.3.
 		if(!comesFromTrustedDomain(request))
 		{
 			sendResponse(request, SipServletResponse.SC_FORBIDDEN);
@@ -198,7 +198,10 @@ public class IcscfService
 	{
 		Address contact = request.getAddressHeader(Headers.CONTACT);
 
-		int expires = contact.getExpires();
+		int expires = -1;
+		if (contact != null)
+			expires = contact.getExpires();
+		
 		if (expires == -1)
 			expires = request.getExpires();
 		
@@ -212,7 +215,7 @@ public class IcscfService
 	public void doRequest(SipServletRequest request) throws IOException, ServletException
 	{
 		
-		// TS 24229 §5.3.2.1A
+		// TS 24229 ï¿½5.3.2.1A
 		if(!comesFromTrustedDomain(request))
 		{
 			sendResponse(request, SipServletResponse.SC_FORBIDDEN);

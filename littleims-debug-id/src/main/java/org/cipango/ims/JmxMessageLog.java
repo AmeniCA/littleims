@@ -13,11 +13,14 @@
 // ========================================================================
 package org.cipango.ims;
 
-import org.eclipse.jetty.util.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JmxMessageLog extends org.cipango.callflow.JmxMessageLog
 {
 
+	private static final Logger __log = LoggerFactory.getLogger(JmxMessageLog.class);
+	
 	public JmxMessageLog()
 	{
 		addAlias("pcscf", "P-CSCF");
@@ -36,7 +39,7 @@ public class JmxMessageLog extends org.cipango.callflow.JmxMessageLog
 		}
 		catch (Exception e)
 		{
-			Log.ignore(e);
+			__log.debug("Failed to add alias with prefix " + prefix, e);
 		}
 	}
 	

@@ -14,34 +14,44 @@
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>jetty.home</name>
+                  <value>${project.build.directory}</value>
+                </property>
+                <property>
+                  <name>logback.configurationFile</name>
+                  <value>file:${project.build.directory}/resources/logback.xml</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    
+      <plugin>
         <groupId>org.cipango</groupId>
         <artifactId>cipango-maven-plugin</artifactId>
         <configuration>
           <systemPropertiesFile>../littleims.properties</systemPropertiesFile>
-          <systemProperties>
-            <systemProperty>
-              <name>logback.configurationFile</name>
-              <value>file:${project.build.directory}/resources/logback.xml</value>
-            </systemProperty>
-            <systemProperty>
-              <name>jetty.home</name>
-              <value>${project.build.directory}</value>
-            </systemProperty>
-          </systemProperties>
           <stopKey>foo</stopKey>
           <stopPort>9997</stopPort>
-          <jettyConfig>${basedir}/src/main/cipango-maven-plugin/cipango-icscf.xml</jettyConfig>
+          <jettyConfig>${basedir}/src/main/config/etc/cipango-icscf.xml</jettyConfig>
+          <extraConfigurationClasses>
+            <extraConfigurationClasse>org.cipango.server.sipapp.SipXmlConfiguration</extraConfigurationClasse>
+            <extraConfigurationClasse>org.cipango.diameter.app.DiameterConfiguration</extraConfigurationClasse>
+          </extraConfigurationClasses>
           <webAppConfig>
-            <configurationClasses>
-              <configurationClasse>org.mortbay.jetty.plugin.MavenWebInfConfiguration</configurationClasse>
-              <configurationClasse>org.eclipse.jetty.webapp.WebXmlConfiguration</configurationClasse>
-              <configurationClasse>org.eclipse.jetty.webapp.MetaInfConfiguration</configurationClasse>
-              <configurationClasse>org.eclipse.jetty.webapp.FragmentConfiguration</configurationClasse>
-              <configurationClasse>org.eclipse.jetty.webapp.JettyWebXmlConfiguration</configurationClasse>
-              <configurationClasse>org.eclipse.jetty.webapp.TagLibConfiguration</configurationClasse>
-              <configurationClasse>org.cipango.sipapp.SipXmlConfiguration</configurationClasse>
-              <configurationClasse>org.cipango.diameter.app.DiameterConfiguration</configurationClasse>
-            </configurationClasses>
             <contextPath>/</contextPath>
           </webAppConfig>
         </configuration>
